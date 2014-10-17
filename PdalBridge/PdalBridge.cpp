@@ -7,7 +7,7 @@ PdalBridge::PdalBridge(bool debug, boost::uint32_t verbosity) :
     m_manager(NULL),
     m_reader(NULL),
     m_numPoints(0),
-    m_readStarted(false)
+    m_buffer(NULL)
 {
 }
 
@@ -64,12 +64,37 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
     const pdal::PointBufferSet& pbSet = m_manager->buffers();
     m_bbox = pdal::PointBuffer::calculateBounds(pbSet);
 
+    const pdal::PointContextRef& context = m_manager->context();
+    m_dimensionIds = context.dims();
+    updateDimensionTypes();
+    
+    // merge all the buffers in the point buffer set into just one buffer,
+    // so that life is easier for us
+    m_buffer = new pdal::PointBuffer(context);
+    pdal::PointBufferSet::const_iterator iter = pbSet.begin();
+    while (iter != pbSet.end())
+    {
+        const pdal::PointBufferPtr& data = *iter;
+        const pdal::PointBuffer& t = *data;
+        pdal::PointBuffer& tt = (pdal::PointBuffer&)t;
+
+        m_buffer->append(tt);   // BUG: this should take a const PointBuffer
+        
+        ++iter;
+    }
+    
     return;
 }
 
 
 void PdalBridge::close()
 {
+    if (m_buffer)
+    {
+        delete m_buffer;    
+        m_buffer = NULL;
+    }
+    
     if (m_reader)
     {
         delete m_reader;
@@ -98,7 +123,7 @@ const std::string PdalBridge::getWKT() const
 }
 
 
-uint64_t PdalBridge::getNumPoints() const
+pdal::point_count_t PdalBridge::getNumPoints() const
 {
     return m_numPoints;
 }
@@ -116,10 +141,32 @@ void PdalBridge::getBounds(double& xmin, double& ymin, double& zmin,
 }
 
 
-std::vector<pdal::Dimension::Id::Enum> PdalBridge::getFields() const
+void PdalBridge::setFields(const std::vector<DimId>& dimIds)
+{
+    m_dimensionIds = dimIds;
+    updateDimensionTypes();
+}
+
+
+void PdalBridge::updateDimensionTypes()
 {
     const pdal::PointContextRef& context = m_manager->context();
-    return context.dims();
+
+    m_dimensionTypes.clear();
+    std::vector<DimId>::const_iterator iter = m_dimensionIds.begin();
+    while (iter != m_dimensionIds.end())
+    {
+        DimId id = *iter;
+        DimType type = context.dimType(id);
+        m_dimensionTypes.push_back(type);
+        ++iter;
+    }
+}
+
+
+std::vector<pdal::Dimension::Id::Enum> PdalBridge::getFields() const
+{
+    return m_dimensionIds;
 }
 
 
@@ -130,49 +177,91 @@ pdal::Dimension::Type::Enum PdalBridge::getFieldType(pdal::Dimension::Id::Enum i
 }
 
 
-void PdalBridge::readBegin()
+template<typename T>
+static void doTheData(char* &p, const pdal::PointBuffer& data, pdal::point_count_t pointIndex, PdalBridge::DimId dimensionIndex)
 {
-    m_readStarted = false;
+    const T value = data.getFieldAs<T>(dimensionIndex, pointIndex);    
+    *(T*)p = value;    
+    p += sizeof(T);
 }
 
 
-bool PdalBridge::readNext()
+void PdalBridge::processOnePoint(char* &p, pdal::point_count_t pointNum)
 {
-    const pdal::PointBufferSet& pbSet = m_manager->buffers();
+    const pdal::PointBuffer& data = *m_buffer;
     
-    if (m_readStarted == false)
+    const int numDims = m_dimensionIds.size();
+
+    for (int dimIndex=0; dimIndex<numDims; dimIndex++)
     {
-        m_bufIter = pbSet.begin();
-        m_pointIndex = 0;        
-        m_readStarted = true;
-        return true;
+        const DimId id = m_dimensionIds[dimIndex];
+        const DimType type = m_dimensionTypes[dimIndex];
+        
+        switch (type)
+        {
+            case pdal::Dimension::Type::Unsigned8:
+                doTheData<boost::uint8_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Signed8:
+                doTheData<boost::int8_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Unsigned16:
+                doTheData<boost::uint16_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Signed16:
+                doTheData<boost::int16_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Unsigned32:
+                doTheData<boost::uint32_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Signed32:
+                doTheData<boost::int32_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Unsigned64:
+                doTheData<boost::uint64_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Signed64:
+                doTheData<boost::int64_t>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Float:
+                doTheData<float>(p, data, pointNum, id);
+                break;
+            case pdal::Dimension::Type::Double:
+                doTheData<double>(p, data, pointNum, id);
+                break;
+            default:
+            assert(false);
+        }
     }
     
-    const pdal::PointBufferPtr& data = *m_bufIter;
-    
-    ++m_pointIndex;
-    if (m_pointIndex < data->size())
-    {
-        return true;
-    }
-    
-    m_pointIndex = 0;
-    ++m_bufIter;
-    if (m_bufIter != pbSet.end())
-    {
-        return true;
-    }
-    
-    return false;
+    return;
 }
 
 
-double PdalBridge::getFieldAsDouble(pdal::Dimension::Id::Enum dimensionIndex)
+pdal::point_count_t PdalBridge::readPoints(void* buffer, pdal::point_count_t offset, pdal::point_count_t numPoints)
 {
-    const pdal::PointBufferPtr& data = *m_bufIter;
+    char* p = (char*)buffer;
+    
+    // don't allow the user to ask for more points than we actually have
+    if (offset+numPoints > m_numPoints)
+    {
+        numPoints = m_numPoints - offset;
+    }
+    
+    pdal::point_count_t numRead;
+    for (numRead=0; numRead<numPoints; numRead++)
+    {        
+        processOnePoint(p, offset+numRead);
+    }
 
-    double value = data->getFieldAs<double>(dimensionIndex, m_pointIndex);
-            
-    return value;
+    return numRead;
+}
 
+
+// Return a list of the (min,max) pair for each previously specified
+// dimensions.
+std::list<PdalBridge::stats> getMinMax()
+{
+    std::list<PdalBridge::stats> stats;
+    return stats;
 }

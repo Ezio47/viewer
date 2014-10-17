@@ -6,6 +6,9 @@
 class PdalBridge
 {
 public:
+    typedef pdal::Dimension::Id::Enum DimId;
+    typedef pdal::Dimension::Type::Enum DimType;
+    
     PdalBridge(bool debug=false, boost::uint32_t verbosity=0);
 
     ~PdalBridge();
@@ -18,26 +21,38 @@ public:
 
     const std::string getWKT() const;
     
-    boost::uint64_t getNumPoints() const;
+    pdal::point_count_t getNumPoints() const;
     
     void getBounds(double& xmin, double& ymin, double& zmin,
                    double& xmax, double& ymax, double& zmax) const;
     
-    std::vector<pdal::Dimension::Id::Enum> getFields() const;
-    pdal::Dimension::Type::Enum getFieldType(pdal::Dimension::Id::Enum);
+    std::vector<DimId> getFields() const;
+    DimType getFieldType(DimId);
+    void setFields(const std::vector<DimId>&);
     
-    void readBegin();
-    bool readNext();
-    double getFieldAsDouble(pdal::Dimension::Id::Enum dimensionIndex);
+    // Fills up to numPoints points into the buffer, starting at the offset
+    // point, and packed according to the order of the list from getFields().
+    // Returns the number of points actually put into the buffer.
+    pdal::point_count_t readPoints(void* buffer, pdal::point_count_t offset, pdal::point_count_t numPoints);
+
+    // Return a list of the (min,max) pair for each previously specified
+    // dimensions.
+    struct stats { double min; double max; double mean; };
+    std::list<stats> getMinMax();
 
 private:    
+    bool readNext();
+    double getFieldAsDouble(DimId);
+    void updateDimensionTypes();
+    void processOnePoint(char* &, pdal::point_count_t pointNum);
+    
     bool m_debug;
     boost::uint32_t m_verbosity;
     pdal::PipelineManager* m_manager;
     pdal::PipelineReader* m_reader;
     pdal::BOX3D m_bbox;
-    boost::uint64_t m_numPoints;
-    pdal::PointBufferSet::const_iterator m_bufIter;
-    boost::uint64_t m_pointIndex;
-    bool m_readStarted;
+    pdal::point_count_t m_numPoints;
+    std::vector<DimId> m_dimensionIds;
+    std::vector<DimType> m_dimensionTypes;
+    pdal::PointBuffer* m_buffer;
 };
