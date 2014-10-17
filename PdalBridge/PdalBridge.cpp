@@ -6,6 +6,7 @@ PdalBridge::PdalBridge(bool debug, boost::uint32_t verbosity) :
     m_verbosity(verbosity),
     m_manager(NULL),
     m_reader(NULL),
+    m_statsStage(NULL),
     m_numPoints(0),
     m_buffer(NULL)
 {
@@ -55,22 +56,23 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
         opts.add("filename", fname);
         reader->setOptions(opts);
     }
-    
+
+    pdal::Stage* stage = m_manager->addFilter("filters.stats", m_manager->getStage());
+    m_statsStage = (pdal::filters::Stats*)stage;
+
     // for deeply technical reasons, PDAL now requires we read the whole file to
     // find the proper bounds (although this may be fixed again in the future)
     m_numPoints = m_manager->execute();
 
-    // compute the bounds
-    const pdal::PointBufferSet& pbSet = m_manager->buffers();
-    m_bbox = pdal::PointBuffer::calculateBounds(pbSet);
-
     const pdal::PointContextRef& context = m_manager->context();
+    
     m_dimensionIds = context.dims();
     updateDimensionTypes();
     
     // merge all the buffers in the point buffer set into just one buffer,
     // so that life is easier for us
     m_buffer = new pdal::PointBuffer(context);
+    const pdal::PointBufferSet& pbSet = m_manager->buffers();
     pdal::PointBufferSet::const_iterator iter = pbSet.begin();
     while (iter != pbSet.end())
     {
@@ -82,7 +84,7 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
         
         ++iter;
     }
-    
+
     return;
 }
 
@@ -107,17 +109,17 @@ void PdalBridge::close()
         m_manager = NULL;
     }
     
+    m_statsStage = NULL;
+    
     return;
 }
 
 
-const std::string PdalBridge::getWKT() const
+const std::string PdalBridge::getWKT(bool pretty) const
 {
-    pdal::Stage* stage = m_manager->getStage();
-    assert(stage);
-    const pdal::SpatialReference& srs = stage->getSpatialReference();
+    const pdal::PointContextRef& context = m_manager->context();
+    const pdal::SpatialReference& srs = context.spatialRef();
     
-    const bool pretty = false;
     const std::string wkt = srs.getWKT(pdal::SpatialReference::eCompoundOK, pretty);
     return wkt;
 }
@@ -126,18 +128,6 @@ const std::string PdalBridge::getWKT() const
 pdal::point_count_t PdalBridge::getNumPoints() const
 {
     return m_numPoints;
-}
-
-
-void PdalBridge::getBounds(double& xmin, double& ymin, double& zmin,
-                           double& xmax, double& ymax, double& zmax) const
-{
-     xmin = m_bbox.minx;
-     ymin = m_bbox.miny;
-     zmin = m_bbox.minz;
-     xmax = m_bbox.maxx;
-     ymax = m_bbox.maxy;
-     zmax = m_bbox.maxz;
 }
 
 
@@ -258,10 +248,10 @@ pdal::point_count_t PdalBridge::readPoints(void* buffer, pdal::point_count_t off
 }
 
 
-// Return a list of the (min,max) pair for each previously specified
-// dimensions.
-std::list<PdalBridge::stats> getMinMax()
+void PdalBridge::getStats(DimId id, double& min, double& mean, double& max) const
 {
-    std::list<PdalBridge::stats> stats;
-    return stats;
+    const pdal::filters::stats::Summary& summary = m_statsStage->getStats(id);
+    min = summary.minimum();
+    mean = summary.average();
+    max = summary.maximum();
 }

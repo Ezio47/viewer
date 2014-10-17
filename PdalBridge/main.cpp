@@ -12,10 +12,13 @@ int main()
     boost::uint64_t numPoints = pdal.getNumPoints();
     printf("num points: %lld\n", numPoints);
 
-    double xmin, ymin, zmin, xmax, ymax, zmax;
-    pdal.getBounds(xmin, ymin, zmin, xmax, ymax, zmax);
-    printf("Bounds: (%f,%f,%f) to (%f,%f,%f)\n",
-           xmin, ymin, zmin, xmax, ymax, zmax);
+    double xmin, ymin, zmin, xmean, ymean, zmean, xmax, ymax, zmax;
+    pdal.getStats(pdal::Dimension::Id::X, xmin, xmean, xmax);
+    pdal.getStats(pdal::Dimension::Id::Y, ymin, ymean, ymax);
+    pdal.getStats(pdal::Dimension::Id::Z, zmin, zmean, zmax);
+    printf("Min (x,y,z): (%f,%f,%f)\n", xmin, ymin, zmin);
+    printf("Avg (x,y,z): (%f,%f,%f)\n", xmean, ymean, zmean);
+    printf("Max (x,y,z): (%f,%f,%f)\n", xmax, ymax, zmax);
 
     std::string wkt = pdal.getWKT();
     wkt[30] = 0;
