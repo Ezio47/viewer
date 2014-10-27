@@ -1,4 +1,7 @@
 *.dSYM
-
-
 PdalBridge/main
+
+server/pubspec.lock
+server/bin/packages
+server/packages
+
