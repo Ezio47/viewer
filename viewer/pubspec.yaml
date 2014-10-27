@@ -1,4 +1,4 @@
-name: dv
-description: A sample web application
+name: Viewer
+description: A lidar viewer
 dependencies:
   browser: any

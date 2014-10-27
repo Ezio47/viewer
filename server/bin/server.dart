@@ -3,7 +3,8 @@ import 'package:start/start.dart';
 void main() {
   start(host: "localhost", port: 8001).then((Server app) {
 
-    app.static('/Users/mgerlek/work/web');
+    app.static('/Users/mgerlek/work/dev/tuple/viewer/web');
+    //app.static('/Users/mgerlek/work/dev/tuple/viewer/build/web');
 
     /*
     app.get('/hello/:name.:lastname?').listen((request) {
