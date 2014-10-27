@@ -5,3 +5,10 @@ server/pubspec.lock
 server/bin/packages
 server/packages
 
+viewer/packages
+viewer/pubspec.lock
+viewer/web/packages
+viewer/web/vendors/packages
+viewer/web/templates/packages
+viewer/web/templates/css/packages
+
