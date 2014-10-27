@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dv</title>
+    
+    
+    <link rel="stylesheet" type="text/css" href="./templates/css/base.css">
+   
+    <script type="text/javascript" src="./vendors/Q-0.9.7.js"></script>
+    <script type="text/javascript" src="./vendors/Hammer-1.0.5.js"></script>
+    <script type="text/javascript" src="./vendors/Leap.js"></script>
+    <script type="text/javascript" src="./vendors/OSG.js"></script>
+<!--    <script type="text/javascript" src="cloud.osgjs"></script> -->
+
+        
+    
+  </head>
+  <body>
+   
+<!--
+    <h1>Dv</h1>
+    
+    <p>Hello world from Dart!</p>
+    
+    <div id="sample_container_id">
+      <p id="sample_text_id">Click me!</p>
+    </div>
+-->
+
+  <div id="ViewContainer" class="osgjs-fullpage">
+    <!-- very important change the size of the parent element instead-->
+    <canvas id="View" style="height:100%;width:100%;" oncontextmenu="return false;"></canvas>
+  </div>
+  
+    <script type="application/dart" src="dv.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>
