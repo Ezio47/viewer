@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Rialto</title>
+    
+    <link rel="stylesheet" type="text/css" href="./templates/css/base.css">
+   
+    <!-- needed for OpenSceneGraph -->
+    <script type="text/javascript" src="./vendors/Q-0.9.7.js"></script>
+    <script type="text/javascript" src="./vendors/Hammer-1.0.5.js"></script>
+    <script type="text/javascript" src="./vendors/Leap.js"></script>
+    <script type="text/javascript" src="./vendors/OSG.js"></script>
+
+    <link rel="import" href="packages/polymer/polymer.html">
+    <link rel="import" href="packages/core_elements/core_dropdown.html">
+    <link rel="import" href="packages/core_elements/core_header_panel.html">
+    <link rel="import" href="packages/core_elements/core_icon_button.html">
+    <link rel="import" href="packages/core_elements/core_item.html">
+    <link rel="import" href="packages/core_elements/core_menu.html">
+    <link rel="import" href="packages/core_elements/core_overlay.html">
+    <link rel="import" href="packages/core_elements/core_toolbar.html">
+  </head>
+ 
+ 
+  <!-- CANVAS: very important change the size of the parent element instead -->
+  
+  <body fullbleed vertical layout unresolved>
+  
+    <core-header-panel flex>
+  
+    <core-toolbar id="top-toolbar">
+      <core-item label="File" class="mybutton" id="button1"></core-item>
+      <core-item label="Display" class="mybutton" id="button2"></core-item>
+      <core-item label="Action" class="mybutton" id="button3"></core-item>
+    </core-toolbar>
+    
+   <div fit vertical layout>
+      <div flex id="ViewContainer">
+        <canvas id="View" style="height:100%;width:100%;" oncontextmenu="return false;"></canvas>
+      </div>
+
+      <div id="bottom-toolbar">
+        <span flex>(x, y, z)</span>
+      </div>
+    </div>
+   
+  </core-header-panel>
+
+  <core-overlay id="dialog1" autoCloseDisabled>
+    <div class="dialog">
+      <input placeholder="1 say something..." autofocus>
+      <div>I agree with this wholeheartedly.</div>
+      <button core-overlay-toggle>OK</button>
+      <button core-overlay-toggle>!OK</button>
+    </div>
+  </core-overlay>
+
+  <core-overlay id="dialog2" autoCloseDisabled>
+    <div class="dialog">
+      <input placeholder="2 say something..." autofocus>
+      <div>I agree with this wholeheartedly.</div>
+      <button core-overlay-toggle>OK</button>
+      <button core-overlay-toggle>!OK</button>
+    </div>
+  </core-overlay>
+
+  <core-overlay id="dialog3" autoCloseDisabled>
+    <div class="dialog">
+      <input placeholder="3 say something..." autofocus>
+      <div>I agree with this wholeheartedly.</div>
+      <button core-overlay-toggle>OK</button>
+      <button core-overlay-toggle>!OK</button>
+    </div>
+  </core-overlay>
+
+
+    <!-- <script type="application/dart">export 'package:polymer/init.dart';</script>  -->
+    <script type="application/dart" src="main.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  
+  </body>
+
+</html>
+

@@ -1,4 +1,9 @@
-name: Viewer
-description: A lidar viewer
+name: Rialto
+description: The Rialto Point Cloud Viewer
 dependencies:
   browser: any
+  polymer: any
+  core_elements: any
+  paper_elements: any
+transformers:
+- polymer

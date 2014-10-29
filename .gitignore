@@ -5,6 +5,7 @@ server/pubspec.lock
 server/bin/packages
 server/packages
 
+viewer/.pub
 viewer/packages
 viewer/pubspec.lock
 viewer/web/packages

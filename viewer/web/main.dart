@@ -1,7 +1,8 @@
 import 'dart:html';
 import 'dart:js';
 import 'dart:core';
-
+import 'package:polymer/polymer.dart';
+import 'package:core_elements/core_overlay.dart';
 
 Map getModel() {
 
@@ -78,7 +79,7 @@ void reportTimer()
   window.alert(millis.toString());
 }
 
-void main()
+void doOSG()
 {  
      //var canvas = document.getElementById( 'View' );
      var canvas = querySelector("#View");
@@ -134,11 +135,42 @@ void main()
      return;
 }
 
-void reverseText(MouseEvent event) {
-  var text = querySelector("#sample_text_id").text;
-  var buffer = new StringBuffer();
-  for (int i = text.length - 1; i >= 0; i--) {
-    buffer.write(text[i]);
-  }
-  querySelector("#sample_text_id").text = buffer.toString();
+
+void tapHandler1(Event e)
+{ 
+  var elem = querySelector("#dialog1");
+  assert(elem is CoreOverlay);
+  elem.open();
+}
+
+void tapHandler2(Event e)
+{ 
+  var elem = querySelector("#dialog2");
+  assert(elem is CoreOverlay);
+  elem.open();
+}
+void tapHandler3(Event e)
+{ 
+  var elem = querySelector("#dialog3");
+  assert(elem is CoreOverlay);
+  elem.open();
+}
+
+void main()
+{
+  initPolymer().run(() {
+    
+    // Code that doesn't need to wait.
+
+    
+    Polymer.onReady.then((_) {
+      // Code that executes after elements have been upgraded.
+
+      var subscription1 = querySelector("#button1").onClick.listen((event) => tapHandler1(event));
+      var subscription2 = querySelector("#button2").onClick.listen((event) => tapHandler2(event));
+      var subscription3 = querySelector("#button3").onClick.listen((event) => tapHandler3(event));
+      
+      doOSG();
+    });
+  });
 }
