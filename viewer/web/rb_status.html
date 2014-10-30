@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<link rel="import" href="packages/polymer/polymer.html">
+
+<polymer-element name="rb-status" attributes="data">
+
+  <template>
+    <style>
+      :host {
+        color: black;
+        background-color: white;
+        font-size: 14px;
+      }
+    </style>
+    
+    <div>
+      <span>Data: {{data}}</span>
+    </div>
+  </template>
+
+  <script type="application/dart" src="rb_status.dart"></script>
+
+</polymer-element>

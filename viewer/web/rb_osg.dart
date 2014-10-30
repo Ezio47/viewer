@@ -4,11 +4,11 @@ import 'dart:js';
 import 'dart:core';
 
 
-@CustomTag('rb-osg-view')
-class RbOsgView extends PolymerElement {
+@CustomTag('rb-osg')
+class RbOsg extends PolymerElement {
   @observable String counter='00:00';
   
-  RbOsgView.created() : super.created();
+  RbOsg.created() : super.created();
   
    
   @override

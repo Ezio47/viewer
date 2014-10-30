@@ -8,25 +8,22 @@
     
 <link rel="import" href="packages/polymer/polymer.html">
 
-<polymer-element name="rb-osg-view">
+<polymer-element name="rb-osg">
 
   <template>
     <style>
       :host {
-        background-color: LemonChiffon;
-        text-align: center;
-        display: inline-block;
-        border: solid 1px;
-        padding: 10px 10px 10px 10px;
+        color: white;
+        background-color: black;
       }
     </style>
-    <div>OSG
-      <div flex id="ViewContainer">
-        <canvas id="View" style="height:100%;width:100%;" onload="assert(false);" oncontextmenu="return false;"></canvas>
-      </div>
+
+    <div flex id="ViewContainer" class="renderwindow">
+      <canvas id="View" style="height:100%;width:100%;" onload="assert(false);" oncontextmenu="return false;"></canvas>
     </div>
+
   </template>
 
-  <script type="application/dart" src="rb_osg_view.dart"></script>
+  <script type="application/dart" src="rb_osg.dart"></script>
 
 </polymer-element>

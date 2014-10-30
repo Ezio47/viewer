@@ -1,13 +1,12 @@
 import 'package:polymer/polymer.dart';
 import 'dart:core';
-import 'dart:html';
 
 
-@CustomTag('rb-status-view')
-class RbStatusView extends PolymerElement {
-  @observable String data="-data-";
+@CustomTag('rb-status')
+class RbStatus extends PolymerElement {
+  @published String data="-data-";
   
-  RbStatusView.created() : super.created();
+  RbStatus.created() : super.created();
     
   @override
   void attached() {

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+  
+<link rel="import" href="packages/polymer/polymer.html">
+    
+<polymer-element name="rb-settings" attributes="counter"> 
+
+  <template>
+    <style>
+      :host {
+        color: black;
+        background-color: white;
+        font-size: 14px;
+      }
+      .mybutton {
+        font-size: 14px;    
+      }
+    </style>
+    
+    <div class="top-toolbar">
+      <button on-click="{{doFileDialog}}" class="mybutton">File</button>
+      <button on-click="{{doDisplayDialog}}" class="mybutton">Display</button>
+      <button on-click="{{doActionDialog}}" class="mybutton">Action</button>
+    </div>
+  </template>
+
+  <script type="application/dart" src="rb_settings.dart"></script>
+
+</polymer-element>

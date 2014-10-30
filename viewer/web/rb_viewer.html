@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 
+<link rel="stylesheet" href="rialto.css">
   
 <link rel="import" href="packages/polymer/polymer.html">
 
-    <link rel="import" href="rb_osg_view.html">
-    <link rel="import" href="rb_settings_view.html">
-    <link rel="import" href="rb_status_view.html">
+<link rel="import" href="rb_osg.html">
+<link rel="import" href="rb_settings.html">
+<link rel="import" href="rb_status.html">
 
 <polymer-element name="rb-viewer">
 
   <template>
     <style>
-      :host {
-        background-color: LemonChiffon;
-        text-align: center;
-        display: inline-block;
-        border: solid 1px;
-        padding: 10px 10px 10px 10px;
-      }
     </style>
-    <div>Viewer
-      <div>
-        <rb-osg-view></rb-osg-view>
-        <rb-settings-view counter="{{xyz}}"></rb-settings-view>
-        <rb-status-view data="{{xyz}}"></rb-status-view>
+
+    <div>
+      <div layout vertical>
+        <rb-settings counter={{xyz}}></rb-settings>
+        <rb-osg></rb-osg>
+        <rb-status data="{{xyz}}"></rb-status>
       </div>
     </div>
+
   </template>
 
   <script type="application/dart" src="rb_viewer.dart"></script>

@@ -5,7 +5,7 @@ import 'dart:html';
 
 @CustomTag('rb-viewer')
 class RbViewer extends PolymerElement {
-  @observable String xyz="......";
+  @published String xyz="......";
   
   RbViewer.created() : super.created();
     
