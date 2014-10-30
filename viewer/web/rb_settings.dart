@@ -1,36 +1,45 @@
 import 'dart:html';
-import 'dart:async';
 import 'package:polymer/polymer.dart';
 import 'dart:core';
 
 @CustomTag('rb-settings')
 class RbSettings extends PolymerElement {
-  @published String counter='00:00';
+  @published String filename;
+  int _counter;
   
   RbSettings.created() : super.created();
-  
-  Stopwatch mywatch = new Stopwatch();
-  Timer mytimer;
-  
-//  ButtonElement stopButton;
-  
+   
   @override
   void attached() {
     super.attached();
-
-    //startButton = $['startButton'];
-    //stopButton.disabled = true;
+    
+    initSettings();
   }
   
   @override
   void detached() {
     super.detached();
-    mytimer.cancel();
   }
   
-  void doFileDialog(Event e, var detail, Node target) {}
+  void initSettings()
+  {
+    filename = " ";
+    _counter = 0;
+  }
   
-  void doDisplayDialog(Event e, var detail, Node target) {}
-  
-  void doActionDialog(Event e, var detail, Node target) {}
+  void toggleFileDialog(Event e, var detail, Node target) {
+    var fileDialog = $['filedialog'];
+    fileDialog.toggle();
+  }
+
+
+  void toggleColorsDialog(Event e, var detail, Node target) {
+    var dlg = $['colorsdialog'];
+    dlg.toggle();
+  }
+
+  void openFile(Event e, var detail, Node target) {
+    filename = "file_" + _counter.toString() + ".las";
+    ++_counter;
+  }
 }

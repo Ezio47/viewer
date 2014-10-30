@@ -6,7 +6,7 @@ import 'dart:core';
 
 @CustomTag('rb-osg')
 class RbOsg extends PolymerElement {
-  @observable String counter='00:00';
+  @published String mousePosition;
   
   RbOsg.created() : super.created();
   
@@ -20,6 +20,8 @@ class RbOsg extends PolymerElement {
     
     var canvas =  this.shadowRoot.querySelector("#View");
     doOSG(canvas);
+    
+    mousePosition = "(12.345, 67.890)";
   }
   
   @override

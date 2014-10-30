@@ -2,19 +2,16 @@
 
 <link rel="import" href="packages/polymer/polymer.html">
 
-<polymer-element name="rb-status" attributes="data">
+<polymer-element name="rb-status" attributes="mousePosition">
 
   <template>
     <style>
       :host {
-        color: black;
-        background-color: white;
-        font-size: 14px;
       }
     </style>
     
     <div>
-      <span>Data: {{data}}</span>
+      <span>Data: {{mousePosition}}</span>
     </div>
   </template>
 

@@ -3,6 +3,9 @@
 <link rel="stylesheet" href="rialto.css">
   
 <link rel="import" href="packages/polymer/polymer.html">
+<link rel="import" href="packages/core_elements/core_scaffold.html">
+<link rel="import" href="packages/core_elements/core_menu.html">
+<link rel="import" href="packages/core_elements/core_item.html">
 
 <link rel="import" href="rb_osg.html">
 <link rel="import" href="rb_settings.html">
@@ -12,14 +15,45 @@
 
   <template>
     <style>
+       /* http://stackoverflow.com/questions/24594333/polymer-core-scaffold-coloring-and-paper-button */
+       core-scaffold::shadow {
+     
+       }
+       core-toolbar {
+          background: yellow;    /* settings title, status bar */
+       
+       }
+       core-scaffold::shadow core-toolbar {
+          background: yellow;    /* settings title, status bar */
+       
+       }
+       core-header-panel {
+     
+        
+       }
     </style>
 
     <div>
-      <div layout vertical>
-        <rb-settings counter={{xyz}}></rb-settings>
-        <rb-osg></rb-osg>
-        <rb-status data="{{xyz}}"></rb-status>
-      </div>
+      <core-scaffold>
+
+        <core-header-panel navigation flex>
+          <core-toolbar id="navheader">
+            <span>Rialto Viewer</span>
+          </core-toolbar>
+          <core-menu>
+            <rb-settings filename={{g_filename}}></rb-settings>
+          </core-menu>
+        </core-header-panel>
+  
+        <span tool style="color:yellow">{{g_filename}}</span>"
+
+        <div class="content">
+          <rb-osg mousePosition="{{g_mousePosition}}"></rb-osg>
+          <core-toolbar>
+            <rb-status mousePosition="{{g_mousePosition}}"></rb-status>
+          </core-toolbar>
+        </div>
+      </core-scaffold>
     </div>
 
   </template>

@@ -1,11 +1,11 @@
 import 'package:polymer/polymer.dart';
 import 'dart:core';
-import 'dart:html';
 
 
 @CustomTag('rb-viewer')
 class RbViewer extends PolymerElement {
-  @published String xyz="......";
+  @published String g_mousePosition;
+  @published String g_filename;
   
   RbViewer.created() : super.created();
     
