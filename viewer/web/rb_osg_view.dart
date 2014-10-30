@@ -1,9 +1,36 @@
 import 'dart:html';
+import 'package:polymer/polymer.dart';
 import 'dart:js';
 import 'dart:core';
-import 'package:polymer/polymer.dart';
-import 'package:core_elements/core_overlay.dart';
 
+
+@CustomTag('rb-osg-view')
+class RbOsgView extends PolymerElement {
+  @observable String counter='00:00';
+  
+  RbOsgView.created() : super.created();
+  
+   
+  @override
+  void attached() {
+    super.attached();
+    
+    var anvas =  querySelector("#osgview");
+    anvas = 9;
+    
+    var canvas =  this.shadowRoot.querySelector("#View");
+    doOSG(canvas);
+  }
+  
+  @override
+  void detached() {
+    super.detached();
+  }
+}
+
+
+
+/////////////
 Map getModel() {
 
   var K = 1000;
@@ -79,11 +106,9 @@ void reportTimer()
   window.alert(millis.toString());
 }
 
-void doOSG()
-{  
-     //var canvas = document.getElementById( 'View' );
-     var canvas = querySelector("#View");
-  
+
+void doOSG(Element canvas)
+{      
      //var osg = window.OSG.osg;
      var OSG = context['OSG'];
      var osg = OSG['osg'];
@@ -133,44 +158,4 @@ void doOSG()
      //reportTimer();
      
      return;
-}
-
-
-void tapHandler1(Event e)
-{ 
-  var elem = querySelector("#dialog1");
-  assert(elem is CoreOverlay);
-  elem.open();
-}
-
-void tapHandler2(Event e)
-{ 
-  var elem = querySelector("#dialog2");
-  assert(elem is CoreOverlay);
-  elem.open();
-}
-void tapHandler3(Event e)
-{ 
-  var elem = querySelector("#dialog3");
-  assert(elem is CoreOverlay);
-  elem.open();
-}
-
-void main()
-{
-  initPolymer().run(() {
-    
-    // Code that doesn't need to wait.
-
-    
-    Polymer.onReady.then((_) {
-      // Code that executes after elements have been upgraded.
-
-      var subscription1 = querySelector("#button1").onClick.listen((event) => tapHandler1(event));
-      var subscription2 = querySelector("#button2").onClick.listen((event) => tapHandler2(event));
-      var subscription3 = querySelector("#button3").onClick.listen((event) => tapHandler3(event));
-      
-      doOSG();
-    });
-  });
 }
