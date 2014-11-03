@@ -5,7 +5,8 @@ import 'dart:core';
 @CustomTag('rb-settings')
 class RbSettings extends PolymerElement {
   @published String filename;
-  int _counter;
+  @published String servername;
+  @published List<String>files = toObservable([]);
   
   RbSettings.created() : super.created();
    
@@ -23,23 +24,12 @@ class RbSettings extends PolymerElement {
   
   void initSettings()
   {
-    filename = " ";
-    _counter = 0;
-  }
-  
-  void toggleFileDialog(Event e, var detail, Node target) {
-    var fileDialog = $['filedialog'];
-    fileDialog.toggle();
-  }
-
-
-  void toggleColorsDialog(Event e, var detail, Node target) {
-    var dlg = $['colorsdialog'];
-    dlg.toggle();
+    filename = "xxx";
+    servername = "localhost:8080";
+    files.addAll(["foo.las", "bar.las", "baz.las"]);
   }
 
   void openFile(Event e, var detail, Node target) {
-    filename = "file_" + _counter.toString() + ".las";
-    ++_counter;
+    window.alert(filename);
   }
 }

@@ -6,57 +6,54 @@
 <link rel="import" href="packages/core_elements/core_header_panel.html">
 <link rel="import" href="packages/core_elements/core_icon_button.html">
 <link rel="import" href="packages/core_elements/core_item.html">
+<link rel="import" href="packages/core_elements/core_input.html">
 
-<polymer-element name="rb-settings" attributes="filename"> 
+<polymer-element name="rb-settings" attributes="filename servername"> 
 
   <template>
     <style>
       :host {
+ 
       }
-      .mybox {  
-        margin:5px 5px 5px 5px;
-        padding:5px 5px 5px 10px; 
-        border-style:solid;
-        border-width:1px;
-        border-color:#808080;
+      hr {
+        width:66%;
       }
-      .bigbutton {
-         background-color:#f0f0f0;
+      
+      .padded {
+        padding: 4px;
+      }
+      .title {
+        font-size: 16px;
+        padding: 4px;
+      }
+      fieldset {
+        padding: 4px;
       }
       .smallbutton {
-         background-color:#f0f0f0;
-         height: 30px;
+        height: 20px;
+        width: 20px;
       }
-      .hrsep {
-        width:66%;
-      } 
     </style>
     
-    <div vertical layout>
-       <core-icon-button on-click="{{toggleFileDialog}}" class="bigbutton">File operations</core-icon-button>
-       <core-collapse id="filedialog">
-         <div class="mybox" layout vertical>
-           <core-icon-button  on-click="{{openFile}}" class="smallbutton">Open...</core-icon-button >
-           <core-icon-button class="smallbutton">Lorem...</core-icon-button>
-           <core-icon-button class="smallbutton">Ipsum...</core-icon-button>
-           <hr class="hrsep">
-           <span>Current file: {{filename}}</span>
-         </div>
-       </core-collapse>
+    <div vertical layout class="padded">
+      <div class="title">Settings</div>
       
-       <core-icon-button on-click="{{toggleColorsDialog}}" class="bigbutton">Colors</core-icon-button>
-       <core-collapse id="colorsdialog">
-         <div class="mybox" layout vertical>
-           <core-icon-button class="smallbutton">Lorem...</core-icon-button>
-           <core-icon-button class="smallbutton">Ipsum...</core-icon-button>
-           <core-icon-button class="smallbutton">Forbo...</core-icon-button>
-           <hr class="hrsep">
-           <div>Dolor sit amet: 10</div>
-           <div>Ut enim ad minim: 3.14159</div>
-         </div>
-      </core-collapse>
- 
+      <fieldset>
+        <legend>Files</legend>
+        
+        <template repeat="{{file in files}}">
+          <div>
+            <input type="checkbox" name="vehicle" value="Enabled">
+            <span>{{file}}</span>
+            <button class="smallbutton" on-click="{{openFile}}">X</button>
+            <button class="smallbutton" on-click="{{openFile}}">C</button>
+            <button class="smallbutton" on-click="{{openFile}}">i</button>
+          </div>
+        </template>
+        <button class="smallbutton" on-click="{{openFile}}">+</button>
+      </fieldset>
     </div>
+     
 
     
   </template>

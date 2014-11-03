@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <link rel="stylesheet" href="rialto.css">
-  
+ 
 <link rel="import" href="packages/polymer/polymer.html">
 <link rel="import" href="packages/core_elements/core_scaffold.html">
 <link rel="import" href="packages/core_elements/core_menu.html">
@@ -13,48 +13,86 @@
 
 <polymer-element name="rb-viewer">
 
+
+
+
   <template>
     <style>
-       /* http://stackoverflow.com/questions/24594333/polymer-core-scaffold-coloring-and-paper-button */
-       core-scaffold::shadow {
-     
-       }
-       core-toolbar {
-          background: yellow;    /* settings title, status bar */
-       
-       }
-       core-scaffold::shadow core-toolbar {
-          background: yellow;    /* settings title, status bar */
-       
-       }
-       core-header-panel {
-     
-        
-       }
+    <!-- http://projects.peterfessel.com/fluid-web-app-layout/ -->
+      
+    body {
+      width: 100%;
+      height: 100%;
+      color: black; 
+    }
+    body, div {
+      margin: 0px;
+    }
+    
+    body * {
+      box-sizing: border-box; /* makes sizing by percentage in combination with padding possible */
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      padding: 10px;
+    }
+
+    /* layout styles */
+    .fixed-container-outer {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 0px;
+    }
+    .fixed-sidebar {
+      display: inline-block;
+      float: left;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      bottom: 0px;
+      width: 200px; /* sidebar width */
+      background-color: #888;
+      color: back;
+    }
+    .fixed-container-inner {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      left: 200px; /* same as sidebar width */
+    }
+    .fluid-box3 {
+      display: inline-block;
+      float: left;
+      height: 100%;
+      width: 100%;
+      background-color: black;
+    }
+   .fixed-footer-inner {
+      height: 30px;
+      background-color: #888;
+      color: black;
+    }
     </style>
-
-    <div>
-      <core-scaffold>
-
-        <core-header-panel navigation flex>
-          <core-toolbar id="navheader">
-            <span>Rialto Viewer</span>
-          </core-toolbar>
-          <core-menu>
-            <rb-settings filename={{g_filename}}></rb-settings>
-          </core-menu>
-        </core-header-panel>
-  
-        <span tool style="color:yellow">{{g_filename}}</span>"
-
-        <div class="content">
-          <rb-osg mousePosition="{{g_mousePosition}}"></rb-osg>
-          <core-toolbar>
-            <rb-status mousePosition="{{g_mousePosition}}"></rb-status>
-          </core-toolbar>
+    
+    <div class="fixed-container-outer">
+      <div class="fixed-sidebar ">
+        <rb-settings filename={{g_filename}} servername={{g_servername}}></rb-settings>
+      </div>
+      <div class="fixed-container-inner">
+          <div class="fluid-box3">
+            <div vertical layout style="height:100%">
+              <div flex black>
+                <rb-osg mousePosition="{{g_mousePosition}}"></rb-osg> 
+              </div>
+              <div class="fixed-footer-inner ">  
+                <rb-status mousePosition="{{g_mousePosition}}"></rb-status>    
+              </div>
+            </div>
+          </div>
         </div>
-      </core-scaffold>
-    </div>
+      </div>
 
   </template>
 

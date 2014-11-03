@@ -2,6 +2,7 @@ import 'dart:html';
 import 'package:polymer/polymer.dart';
 import 'dart:js';
 import 'dart:core';
+import "graphs.dart";
 
 
 @CustomTag('rb-osg')
@@ -33,60 +34,7 @@ class RbOsg extends PolymerElement {
 
 
 /////////////
-Map getModel() {
 
-  var K = 1000;
-  var siz = 20 * K;
-  
-  List colors = [];
-  List normals = [];
-  List points = [];
-  
-  for (var i=0; i<siz; i++)
-  {
-    colors.addAll([1,1,1,1]);
-    normals.addAll([1.0, 1.0, 1.0]);
-    var pt = (i / siz) * 10.0;
-    points.addAll([pt, pt, pt]);
-  }
-  
-  Map m =
-  {
-  "children": [ {
-      "children": [ {
-          "attributes": {
-            "Color": {
-              "elements": colors,
-              "itemSize": 4, 
-              "type": "ARRAY_BUFFER"
-            }, 
-            "Normal": {
-              "elements": normals,
-              "itemSize": 3, 
-              "type": "ARRAY_BUFFER"
-            }, 
-            "Vertex": {
-              "elements": points,
-              "itemSize": 3, 
-              "type": "ARRAY_BUFFER"
-            }
-          }, 
-          "name": "", 
-          "primitives": [ {
-              "count": siz, 
-              "first": 0, 
-              "mode": "POINTS"
-            }
-          ]
-        }
-      ], 
-      "name": "cloud.osg"
-    }
-  ]
-};
-  
-  return m;
-}
 
 int _timer = 0;
 void startTimer()
@@ -111,6 +59,8 @@ void reportTimer()
 
 void doOSG(Element canvas)
 {      
+     var myModel = new Graphs().getModel2();
+     
      //var osg = window.OSG.osg;
      var OSG = context['OSG'];
      var osg = OSG['osg'];
@@ -142,7 +92,7 @@ void doOSG(Element canvas)
      //    rotate.addChild( data );
      //} );
   
-     var tempModelMap = getModel();
+     var tempModelMap = myModel;
      startTimer();
      var tempModelJson = new JsObject.jsify(tempModelMap);
      endTimer();
