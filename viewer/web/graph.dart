@@ -1,7 +1,44 @@
 import 'dart:core';
+import "dart:math" as math;
 
-class Graphs
+
+class Graph
 {
+  bool _isActive;
+  Map _points;
+  String _name;
+  
+  Graph(String name)
+  {
+    _name = name;
+    
+    switch (_name) {
+      case "1":
+        _points = _getLineModel();
+        break;
+      case "2":
+        _points = getCubeModel();
+        break;
+      case "3":
+        _points = _getRandomModel();
+        break;
+      default:
+        _points = _getRandomModel();
+        //assert(false);
+    }
+    
+    _isActive = true;
+    
+    return;
+  }
+
+  
+  Map get points => _points;
+  bool get isActive => _isActive;
+  String get name => _name;
+  
+  
+  static 
   Map _toJson(List colors, List normals, List points, int numPoints)
   {
     Map m =
@@ -42,7 +79,7 @@ class Graphs
     return m;
   }
 
-  Map makeCube(double xmin, double ymin, double zmin, double xmax, double ymax, double zmax)
+  Map _makeCube(double xmin, double ymin, double zmin, double xmax, double ymax, double zmax)
   {
     // x = red
     // y = green
@@ -66,9 +103,10 @@ class Graphs
     (xmin, ymax, zmin), (xmin, ymax, zmax)
     (xmax, ymax, zmin), (xmax, ymax, zmax)
     */
+    return new Map();
   }
  
-  Map getModel2()
+  static Map getCubeModel()
   {
     var xdim = 5;
     var ydim = 50;
@@ -96,8 +134,38 @@ class Graphs
     Map m = _toJson(colors, normals, points, numPoints); 
     return m;
   }
+  
+  
+  static Map _getRandomModel()
+  {
+    var xdim = 5;
+    var ydim = 20;
+    var zdim = 10;
     
-  Map getModel()
+    List colors = [];
+    List normals = [];
+    List points = [];
+    
+    var random = new math.Random();
+    
+    var numPoints = 5000;
+    
+    for (var i=0; i<numPoints; i++)
+    {
+      colors.addAll([1,1,1,1]);
+      normals.addAll([1.0, 1.0, 1.0]);
+      var x = random.nextDouble() * xdim;
+      var y = random.nextDouble() * ydim;
+      var z = random.nextDouble() * zdim;
+      points.addAll([x, y, z]);
+    }
+    
+    Map m = _toJson(colors, normals, points, numPoints); 
+    return m;
+  }
+
+  
+  static Map _getLineModel()
   {
     var K = 1000;
     var siz = 20 * K;

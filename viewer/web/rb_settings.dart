@@ -4,9 +4,8 @@ import 'dart:core';
 
 @CustomTag('rb-settings')
 class RbSettings extends PolymerElement {
-  @published String filename;
-  @published String servername;
-  @published List<String>files = toObservable([]);
+  @published List<String> files;
+  @published String server;
   
   RbSettings.created() : super.created();
    
@@ -24,12 +23,44 @@ class RbSettings extends PolymerElement {
   
   void initSettings()
   {
-    filename = "xxx";
-    servername = "localhost:8080";
-    files.addAll(["foo.las", "bar.las", "baz.las"]);
   }
 
   void openFile(Event e, var detail, Node target) {
-    window.alert(filename);
+    var dlg = this.shadowRoot.querySelector("#openDialog");
+    dlg.showModal();
+  }
+  
+  void openFileCancel(Event e, var detail, Node target) {
+    DialogElement dlg = this.shadowRoot.querySelector("#openDialog");
+    dlg.close("");
+    return;
+  }
+
+  void openFileOkay(Event e, var detail, Node target) {
+    var txt = this.shadowRoot.querySelector("#filenamearea");
+    files.add(txt.value);
+    txt.value = "";
+  }
+
+  void toggleFile(Event e, var detail, Node target) {
+    var button = target as ButtonElement;
+    window.alert("toggle for ${button.id.toString()}");
+  }
+
+  void infoFile(Event e, var detail, Node target) {
+    var button = target as ButtonElement;
+    window.alert("info for ${button.id.toString()}");
+  }
+  
+  void colorizeFile(Event e, var detail, Node target) {
+    var button = target as ButtonElement;
+    window.alert("colorize for ${button.id.toString()}");
+  }
+  
+  void deleteFile(Event e, var detail, Node target)
+  {
+    var button = target as ButtonElement;
+    files.remove(button.id.toString());
+    return;
   }
 }

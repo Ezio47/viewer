@@ -2,12 +2,14 @@ import 'dart:html';
 import 'package:polymer/polymer.dart';
 import 'dart:js';
 import 'dart:core';
-import "graphs.dart";
+import "graph.dart";
 
 
 @CustomTag('rb-osg')
 class RbOsg extends PolymerElement {
   @published String mousePosition;
+  Map<String, Graph> _graphs = new Map();
+  CanvasElement _canvas;
   
   RbOsg.created() : super.created();
   
@@ -16,11 +18,8 @@ class RbOsg extends PolymerElement {
   void attached() {
     super.attached();
     
-    var anvas =  querySelector("#osgview");
-    anvas = 9;
-    
-    var canvas =  this.shadowRoot.querySelector("#View");
-    doOSG(canvas);
+    _canvas =  this.shadowRoot.querySelector("#View");
+    assert(_canvas != null);
     
     mousePosition = "(12.345, 67.890)";
   }
@@ -29,37 +28,27 @@ class RbOsg extends PolymerElement {
   void detached() {
     super.detached();
   }
+  
+
+  void addGraph(String s)
+  {
+    Graph g = new Graph(s);
+    _graphs[s] = g;
+    
+    doOSG(_canvas, g);
+  }
+
+  void removeGraph(String s)
+  {
+    _graphs.remove(s);
+  }
 }
 
 
-
-/////////////
-
-
-int _timer = 0;
-void startTimer()
-{
-  _timer = new DateTime.now().millisecondsSinceEpoch;
-}
-
-
-void endTimer()
-{
-  int now = new DateTime.now().millisecondsSinceEpoch;
-  _timer = now - _timer;;
-}
-
-
-void reportTimer()
-{
-  double millis = _timer / 1000.0;
-  window.alert(millis.toString());
-}
-
-
-void doOSG(Element canvas)
+void doOSG(Element canvas, Graph g)
 {      
-     var myModel = new Graphs().getModel2();
+     //var myModel = Graph.getCubeModel();
+     var myModel = g;
      
      //var osg = window.OSG.osg;
      var OSG = context['OSG'];
@@ -92,11 +81,8 @@ void doOSG(Element canvas)
      //    rotate.addChild( data );
      //} );
   
-     var tempModelMap = myModel;
-     startTimer();
+     var tempModelMap = myModel.points;
      var tempModelJson = new JsObject.jsify(tempModelMap);
-     endTimer();
-     var t = new DateTime.now();
      var tempData = osgDB.callMethod("parseSceneGraph", [tempModelJson]);
      
      rotate.callMethod("addChild", [tempData]);

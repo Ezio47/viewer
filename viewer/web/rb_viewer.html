@@ -13,9 +13,6 @@
 
 <polymer-element name="rb-viewer">
 
-
-
-
   <template>
     <style>
     <!-- http://projects.peterfessel.com/fluid-web-app-layout/ -->
@@ -78,13 +75,13 @@
     
     <div class="fixed-container-outer">
       <div class="fixed-sidebar ">
-        <rb-settings filename={{g_filename}} servername={{g_servername}}></rb-settings>
+        <rb-settings server="{{g_server}}" files={{g_files}}></rb-settings>
       </div>
       <div class="fixed-container-inner">
           <div class="fluid-box3">
             <div vertical layout style="height:100%">
               <div flex black>
-                <rb-osg mousePosition="{{g_mousePosition}}"></rb-osg> 
+                <rb-osg id="osg_elem" mousePosition="{{g_mousePosition}}"></rb-osg> 
               </div>
               <div class="fixed-footer-inner ">  
                 <rb-status mousePosition="{{g_mousePosition}}"></rb-status>    

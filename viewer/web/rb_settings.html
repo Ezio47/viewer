@@ -7,8 +7,11 @@
 <link rel="import" href="packages/core_elements/core_icon_button.html">
 <link rel="import" href="packages/core_elements/core_item.html">
 <link rel="import" href="packages/core_elements/core_input.html">
+<link rel="import" href="packages/core_elements/core_icon.html">
+<link rel="import" href="packages/core_elements/core_icons.html">
+<link rel="import" href="packages/core_elements/core_iconset.html">
 
-<polymer-element name="rb-settings" attributes="filename servername"> 
+<polymer-element name="rb-settings" attributes="files server"> 
 
   <template>
     <style>
@@ -30,8 +33,26 @@
         padding: 4px;
       }
       .smallbutton {
-        height: 20px;
-        width: 20px;
+        height: 16px;
+        width: 16px;
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+        border-width: 0;
+        background-color: #eee;
+      }
+      .smallbuttontext {
+        text-align: center;
+        display:table-cell;
+        vertical-align:middle;
+      }
+      .icon {
+      }
+      .padright {
+        margin: 0px 10px 0px 0px;
+      }
+      .padleft {
+        margin: 0px 0px 0px 10px;
       }
     </style>
     
@@ -43,18 +64,26 @@
         
         <template repeat="{{file in files}}">
           <div>
-            <input type="checkbox" name="vehicle" value="Enabled">
-            <span>{{file}}</span>
-            <button class="smallbutton" on-click="{{openFile}}">X</button>
-            <button class="smallbutton" on-click="{{openFile}}">C</button>
-            <button class="smallbutton" on-click="{{openFile}}">i</button>
+            <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleFile}}" class="padright">
+            <button class="smallbutton" on-click="{{deleteFile}}" id="{{file}}"><img src="vendors/iconic/x.png" class="icon"></button>
+            <button class="smallbutton" on-click="{{colorizeFile}}" id="{{file}}"><img src="vendors/iconic/brush.png" class="icon"></button>
+            <button class="smallbutton" on-click="{{infoFile}}" id="{{file}}"><img src="vendors/iconic/question-mark.png" class="icon"></button>
+            <span class="padleft">{{file}}</span>
           </div>
         </template>
-        <button class="smallbutton" on-click="{{openFile}}">+</button>
+        <button class="smallbutton" on-click="{{openFile}}"><img src="vendors/iconic/plus.png" class="icon"></button>        
       </fieldset>
     </div>
      
-
+    <dialog id="openDialog">
+    <form method="dialog">
+      <input type="text" id="filenamearea" name="name">
+      <menu>
+        <button id="cancel" type="reset" on-click="{{openFileCancel}}">Cancel</button>
+        <button type="submit" on-click="{{openFileOkay}}">Confirm</button>
+      </menu>
+    </form>
+  </dialog>
     
   </template>
 
