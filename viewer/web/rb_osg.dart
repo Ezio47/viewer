@@ -4,15 +4,16 @@ import 'dart:js';
 import 'dart:core';
 import "graph.dart";
 import 'osg_bridge.dart';
+import 'webgl.dart';
 
 
 @CustomTag('rb-osg')
 class RbOsg extends PolymerElement {
   @published String mousePosition;
   Map<String, Graph> _graphs = new Map();
-  CanvasElement _canvas;
+  /*Canvas*/Element _canvas;
   OSGBridge _osgBridge;
-  
+  webgl _webgl;
   
   RbOsg.created() : super.created();
   
@@ -22,6 +23,7 @@ class RbOsg extends PolymerElement {
     super.attached();
     
     _canvas =  this.shadowRoot.querySelector("#View");
+    _canvas =  this.shadowRoot.querySelector("#container");
     assert(_canvas != null);
     
     _osgBridge = new OSGBridge();
@@ -40,7 +42,11 @@ class RbOsg extends PolymerElement {
     Graph g = new Graph(s);
     _graphs[s] = g;
     
-    _osgBridge.doOSG(_canvas, g);
+    //_osgBridge.doOSG(_canvas, g);
+    _webgl = new webgl();
+    _webgl.init(_canvas);
+    _webgl.animate(0);
+    
   }
 
   void removeGraph(String s)
