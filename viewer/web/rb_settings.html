@@ -11,7 +11,7 @@
 <link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/core_elements/core_iconset.html">
 
-<polymer-element name="rb-settings" attributes="files server"> 
+<polymer-element name="rb-settings" attributes="files server showAxes"> 
 
   <template>
     <style>
@@ -73,6 +73,15 @@
         </template>
         <button class="smallbutton" on-click="{{openFile}}"><img src="vendors/iconic/plus.png" class="icon"></button>        
       </fieldset>
+
+      <fieldset>
+        <legend>Display</legend>
+        
+          <div>
+            <input type="checkbox" name="vehicle" value="Enabled" checked="{{showAxes}}" class="padright">Toggle axes
+          </div>
+      </fieldset>
+
     </div>
      
     <dialog id="openDialog">

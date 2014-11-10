@@ -4,7 +4,8 @@ import 'dart:core';
 
 @CustomTag('rb-status')
 class RbStatus extends PolymerElement {
-  @published String mousePosition;
+  @published double mousePositionX;
+  @published double mousePositionY;
   
   RbStatus.created() : super.created();
     

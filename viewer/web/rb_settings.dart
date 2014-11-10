@@ -6,6 +6,7 @@ import 'dart:core';
 class RbSettings extends PolymerElement {
   @published List<String> files;
   @published String server;
+  @published bool showAxes;
   
   RbSettings.created() : super.created();
    

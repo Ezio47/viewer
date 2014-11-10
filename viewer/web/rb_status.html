@@ -2,7 +2,7 @@
 
 <link rel="import" href="packages/polymer/polymer.html">
 
-<polymer-element name="rb-status" attributes="mousePosition">
+<polymer-element name="rb-status" attributes="mousePositionX mousePositionY">
 
   <template>
     <style>
@@ -11,7 +11,7 @@
     </style>
     
     <div>
-      <span>Data: {{mousePosition}}</span>
+      <span>Data: {{mousePositionX.toStringAsFixed(3)}}  {{mousePositionY.toStringAsFixed(3)}}</span>
     </div>
   </template>
 

@@ -1,7 +1,9 @@
 library graph;
 
 import 'dart:core';
-import "dart:math" as math;
+import "dart:math" as Math;
+
+import 'package:three/three.dart';
 
 
 class Graph
@@ -9,6 +11,7 @@ class Graph
   bool _isActive;
   Map _points;
   String _name;
+
   
   Graph(String name)
   {
@@ -242,7 +245,7 @@ class Graph
     List normals = [];
     List points = [];
     
-    var random = new math.Random();
+    var random = new Math.Random();
     
     var numPoints = 5000;
     
@@ -280,5 +283,70 @@ class Graph
 
     Map m = _toJsonPoints(colors, normals, points, siz); 
     return m;
+  }
+  
+  static List<GeometryAttribute> makeNewCube(num particles)
+  {
+    var positions = new GeometryAttribute.float32(particles * 3, 3);
+    var colors     = new GeometryAttribute.float32(particles * 3, 3);
+    var list = new List<GeometryAttribute>();
+    list.add(positions);
+    list.add(colors);
+    
+    var rnd = new Math.Random();
+    
+    var color = new Color();
+  
+    var n = 1000.0, n2 = n / 2.0; // particles spread in the cube
+  
+    for ( var i = 0; i < positions.array.length; i += 3 ) {
+    
+      // positions
+      var x = rnd.nextDouble() * n - n2;   // -500..+500
+      var y = rnd.nextDouble() * n - n2;
+      var z = rnd.nextDouble() * n - n2;
+      assert(x>=-500.0 && y>=-500.0 && z>=-500.0);
+      assert(x<=500.0 && y<=500.0 && z<=500.0);
+      //print("$x $y $z");
+      
+      positions.array[ i     ] = x;
+      positions.array[ i + 1 ] = y;
+      positions.array[ i + 2 ] = z;
+    
+      // colors
+      var vx = ( x / n ) + 0.5;
+      var vy = ( y / n ) + 0.5;
+      var vz = ( z / n ) + 0.5;
+    
+      color.setRGB( vx, vy, vz );
+    
+      //colors.array[ i ]     = color.r;
+      //colors.array[ i + 1 ] = color.g;
+      //colors.array[ i + 2 ] = color.b;
+      
+      if (x < 0.0 && y < 0.0 && z < 0.0)
+      {
+        // red at -5,-5,-5
+        colors.array[i] = 1.0;
+        colors.array[i+1] = 0.0;
+        colors.array[i+2] = 0.0;
+        //print("$x $y $z");
+      }
+      else if (x > 0.0 && y > 0.0 && z> 0.0)
+      {
+        // blue at +5,+5,+5
+        colors.array[i] = 0.0;
+        colors.array[i+1] = 0.0;
+        colors.array[i+2] = 1.0;
+      }
+      else
+      {
+        colors.array[i] = 0.0;
+        colors.array[i+1] = 0.0;
+        colors.array[i+2] = 0.0;
+      }
+    }
+  
+    return list;
   }
 }

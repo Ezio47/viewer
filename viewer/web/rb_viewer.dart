@@ -6,7 +6,9 @@ import 'rb_osg.dart';
 class RbViewer extends PolymerElement {
   
   // these are the globals of the model for all the components
-  @published String g_mousePosition = "";
+  @published double g_mousePositionX = 0.0;
+  @published double g_mousePositionY = 0.0;
+  @published bool g_showAxes = false;
   @published ObservableList<String> g_files = toObservable([]);
   List<String> _oldFiles = [];
   @published String g_server = "";

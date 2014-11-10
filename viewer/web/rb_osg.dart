@@ -1,19 +1,19 @@
 import 'dart:html';
 import 'package:polymer/polymer.dart';
-import 'dart:js';
 import 'dart:core';
 import "graph.dart";
-import 'osg_bridge.dart';
-import 'webgl.dart';
+import 'display.dart';
 
 
 @CustomTag('rb-osg')
 class RbOsg extends PolymerElement {
-  @published String mousePosition;
+  @published double mousePositionX;
+  @published double mousePositionY;
+  @published bool showAxes;
+  
   Map<String, Graph> _graphs = new Map();
-  /*Canvas*/Element _canvas;
-  OSGBridge _osgBridge;
-  webgl _webgl;
+  Element _canvas;
+  Display _webgl;
   
   RbOsg.created() : super.created();
   
@@ -25,10 +25,13 @@ class RbOsg extends PolymerElement {
     _canvas =  this.shadowRoot.querySelector("#View");
     _canvas =  this.shadowRoot.querySelector("#container");
     assert(_canvas != null);
+
+    mousePositionX = 0.0;
+    mousePositionY = 0.0;
+
+    _canvas.onMouseMove.listen(onDocumentMouseMove);
     
-    _osgBridge = new OSGBridge();
-    
-    mousePosition = "(12.345, 67.890)";
+   
   }
   
   @override
@@ -36,14 +39,36 @@ class RbOsg extends PolymerElement {
     super.detached();
   }
   
+  showAxesChanged(var o, var n)
+  {
+    if (_webgl != null)
+    {
+      if (n)
+      {
+        _webgl.addAxes();
+      }
+      else
+      {
+        _webgl.removeAxes();
+      }
+    }
+  }
+  
+  
+  onDocumentMouseMove( event )
+  {
+    mousePositionX = _webgl.mouseX;
+    mousePositionY = _webgl.mouseY;
+  }
 
+  
   void addGraph(String s)
   {
     Graph g = new Graph(s);
     _graphs[s] = g;
     
     //_osgBridge.doOSG(_canvas, g);
-    _webgl = new webgl();
+    _webgl = new Display();
     _webgl.init(_canvas);
     _webgl.animate(0);
     
