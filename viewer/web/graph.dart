@@ -1,3 +1,5 @@
+library graph;
+
 import 'dart:core';
 import "dart:math" as math;
 
@@ -22,8 +24,11 @@ class Graph
       case "3":
         _points = _getRandomModel();
         break;
+      case "4":
+        _points = _makeCubeLines();
+        break;
       default:
-        _points = _getRandomModel();
+        _points = _makeCubeLines();
         //assert(false);
     }
     
@@ -36,41 +41,96 @@ class Graph
   Map get points => _points;
   bool get isActive => _isActive;
   String get name => _name;
-  
-  
+ 
   static 
-  Map _toJson(List colors, List normals, List points, int numPoints)
+  Map _toJsonPoints(List colors, List normals, List points, int numPoints)
   {
-    Map m =
+    Map normal = 
       {
-      "children": [ {
-          "children": [ {
-              "attributes": {
-                "Color": {
-                  "elements": colors,
-                  "itemSize": 4, 
-                  "type": "ARRAY_BUFFER"
-                }, 
-                "Normal": {
-                  "elements": normals,
-                  "itemSize": 3, 
-                  "type": "ARRAY_BUFFER"
-                }, 
-                "Vertex": {
+        "elements": normals,
+        "itemSize": 3,
+        "type": "ARRAY_BUFFER"
+      };
+    Map color = {
+                 "elements": colors,
+                 "itemSize": 4, 
+                 "type": "ARRAY_BUFFER"
+               };
+    Map vertex = {
                   "elements": points,
                   "itemSize": 3, 
                   "type": "ARRAY_BUFFER"
-                }
-              }, 
-              "name": "", 
-              "primitives": [ {
-                  "count": numPoints, 
-                  "first": 0, 
-                  "mode": "POINTS"
-                }
-              ]
-            }
-          ], 
+                };
+    Map attributes = {
+                      "Color": color, 
+                      "Normal" : normal, 
+                      "Vertex": vertex
+                    };
+    
+    Map primitives = {
+                      "count": numPoints, 
+                      "first": 0, 
+                      "mode": "POINTS"
+                    };
+    Map child1 = {
+                  "attributes": attributes, 
+                  "name": "child1", 
+                  "primitives": [primitives]
+                };
+    
+    Map m =
+      {
+      "children": [ {
+          "children": [ child1 ], 
+          "name": "cloud.osg"
+        }
+      ],
+      "name": "top"
+    };
+    
+    return m;
+  }
+
+  
+  static 
+  Map _toJsonLines(List colors, List normals, List points, int numPoints)
+  {
+    Map normal = {
+                   "elements": normals,
+                   "itemSize": 3,
+                   "type": "ARRAY_BUFFER"
+                 };
+    Map color = {
+                  "elements": colors,
+                  "itemSize": 4, 
+                  "type": "ARRAY_BUFFER"
+                };
+    Map vertex = {
+                   "elements": points,
+                   "itemSize": 3, 
+                   "type": "ARRAY_BUFFER"
+                 };
+    Map attributes = {
+                       "Color": color, 
+                       "Normal" : normal, 
+                       "Vertex": vertex
+                     };
+    
+    Map primitives = {
+                       "count": numPoints, 
+                       "first": 0, 
+                       "mode": "LINES"
+                     };
+    Map child1 = {
+                   "attributes": attributes, 
+                   "name": "", 
+                   "primitives": [primitives]
+                 };
+    
+    Map m =
+      {
+      "children": [ {
+          "children": [ child1 ], 
           "name": "cloud.osg"
         }
       ]
@@ -79,33 +139,69 @@ class Graph
     return m;
   }
 
-  Map _makeCube(double xmin, double ymin, double zmin, double xmax, double ymax, double zmax)
+  
+  Map _makeCubeLines()
   {
+    double xmin = 0.0;
+    double xmax = 5.0;
+    double ymin = 0.0;
+    double ymax = 10.0;
+    double zmin = 0.0;
+    double zmax = 15.0;
+    
     // x = red
     // y = green
     // z = blue
     
+    List colors = [];
+    List normals = [];
+    List points = [];
+    
     // X
-    /*(xmin, ymin, zmin), (xmax, ymin, zmin)
-    (xmin, ymax, zmin), (xmax, ymax, zmin)
-    (xmin, ymin, zmax), (xmax, ymin, zmax)
-    (xmin, ymax, zmax), (xmax, ymax, zmax)
+    points.addAll([xmin, ymin, zmin]);
+    points.addAll([xmax, ymin, zmin]);
+    points.addAll([xmin, ymax, zmin]);
+    points.addAll([xmax, ymax, zmin]);
+    points.addAll([xmin, ymin, zmax]);
+    points.addAll([xmax, ymin, zmax]);
+    points.addAll([xmin, ymax, zmax]);
+    points.addAll([xmax, ymax, zmax]);
     
     // Y
-    (xmin, ymin, zmin), (xmin, ymax, zmin)
-    (xmax, ymin, zmin), (xmax, ymax, zmin)
-    (xmin, ymin, zmax), (xmin, ymax, zmax)
-    (xmax, ymin, zmax), (xmax, ymax, zmax)
+    points.addAll([xmin, ymin, zmin]);
+    points.addAll([xmin, ymax, zmin]);
+    points.addAll([xmax, ymin, zmin]);
+    points.addAll([xmax, ymax, zmin]);
+    points.addAll([xmin, ymin, zmax]);
+    points.addAll([xmin, ymax, zmax]);
+    points.addAll([xmax, ymin, zmax]);
+    points.addAll([xmax, ymax, zmax]);
     
     // Z
-    (xmin, ymin, zmin), (xmin, ymin, zmax)
-    (xmax, ymin, zmin), (xmax, ymin, zmax)
-    (xmin, ymax, zmin), (xmin, ymax, zmax)
-    (xmax, ymax, zmin), (xmax, ymax, zmax)
-    */
-    return new Map();
+    points.addAll([xmin, ymin, zmin]);
+    points.addAll([xmin, ymin, zmax]);
+    points.addAll([xmax, ymin, zmin]);
+    points.addAll([xmax, ymin, zmax]);
+    points.addAll([xmin, ymax, zmin]);
+    points.addAll([xmin, ymax, zmax]);
+    points.addAll([xmax, ymax, zmin]);
+    points.addAll([xmax, ymax, zmax]);
+    
+    var numPoints = 8*3;
+    
+    for (var i=0; i<numPoints; i++)
+    {
+      colors.addAll([1,1,1,1]);
+      normals.addAll([1.0, 1.0, 1.0]);
+    }
+    
+
+    Map m = _toJsonLines(colors, normals, points, numPoints); 
+    
+    return m;
   }
  
+  
   static Map getCubeModel()
   {
     var xdim = 5;
@@ -131,7 +227,7 @@ class Graph
     
     var numPoints = xdim * ydim * zdim;
     
-    Map m = _toJson(colors, normals, points, numPoints); 
+    Map m = _toJsonPoints(colors, normals, points, numPoints); 
     return m;
   }
   
@@ -160,7 +256,7 @@ class Graph
       points.addAll([x, y, z]);
     }
     
-    Map m = _toJson(colors, normals, points, numPoints); 
+    Map m = _toJsonPoints(colors, normals, points, numPoints); 
     return m;
   }
 
@@ -182,7 +278,7 @@ class Graph
       points.addAll([pt, pt, pt]);
     }  
 
-    Map m = _toJson(colors, normals, points, siz); 
+    Map m = _toJsonPoints(colors, normals, points, siz); 
     return m;
   }
 }
