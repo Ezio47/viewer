@@ -14,7 +14,7 @@ class RbViewer extends PolymerElement
   void attached() {
     super.attached();
 
-    hub.doAddFile("1");
+    hub.doAddFile("5");
     hub.doToggleAxes(true);
   }
 
