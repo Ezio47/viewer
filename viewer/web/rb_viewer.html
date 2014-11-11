@@ -7,7 +7,7 @@
 <link rel="import" href="packages/core_elements/core_menu.html">
 <link rel="import" href="packages/core_elements/core_item.html">
 
-<link rel="import" href="rb_osg.html">
+<link rel="import" href="rb_render.html">
 <link rel="import" href="rb_settings.html">
 <link rel="import" href="rb_status.html">
 
@@ -75,17 +75,16 @@
     
     <div class="fixed-container-outer">
       <div class="fixed-sidebar ">
-        <rb-settings server="{{g_server}}" files="{{g_files}}" showAxes="{{g_showAxes}}"></rb-settings>
+        <rb-settings></rb-settings>
       </div>
       <div class="fixed-container-inner">
           <div class="fluid-box3">
             <div vertical layout style="height:100%">
               <div flex black>
-                <rb-osg id="osg_elem" mousePositionX="{{g_mousePositionX}}" mousePositionY="{{g_mousePositionY}}"
-                        showAxes="{{g_showAxes}}"></rb-osg> 
+                <rb-render></rb-render> 
               </div>
               <div class="fixed-footer-inner ">  
-                <rb-status mousePositionX="{{g_mousePositionX}}" mousePositionY="{{g_mousePositionY}}"></rb-status>    
+                <rb-status></rb-status>    
               </div>
             </div>
           </div>

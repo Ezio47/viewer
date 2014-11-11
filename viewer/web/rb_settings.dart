@@ -1,12 +1,14 @@
+library rb_settings;
+
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import 'dart:core';
+import 'hub.dart';
 
 @CustomTag('rb-settings')
 class RbSettings extends PolymerElement {
-  @published List<String> files;
-  @published String server;
-  @published bool showAxes;
+  @published List<String> files = new List();
+  @published bool showAxes = false;
   
   RbSettings.created() : super.created();
    
@@ -14,6 +16,7 @@ class RbSettings extends PolymerElement {
   void attached() {
     super.attached();
     
+    hub.settingsUI = this;
     initSettings();
   }
   
@@ -24,6 +27,21 @@ class RbSettings extends PolymerElement {
   
   void initSettings()
   {
+  }
+
+  void doAddFile(String s)
+  {
+    files.add(s);
+  }
+  
+  void doRemoveFile(String s)
+  {
+    files.remove(s);
+  }
+  
+  void toggleAxes(Event e, var detail, Node target) {
+    var button = target as InputElement;
+    hub.showAxes(button.checked);
   }
 
   void openFile(Event e, var detail, Node target) {
@@ -39,7 +57,7 @@ class RbSettings extends PolymerElement {
 
   void openFileOkay(Event e, var detail, Node target) {
     var txt = this.shadowRoot.querySelector("#filenamearea");
-    files.add(txt.value);
+    hub.addFile(txt.value);
     txt.value = "";
   }
 
@@ -61,7 +79,7 @@ class RbSettings extends PolymerElement {
   void deleteFile(Event e, var detail, Node target)
   {
     var button = target as ButtonElement;
-    files.remove(button.id.toString());
+    hub.removeFile(button.id.toString());
     return;
   }
 }

@@ -11,7 +11,7 @@
 <link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/core_elements/core_iconset.html">
 
-<polymer-element name="rb-settings" attributes="files server showAxes"> 
+<polymer-element name="rb-settings"> 
 
   <template>
     <style>
@@ -78,7 +78,7 @@
         <legend>Display</legend>
         
           <div>
-            <input type="checkbox" name="vehicle" value="Enabled" checked="{{showAxes}}" class="padright">Toggle axes
+            <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleAxes}}" class="padright">Toggle axes
           </div>
       </fieldset>
 

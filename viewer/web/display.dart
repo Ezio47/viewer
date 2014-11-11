@@ -1,11 +1,11 @@
 library webgl;
 
 import 'dart:html';
-import 'dart:math' as Math;
+//import 'dart:math' as Math;
 import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/controls/trackball_controls.dart';
-import 'graph.dart';
+import 'cloud_generator.dart';
 
 class Display
 {
@@ -49,9 +49,11 @@ class Display
     
     var particles =  100000;
   
-    var list = Graph.makeNewCube(particles);
-    var positions = list[0];
-    var colors     = list[1];
+    var map = CloudGenerator.makeNewCube(particles);
+    var positions = map["positions"];
+    var colors     = map["colors"];
+    assert(positions != null);
+    assert(colors != null);
   
     BufferGeometry geometry = new BufferGeometry();
     geometry.attributes = {

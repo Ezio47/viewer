@@ -1,5 +1,8 @@
+library rb_status;
+
 import 'package:polymer/polymer.dart';
 import 'dart:core';
+import 'hub.dart';
 
 
 @CustomTag('rb-status')
@@ -13,7 +16,7 @@ class RbStatus extends PolymerElement {
   void attached() {
     super.attached();
     
-    
+    hub.statusUI = this;    
   }
   
   @override
@@ -21,4 +24,9 @@ class RbStatus extends PolymerElement {
     super.detached();
   }
   
+  void doMousePosition(double x, double y)
+  {
+    mousePositionX = x;
+    mousePositionY = y;
+  }
 }

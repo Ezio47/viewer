@@ -1,21 +1,24 @@
+library rb_render;
+
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import 'dart:core';
-import "graph.dart";
+import "point_cloud.dart";
 import 'display.dart';
+import 'hub.dart';
+import 'cloud_generator.dart';
 
 
-@CustomTag('rb-osg')
-class RbOsg extends PolymerElement {
+@CustomTag('rb-render')
+class RbRender extends PolymerElement {
   @published double mousePositionX;
   @published double mousePositionY;
-  @published bool showAxes;
   
-  Map<String, Graph> _graphs = new Map();
+  Map<String, PointCloud> _pointclouds = new Map();
   Element _canvas;
   Display _webgl;
   
-  RbOsg.created() : super.created();
+  RbRender.created() : super.created();
   
    
   @override
@@ -31,7 +34,7 @@ class RbOsg extends PolymerElement {
 
     _canvas.onMouseMove.listen(onDocumentMouseMove);
     
-   
+    hub.renderUI = this;
   }
   
   @override
@@ -39,44 +42,39 @@ class RbOsg extends PolymerElement {
     super.detached();
   }
   
-  showAxesChanged(var o, var n)
+  void showAxes(bool on)
   {
-    if (_webgl != null)
+    if (on)
     {
-      if (n)
-      {
-        _webgl.addAxes();
-      }
-      else
-      {
-        _webgl.removeAxes();
-      }
+      _webgl.addAxes(); 
+    }
+    else
+    {
+      _webgl.removeAxes();
     }
   }
-  
   
   onDocumentMouseMove( event )
   {
     mousePositionX = _webgl.mouseX;
     mousePositionY = _webgl.mouseY;
+    hub.mouseMoved(mousePositionX,  mousePositionY);
   }
 
   
   void addGraph(String s)
   {
-    Graph g = new Graph(s);
-    _graphs[s] = g;
+    var map = CloudGenerator.generate(s);
+    _pointclouds[s] = new PointCloud(map);
     
-    //_osgBridge.doOSG(_canvas, g);
     _webgl = new Display();
     _webgl.init(_canvas);
     _webgl.animate(0);
-    
   }
 
   void removeGraph(String s)
   {
-    _graphs.remove(s);
+    _pointclouds.remove(s);
   }
 }
 
