@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-  
+
 <link rel="import" href="packages/polymer/polymer.html">
 <link rel="import" href="packages/core_elements/core_collapse.html">
 <link rel="import" href="packages/core_elements/core_toolbar.html">
@@ -11,17 +11,17 @@
 <link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/core_elements/core_iconset.html">
 
-<polymer-element name="rb-settings"> 
+<polymer-element name="rb-settings">
 
   <template>
     <style>
       :host {
- 
+
       }
       hr {
         width:66%;
       }
-      
+
       .padded {
         padding: 4px;
       }
@@ -55,13 +55,13 @@
         margin: 0px 0px 0px 10px;
       }
     </style>
-    
+
     <div vertical layout class="padded">
       <div class="title">Settings</div>
-      
+
       <fieldset>
         <legend>Files</legend>
-        
+
         <template repeat="{{file in files}}">
           <div>
             <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleFile}}" class="padright">
@@ -71,19 +71,20 @@
             <span class="padleft">{{file}}</span>
           </div>
         </template>
-        <button class="smallbutton" on-click="{{openFile}}"><img src="vendors/iconic/plus.png" class="icon"></button>        
+        <button class="smallbutton" on-click="{{openFile}}"><img src="vendors/iconic/plus.png" class="icon"></button>
       </fieldset>
 
       <fieldset>
         <legend>Display</legend>
-        
+
           <div>
-            <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleAxes}}" class="padright">Toggle axes
+            <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleAxes}}" class="padright">
+            <span>Toggle axes</span>
           </div>
       </fieldset>
 
     </div>
-     
+
     <dialog id="openDialog">
     <form method="dialog">
       <input type="text" id="filenamearea" name="name">
@@ -93,7 +94,7 @@
       </menu>
     </form>
   </dialog>
-    
+
   </template>
 
   <script type="application/dart" src="rb_settings.dart"></script>

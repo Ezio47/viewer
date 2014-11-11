@@ -17,7 +17,7 @@ import 'dart:math' as Math;
 //
 // geamattrib has numitems and itemsize
 //
-// we assume each file wil return at least dims for x, y, and z
+// we assume each file will return at least dims for x, y, and z (or 'positions')
 
 class CloudGenerator
 {
@@ -26,7 +26,7 @@ class CloudGenerator
     switch (name)
     {
       case "1":
-        return makeNewCube(5000);
+        return makeNewCube();
       case "2":
         return makeOldCube();
       case "3":
@@ -34,13 +34,15 @@ class CloudGenerator
       case "4":
         return makeLine();
       default:
-        return makeNewCube(5000);
+        return makeNewCube();
     }
   }
   
   
-  static Map<String, GeometryAttribute> makeNewCube(num particles)
+  static Map<String, GeometryAttribute> makeNewCube()
   {
+    num particles = 50000;
+    
     Map<String, GeometryAttribute> map = new Map();
     
     var positions = new GeometryAttribute.float32(particles * 3, 3);
@@ -113,15 +115,21 @@ class CloudGenerator
   {
     Map<String, GeometryAttribute> map = new Map();
     
-    var positions = new GeometryAttribute.float32(8 * 3, 3);
-    map["positions"] = positions;
+    var numPoints = 24;
+    
+    var xx = new GeometryAttribute.float32(numPoints, 3);
+    var yy = new GeometryAttribute.float32(numPoints, 3);
+    var zz = new GeometryAttribute.float32(numPoints, 3);
+    map["x"] = xx;
+    map["y"] = yy;
+    map["z"] = zz;
     
     double xmin = 0.0;
-    double xmax = 5.0;
+    double xmax = 500.0;
     double ymin = 0.0;
-    double ymax = 10.0;
+    double ymax = 1000.0;
     double zmin = 0.0;
-    double zmax = 15.0;
+    double zmax = 1500.0;
     
     // x = red
     // y = green
@@ -159,12 +167,11 @@ class CloudGenerator
     points.addAll([xmax, ymax, zmin]);
     points.addAll([xmax, ymax, zmax]);
     
-    var numPoints = 8*3;
-    for (int i=0; i<numPoints*3; i+=3)
+    for (int i=0; i<numPoints; i++)
     {
-      positions.array[i] = points[i];
-      positions.array[i+1] = points[i+1];
-      positions.array[i+2] = points[i+2];
+      xx.array[i] = points[i*3];
+      yy.array[i] = points[i*3+1];
+      zz.array[i] = points[i*3+2];
     }
     
     return map;
@@ -175,14 +182,14 @@ class CloudGenerator
   {
     Map<String, GeometryAttribute> map = new Map();
     
-    var numPoints = 5000;
+    var numPoints = 50000;
     
     var positions = new GeometryAttribute.float32(numPoints * 3, 3);
     map["positions"] = positions;
 
-    var xdim = 5;
-    var ydim = 20;
-    var zdim = 10;
+    var xdim = 500;
+    var ydim = 2000;
+    var zdim = 1000;
      
     var random = new Math.Random();
      
@@ -204,15 +211,14 @@ class CloudGenerator
   {
     Map<String, GeometryAttribute> map = new Map();
     
-    var K = 1000;
-    var siz = 20 * K;
+    var numPoints = 2000;
     
-    var positions = new GeometryAttribute.float32(siz * 3, 3);
+    var positions = new GeometryAttribute.float32(numPoints * 3, 3);
     map["positions"] = positions;
        
-    for (var i=0; i<siz*3; i+=3)
+    for (var i=0; i<numPoints*3; i+=3)
     {
-      var pt = (i / siz) * 10.0;
+      double pt = i.toDouble() / 10.0;
       positions.array[i] = pt;
       positions.array[i+1] = pt;
       positions.array[i+2] = pt;

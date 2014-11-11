@@ -1,44 +1,103 @@
 library hub;
 
 import 'dart:core';
+import 'dart:html';
 import 'rb_render.dart';
 import 'rb_settings.dart';
 import 'rb_status.dart';
+import 'renderer.dart';
+import 'cloud_generator.dart';
+import 'point_cloud.dart';
+
 
 // thje global singleton
 Hub hub = new Hub();
 
 class Hub
 {
-  // the main Elements
+  // the big, public, singleton components
   RbRender renderUI;
   RbSettings settingsUI;
   RbStatus statusUI;
-  
+  Element canvas;
+  Renderer renderer;
+
+  // private
+  Map<String, PointCloud> _pointclouds = new Map();
+
+
   Hub()
   {
     return;
   }
-  
-  void addFile(String file)
+
+
+  void doColorizeFile(String file)
+  {
+    renderer.removeCloud();
+
+    PointCloud cloud = _pointclouds[file];
+    assert(cloud != null);
+
+    cloud.colorize();
+
+    renderer.addCloud(cloud);
+  }
+
+
+  void doAddFile(String file)
   {
     settingsUI.doAddFile(file);
-    renderUI.addGraph(file);
+
+    var data = CloudGenerator.generate(file);
+    var cloud = new PointCloud(data);
+
+    _pointclouds[file] = cloud;
+
+    statusUI.minx = cloud.minx;
+    statusUI.maxx = cloud.maxx;
+    statusUI.miny = cloud.miny;
+    statusUI.maxy = cloud.maxy;
+    statusUI.minz = cloud.minz;
+    statusUI.maxz = cloud.maxz;
+
+    // we don't make the renderer until we have to
+    if (renderer == null)
+    {
+      renderer = new Renderer(canvas);
+      renderer.init();
+      renderer.animate(0);
+    }
+
+    renderer.addCloud(cloud);
   }
-  
-  void removeFile(String file)
+
+
+  void doRemoveFile(String file)
   {
     settingsUI.doRemoveFile(file);
-    renderUI.removeGraph(file);
+    _pointclouds.remove(file);
+
+    renderer.removeCloud();
   }
-  
-  void showAxes(bool on)
+
+
+  void doToggleAxes(bool on)
   {
-    renderUI.showAxes(on);
+    if (on)
+    {
+      renderer.addAxes();
+    }
+    else
+    {
+      renderer.removeAxes();
+    }
   }
-  
-  void mouseMoved(double x, double y)
+
+
+  void doMouseMoved()
   {
-    statusUI.doMousePosition(x, y);
+    statusUI.mousePositionX = renderer.mouseX;
+    statusUI.mousePositionY = renderer.mouseY;
   }
 }

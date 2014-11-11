@@ -9,24 +9,19 @@ import 'hub.dart';
 class RbStatus extends PolymerElement {
   @published double mousePositionX;
   @published double mousePositionY;
-  
+  @published double minx, maxx, miny, maxy, minz, maxz;
+
   RbStatus.created() : super.created();
-    
+
   @override
   void attached() {
     super.attached();
-    
-    hub.statusUI = this;    
+
+    hub.statusUI = this;
   }
-  
+
   @override
   void detached() {
     super.detached();
-  }
-  
-  void doMousePosition(double x, double y)
-  {
-    mousePositionX = x;
-    mousePositionY = y;
   }
 }
