@@ -1,17 +1,19 @@
-library rb_settings;
+library settings_element;
 
+
+import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
-import 'dart:core';
-import 'hub.dart';
+import '../hub.dart';
 
-@CustomTag('rb-settings')
-class RbSettings extends PolymerElement
+
+@CustomTag('settings-element')
+class SettingsElement extends PolymerElement
 {
   @published ObservableList<String> files = new ObservableList();
   @published bool showAxes = false;
 
-  RbSettings.created() : super.created();
+  SettingsElement.created() : super.created();
 
   @override
   void attached() {

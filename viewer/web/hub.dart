@@ -1,10 +1,11 @@
 library hub;
 
+
 import 'dart:core';
 import 'dart:html';
-import 'rb_render.dart';
-import 'rb_settings.dart';
-import 'rb_status.dart';
+import 'elements/render_element.dart';
+import 'elements/settings_element.dart';
+import 'elements/status_element.dart';
 import 'renderer.dart';
 import 'cloud_generator.dart';
 import 'point_cloud.dart';
@@ -16,9 +17,9 @@ Hub hub = new Hub();
 class Hub
 {
   // the big, public, singleton components
-  RbRender renderUI;
-  RbSettings settingsUI;
-  RbStatus statusUI;
+  RenderElement renderUI;
+  SettingsElement settingsUI;
+  StatusElement statusUI;
   Element canvas;
   Renderer renderer;
 

@@ -11,7 +11,7 @@
 <link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/core_elements/core_iconset.html">
 
-<polymer-element name="rb-settings">
+<polymer-element name="settings-element">
 
   <template>
     <style>
@@ -65,13 +65,13 @@
         <template repeat="{{file in files}}">
           <div>
             <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleFile}}" class="padright">
-            <button class="smallbutton" on-click="{{deleteFile}}" id="{{file}}"><img src="vendors/iconic/x.png" class="icon"></button>
-            <button class="smallbutton" on-click="{{colorizeFile}}" id="{{file}}"><img src="vendors/iconic/brush.png" class="icon"></button>
-            <button class="smallbutton" on-click="{{infoFile}}" id="{{file}}"><img src="vendors/iconic/question-mark.png" class="icon"></button>
+            <button class="smallbutton" on-click="{{deleteFile}}" id="{{file}}"><img src="../vendors/iconic/x.png" class="icon"></button>
+            <button class="smallbutton" on-click="{{colorizeFile}}" id="{{file}}"><img src="../vendors/iconic/brush.png" class="icon"></button>
+            <button class="smallbutton" on-click="{{infoFile}}" id="{{file}}"><img src="../vendors/iconic/question-mark.png" class="icon"></button>
             <span class="padleft">{{file}}</span>
           </div>
         </template>
-        <button class="smallbutton" on-click="{{openFile}}"><img src="vendors/iconic/plus.png" class="icon"></button>
+        <button class="smallbutton" on-click="{{openFile}}"><img src="../vendors/iconic/plus.png" class="icon"></button>
       </fieldset>
 
       <fieldset>
@@ -97,6 +97,6 @@
 
   </template>
 
-  <script type="application/dart" src="rb_settings.dart"></script>
+  <script type="application/dart" src="settings_element.dart"></script>
 
 </polymer-element>

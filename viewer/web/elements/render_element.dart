@@ -1,14 +1,15 @@
-library rb_render;
+library render_element;
 
-import 'package:polymer/polymer.dart';
+
 import 'dart:core';
-import 'hub.dart';
+import 'package:polymer/polymer.dart';
+import '../hub.dart';
 
 
-@CustomTag('rb-render')
-class RbRender extends PolymerElement
+@CustomTag('render-element')
+class RenderElement extends PolymerElement
 {
-  RbRender.created() : super.created();
+  RenderElement.created() : super.created();
 
   @override
   void attached() {

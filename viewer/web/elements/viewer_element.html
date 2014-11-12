@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 
-<link rel="stylesheet" href="rialto.css">
- 
+<link rel="stylesheet" href="../rialto.css">
+
 <link rel="import" href="packages/polymer/polymer.html">
 <link rel="import" href="packages/core_elements/core_scaffold.html">
 <link rel="import" href="packages/core_elements/core_menu.html">
 <link rel="import" href="packages/core_elements/core_item.html">
 
-<link rel="import" href="rb_render.html">
-<link rel="import" href="rb_settings.html">
-<link rel="import" href="rb_status.html">
+<link rel="import" href="render_element.html">
+<link rel="import" href="settings_element.html">
+<link rel="import" href="status_element.html">
 
-<polymer-element name="rb-viewer">
+<polymer-element name="viewer-element">
 
   <template>
     <style>
     <!-- http://projects.peterfessel.com/fluid-web-app-layout/ -->
-      
+
     body {
       width: 100%;
       height: 100%;
-      color: black; 
+      color: black;
     }
     body, div {
       margin: 0px;
     }
-    
+
     body * {
       box-sizing: border-box; /* makes sizing by percentage in combination with padding possible */
       -moz-box-sizing: border-box;
@@ -72,19 +72,19 @@
       color: black;
     }
     </style>
-    
+
     <div class="fixed-container-outer">
       <div class="fixed-sidebar ">
-        <rb-settings></rb-settings>
+        <settings-element></settings-element>
       </div>
       <div class="fixed-container-inner">
           <div class="fluid-box3">
             <div vertical layout style="height:100%">
               <div flex black>
-                <rb-render></rb-render> 
+                <render-element></render-element>
               </div>
-              <div class="fixed-footer-inner ">  
-                <rb-status></rb-status>    
+              <div class="fixed-footer-inner ">
+                <status-element></status-element>
               </div>
             </div>
           </div>
@@ -93,6 +93,6 @@
 
   </template>
 
-  <script type="application/dart" src="rb_viewer.dart"></script>
+  <script type="application/dart" src="viewer_element.dart"></script>
 
 </polymer-element>

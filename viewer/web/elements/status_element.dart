@@ -1,17 +1,18 @@
-library rb_status;
+library status_element;
 
-import 'package:polymer/polymer.dart';
+
 import 'dart:core';
-import 'hub.dart';
+import 'package:polymer/polymer.dart';
+import '../hub.dart';
 
 
-@CustomTag('rb-status')
-class RbStatus extends PolymerElement {
+@CustomTag('status-element')
+class StatusElement extends PolymerElement {
   @published double mousePositionX;
   @published double mousePositionY;
   @published double minx, maxx, miny, maxy, minz, maxz;
 
-  RbStatus.created() : super.created();
+  StatusElement.created() : super.created();
 
   @override
   void attached() {
