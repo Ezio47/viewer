@@ -17,7 +17,6 @@ class ViewerElement extends PolymerElement
     super.attached();
 
     hub.doAddFile("5");
-    hub.doToggleAxes(true);
   }
 
 

@@ -78,8 +78,14 @@
         <legend>Display</legend>
 
           <div>
-            <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleAxes}}" class="padright">
-            <span>Toggle axes</span>
+            <div>
+              <input type="checkbox" value="Enabled" on-click="{{toggleAxes}}" class="padright">
+              <span>Toggle axes</span>
+            </div>
+            <div>
+              <input type="checkbox" value="Enabled" on-click="{{toggleBbox}}" class="padright">
+              <span>Toggle bbox</span>
+            </div>
           </div>
       </fieldset>
 

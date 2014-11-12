@@ -6,13 +6,16 @@ import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/controls/trackball_controls.dart';
 import 'point_cloud.dart';
+import 'render_utils.dart';
+import 'utils.dart';
 
 
 class Renderer
 {
   // public
   double mouseX = 0.0, mouseY = 0.0;
-  bool showAxes = false;
+  bool _showAxes = false;
+  bool _showBbox = false;
 
   // private
   Camera _camera;
@@ -22,9 +25,11 @@ class Renderer
   Projector _projector;
   Element _canvas;
   ParticleSystem _particleSystem;
-  List<Line> _axes = new List();
   Line _myline;
   double _ndcMouseX = 0.0, _ndcMouseY = 0.0;
+
+  List<Line> _axes;
+  List<Line> _bbox;
 
 
   Renderer(var canvas)
@@ -47,8 +52,8 @@ class Renderer
 
     _addCameraControls();
 
-    _canvas.onMouseMove.listen(onMyMouseMove);
-    window.onResize.listen(onMyWindowResize);
+    _canvas.onMouseMove.listen(_updateMouseLocalCoords);
+    window.onResize.listen(_onMyWindowResize);
   }
 
 
@@ -79,108 +84,62 @@ class Renderer
   }
 
 
-  static GeometryAttribute _clone(GeometryAttribute src)
+  void setCloud(PointCloud cloud)
   {
-    int count = src.numItems;
+    _particleSystem = RenderUtils.drawPoints(cloud);
+    _scene.add(_particleSystem);
 
-    var dst = new GeometryAttribute.float32(count, 3);
-
-    for (int i=0; i<count; i++)
+    _axes = RenderUtils.drawAxes(cloud.low, cloud.high);
+    if (_showAxes)
     {
-      dst.array[i] = src.array[i];
+      _axes.forEach((l) => _scene.add(l));
     }
 
-    return dst;
-  }
-
-  void addCloud(PointCloud cloud)
-  {
-    var positions = cloud.map["positions"];
-    var colors    = cloud.map["colors"];
-    assert(positions != null);
-    assert(colors != null);
-
-    // the underlying system wants to take ownership of these arrays, so we'll
-    // pass them copies
-    BufferGeometry geometry = new BufferGeometry();
-    geometry.attributes = {
-       "position" : _clone(positions),
-       "color"    : _clone(colors)
-    };
-
-    geometry.computeBoundingSphere();
-    var material = new ParticleBasicMaterial( size: 5, vertexColors: 2 );
-
-    _particleSystem = new ParticleSystem( geometry, material );
-    _scene.add( _particleSystem );
-
-    createAxes(cloud);
-    if (showAxes)
+    _bbox = RenderUtils.drawBbox(cloud.low, cloud.high);
+    if (_showBbox)
     {
-      _scene.add(_axes[0]);
-      _scene.add(_axes[1]);
-      _scene.add(_axes[2]);
+      _bbox.forEach((l) => _scene.add(l));
     }
   }
 
 
-  void createAxes(var cloud)
-  {
-    _axes.clear();
-
-    var material;
-    var geometry;
-    var line;
-
-    material = new LineBasicMaterial(color:0xff0000);
-    geometry = new Geometry();
-    geometry.vertices.add(new Vector3( cloud.minx, cloud.miny, cloud.minz ));
-    geometry.vertices.add(new Vector3( cloud.maxx, cloud.miny, cloud.minz ));
-    line = new Line( geometry, material );
-    _axes.add(line);
-
-    material = new LineBasicMaterial(color:0x00ff00);
-    geometry = new Geometry();
-    geometry.vertices.add(new Vector3( cloud.minx, cloud.miny, cloud.minz ));
-    geometry.vertices.add(new Vector3( cloud.minx, cloud.maxy, cloud.minz ));
-    line = new Line( geometry, material );
-    _axes.add(line);
-
-    material = new LineBasicMaterial(color:0x0000ff);
-    geometry = new Geometry();
-    geometry.vertices.add(new Vector3( cloud.minx, cloud.miny, cloud.minz ));
-    geometry.vertices.add(new Vector3( cloud.minx, cloud.miny, cloud.maxz ));
-    line = new Line( geometry, material );
-    _axes.add(line);
-  }
-
-
-  void removeCloud()
+  void unsetCloud()
   {
     _scene.remove(_particleSystem);
-    _scene.remove(_axes[0]);
-    _scene.remove(_axes[1]);
-    _scene.remove(_axes[2]);
+    _axes.forEach((l) => _scene.remove(l));
+    _bbox.forEach((l) => _scene.remove(l));
   }
 
 
-  void addAxes()
+  void toggleAxesDisplay(bool on)
   {
-    _scene.add(_axes[0]);
-    _scene.add(_axes[1]);
-    _scene.add(_axes[2]);
+    if (on)
+    {
+      _axes.forEach((l) => _scene.add(l));
+    }
+    else
+    {
+      _axes.forEach((l) => _scene.remove(l));
+    }
+    _showAxes = on;
   }
 
 
-  void removeAxes()
+  void toggleBboxDisplay(bool on)
   {
-    _scene.remove(_axes[0]);
-    _scene.remove(_axes[1]);
-    _scene.remove(_axes[2]);
+    if (on)
+    {
+      _bbox.forEach((l) => _scene.add(l));
+    }
+    else
+    {
+      _bbox.forEach((l) => _scene.remove(l));
+    }
+    _showBbox = on;
   }
 
 
-  void onMyMouseMove( event )
+  void _updateMouseLocalCoords( event )
   {
     event.preventDefault();
 
@@ -191,11 +150,10 @@ class Renderer
 
     _ndcMouseX = ( x / window.innerWidth ) * 2 - 1;
     _ndcMouseY = - ( y / window.innerHeight ) * 2 + 1;
-
   }
 
 
-  onMyWindowResize(event)
+  _onMyWindowResize(event)
   {
     _webglRenderer.setSize( window.innerWidth, window.innerHeight );
   }
@@ -204,26 +162,24 @@ class Renderer
   void animate(num time)
   {
     window.requestAnimationFrame(animate);
-    render();
+    _render();
   }
 
 
-  void render()
+  void _render()
   {
     if (_cameraControls != null)
     {
       _cameraControls.update();
     }
 
-    updateMouse();
-
-    //createRay();
+    _updateMouseWorldCoords();
 
     _webglRenderer.render( _scene, _camera );
   }
 
 
-  void updateMouse()
+  void _updateMouseWorldCoords()
   {
     _camera.lookAt( _scene.position );
 
@@ -235,36 +191,5 @@ class Renderer
 
     mouseX = xx;
     mouseY = yy;
-  }
-
-
-  void createRay()
-  {
-    _camera.lookAt( _scene.position );
-
-    var vector = new Vector3( _ndcMouseX, _ndcMouseY, 0.0 );
-    _projector.unprojectVector( vector, _camera );
-
-    var ray = new Ray( _camera.position, vector.sub( _camera.position ).normalize() );
-    var xx = ray.origin.x;
-    var yy = ray.origin.y;
-    var zz = ray.origin.z;
-    var xxx = ray.direction.x;
-    var yyy = ray.direction.y;
-    var zzz = ray.direction.z;
-
-    if (_myline != null)
-    {
-      _scene.remove(_myline);
-    }
-    {
-       var material = new LineBasicMaterial(color:0x888888);
-       var geometry = new Geometry();
-       //geometry.vertices.add(new Vector3( xx,yy,zz ));
-       geometry.vertices.add(new Vector3( xx-2000*xxx, yy-2000*yyy, zz-2000*zzz ));
-       geometry.vertices.add(new Vector3( xx+2000*xxx, yy+2000*yyy, zz+2000*zzz ));
-       _myline = new Line( geometry, material );
-       _scene.add( _myline );
-     }
   }
 }

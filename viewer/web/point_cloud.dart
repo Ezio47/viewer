@@ -3,6 +3,7 @@ library point_cloud;
 import 'dart:core';
 import 'package:three/three.dart';
 import 'dart:math' as Math;
+import 'package:vector_math/vector_math.dart';
 
 
 // given a set of dimensions, as returned by FileGenerator, this class represents
@@ -10,24 +11,24 @@ import 'dart:math' as Math;
 
 class PointCloud
 {
-  Map<String, GeometryAttribute> map;
+  Map<String, GeometryAttribute> dims;
   int numPoints;
-  double minx, maxx, miny, maxy, minz, maxz;
+  Vector3 low, high;
 
-  PointCloud(Map<String, GeometryAttribute> mymap)
+  PointCloud(Map<String, GeometryAttribute> mydims)
   {
-    map = mymap;
+    dims = mydims;
 
     _checkValid();
 
-    if (!map.containsKey("positions"))
+    if (!dims.containsKey("positions"))
     {
       combineXYZ();
     }
 
-    numPoints = map["positions"].numItems.toInt() ~/ 3;
+    numPoints = dims["positions"].numItems.toInt() ~/ 3;
 
-    if (! mymap.containsKey("colors"))
+    if (! mydims.containsKey("colors"))
     {
       _addColorArray();
     }
@@ -38,16 +39,16 @@ class PointCloud
 
   void colorize()
   {
-    double zLen = maxz - minz;
+    double zLen = high.z - low.z;
 
-    var positions = map["positions"].array;
-    var colors = map["colors"].array;
-    var numItems = map["colors"].numItems;
+    var positions = dims["positions"].array;
+    var colors = dims["colors"].array;
+    var numItems = dims["colors"].numItems;
 
     for (int i=0; i<numPoints*3; i+=3)
     {
       double z = positions[i+2];
-      double c = (z - minz) / zLen;
+      double c = (z - low.z) / zLen;
 
       // clip, due to FP math
       assert(c >= -0.1 && c <= 1.1);
@@ -87,61 +88,68 @@ class PointCloud
       colors.array[i+2] = 1.0;
     }
 
-    map["colors"] = colors;
+    dims["colors"] = colors;
   }
 
 
   void computeBounds()
   {
-    minx = map["positions"].array[0];
-    maxx = map["positions"].array[0];
-    miny = map["positions"].array[1];
-    maxy = map["positions"].array[1];
-    minz = map["positions"].array[2];
-    maxz = map["positions"].array[2];
+    var minx = dims["positions"].array[0];
+    var maxx = dims["positions"].array[0];
+    var miny = dims["positions"].array[1];
+    var maxy = dims["positions"].array[1];
+    var minz = dims["positions"].array[2];
+    var maxz = dims["positions"].array[2];
 
-    for (int i=3; i<numPoints; i+=3)
+    for (int i=3; i<numPoints*3; i+=3)
     {
-      minx = Math.min(minx, map["positions"].array[i]);
-      maxx = Math.max(maxx, map["positions"].array[i]);
-      miny = Math.min(miny, map["positions"].array[i+1]);
-      maxy = Math.max(maxy, map["positions"].array[i+1]);
-      minz = Math.min(minz, map["positions"].array[i+2]);
-      maxz = Math.max(maxz, map["positions"].array[i+2]);
+      var x = dims["positions"].array[i];
+      var y = dims["positions"].array[i+1];
+      var z = dims["positions"].array[i+2];
+
+      minx = Math.min(minx, x);
+      maxx = Math.max(maxx, x);
+      miny = Math.min(miny, y);
+      maxy = Math.max(maxy, y);
+      minz = Math.min(minz, z);
+      maxz = Math.max(maxz, z);
     }
+
+    low = new Vector3(minx, miny, minz);
+    high = new Vector3(maxx, maxy, maxz);
   }
 
   void combineXYZ()
   {
-    num count = map["x"].numItems;
+    num count = dims["x"].numItems;
 
     var positions = new GeometryAttribute.float32(count * 3, 3);
-    map["positions"] = positions;
+    dims["positions"] = positions;
 
     for (int i=0, j=0; i<count; i++, j+=3)
     {
-      positions.array[j] = map["x"].array[i];
-      positions.array[j+1] = map["y"].array[i];
-      positions.array[j+2] = map["z"].array[i];
+      positions.array[j] = dims["x"].array[i];
+      positions.array[j+1] = dims["y"].array[i];
+      positions.array[j+2] = dims["z"].array[i];
     }
 
-    map.remove("x");
-    map.remove("y");
-    map.remove("z");
+    dims.remove("x");
+    dims.remove("y");
+    dims.remove("z");
   }
 
 
   void _checkValid()
   {
-    bool xyz = map.containsKey("x") && map.containsKey("y") && map.containsKey("z");
-    bool positions = map.containsKey("positions");
+    bool xyz = dims.containsKey("x") && dims.containsKey("y") && dims.containsKey("z");
+    bool positions = dims.containsKey("positions");
     assert(xyz || positions);
     assert(!(xyz && positions));
 
-    num count = map[map.keys.first].numItems;
-    for (var k in map.keys)
+    num count = dims[dims.keys.first].numItems;
+    for (var k in dims.keys)
     {
-      assert(map[k].numItems == count);
+      assert(dims[k].numItems == count);
     }
   }
 }

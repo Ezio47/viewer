@@ -12,6 +12,7 @@ class SettingsElement extends PolymerElement
 {
   @published ObservableList<String> files = new ObservableList();
   @published bool showAxes = false;
+  @published bool showBbox = false;
 
   SettingsElement.created() : super.created();
 
@@ -45,6 +46,11 @@ class SettingsElement extends PolymerElement
   void toggleAxes(Event e, var detail, Node target) {
     var button = target as InputElement;
     hub.doToggleAxes(button.checked);
+  }
+
+  void toggleBbox(Event e, var detail, Node target) {
+    var button = target as InputElement;
+    hub.doToggleBbox(button.checked);
   }
 
   void openFile(Event e, var detail, Node target) {

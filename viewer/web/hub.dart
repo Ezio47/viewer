@@ -35,14 +35,14 @@ class Hub
 
   void doColorizeFile(String file)
   {
-    renderer.removeCloud();
+    renderer.unsetCloud();
 
     PointCloud cloud = _pointclouds[file];
     assert(cloud != null);
 
     cloud.colorize();
 
-    renderer.addCloud(cloud);
+    renderer.setCloud(cloud);
   }
 
 
@@ -55,12 +55,12 @@ class Hub
 
     _pointclouds[file] = cloud;
 
-    statusUI.minx = cloud.minx;
-    statusUI.maxx = cloud.maxx;
-    statusUI.miny = cloud.miny;
-    statusUI.maxy = cloud.maxy;
-    statusUI.minz = cloud.minz;
-    statusUI.maxz = cloud.maxz;
+    statusUI.minx = cloud.low.x;
+    statusUI.maxx = cloud.high.x;
+    statusUI.miny = cloud.low.y;
+    statusUI.maxy = cloud.high.y;
+    statusUI.minz = cloud.low.z;
+    statusUI.maxz = cloud.high.z;
 
     // we don't make the renderer until we have to
     if (renderer == null)
@@ -70,7 +70,7 @@ class Hub
       renderer.animate(0);
     }
 
-    renderer.addCloud(cloud);
+    renderer.setCloud(cloud);
   }
 
 
@@ -79,21 +79,13 @@ class Hub
     settingsUI.doRemoveFile(file);
     _pointclouds.remove(file);
 
-    renderer.removeCloud();
+    renderer.unsetCloud();
   }
 
 
-  void doToggleAxes(bool on)
-  {
-    if (on)
-    {
-      renderer.addAxes();
-    }
-    else
-    {
-      renderer.removeAxes();
-    }
-  }
+  void doToggleAxes(bool on) => renderer.toggleAxesDisplay(on);
+
+  void doToggleBbox(bool on) => renderer.toggleBboxDisplay(on);
 
 
   void doMouseMoved()
