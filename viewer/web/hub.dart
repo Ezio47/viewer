@@ -87,6 +87,7 @@ class Hub
 
   void doToggleBbox(bool on) => renderer.toggleBboxDisplay(on);
 
+  void goHome() => renderer.goHome();
 
   void doMouseMoved()
   {

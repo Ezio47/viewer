@@ -18,7 +18,7 @@ class Renderer
   bool _showBbox = false;
 
   // private
-  Camera _camera;
+  PerspectiveCamera _camera;
   Scene _scene;
   WebGLRenderer _webglRenderer;
   var _cameraControls;
@@ -26,8 +26,10 @@ class Renderer
   Element _canvas;
   ParticleSystem _particleSystem;
   Line _myline;
-  double _ndcMouseX = 0.0, _ndcMouseY = 0.0;
+  double _ndcMouseX = 0.0, _ndcMouseY = 0.0;  // [-1..+1]
 
+  Vector3 _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
+  Vector3 _cameraUpPosition = new Vector3(0.0, 1.0, 0.0);
   List<Line> _axes;
   List<Line> _bbox;
 
@@ -44,12 +46,11 @@ class Renderer
     _scene = new Scene();
     _projector = new Projector();
 
-    _addCamera();
-
     _webglRenderer = new WebGLRenderer();
     _webglRenderer.setSize(window.innerWidth, window.innerHeight);
     _canvas.children.add(_webglRenderer.domElement);
 
+    _addCamera();
     _addCameraControls();
 
     _canvas.onMouseMove.listen(_updateMouseLocalCoords);
@@ -57,28 +58,32 @@ class Renderer
   }
 
 
+  void goHome()
+  {
+    _camera.position.setFrom(_cameraHomePosition);
+    _camera.up.setFrom(_cameraUpPosition);
+  }
+
+
   void _addCameraControls()
   {
     _cameraControls = new TrackballControls(_camera, _webglRenderer.domElement);
-    _cameraControls.target = new Vector3(0.0, 2.0, 0.0);
-    _cameraControls.rotateSpeed = 1.0;
-    _cameraControls.zoomSpeed = 1.2;
-    _cameraControls.panSpeed = 0.8;
-    _cameraControls.noZoom = false;
-    _cameraControls.noPan = false;
+    _cameraControls.zoomSpeed = 0.25;
 
-    _cameraControls.staticMoving = true;
-    _cameraControls.dynamicDampingFactor = 0.3;
+    //_cameraControls.target = new Vector3(0.0, 2.0, 0.0);
+    //_cameraControls.rotateSpeed = 1.0;
+    //_cameraControls.panSpeed = 0.8;
+    //_cameraControls.noZoom = false;
+    //_cameraControls.noPan = false;
+    //_cameraControls.staticMoving = true;
+    //_cameraControls.dynamicDampingFactor = 0.3;
   }
 
 
   void _addCamera()
   {
-    //camera = new PerspectiveCamera( 90.0, window.innerWidth / window.innerHeight, 1.0, 10000.0 );
-    _camera = new OrthographicCamera(-2500.0, 2500.0, 2500.0, -2500.0, 0.1, 10000.0);
-
-    _camera.position.setValues(0.0, 0.0, 5000.0);
-    _camera.lookAt(new Vector3(0.0, 0.0, 0.0));
+    final double aspect = window.innerWidth.toDouble() / window.innerHeight.toDouble();
+    _camera = new PerspectiveCamera(60.0, aspect, 0.1, 20000.0);
 
     _scene.add(_camera);
   }
@@ -88,6 +93,10 @@ class Renderer
   {
     _particleSystem = RenderUtils.drawPoints(cloud);
     _scene.add(_particleSystem);
+
+    // when we set the cloud, we need to set the camera relative to it
+    _cameraHomePosition = RenderUtils.getDefaultCameraPosition(cloud);
+    goHome();
 
     _axes = RenderUtils.drawAxes(cloud.low, cloud.high);
     if (_showAxes)
@@ -108,6 +117,8 @@ class Renderer
     _scene.remove(_particleSystem);
     _axes.forEach((l) => _scene.remove(l));
     _bbox.forEach((l) => _scene.remove(l));
+
+    _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
   }
 
 
@@ -146,8 +157,6 @@ class Renderer
     var x = event.client.x - _canvas.documentOffset.x;
     var y = event.client.y - _canvas.documentOffset.y;
 
-    //print ("mouse: $x $y");
-
     _ndcMouseX = ( x / window.innerWidth ) * 2 - 1;
     _ndcMouseY = - ( y / window.innerHeight ) * 2 + 1;
   }
@@ -155,7 +164,12 @@ class Renderer
 
   _onMyWindowResize(event)
   {
-    _webglRenderer.setSize( window.innerWidth, window.innerHeight );
+    _webglRenderer.setSize(window.innerWidth, window.innerHeight);
+
+    final double aspect = window.innerWidth.toDouble() / window.innerHeight.toDouble();
+    _camera.aspect = aspect;
+
+    _camera.lookAt(_scene.position);
   }
 
 
@@ -181,15 +195,17 @@ class Renderer
 
   void _updateMouseWorldCoords()
   {
-    _camera.lookAt( _scene.position );
+    //_camera.lookAt(_scene.position);
 
-    var vector = new Vector3( _ndcMouseX, _ndcMouseY, 0.0 );
-    _projector.unprojectVector( vector, _camera );
-    var xx = vector.x;
-    var yy = vector.y;
-    var zz = vector.z;
+    var vector = new Vector3(_ndcMouseX, _ndcMouseY, 1.0);
+    _projector.unprojectVector(vector, _camera);
+    var x = vector.x;
+    var y = vector.y;
+    var z = vector.z;
 
-    mouseX = xx;
-    mouseY = yy;
+    //mouseX = _ndcMouseX;
+    //mouseY = _ndcMouseY;
+    mouseX = x;
+    mouseY = y;
   }
 }

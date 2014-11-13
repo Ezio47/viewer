@@ -53,6 +53,10 @@ class SettingsElement extends PolymerElement
     hub.doToggleBbox(button.checked);
   }
 
+  void goHome(Event e, var detail, Node target) {
+    hub.goHome();
+  }
+
   void openFile(Event e, var detail, Node target) {
     var dlg = this.shadowRoot.querySelector("#openDialog");
     dlg.showModal();
