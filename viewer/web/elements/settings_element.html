@@ -8,8 +8,8 @@
 <link rel="import" href="packages/core_elements/core_item.html">
 <link rel="import" href="packages/core_elements/core_input.html">
 <link rel="import" href="packages/core_elements/core_icon.html">
-<link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/core_elements/core_iconset.html">
+<link rel="import" href="packages/core_elements/image_icons.html">
 
 <polymer-element name="settings-element">
 
@@ -64,6 +64,8 @@
 
         <template repeat="{{file in files}}">
           <div>
+            <core-icon icon="close"></core-icon>
+            <core-icon icon="info"></core-icon>
             <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleFile}}" class="padright">
             <button class="smallbutton" on-click="{{deleteFile}}" id="{{file}}"><img src="../vendors/iconic/x.png" class="icon"></button>
             <button class="smallbutton" on-click="{{colorizeFile}}" id="{{file}}"><img src="../vendors/iconic/brush.png" class="icon"></button>

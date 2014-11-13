@@ -47,14 +47,16 @@ class Renderer
     _projector = new Projector();
 
     _webglRenderer = new WebGLRenderer();
-    _webglRenderer.setSize(window.innerWidth, window.innerHeight);
+    var xx = _canvas.clientWidth;
+    var yy = _canvas.clientHeight;
+    _webglRenderer.setSize(window.innerWidth - _canvas.documentOffset.x , window.innerHeight - _canvas.documentOffset.y );
     _canvas.children.add(_webglRenderer.domElement);
 
     _addCamera();
     _addCameraControls();
 
     _canvas.onMouseMove.listen(_updateMouseLocalCoords);
-    window.onResize.listen(_onMyWindowResize);
+    _canvas.onResize.listen(_onMyWindowResize);
   }
 
 
@@ -82,7 +84,9 @@ class Renderer
 
   void _addCamera()
   {
-    final double aspect = window.innerWidth.toDouble() / window.innerHeight.toDouble();
+    var w = window.innerWidth - _canvas.documentOffset.x;
+    var h = window.innerHeight - _canvas.documentOffset.y;
+    final double aspect = w.toDouble() / h.toDouble();
     _camera = new PerspectiveCamera(60.0, aspect, 0.1, 20000.0);
 
     _scene.add(_camera);
@@ -164,9 +168,11 @@ class Renderer
 
   _onMyWindowResize(event)
   {
-    _webglRenderer.setSize(window.innerWidth, window.innerHeight);
+    var w = window.innerWidth - _canvas.documentOffset.x;
+    var h = window.innerHeight - _canvas.documentOffset.y;
+    _webglRenderer.setSize(w, h);
 
-    final double aspect = window.innerWidth.toDouble() / window.innerHeight.toDouble();
+    final double aspect = w.toDouble() / h.toDouble();
     _camera.aspect = aspect;
 
     _camera.lookAt(_scene.position);

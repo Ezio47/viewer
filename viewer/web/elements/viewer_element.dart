@@ -16,7 +16,7 @@ class ViewerElement extends PolymerElement
   void attached() {
     super.attached();
 
-    hub.doAddFile("5");
+   hub.doAddFile("5");
   }
 
 

@@ -69,6 +69,8 @@ class SettingsElement extends PolymerElement
   }
 
   void openFileOkay(Event e, var detail, Node target) {
+    DialogElement dlg = this.shadowRoot.querySelector("#openDialog");
+    dlg.close("");
     var txt = this.shadowRoot.querySelector("#filenamearea");
     hub.doAddFile(txt.value);
     txt.value = "";
