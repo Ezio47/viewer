@@ -10,7 +10,7 @@ import '../hub.dart';
 @CustomTag('settings-element')
 class SettingsElement extends PolymerElement
 {
-  @published ObservableList<String> files = new ObservableList();
+  @published ObservableList<CloudFile> files = new ObservableList();
   @published bool showAxes = false;
   @published bool showBbox = false;
 
@@ -35,12 +35,12 @@ class SettingsElement extends PolymerElement
 
   void doAddFile(String s)
   {
-    files.add(s);
+    files.add(new CloudFile(s));
   }
 
   void doRemoveFile(String s)
   {
-    files.remove(s);
+      files.removeWhere((f) => f.name==s);
   }
 
   void toggleAxes(Event e, var detail, Node target) {
@@ -93,8 +93,43 @@ class SettingsElement extends PolymerElement
 
   void deleteFile(Event e, var detail, Node target)
   {
-    var button = target as ButtonElement;
-    hub.doRemoveFile(button.id.toString());
+    int id = int.parse(target.parent.id);
+  //  var button = target as ButtonElement;
+  //  hub.doRemoveFile(button.id.toString());
     return;
   }
+
+
+
+  @observable bool selectionEnabled = true;
+
+  void selectionMade( e )
+  {
+      window.alert("selection made ${e.detail.data.toString()}");
+      if (e.detail.data.checked)
+      {
+       // files.remove(e.detail.data);
+      }
+  }
+
+  @override
+  void ready()
+  {
+      $[ 'kore-list' ].on ['core-activate'].listen( handleListChange );
+  }
+
+  void handleListChange(e)
+  {
+    window.alert("list change ${e.detail.data.toString()}");
+  }
+
+  @observable var selection;
+}
+
+
+class CloudFile extends Observable{
+  @observable String name;
+  @observable bool checked;
+  CloudFile(this.name) { checked=false; }
+  String toString() => "<$name $checked>";
 }

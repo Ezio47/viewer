@@ -63,7 +63,7 @@ class Renderer
     _addCameraControls();
 
     _canvas.onMouseMove.listen(_updateMouseLocalCoords);
-    _canvas.onResize.listen(_onMyWindowResize);
+    window.onResize.listen(_onMyWindowResize);
   }
 
 

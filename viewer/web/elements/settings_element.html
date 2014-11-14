@@ -9,105 +9,162 @@
 <link rel="import" href="packages/core_elements/core_input.html">
 <link rel="import" href="packages/core_elements/core_icon.html">
 <link rel="import" href="packages/core_elements/core_iconset.html">
+<link rel="import" href="packages/core_elements/core_list_dart.html">
+<link rel="import" href="packages/core_elements/core_icon_button.html">
+
+<link rel="import" href="packages/paper_elements/paper_icon_button.html">
+<link rel="import" href="packages/paper_elements/paper_checkbox.html">
+
 <link rel="import" href="packages/core_elements/image_icons.html">
 
 <polymer-element name="settings-element">
 
-  <template>
-    <style>
-      :host {
+    <template>
+        <style>
+            :host {
 
-      }
-      hr {
-        width:66%;
-      }
+            }
+            hr {
+            width:66%;
+            }
 
-      .padded {
-        padding: 4px;
-      }
-      .title {
-        font-size: 16px;
-        padding: 4px;
-      }
-      fieldset {
-        padding: 4px;
-      }
-      .smallbutton {
-        height: 16px;
-        width: 16px;
-        display: inline-block;
-        padding: 0;
-        margin: 0;
-        border-width: 0;
-        background-color: #eee;
-      }
-      .smallbuttontext {
-        text-align: center;
-        display:table-cell;
-        vertical-align:middle;
-      }
-      .icon {
-      }
-      .padright {
-        margin: 0px 10px 0px 0px;
-      }
-      .padleft {
-        margin: 0px 0px 0px 10px;
-      }
-    </style>
+            .padded {
+            padding: 4px;
+            }
+            .title {
+            font-size: 16px;
+            padding: 4px;
+            }
+            fieldset {
+            padding: 4px;
+            }
+            .smallbutton {
+            height: 16px;
+            width: 16px;
+            display: inline-block;
+            padding: 0;
+            margin: 0;
+            border-width: 0;
+            background-color: #eee;
+            }
+            .smallbuttontext {
+            text-align: center;
+            display:table-cell;
+            vertical-align:middle;
+            }
+            .icon {
+            }
+            .padright {
+            margin: 0px 10px 0px 0px;
+            }
+            .padleft {
+            margin: 0px 0px 0px 10px;
+            }
+            .icon-box {
+                margin: 0px;
+                padding: 0px;
+            }
+            .small-icon {
+                border-style: solid;
+                border-color: black;
+                border-width: 1px;
+                margin: 0px;
+                padding: 0px;
+                height: 16px;
+                width: 16px;
+            }
+            .small-checkbox {
+                border-style: solid;
+                border-color: black;
+                border-width: 1px;
+                margin: 0px;
+                padding: 0px;
+                height: 16px;
+                width: 16px;
+            }
+            .selected {
+                background: silver;
+            }
+        </style>
 
-    <div vertical layout class="padded">
-      <div class="title">Settings</div>
+        <div vertical layout class="padded">
 
-      <fieldset>
-        <legend>Files</legend>
+        <div >
+            <core-list-dart data="{{files}}" height="40"
+                    selectionEnabled="{{selectionEnabled}}"
+                    selection="{{selection}}"
+                    on-core-activate =  '{{ selectionMade }}'
+                    style="height:200px;"
+                    id="kore-list">
+                <template>
+                    <div layout horizontal class="{{ {selected: selected} }}" style="height: 40px" id="{{index}}">
+                        <paper-checkbox checked="{{model.checked}}"></paper-checkbox>
+                        <span>{{model.name}}</span>
+                        <div class="icon-box" on-click="{{deleteFile}}">
+                            <core-icon class="small-icon" icon="close" ></core-icon>
+                        </div>
+                        <div class="icon-box" on-click="{{infoFile}}">
+                            <core-icon class="small-icon" icon="info" ></core-icon>
+                        </div>
+                        <core-icon-button class="small-icon" icon="close" ></core-icon-button>
+                        <core-icon-button  icon="close" ></core-icon-button>
+                        <paper-icon-button  icon="close" ></paper-icon-button>
+                    </div>
+                </template>
+            </core-list-dart>
 
-        <template repeat="{{file in files}}">
-          <div>
-            <core-icon icon="close"></core-icon>
-            <core-icon icon="info"></core-icon>
-            <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleFile}}" class="padright">
-            <button class="smallbutton" on-click="{{deleteFile}}" id="{{file}}"><img src="../vendors/iconic/x.png" class="icon"></button>
-            <button class="smallbutton" on-click="{{colorizeFile}}" id="{{file}}"><img src="../vendors/iconic/brush.png" class="icon"></button>
-            <button class="smallbutton" on-click="{{infoFile}}" id="{{file}}"><img src="../vendors/iconic/question-mark.png" class="icon"></button>
-            <span class="padleft">{{file}}</span>
-          </div>
-        </template>
-        <button class="smallbutton" on-click="{{openFile}}"><img src="../vendors/iconic/plus.png" class="icon"></button>
-      </fieldset>
-
-      <fieldset>
-        <legend>Display</legend>
-
-          <div>
-            <div>
-              <input type="checkbox" value="Enabled" on-click="{{toggleAxes}}" class="padright">
-              <span>Toggle axes</span>
+            <span class="small-icon">+</span>
             </div>
-            <div>
-              <input type="checkbox" value="Enabled" on-click="{{toggleBbox}}" class="padright">
-              <span>Toggle bbox</span>
-            </div>
-            <div>
-              <button class="smallbutton" on-click="{{goHome}}"><img src="../vendors/iconic/home.png" class="icon"></button>
-            </div>
-          </div>
-      </fieldset>
 
-    </div>
+            <div class="title">Settings</div>
 
-    <dialog id="openDialog">
-    <form method="dialog">
-      <input type="text" id="filenamearea" name="name">
-      <menu>
-        <button id="cancel" type="reset" on-click="{{openFileCancel}}">Cancel</button>
-        <button type="submit" on-click="{{openFileOkay}}">Confirm</button>
-      </menu>
-    </form>
-  </dialog>
+                <fieldset>
+                    <legend>Files</legend>
 
-  </template>
+                    <template repeat="{{file in files}}">
+                      <div>
+                        <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleFile}}" class="padright">
+                        <button class="smallbutton" on-click="{{deleteFile}}" id="{{file}}"><img src="../vendors/iconic/x.png" class="icon"></button>
+                        <button class="smallbutton" on-click="{{colorizeFile}}" id="{{file}}"><img src="../vendors/iconic/brush.png" class="icon"></button>
+                        <button class="smallbutton" on-click="{{infoFile}}" id="{{file}}"><img src="../vendors/iconic/question-mark.png" class="icon"></button>
+                        <span class="padleft">{{file.name}}</span>
+                      </div>
+                    </template>
+                    <button class="smallbutton" on-click="{{openFile}}"><img src="../vendors/iconic/plus.png" class="icon"></button>
+                </fieldset>
 
-  <script type="application/dart" src="settings_element.dart"></script>
+                <fieldset>
+                    <legend>Display</legend>
+
+                      <div>
+                        <div>
+                          <input type="checkbox" value="Enabled" on-click="{{toggleAxes}}" class="padright">
+                          <span>Toggle axes</span>
+                        </div>
+                        <div>
+                          <input type="checkbox" value="Enabled" on-click="{{toggleBbox}}" class="padright">
+                          <span>Toggle bbox</span>
+                        </div>
+                        <div>
+                          <button class="smallbutton" on-click="{{goHome}}"><img src="../vendors/iconic/home.png" class="icon"></button>
+                        </div>
+                      </div>
+                </fieldset>
+
+        </div>
+
+        <dialog id="openDialog">
+        <form method="dialog">
+          <input type="text" id="filenamearea" name="name">
+          <menu>
+            <button id="cancel" type="reset" on-click="{{openFileCancel}}">Cancel</button>
+            <button type="submit" on-click="{{openFileOkay}}">Confirm</button>
+          </menu>
+        </form>
+        </dialog>
+
+    </template>
+
+    <script type="application/dart" src="settings_element.dart"></script>
 
 </polymer-element>
