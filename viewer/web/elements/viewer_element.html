@@ -33,60 +33,136 @@
 
     <template>
         <style>
-            body {
-              font-family: sans-serif;
-            }
             #navheader {
-              background-color: #56BA89;
             }
-            .content {
-              padding: 20px;
-              background-color: black;
+            /* drawer is always visible on a wide screen
+               so menu button isn't required */
+            core-drawer-panel:not([narrow]) #navicon {
+              display: none;
             }
-            xpaper-button {
-              width: 30px;
+
+            .side-toolbar {
+                background-color: #242d88;
+                border-top-style: none;
+                border-right-style: solid;
+                border-bottom-style: solid;
+                border-left-style: none;
+                border-width: 1px;
+                border-color: darkgrey;
+                justify: center;
+            }
+            .major-toolbar {
+                background-color: #242d88;
+                border-top-style: none;
+                border-right-style: none;
+                border-bottom-style: solid;
+                border-left-style: none;
+                border-width: 1px;
+                border-color: darkgrey;
+                color: #add8e6;
+            }
+            .minor-toolbar {
+                background-color: #242d88; /* #1a154c */
+                border-top-style: none;
+                border-right-style: none;
+                border-bottom-style: solid;
+                border-left-style: none;
+                border-width: 1px;
+                border-color: darkgrey;
+                color: #add8e6;
+            }
+            .sidebar-body {
+                background-color: #add8e6;
+                border-top-style: none;
+                border-right-style: solid;
+                border-bottom-style: none;
+                border-left-style: none;
+                border-width: 1px;
+                border-color: darkgrey;
+                padding: 5px;
+            }
+            .main-body {
+                background-color: black;
+                border-top-style: none;
+                border-right-style: none;
+                border-bottom-style: none;
+                border-left-style: none;
+                border-width: 1px;
+                border-color: darkgrey;
+                padding: 3px;
+            }
+            .status-body {
+                background-color: #add8e6;
+                border-top-style: solid;
+                border-right-style: none;
+                border-bottom-style: none;
+                border-left-style: none;
+                border-width: 1px;
+                border-color: darkgrey;
+                padding: 5px;
+            }
+            .logo-font {
+                font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+                font-variant: small-caps;
+                font-size: 30px;
+                color: #add8e6;
+                text-align: center;
             }
         </style>
 
-        <core-scaffold>
+        <core-drawer-panel id="drawerPanel">
 
-            <core-header-panel navigation flex>
-                <core-toolbar id="navheader">
-                    <span>LOGO</span>
+            <core-header-panel drawer>
+                <core-toolbar id="navheader" class="side-toolbar">
+                    <span flex class="logo-font">Rialto</span>
                 </core-toolbar>
-                <core-menu>
-                    <core-item label="One"></core-item>
-                    <core-item label="Two"></core-item>
-                </core-menu>
-                <settings-element></settings-element>
+                <div class="sidebar-body" fit>
+                    <settings-element></settings-element>
+                </div>
             </core-header-panel>
 
-            <div tool>
-                <core-tooltip label="Open" position="bottom">
-                    <paper-icon-button icon="open-in-browser"></paper-icon-button>
-                </core-tooltip>
+            <core-header-panel main>
+                 <div id="mainheader">
+                    <core-toolbar class="major-toolbar">
 
-                <core-tooltip label="Home" position="bottom">
-                    <paper-icon-button icon="home"></paper-icon-button>
-                </core-tooltip>
+                        <div vertical layout>
+                            <paper-icon-button icon="open-in-browser"></paper-icon-button>
+                            <span style="font-size:75%">OPEN</span>
+                        </div>
 
-                <core-tooltip label="Colorize" position="bottom">
-                    <paper-icon-button icon="image:color-lens"></paper-icon-button>
-                </core-tooltip>
+                        <div vertical layout>
+                            <paper-icon-button icon="home"></paper-icon-button>
+                            <span style="font-size:75%">HOME</span>
+                        </div>
+
+                        <div vertical layout>
+                            <paper-icon-button icon="image:color-lens"></paper-icon-button>
+                            <span style="font-size:75%">COLORIZE</span>
+                        </div>
+                    </core-toolbar>
+
+                    <core-toolbar class="minor-toolbar">
+                        <div vertical layout>
+                            <paper-icon-button icon="image:color-lens"></paper-icon-button>
+                            <span style="font-size:75%">COLORIZE</span>
+                        </div>
+                    </core-toolbar>
+                </div>
+
+                <div class="content" >
+                    <div class="main-body">
+                        <render-element></render-element>
+                    </div>
+                    <div class="status-body">
+                        <status-element ></status-element>
+                    </div>
+                </div>
 
 
-                <paper-icon-button icon="image:color-lens"></paper-icon-button>
-                <span style="font-size:75%">colorize</span>
-            </div>
+            </core-header-panel>
 
-            <div class="content">
-                <render-element></render-element>
-            </div>
-        </core-scaffold>
+        </core-drawer-panel>
 
-        <footer>
-            <status-element></status-element>
-        </footer>
 
     </template>
 
