@@ -28,6 +28,8 @@ class Renderer
   Line _myline;
   double _ndcMouseX = 0.0, _ndcMouseY = 0.0;  // [-1..+1]
 
+  PointCloud _currentCloud;
+
   Vector3 _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
   Vector3 _cameraUpPosition = new Vector3(0.0, 1.0, 0.0);
   List<Line> _axes;
@@ -102,6 +104,8 @@ class Renderer
 
   void setCloud(PointCloud cloud)
   {
+    _currentCloud = cloud;
+
     _particleSystem = RenderUtils.drawPoints(cloud);
     _scene.add(_particleSystem);
 
@@ -123,13 +127,18 @@ class Renderer
   }
 
 
-  void unsetCloud()
+  PointCloud unsetCloud()
   {
+    var oldCloud = _currentCloud;
+    _currentCloud = null;
+
     _scene.remove(_particleSystem);
     _axes.forEach((l) => _scene.remove(l));
     _bbox.forEach((l) => _scene.remove(l));
 
     _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
+
+    return oldCloud;
   }
 
 

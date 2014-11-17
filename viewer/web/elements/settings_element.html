@@ -1,167 +1,148 @@
 <!DOCTYPE html>
 
 <link rel="import" href="packages/polymer/polymer.html">
+
 <link rel="import" href="packages/core_elements/core_collapse.html">
 <link rel="import" href="packages/core_elements/core_toolbar.html">
 <link rel="import" href="packages/core_elements/core_header_panel.html">
 <link rel="import" href="packages/core_elements/core_icon_button.html">
 <link rel="import" href="packages/core_elements/core_item.html">
 <link rel="import" href="packages/core_elements/core_input.html">
-<link rel="import" href="packages/core_elements/core_icon.html">
-<link rel="import" href="packages/core_elements/core_iconset.html">
 <link rel="import" href="packages/core_elements/core_list_dart.html">
-<link rel="import" href="packages/core_elements/core_icon_button.html">
+<link rel="import" href="packages/core_elements/core_field.html">
 
 <link rel="import" href="packages/paper_elements/paper_icon_button.html">
+<link rel="import" href="packages/paper_elements/paper_button.html">
 <link rel="import" href="packages/paper_elements/paper_checkbox.html">
+<link rel="import" href="packages/paper_elements/paper_dialog.html">
+<link rel="import" href="packages/paper_elements/paper_dialog_transition.html">
+<link rel="import" href="packages/paper_elements/paper_item.html">
 
+<link rel="import" href="packages/core_elements/core_icon.html">
+<link rel="import" href="packages/core_elements/core_iconset.html">
+<link rel="import" href="packages/core_elements/core_iconset_svg.html">
 <link rel="import" href="packages/core_elements/image_icons.html">
+
 
 <polymer-element name="settings-element">
 
     <template>
         <style>
             :host {
-
+                font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+                font-size: 14px;
+            }
+            paper-dialog {
             }
             hr {
-            width:66%;
+                width:95%;
             }
-
             .padded {
-            padding: 4px;
-            }
-            .title {
-            font-size: 16px;
-            padding: 4px;
-            }
-            fieldset {
-            padding: 4px;
-            }
-            .smallbutton {
-            height: 16px;
-            width: 16px;
-            display: inline-block;
-            padding: 0;
-            margin: 0;
-            border-width: 0;
-            background-color: #eee;
-            }
-            .smallbuttontext {
-            text-align: center;
-            display:table-cell;
-            vertical-align:middle;
-            }
-            .icon {
+                padding: 4px;
             }
             .padright {
-            margin: 0px 10px 0px 0px;
+                margin: 0px 5px 0px 0px;
             }
-            .padleft {
-            margin: 0px 0px 0px 10px;
-            }
-            .icon-box {
-                margin: 0px;
-                padding: 0px;
-            }
-            .small-icon {
-                border-style: solid;
-                border-color: black;
-                border-width: 1px;
-                margin: 0px;
-                padding: 0px;
-                height: 16px;
-                width: 16px;
-            }
-            .small-checkbox {
-                border-style: solid;
-                border-color: black;
-                border-width: 1px;
-                margin: 0px;
-                padding: 0px;
-                height: 16px;
-                width: 16px;
-            }
-            .selected {
+            .selectedlistitem {
                 background: silver;
             }
-        </style>
+
+            /* http://stackoverflow.com/questions/25352296/polymer-paper-menu-button-change-the-default-size-of-icon */
+            paper-icon-button /deep/ core-icon[role=img] {
+                height: 18px;
+                width: 18px;
+                padding: 1px;
+                margin: 1px;
+            }
+            paper-icon-button {
+                padding: 1px;
+                margin: 1px;
+            }
+            </style>
+
+        <core-iconset-svg id="custom-icons" iconSize="12">
+            <svg>
+                <defs>
+                    <g id="plus">
+                        <path d="M5,1 L5,10 L6,10 L6,1 z" />
+                        <path d="M1,5 L10,5 L10,6 L1,6 z" />
+                    </g>
+                    <g id="minus">
+                        <path d="M2,5 L9,5 L9,6 L2,6 z" />
+                    </g>
+                </defs>
+            </svg>
+        </core-iconset-svg>
 
         <div vertical layout class="padded">
 
-        <div >
-            <core-list-dart data="{{files}}" height="40"
-                    selectionEnabled="{{selectionEnabled}}"
-                    selection="{{selection}}"
-                    on-core-activate =  '{{ selectionMade }}'
-                    style="height:200px;"
-                    id="kore-list">
-                <template>
-                    <div layout horizontal class="{{ {selected: selected} }}" style="height: 40px" id="{{index}}">
-                        <paper-checkbox checked="{{model.checked}}"></paper-checkbox>
-                        <span>{{model.name}}</span>
-                        <div class="icon-box" on-click="{{deleteFile}}">
-                            <core-icon class="small-icon" icon="close" ></core-icon>
-                        </div>
-                        <div class="icon-box" on-click="{{infoFile}}">
-                            <core-icon class="small-icon" icon="info" ></core-icon>
-                        </div>
-                        <core-icon-button class="small-icon" icon="close" ></core-icon-button>
-                        <core-icon-button  icon="close" ></core-icon-button>
-                        <paper-icon-button  icon="close" ></paper-icon-button>
-                    </div>
-                </template>
-            </core-list-dart>
+        <fieldset>
+            <legend>Files</legend>
 
-            <span class="small-icon">+</span>
+            <div>
+                <core-list-dart data="{{files}}" height="20px"
+                        selectionEnabled="{{selectionEnabled}}"
+                        selection="{{selection}}"
+                        on-core-activate = "{{selectionMade}}"
+                        style="height:150px;"
+                        multi="false"
+                        id="file-list">
+                    <template>
+                        <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
+                            <label>
+                                <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
+                                <span>{{index}} -- {{model.name}} -- {{model.checked}}</span>
+                            </label>
+                        </div>
+                    </template>
+                </core-list-dart>
+            </div>
+            <hr>
+            <div align="center">
+                <paper-icon-button icon="custom-icons:plus" on-click="{{openFile}}"></paper-icon-button>
+                <paper-icon-button icon="custom-icons:minus" on-click="{{deleteFile}}"></paper-icon-button>
+                <paper-icon-button icon="help" on-click="{{infoFile}}"></paper-icon-button>
             </div>
 
-            <div class="title">Settings</div>
+        </fieldset>
 
-                <fieldset>
-                    <legend>Files</legend>
+        <fieldset>
+            <legend>Display</legend>
 
-                    <template repeat="{{file in files}}">
-                      <div>
-                        <input type="checkbox" name="vehicle" value="Enabled" on-click="{{toggleFile}}" class="padright">
-                        <button class="smallbutton" on-click="{{deleteFile}}" id="{{file}}"><img src="../vendors/iconic/x.png" class="icon"></button>
-                        <button class="smallbutton" on-click="{{colorizeFile}}" id="{{file}}"><img src="../vendors/iconic/brush.png" class="icon"></button>
-                        <button class="smallbutton" on-click="{{infoFile}}" id="{{file}}"><img src="../vendors/iconic/question-mark.png" class="icon"></button>
-                        <span class="padleft">{{file.name}}</span>
-                      </div>
-                    </template>
-                    <button class="smallbutton" on-click="{{openFile}}"><img src="../vendors/iconic/plus.png" class="icon"></button>
-                </fieldset>
+              <form action="">
+                <div>
+                    <label>
+                        <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
+                        <span>Toggle axes</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
+                        <span>Toggle bbox</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
+                        <span>None</span>
+                    </label>
+                </div>
+              </form>
+        </fieldset>
 
-                <fieldset>
-                    <legend>Display</legend>
+    </div>
 
-                      <div>
-                        <div>
-                          <input type="checkbox" value="Enabled" on-click="{{toggleAxes}}" class="padright">
-                          <span>Toggle axes</span>
-                        </div>
-                        <div>
-                          <input type="checkbox" value="Enabled" on-click="{{toggleBbox}}" class="padright">
-                          <span>Toggle bbox</span>
-                        </div>
-                        <div>
-                          <button class="smallbutton" on-click="{{goHome}}"><img src="../vendors/iconic/home.png" class="icon"></button>
-                        </div>
-                      </div>
-                </fieldset>
-
-        </div>
-
-        <dialog id="openDialog">
-        <form method="dialog">
-          <input type="text" id="filenamearea" name="name">
-          <menu>
-            <button id="cancel" type="reset" on-click="{{openFileCancel}}">Cancel</button>
-            <button type="submit" on-click="{{openFileOkay}}">Confirm</button>
-          </menu>
-        </form>
-        </dialog>
+    <!-- autoFocusDisabled="true" autoCloseDisabled="true" -->
+    <paper-dialog heading="Open File" id="openDialog">
+        <core-field>
+            <label>File name:
+                <input placeholder="" id="filenamearea" type="text" autofocus flex>
+            </label>
+        </core-field>
+        <paper-button dismissive on-click="{{openFileCancel}}">Cancel</paper-button>
+        <paper-button affirmative on-click="{{openFileOkay}}">OK</paper-button>
+    </paper-dialog>
 
     </template>
 

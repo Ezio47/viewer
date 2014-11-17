@@ -33,12 +33,9 @@ class Hub
   }
 
 
-  void doColorizeFile(String file)
+  void doColorize()
   {
-    renderer.unsetCloud();
-
-    PointCloud cloud = _pointclouds[file];
-    assert(cloud != null);
+    var cloud = renderer.unsetCloud();
 
     cloud.colorize();
 

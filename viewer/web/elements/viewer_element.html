@@ -126,17 +126,12 @@
                     <core-toolbar class="major-toolbar">
 
                         <div vertical layout>
-                            <paper-icon-button icon="open-in-browser"></paper-icon-button>
-                            <span style="font-size:75%">OPEN</span>
-                        </div>
-
-                        <div vertical layout>
-                            <paper-icon-button icon="home"></paper-icon-button>
+                            <paper-icon-button icon="home" on-click="{{goHome}}"></paper-icon-button>
                             <span style="font-size:75%">HOME</span>
                         </div>
 
                         <div vertical layout>
-                            <paper-icon-button icon="image:color-lens"></paper-icon-button>
+                            <paper-icon-button icon="image:color-lens" on-click="{{goColorize}}"></paper-icon-button>
                             <span style="font-size:75%">COLORIZE</span>
                         </div>
                     </core-toolbar>

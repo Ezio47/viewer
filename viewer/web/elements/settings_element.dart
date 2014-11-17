@@ -5,131 +5,128 @@ import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
+import 'package:paper_elements/paper_dialog.dart';
 
 
 @CustomTag('settings-element')
-class SettingsElement extends PolymerElement
-{
-  @published ObservableList<CloudFile> files = new ObservableList();
-  @published bool showAxes = false;
-  @published bool showBbox = false;
+class SettingsElement extends PolymerElement {
+    @published ObservableList<CloudFile> files = new ObservableList();
+    @published bool showAxes = false;
+    @published bool showBbox = false;
+    @published bool axesbool1 = false;
+    @published bool axesbool2 = false;
+    @published bool axesbool3 = true;
 
-  SettingsElement.created() : super.created();
+    SettingsElement.created() : super.created();
 
-  @override
-  void attached() {
-    super.attached();
+    @override
+    void attached() {
+        super.attached();
+    }
 
-    hub.settingsUI = this;
-    initSettings();
-  }
+    @override
+    void ready() {
+        $["file-list"].on['core-activate'].listen(handleListChange);
 
-  @override
-  void detached() {
-    super.detached();
-  }
+        hub.settingsUI = this;
+    }
 
-  void initSettings()
-  {
-  }
+    @override
+    void detached() {
+        super.detached();
+    }
 
-  void doAddFile(String s)
-  {
-    files.add(new CloudFile(s));
-  }
+    void axesbool1Changed(var oldvalue) {
+        hub.doToggleAxes(axesbool1);
+        hub.doToggleBbox(axesbool2);
+    }
 
-  void doRemoveFile(String s)
-  {
-      files.removeWhere((f) => f.name==s);
-  }
+    void axesbool2Changed(var oldvalue) {
+        hub.doToggleAxes(axesbool1);
+        hub.doToggleBbox(axesbool2);
+    }
 
-  void toggleAxes(Event e, var detail, Node target) {
-    var button = target as InputElement;
-    hub.doToggleAxes(button.checked);
-  }
+    void axesbool3Changed(var oldvalue) {
+        hub.doToggleAxes(axesbool1);
+        hub.doToggleBbox(axesbool2);
+    }
 
-  void toggleBbox(Event e, var detail, Node target) {
-    var button = target as InputElement;
-    hub.doToggleBbox(button.checked);
-  }
+    void doAddFile(String s) {
+        files.add(new CloudFile(s));
+    }
 
-  void goHome(Event e, var detail, Node target) {
-    hub.goHome();
-  }
+    void doRemoveFile(String s) {
+        files.removeWhere((f) => f.name == s);
+    }
 
-  void openFile(Event e, var detail, Node target) {
-    var dlg = this.shadowRoot.querySelector("#openDialog");
-    dlg.showModal();
-  }
+    void toggleAxes(Event e, var detail, Node target) {
+        var button = target as InputElement;
+        hub.doToggleAxes(button.checked);
+    }
 
-  void openFileCancel(Event e, var detail, Node target) {
-    DialogElement dlg = this.shadowRoot.querySelector("#openDialog");
-    dlg.close("");
-    return;
-  }
+    void toggleBbox(Event e, var detail, Node target) {
+        var button = target as InputElement;
+        hub.doToggleBbox(button.checked);
+    }
 
-  void openFileOkay(Event e, var detail, Node target) {
-    DialogElement dlg = this.shadowRoot.querySelector("#openDialog");
-    dlg.close("");
-    var txt = this.shadowRoot.querySelector("#filenamearea");
-    hub.doAddFile(txt.value);
-    txt.value = "";
-  }
+    void openFile(Event e, var detail, Node target) {
+        var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
+        dlg.toggle();
+    }
 
-  void toggleFile(Event e, var detail, Node target) {
-    var button = target as ButtonElement;
-    window.alert("toggle for ${button.id.toString()}");
-  }
+    void openFileCancel(Event e, var detail, Node target) {
+        var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
+        dlg.toggle();
+    }
 
-  void infoFile(Event e, var detail, Node target) {
-    var button = target as ButtonElement;
-    window.alert("info for ${button.id.toString()}");
-  }
+    void openFileOkay(Event e, var detail, Node target) {
+        var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
+        dlg.toggle();
+        InputElement elem = this.shadowRoot.querySelector("#filenamearea") as InputElement;
+        var txt = elem.value;
+        if (txt.trim().isEmpty == false) {
+            hub.doAddFile(txt);
+        }
+        elem.value = "";
+    }
 
-  void colorizeFile(Event e, var detail, Node target) {
-    var button = target as ButtonElement;
-    hub.doColorizeFile(button.id.toString());
-  }
+    void toggleFile(Event e, var detail, Node target) {
+        var button = target as ButtonElement;
+        window.alert("toggle for ${button.id.toString()}");
+    }
 
-  void deleteFile(Event e, var detail, Node target)
-  {
-    int id = int.parse(target.parent.id);
-  //  var button = target as ButtonElement;
-  //  hub.doRemoveFile(button.id.toString());
-    return;
-  }
+    void infoFile(Event e, var detail, Node target) {
+        if (selection != null) {
+            assert(selection is CloudFile);
+            window.alert("Info for {$selection.name}");
+        }
+    }
 
+    void deleteFile(Event e, var detail, Node target) {
+        if (selection != null) {
+            assert(selection is CloudFile);
+            hub.doRemoveFile(selection.name);
+        }
+        return;
+    }
 
+    void selectionMade(e) {
+    }
 
-  @observable bool selectionEnabled = true;
+    void handleListChange(e) {
+        //window.alert("list change ${e.detail.data.toString()}");
+    }
 
-  void selectionMade( e )
-  {
-      window.alert("selection made ${e.detail.data.toString()}");
-      if (e.detail.data.checked)
-      {
-       // files.remove(e.detail.data);
-      }
-  }
-
-  @override
-  void ready()
-  {
-      $[ 'kore-list' ].on ['core-activate'].listen( handleListChange );
-  }
-
-  void handleListChange(e)
-  {
-    window.alert("list change ${e.detail.data.toString()}");
-  }
-
-  @observable var selection;
+    @observable var selection;
+    @observable bool selectionEnabled = true;
 }
 
 
-class CloudFile extends Observable{
-  @observable String name;
-  @observable bool checked;
-  CloudFile(this.name) { checked=false; }
-  String toString() => "<$name $checked>";
+class CloudFile extends Observable {
+    @observable String name;
+    @observable bool checked;
+    CloudFile(this.name) {
+        checked = true;
+    }
+    String toString() => "<$name $checked>";
 }
