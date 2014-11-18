@@ -60,6 +60,13 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
     pdal::Stage* stage = m_manager->addFilter("filters.stats", m_manager->getStage());
     m_statsStage = (pdal::filters::Stats*)stage;
 
+    stage = m_manager->addFilter("filters.splitter", m_manager->getStage());
+    m_splitterStage = (pdal::filters::Splitter*)stage;
+    pdal::Options o;
+    pdal::Option length("length", 1000, "length");
+    o.add(length);
+    m_splitterStage->setOptions(o);
+    
     // for deeply technical reasons, PDAL now requires we read the whole file to
     // find the proper bounds (although this may be fixed again in the future)
     m_numPoints = m_manager->execute();
@@ -85,6 +92,23 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
         ++iter;
     }
 
+    // now sort the split'ed buffers
+    {
+        for (auto it = pbSet.begin(); it != pbSet.end(); ++it)
+            m_splitBuffers.push_back(*it);
+
+        auto sorter = [](pdal::PointBufferPtr p1, pdal::PointBufferPtr p2)
+        {
+            pdal::BOX3D b1 = p1->calculateBounds();
+            pdal::BOX3D b2 = p2->calculateBounds();
+
+            return b1.minx < b2.minx ?  true :
+                b1.minx > b2.minx ? false :
+                b1.miny < b2.miny;
+        };
+        std::sort(m_splitBuffers.begin(), m_splitBuffers.end(), sorter);
+    }
+    
     return;
 }
 

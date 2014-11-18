@@ -79,6 +79,21 @@ int main()
     
     assert(totNumRead == numPoints);
     
+    // now dump the split buffers
+    {
+        std::vector<pdal::PointBufferPtr>& buffers = pdal.getSplitBuffers();
+        printf("Num split buffers: %lu\n", buffers.size());
+        pdal::point_count_t tot = 0;
+        for (size_t i = 0; i < buffers.size(); ++i)
+        {
+            pdal::PointBufferPtr& buf = buffers[i];
+            printf("  Split buffer %zu: %lu points\n", i, buf->size());
+            tot += buf->size();
+        }
+        if (tot != numPoints)
+            printf("  *** ERROR: not all points accounted for in the cells!\n");
+    }
+    
     pdal.close();
     printf("pass\n");
     

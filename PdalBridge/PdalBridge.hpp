@@ -3,6 +3,8 @@
 #include <pdal/PipelineManager.hpp>
 #include <pdal/PipelineReader.hpp>
 #include <pdal/filters/Stats.hpp>
+#include <pdal/filters/Splitter.hpp>
+
 
 class PdalBridge
 {
@@ -37,6 +39,11 @@ public:
     // Returns the number of points actually put into the buffer.
     pdal::point_count_t readPoints(void* buffer, pdal::point_count_t offset, pdal::point_count_t numPoints);
 
+    std::vector<pdal::PointBufferPtr>& getSplitBuffers()
+    {
+        return m_splitBuffers;
+    }
+    
 private:    
     bool readNext();
     double getFieldAsDouble(DimId);
@@ -48,8 +55,11 @@ private:
     pdal::PipelineManager* m_manager;
     pdal::PipelineReader* m_reader;
     pdal::filters::Stats* m_statsStage;
+    pdal::filters::Splitter* m_splitterStage;
     pdal::point_count_t m_numPoints;
     std::vector<DimId> m_dimensionIds;
     std::vector<DimType> m_dimensionTypes;
     pdal::PointBuffer* m_buffer;
+    
+    std::vector<pdal::PointBufferPtr> m_splitBuffers;
 };
