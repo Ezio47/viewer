@@ -1,25 +1,25 @@
-library point_cloud;
+library renderable_point_cloud;
 
 import 'dart:core';
 import 'package:three/three.dart';
 import 'dart:math' as Math;
 import 'package:vector_math/vector_math.dart';
-
+import 'dart:typed_data';
 
 // given a set of dimensions, as returned by FileGenerator, this class represents
 // the cloud itself
 
-class PointCloud
+class RenderablePointCloud
 {
-  Map<String, GeometryAttribute> dims;
+  Map<String, GeometryAttribute> dims = new Map<String, GeometryAttribute>();
   int numPoints;
   Vector3 low, high;
 
-  PointCloud(Map<String, GeometryAttribute> mydims)
+  RenderablePointCloud(Map<String, Float32List> mydims)
   {
-    dims = mydims;
+     setDims(mydims);
 
-    _checkValid();
+     _checkValid();
 
     if (!dims.containsKey("positions"))
     {
@@ -28,7 +28,7 @@ class PointCloud
 
     numPoints = dims["positions"].numItems.toInt() ~/ 3;
 
-    if (! mydims.containsKey("colors"))
+    if (! dims.containsKey("colors"))
     {
       _addColorArray();
     }
@@ -36,6 +36,29 @@ class PointCloud
     computeBounds();
   }
 
+
+  void setDims(Map<String, Float32List> mydims)
+  {
+      int numPoints = mydims["positions.x"].length;
+
+      var positions = new GeometryAttribute.float32(numPoints * 3, 3);
+      for (int i=0; i<numPoints; i++) {
+          positions.array[i*3+0] = mydims["positions.x"][i];
+          positions.array[i*3+1] = mydims["positions.y"][i];
+          positions.array[i*3+2] = mydims["positions.z"][i];
+      }
+      dims["positions"] = positions;
+
+      if (mydims.containsKey("colors.x")) {
+          var colors = new GeometryAttribute.float32(numPoints * 3, 3);
+          for (int i=0; i<numPoints; i++) {
+              colors.array[i*3+0] = mydims["colors.x"][i];
+              colors.array[i*3+1] = mydims["colors.y"][i];
+              colors.array[i*3+2] = mydims["colors.z"][i];
+          }
+          dims["colors"] = colors;
+      }
+  }
 
   void colorize()
   {

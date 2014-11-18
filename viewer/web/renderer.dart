@@ -5,9 +5,9 @@ import 'dart:html';
 import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/controls/trackball_controls.dart';
-import 'point_cloud.dart';
+import 'renderable_point_cloud.dart';
 import 'render_utils.dart';
-import 'utils.dart';
+//import 'utils.dart';
 
 
 class Renderer
@@ -28,7 +28,7 @@ class Renderer
   Line _myline;
   double _ndcMouseX = 0.0, _ndcMouseY = 0.0;  // [-1..+1]
 
-  PointCloud _currentCloud;
+  RenderablePointCloud _currentCloud;
 
   Vector3 _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
   Vector3 _cameraUpPosition = new Vector3(0.0, 1.0, 0.0);
@@ -102,7 +102,7 @@ class Renderer
   }
 
 
-  void setCloud(PointCloud cloud)
+  void setCloud(RenderablePointCloud cloud)
   {
     _currentCloud = cloud;
 
@@ -127,7 +127,7 @@ class Renderer
   }
 
 
-  PointCloud unsetCloud()
+  RenderablePointCloud unsetCloud()
   {
     var oldCloud = _currentCloud;
     _currentCloud = null;

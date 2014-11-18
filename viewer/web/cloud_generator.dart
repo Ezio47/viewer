@@ -3,6 +3,7 @@ library cloud_generator;
 import 'dart:core';
 import 'package:three/three.dart';
 import 'dart:math' as Math;
+import 'dart:typed_data';
 
 
 // this class pretends to represent a pointcloud file: all it does is
@@ -21,7 +22,7 @@ import 'dart:math' as Math;
 
 class CloudGenerator
 {
-  static Map<String, GeometryAttribute> generate(String name)
+  static Map<String, Float32List> generate(String name)
   {
     switch (name)
     {
@@ -41,19 +42,25 @@ class CloudGenerator
   }
 
 
-  static Map<String, GeometryAttribute> makeNewCube()
+  static Map<String, Float32List> makeNewCube()
   {
     num particles = 50000;
 
-    Map<String, GeometryAttribute> map = new Map();
+    Map<String, Float32List> map = new Map();
 
-    var positions = new GeometryAttribute.float32(particles * 3, 3);
-    var colors     = new GeometryAttribute.float32(particles * 3, 3);
-    assert(colors.itemSize == 3);
-    assert(colors.numItems == particles*3);
+    var positionsX = new Float32List(particles);
+    var positionsY = new Float32List(particles);
+    var positionsZ = new Float32List(particles);
+    var colorsX = new Float32List(particles);
+    var colorsY = new Float32List(particles);
+    var colorsZ = new Float32List(particles);
 
-    map["positions"] = positions;
-    map["colors"] = colors;
+    map["positions.x"] = positionsX;
+    map["positions.y"] = positionsY;
+    map["positions.z"] = positionsZ;
+    map["colors.x"] = colorsX;
+    map["colors.y"] = colorsY;
+    map["colors.z"] = colorsZ;
 
     var rnd = new Math.Random();
 
@@ -61,7 +68,7 @@ class CloudGenerator
 
     var n = 1000.0, n2 = n / 2.0; // particles spread in the cube
 
-    for ( var i = 0; i < positions.array.length; i += 3 ) {
+    for (var i = 0; i < particles; i++) {
 
       // positions
       var x = rnd.nextDouble() * n - n2;   // -500..+500
@@ -71,9 +78,9 @@ class CloudGenerator
       assert(x<=500.0 && y<=500.0 && z<=500.0);
       //print("$x $y $z");
 
-      positions.array[ i     ] = x;
-      positions.array[ i + 1 ] = y;
-      positions.array[ i + 2 ] = z;
+      positionsX[i] = x;
+      positionsY[i] = y;
+      positionsZ[i] = z;
 
       // colors
       var vx = ( x / n ) + 0.5;
@@ -83,29 +90,29 @@ class CloudGenerator
       color.setRGB( vx, vy, vz );
 
       //colors.array[ i ]     = color.r;
-      //colors.array[ i + 1 ] = color.g;
-      //colors.array[ i + 2 ] = color.b;
+      //colors.array[ i ] = color.g;
+      //colors.array[ i ] = color.b;
 
       if (x < 0.0 && y < 0.0 && z < 0.0)
       {
         // red at -5,-5,-5
-        colors.array[i] = 1.0;
-        colors.array[i+1] = 0.0;
-        colors.array[i+2] = 0.0;
+        colorsX[i] = 1.0;
+        colorsY[i] = 0.0;
+        colorsZ[i] = 0.0;
         //print("$x $y $z");
       }
       else if (x > 0.0 && y > 0.0 && z> 0.0)
       {
         // blue at +5,+5,+5
-        colors.array[i] = 0.0;
-        colors.array[i+1] = 0.0;
-        colors.array[i+2] = 1.0;
+        colorsX[i] = 0.0;
+        colorsY[i] = 0.0;
+        colorsZ[i] = 1.0;
       }
       else
       {
-        colors.array[i] = 0.0;
-        colors.array[i+1] = 0.0;
-        colors.array[i+2] = 0.0;
+        colorsX[i] = 0.0;
+        colorsY[i] = 0.0;
+        colorsZ[i] = 0.0;
       }
     }
 
@@ -113,15 +120,15 @@ class CloudGenerator
   }
 
 
-  static Map<String, GeometryAttribute> makeOldCube()
+  static Map<String, Float32List> makeOldCube()
   {
-    Map<String, GeometryAttribute> map = new Map();
+    Map<String, Float32List> map = new Map();
 
     var numPoints = 24;
 
-    var xx = new GeometryAttribute.float32(numPoints, 3);
-    var yy = new GeometryAttribute.float32(numPoints, 3);
-    var zz = new GeometryAttribute.float32(numPoints, 3);
+    var xx = new Float32List(numPoints);
+    var yy = new Float32List(numPoints);
+    var zz = new Float32List(numPoints);
     map["x"] = xx;
     map["y"] = yy;
     map["z"] = zz;
@@ -171,23 +178,27 @@ class CloudGenerator
 
     for (int i=0; i<numPoints; i++)
     {
-      xx.array[i] = points[i*3];
-      yy.array[i] = points[i*3+1];
-      zz.array[i] = points[i*3+2];
+      xx[i] = points[i*3];
+      yy[i] = points[i*3+1];
+      zz[i] = points[i*3+2];
     }
 
     return map;
   }
 
 
-  static Map<String, GeometryAttribute> makeRandom()
+  static Map<String, Float32List> makeRandom()
   {
-    Map<String, GeometryAttribute> map = new Map();
+    Map<String, Float32List> map = new Map();
 
     var numPoints = 50000;
 
-    var positions = new GeometryAttribute.float32(numPoints * 3, 3);
-    map["positions"] = positions;
+    var positionsX = new Float32List(numPoints);
+    var positionsY = new Float32List(numPoints);
+    var positionsZ = new Float32List(numPoints);
+    map["positions.x"] = positionsX;
+    map["positions.y"] = positionsY;
+    map["positions.z"] = positionsZ;
 
     var xdim = 500;
     var ydim = 2000;
@@ -195,47 +206,54 @@ class CloudGenerator
 
     var random = new Math.Random();
 
-    for (var i=0; i<numPoints*3; i+=3)
+    for (var i=0; i<numPoints; i++)
     {
       var x = random.nextDouble() * xdim;
       var y = random.nextDouble() * ydim;
       var z = random.nextDouble() * zdim;
-      positions.array[i] = x;
-      positions.array[i+1] = y;
-      positions.array[i+2] = z;
+      positionsX[i] = x;
+      positionsY[i] = y;
+      positionsZ[i] = z;
     }
 
     return map;
   }
 
 
-  static Map<String, GeometryAttribute> makeLine()
+  static Map<String, Float32List> makeLine()
   {
-    Map<String, GeometryAttribute> map = new Map();
+    Map<String, Float32List> map = new Map();
 
     var numPoints = 2000;
 
-    var positions = new GeometryAttribute.float32(numPoints * 3, 3);
-    map["positions"] = positions;
+    var positionsX = new Float32List(numPoints);
+    var positionsY = new Float32List(numPoints);
+    var positionsZ = new Float32List(numPoints);
 
-    for (var i=0; i<numPoints*3; i+=3)
+    map["positions.x"] = positionsX;
+    map["positions.y"] = positionsY;
+    map["positions.z"] = positionsZ;
+
+    for (var i=0; i<numPoints; i++)
     {
       double pt = i.toDouble() / 10.0;
-      positions.array[i] = pt;
-      positions.array[i+1] = pt;
-      positions.array[i+2] = pt;
+      positionsX[i] = pt;
+      positionsY[i] = pt;
+      positionsZ[i] = pt;
     }
 
     return map;
   }
 
 
-  static Map<String, GeometryAttribute> makeTerrain()
+  static Map<String, Float32List> makeTerrain()
   {
     Terrain terrain = new Terrain();
 
-    Map<String, GeometryAttribute> map = new Map();
-    map["positions"] = terrain.values;
+    Map<String, Float32List> map = new Map();
+    map["positions.x"] = terrain.valuesX;
+    map["positions.y"] = terrain.valuesY;
+    map["positions.z"] = terrain.valuesZ;
 
     return map;
   }
@@ -246,14 +264,15 @@ class CloudGenerator
 class Terrain
 {
   int width, height;
-  var values;
+  var valuesX, valuesY, valuesZ;
+  var _valuesW;
   var rnd = new Math.Random();
 
   Terrain()
   {
     width = 512;
     height = 512;
-    values = new GeometryAttribute.float32(width*height * 1, 1);
+    _valuesW = new Float32List(width*height);
 
     int featuresize = 32;
 
@@ -282,7 +301,9 @@ class Terrain
       scale = scale / 2.0;
     }
 
-    var t = new GeometryAttribute.float32(width*height * 3, 3);
+    valuesX = new Float32List(width*height);
+    valuesY = new Float32List(width*height);
+    valuesZ = new Float32List(width*height);
     int i=0;
     for (int w=0; w<width; w++)
     {
@@ -303,27 +324,27 @@ class Terrain
         // for better viewing, exaggerate Z
         z = z * 200.0;
 
-        t.array[i++] = x;
-        t.array[i++] = y;
-        t.array[i++] = z;
+        valuesX[i] = x;
+        valuesY[i] = y;
+        valuesZ[i] = z;
+        i++;
       }
     }
 
-    values = t;
   }
 
   double getSample(int x, int y)
   {
     x = x & (width - 1);
     y = y & (height - 1);
-    return values.array[x + y * width];
+    return _valuesW[x + y * width];
   }
 
   void setSample(int x, int y, double value)
   {
     x = x & (width - 1);
     y = y & (height - 1);
-    values.array[x + y * width] = value;
+    _valuesW[x + y * width] = value;
   }
 
   void sampleSquare(int x, int y, int size, double value)

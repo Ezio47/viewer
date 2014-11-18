@@ -5,6 +5,7 @@ import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
+import '../comms.dart';
 
 
 @CustomTag('viewer-element')
@@ -21,6 +22,8 @@ class ViewerElement extends PolymerElement {
 
     @override
     void ready() {
+
+
         hub.doAddFile("5");
     }
 
@@ -33,6 +36,8 @@ class ViewerElement extends PolymerElement {
 
     void goHome(Event e, var detail, Node target) {
         hub.goHome();
+
+        FauxComms.test();
     }
 
 

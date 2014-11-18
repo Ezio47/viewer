@@ -8,7 +8,7 @@ import 'elements/settings_element.dart';
 import 'elements/status_element.dart';
 import 'renderer.dart';
 import 'cloud_generator.dart';
-import 'point_cloud.dart';
+import 'renderable_point_cloud.dart';
 
 
 // thje global singleton
@@ -24,7 +24,7 @@ class Hub
   Renderer renderer;
 
   // private
-  Map<String, PointCloud> _pointclouds = new Map();
+  Map<String, RenderablePointCloud> _pointclouds = new Map();
 
 
   Hub()
@@ -48,7 +48,7 @@ class Hub
     settingsUI.doAddFile(file);
 
     var data = CloudGenerator.generate(file);
-    var cloud = new PointCloud(data);
+    var cloud = new RenderablePointCloud(data);
 
     _pointclouds[file] = cloud;
 

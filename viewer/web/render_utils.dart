@@ -4,7 +4,7 @@ import 'dart:core';
 import 'package:vector_math/vector_math.dart';
 import 'package:three/three.dart';
 import 'utils.dart';
-import 'point_cloud.dart';
+import 'renderable_point_cloud.dart';
 
 
 class RenderUtils
@@ -77,7 +77,7 @@ class RenderUtils
     return lines;
   }
 
-  static ParticleSystem drawPoints(PointCloud cloud)
+  static ParticleSystem drawPoints(RenderablePointCloud cloud)
   {
     var positions = cloud.dims["positions"];
     var colors    = cloud.dims["colors"];
@@ -100,7 +100,7 @@ class RenderUtils
     return particleSystem;
   }
 
-  static Vector3 getDefaultCameraPosition(PointCloud cloud)
+  static Vector3 getDefaultCameraPosition(RenderablePointCloud cloud)
   {
     // when we change the cloud, we need to change where the camera is
 
