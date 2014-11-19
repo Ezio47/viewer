@@ -25,8 +25,12 @@ class PointCloudGenerator {
                 return makeOldCube();
             case "random":
                 return makeRandom();
-            case "terrain":
-                return makeTerrain();
+            case "terrain1":
+                return makeTerrain(1);
+            case "terrain2":
+                return makeTerrain(2);
+            case "terrain3":
+                return makeTerrain(3);
         }
         throw new RialtoArgumentError("invalid file name");
     }
@@ -234,11 +238,11 @@ class PointCloudGenerator {
         cloud.addDimensions(map);
 
         return cloud;
-}
+    }
 
 
-    static PointCloud makeTerrain() {
-        _Terrain terrain = new _Terrain();
+    static PointCloud makeTerrain(int which) {
+        _Terrain terrain = new _Terrain(which);
 
         Map<String, Float32List> map = new Map();
         map["positions.x"] = terrain.valuesX;
@@ -258,14 +262,73 @@ class _Terrain {
     int width, height;
     var valuesX, valuesY, valuesZ;
     var _valuesW;
-    var rnd = new Math.Random();
+    var rnd = new Math.Random(new DateTime.now().millisecondsSinceEpoch);
 
-    _Terrain() {
+    _Terrain(int which) {
         width = 512;
         height = 512;
         _valuesW = new Float32List(width * height);
 
-        int featuresize = 32;
+        _generatePoints();
+
+        valuesX = new Float32List(width * height);
+        valuesY = new Float32List(width * height);
+        valuesZ = new Float32List(width * height);
+
+        double xoffset;
+        double yoffset;
+        switch (which) {
+            case 1:
+                xoffset = 0.0;
+                yoffset = 0.0;
+                break;
+            case 2:
+                xoffset = 400.0;
+                yoffset = 400.0;
+                break;
+            case 3:
+                xoffset = 550.0;
+                yoffset = -150.0;
+                break;
+            default:
+                throw new RialtoArgumentError("invalid terrain mode value");
+        }
+
+        _makeGrid(xoffset, yoffset);
+    }
+
+    void _makeGrid(double xoffset, double yoffset) {
+
+        double scale = 5.0;
+
+        int i = 0;
+        for (int w = 0; w < width; w++) {
+            for (int h = 0; h < height; h++) {
+                double x = w.toDouble();
+                double y = h.toDouble();
+                double z = getSample(w, h);
+
+                // jiggle the (x,y) points, to prevent visual artifacts
+                x += (rnd.nextDouble() - 0.5);
+                y += (rnd.nextDouble() - 0.5);
+
+                // for better viewing, center the data at zero and spread it out more
+                x = (x - width / 2) * scale;
+                y = (y - height / 2) * scale;
+
+                // for better viewing, exaggerate Z
+                z = z * 200.0;
+
+                valuesX[i] = x + xoffset * scale;
+                valuesY[i] = y + yoffset * scale;
+                valuesZ[i] = z;
+                i++;
+            }
+        }
+    }
+
+    void _generatePoints() {
+        const int featuresize = 32;
 
         for (int y = 0; y < height; y += featuresize) {
             for (int x = 0; x < width; x += featuresize) {
@@ -279,7 +342,6 @@ class _Terrain {
         }
 
         int samplesize = featuresize;
-
         double scale = 1.0;
 
         while (samplesize > 1) {
@@ -288,35 +350,6 @@ class _Terrain {
             samplesize = samplesize ~/ 2;
             scale = scale / 2.0;
         }
-
-        valuesX = new Float32List(width * height);
-        valuesY = new Float32List(width * height);
-        valuesZ = new Float32List(width * height);
-        int i = 0;
-        for (int w = 0; w < width; w++) {
-            for (int h = 0; h < height; h++) {
-                double x = w.toDouble();
-                double y = h.toDouble();
-                double z = getSample(w, h);
-
-                // jiggle the (x,y) points, to prevent visual artifacts
-                x += (rnd.nextDouble() - 0.5);
-                y += (rnd.nextDouble() - 0.5);
-
-                // for better viewing, center the data at zero and spread it out more
-                x = (x - width / 2) * 5.0;
-                y = (y - height / 2) * 5.0;
-
-                // for better viewing, exaggerate Z
-                z = z * 200.0;
-
-                valuesX[i] = x;
-                valuesY[i] = y;
-                valuesZ[i] = z;
-                i++;
-            }
-        }
-
     }
 
     double getSample(int x, int y) {
