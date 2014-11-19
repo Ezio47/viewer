@@ -31,11 +31,6 @@ class Hub {
         return;
     }
 
-    void addLoadedPointCloud(PointCloud cloud)
-    {
-        _pointClouds[cloud.name] = cloud;
-    }
-
     void doColorize() {
         renderer.unsetSource();
 
@@ -104,5 +99,14 @@ class Hub {
     void doMouseMoved() {
         statusUI.mousePositionX = renderer.mouseX;
         statusUI.mousePositionY = renderer.mouseY;
+    }
+
+    void bootup() {
+        Proxy proxy = new ServerProxy("http://www.example.com/");
+        proxy.load();
+        List<Proxy> list = proxy.sources;
+        proxy = list.firstWhere((e) => e.name == "terrain1.dat");
+        assert(proxy != null);
+        doAddFile(proxy);
     }
 }

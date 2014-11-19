@@ -7,7 +7,6 @@ import 'package:polymer/polymer.dart';
 import '../hub.dart';
 import '../utils.dart';
 
-
 @CustomTag('viewer-element')
 class ViewerElement extends PolymerElement {
 
@@ -23,8 +22,9 @@ class ViewerElement extends PolymerElement {
     @override
     void ready() {
 
+        //hub.doAddFile("5");
 
-        ///  hub.doAddFile("5");
+        hub.bootup();
     }
 
 
