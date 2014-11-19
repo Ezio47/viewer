@@ -22,6 +22,8 @@ class RenderElement extends PolymerElement
     hub.canvas = canvas;
 
     canvas.onMouseMove.listen(onMyMouseMove);
+
+    hub.makeRenderer();
   }
 
   @override

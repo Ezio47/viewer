@@ -43,6 +43,16 @@ class Hub
   }
 
 
+  void makeRenderer() {
+      // we don't make the renderer until we have to
+      if (renderer == null)
+      {
+        renderer = new Renderer(canvas);
+        renderer.init();
+        renderer.animate(0);
+      }
+  }
+
   void doAddFile(String file)
   {
     settingsUI.doAddFile(file);
@@ -58,14 +68,6 @@ class Hub
     statusUI.maxy = cloud.high.y;
     statusUI.minz = cloud.low.z;
     statusUI.maxz = cloud.high.z;
-
-    // we don't make the renderer until we have to
-    if (renderer == null)
-    {
-      renderer = new Renderer(canvas);
-      renderer.init();
-      renderer.animate(0);
-    }
 
     renderer.setCloud(cloud);
   }
