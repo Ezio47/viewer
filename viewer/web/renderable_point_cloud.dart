@@ -30,9 +30,7 @@ class RenderablePointCloud {
     }
 
 
-    GeometryAttribute _convertArray3(Float32List src1,
-                                            Float32List src2,
-                                            Float32List src3) {
+    GeometryAttribute _convertArray3(Float32List src1, Float32List src2, Float32List src3) {
         var dst = new GeometryAttribute.float32(numPoints * 3, 3);
 
         for (int i = 0; i < numPoints; i++) {
@@ -46,14 +44,10 @@ class RenderablePointCloud {
 
 
     void _convertArrays(Map<String, Float32List> mydims) {
-        dims["positions"] = _convertArray3(mydims["positions.x"],
-                                           mydims["positions.y"],
-                                           mydims["positions.z"]);
+        dims["positions"] = _convertArray3(mydims["positions.x"], mydims["positions.y"], mydims["positions.z"]);
 
         if (mydims.containsKey("colors.x")) {
-            dims["colors"] = _convertArray3(mydims["colors.x"],
-                                            mydims["colors.y"],
-                                            mydims["colors.z"]);
+            dims["colors"] = _convertArray3(mydims["colors.x"], mydims["colors.y"], mydims["colors.z"]);
         } else {
             var colors = new GeometryAttribute.float32(numPoints * 3, 3);
             dims["colors"] = colors;
@@ -104,8 +98,7 @@ class RenderablePointCloud {
         double max = list[0];
         double sum = 0.0;
 
-        for (int i=0; i<numPoints; i++)
-        {
+        for (int i = 0; i < numPoints; i++) {
             double v = list[i];
             min = Math.min(min, v);
             max = Math.max(max, v);

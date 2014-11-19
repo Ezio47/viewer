@@ -7,34 +7,31 @@ import '../hub.dart';
 
 
 @CustomTag('render-element')
-class RenderElement extends PolymerElement
-{
-  RenderElement.created() : super.created();
+class RenderElement extends PolymerElement {
+    RenderElement.created() : super.created();
 
-  @override
-  void attached() {
-    super.attached();
+    @override
+    void attached() {
+        super.attached();
 
-    var canvas =  this.shadowRoot.querySelector("#container");
-    assert(canvas != null);
+        var canvas = this.shadowRoot.querySelector("#container");
+        assert(canvas != null);
 
-    hub.renderUI = this;
-    hub.canvas = canvas;
+        hub.renderUI = this;
+        hub.canvas = canvas;
 
-    canvas.onMouseMove.listen(onMyMouseMove);
+        canvas.onMouseMove.listen(onMyMouseMove);
 
-    hub.makeRenderer();
-  }
+        hub.makeRenderer();
+    }
 
-  @override
-  void detached() {
-    super.detached();
-  }
+    @override
+    void detached() {
+        super.detached();
+    }
 
 
-  void onMyMouseMove(event)
-  {
-    hub.doMouseMoved();
-  }
+    void onMyMouseMove(event) {
+        hub.doMouseMoved();
+    }
 }
-

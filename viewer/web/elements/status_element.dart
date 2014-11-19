@@ -8,21 +8,21 @@ import '../hub.dart';
 
 @CustomTag('status-element')
 class StatusElement extends PolymerElement {
-  @published double mousePositionX;
-  @published double mousePositionY;
-  @published double minx, maxx, miny, maxy, minz, maxz;
+    @published double mousePositionX;
+    @published double mousePositionY;
+    @published double minx, maxx, miny, maxy, minz, maxz;
 
-  StatusElement.created() : super.created();
+    StatusElement.created() : super.created();
 
-  @override
-  void attached() {
-    super.attached();
+    @override
+    void attached() {
+        super.attached();
 
-    hub.statusUI = this;
-  }
+        hub.statusUI = this;
+    }
 
-  @override
-  void detached() {
-    super.detached();
-  }
+    @override
+    void detached() {
+        super.detached();
+    }
 }

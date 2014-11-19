@@ -138,8 +138,7 @@ class SettingsElement extends PolymerElement {
     void loadItems() {
         items.clear();
 
-        if (_pcSource is! PointCloudServer)
-            items.add(new Item("..", null));
+        if (_pcSource is! PointCloudServer) items.add(new Item("..", null));
 
         for (var s in _pcSource.sources) {
             items.add(new Item(s.path, s));
