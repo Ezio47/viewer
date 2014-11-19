@@ -6,7 +6,7 @@ import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
 import 'package:paper_elements/paper_dialog.dart';
-import '../point_cloud_source.dart';
+import '../proxy.dart';
 
 
 @CustomTag('settings-element')
@@ -52,12 +52,12 @@ class SettingsElement extends PolymerElement {
         hub.doToggleBbox(axesbool2);
     }
 
-    void doAddFile(String s) {
-        files.add(new CloudFile(s));
+    void doAddFile(String name, String fullpath) {
+        files.add(new CloudFile(name, fullpath));
     }
 
-    void doRemoveFile(String s) {
-        files.removeWhere((f) => f.name == s);
+    void doRemoveFile(String fullpath) {
+        files.removeWhere((f) => f.fullpath == fullpath);
     }
 
     void toggleAxes(Event e, var detail, Node target) {
@@ -74,7 +74,7 @@ class SettingsElement extends PolymerElement {
         var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
 
         _pcSource = null;
-        _pcSource = new PointCloudServer("http://www.example.com/");
+        _pcSource = new ServerProxy("http://www.example.com/");
         _pcSource.load();
         loadItems();
 
@@ -97,7 +97,7 @@ class SettingsElement extends PolymerElement {
         elem.value = "";*/
 
         assert(_currentItem != null);
-        hub.doAddFile(_currentItem.path);
+        hub.doAddFile(_currentItem);
     }
 
     void toggleFile(Event e, var detail, Node target) {
@@ -115,7 +115,7 @@ class SettingsElement extends PolymerElement {
     void deleteFile(Event e, var detail, Node target) {
         if (selection != null) {
             assert(selection is CloudFile);
-            hub.doRemoveFile(selection.name);
+            hub.doRemoveFile(selection.fullpath);
         }
         return;
     }
@@ -130,18 +130,20 @@ class SettingsElement extends PolymerElement {
     @observable var selection;
     @observable bool selectionEnabled = true;
 
+    @observable var itemSelection;
+    @observable bool itemSelectionEnabled = true;
 
     @published ObservableList<Item> items = new ObservableList();
-    PointCloudSource _pcSource = null;
-    PointCloudSource _currentItem = null;
+    Proxy _pcSource = null;
+    Proxy _currentItem = null;
 
     void loadItems() {
         items.clear();
 
-        if (_pcSource is! PointCloudServer) items.add(new Item("..", null));
+        if (_pcSource is! ServerProxy) items.add(new Item("..", null));
 
         for (var s in _pcSource.sources) {
-            items.add(new Item(s.path, s));
+            items.add(new Item(s.name, s));
         }
     }
 
@@ -159,10 +161,10 @@ class SettingsElement extends PolymerElement {
             _pcSource = _pcSource.parent;
             loadItems();
 
-        } else if (source is PointCloudFile) {
+        } else if (source is FileProxy) {
             //window.alert(item.name);
 
-        } else if (source is PointCloudDirectory) {
+        } else if (source is DirectoryProxy) {
             _pcSource = source;
             _pcSource.load();
             loadItems();
@@ -178,14 +180,15 @@ class SettingsElement extends PolymerElement {
 class Item extends Observable {
     Item(this.name, this.source);
     @observable String name;
-    PointCloudSource source;
+    Proxy source;
 }
 
 
 class CloudFile extends Observable {
     @observable String name;
+    @observable String fullpath;
     @observable bool checked;
-    CloudFile(this.name) {
+    CloudFile(this.name, this.fullpath) {
         checked = true;
     }
     String toString() => "<$name $checked>";

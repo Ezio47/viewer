@@ -5,7 +5,7 @@ import 'dart:html';
 import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/controls/trackball_controls.dart';
-import 'renderable_point_cloud.dart';
+import 'render_source.dart';
 import 'render_utils.dart';
 //import 'utils.dart';
 
@@ -29,7 +29,7 @@ class Renderer {
     double _ndcMouseX = 0.0,
             _ndcMouseY = 0.0; // [-1..+1]
 
-    RenderablePointCloud _currentCloud;
+    RenderSource _renderTarget;
 
     Vector3 _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
     Vector3 _cameraUpPosition = new Vector3(0.0, 1.0, 0.0);
@@ -98,43 +98,55 @@ class Renderer {
     }
 
 
-    void setCloud(RenderablePointCloud cloud) {
-        _currentCloud = cloud;
+    void setSource(RenderSource renderTarget) {
+        _renderTarget = renderTarget;
 
-        _particleSystem = RenderUtils.drawPoints(cloud);
+        _particleSystem = RenderUtils.drawPoints(renderTarget);
         _scene.add(_particleSystem);
 
         // when we set the cloud, we need to set the camera relative to it
-        _cameraHomePosition = RenderUtils.getDefaultCameraPosition(cloud);
+        _cameraHomePosition = RenderUtils.getDefaultCameraPosition(renderTarget);
         goHome();
 
-        _axes = RenderUtils.drawAxes(cloud.low, cloud.high);
+        _axes = RenderUtils.drawAxes(renderTarget.low, renderTarget.high);
         if (_showAxes) {
             _axes.forEach((l) => _scene.add(l));
         }
 
-        _bbox = RenderUtils.drawBbox(cloud.low, cloud.high);
+        _bbox = RenderUtils.drawBbox(renderTarget.low, renderTarget.high);
         if (_showBbox) {
             _bbox.forEach((l) => _scene.add(l));
         }
     }
 
 
-    RenderablePointCloud unsetCloud() {
-        var oldCloud = _currentCloud;
-        _currentCloud = null;
+    void unsetSource() {
+        _renderTarget = null;
 
-        _scene.remove(_particleSystem);
-        _axes.forEach((l) => _scene.remove(l));
-        _bbox.forEach((l) => _scene.remove(l));
+        if (_particleSystem != null) {
+            _scene.remove(_particleSystem);
+            _particleSystem = null;
+        }
+
+        if (_axes != null) {
+            _axes.forEach((l) => _scene.remove(l));
+            _axes.clear();
+            _axes = null;
+        }
+
+        if (_bbox != null) {
+            _bbox.forEach((l) => _scene.remove(l));
+            _bbox.clear();
+            _bbox = null;
+        }
 
         _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
-
-        return oldCloud;
     }
 
 
     void toggleAxesDisplay(bool on) {
+        if (_axes == null) return;
+
         if (on) {
             _axes.forEach((l) => _scene.add(l));
         } else {
@@ -145,6 +157,8 @@ class Renderer {
 
 
     void toggleBboxDisplay(bool on) {
+        if (_bbox == null) return;
+
         if (on) {
             _bbox.forEach((l) => _scene.add(l));
         } else {

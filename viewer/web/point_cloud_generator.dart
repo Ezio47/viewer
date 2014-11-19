@@ -1,45 +1,38 @@
-library cloud_generator;
+library point_cloud_generator;
 
 import 'dart:core';
 import 'package:three/three.dart';
 import 'dart:math' as Math;
 import 'dart:typed_data';
+import 'point_cloud.dart';
+import 'rialto_exceptions.dart';
 
 
 // this class pretends to represent a pointcloud file: all it does is
 // return a set of points, like a file would
 //
-// each statuc function returns a structure:
-// {
-//   "dim1" : GeometryAttribute.float32
-//   "dim2" : GeometryAttribute.float32
-//   ...
-// }
-//
-// geamattrib has numitems and itemsize
-//
 // we assume each file will return at least dims for x, y, and z (or 'positions')
 
-class CloudGenerator {
-    static Map<String, Float32List> generate(String name) {
+class PointCloudGenerator {
+
+    static PointCloud generate(String name) {
         switch (name) {
-            case "file1":
-                return makeNewCube();
-            case "file2":
-                return makeOldCube();
-            case "file3":
-                return makeRandom();
-            case "file4":
+            case "line":
                 return makeLine();
-            case "file5":
-                return makeTerrain();
-            default:
+            case "newcube":
                 return makeNewCube();
+            case "oldcube":
+                return makeOldCube();
+            case "random":
+                return makeRandom();
+            case "terrain":
+                return makeTerrain();
         }
+        throw new RialtoArgumentError("invalid file name");
     }
 
 
-    static Map<String, Float32List> makeNewCube() {
+    static PointCloud makeNewCube() {
         num particles = 50000;
 
         Map<String, Float32List> map = new Map();
@@ -108,11 +101,14 @@ class CloudGenerator {
             }
         }
 
-        return map;
+        var cloud = new PointCloud("newcube");
+        cloud.addDimensions(map);
+
+        return cloud;
     }
 
 
-    static Map<String, Float32List> makeOldCube() {
+    static PointCloud makeOldCube() {
         Map<String, Float32List> map = new Map();
 
         var numPoints = 24;
@@ -173,11 +169,14 @@ class CloudGenerator {
             zz[i] = points[i * 3 + 2];
         }
 
-        return map;
+        var cloud = new PointCloud("oldcube");
+        cloud.addDimensions(map);
+
+        return cloud;
     }
 
 
-    static Map<String, Float32List> makeRandom() {
+    static PointCloud makeRandom() {
         Map<String, Float32List> map = new Map();
 
         var numPoints = 50000;
@@ -204,11 +203,14 @@ class CloudGenerator {
             positionsZ[i] = z;
         }
 
-        return map;
+        var cloud = new PointCloud("random");
+        cloud.addDimensions(map);
+
+        return cloud;
     }
 
 
-    static Map<String, Float32List> makeLine() {
+    static PointCloud makeLine() {
         Map<String, Float32List> map = new Map();
 
         var numPoints = 2000;
@@ -228,31 +230,37 @@ class CloudGenerator {
             positionsZ[i] = pt;
         }
 
-        return map;
-    }
+        var cloud = new PointCloud("line");
+        cloud.addDimensions(map);
+
+        return cloud;
+}
 
 
-    static Map<String, Float32List> makeTerrain() {
-        Terrain terrain = new Terrain();
+    static PointCloud makeTerrain() {
+        _Terrain terrain = new _Terrain();
 
         Map<String, Float32List> map = new Map();
         map["positions.x"] = terrain.valuesX;
         map["positions.y"] = terrain.valuesY;
         map["positions.z"] = terrain.valuesZ;
 
-        return map;
+        var cloud = new PointCloud("terrain");
+        cloud.addDimensions(map);
+
+        return cloud;
     }
 }
 
 
 // http://www.bluh.org/code-the-diamond-square-algorithm/
-class Terrain {
+class _Terrain {
     int width, height;
     var valuesX, valuesY, valuesZ;
     var _valuesW;
     var rnd = new Math.Random();
 
-    Terrain() {
+    _Terrain() {
         width = 512;
         height = 512;
         _valuesW = new Float32List(width * height);

@@ -7,8 +7,9 @@ import 'elements/render_element.dart';
 import 'elements/settings_element.dart';
 import 'elements/status_element.dart';
 import 'renderer.dart';
-import 'cloud_generator.dart';
-import 'renderable_point_cloud.dart';
+import 'render_source.dart';
+import 'point_cloud.dart';
+import 'proxy.dart';
 
 
 // thje global singleton
@@ -22,21 +23,28 @@ class Hub {
     Element canvas;
     Renderer renderer;
 
-    // private
-    Map<String, RenderablePointCloud> _pointclouds = new Map();
+    // private - the gloabl repo for loaded data
+    Map<String, PointCloud> _pointClouds = new Map<String, PointCloud>();
 
 
     Hub() {
         return;
     }
 
+    void addLoadedPointCloud(PointCloud cloud)
+    {
+        _pointClouds[cloud.name] = cloud;
+    }
 
     void doColorize() {
-        var cloud = renderer.unsetCloud();
+        renderer.unsetSource();
 
-        cloud.colorize();
+        var renderSource = new RenderSource();
+        renderSource.addClouds(_pointClouds.values.toList());
 
-        renderer.setCloud(cloud);
+        renderSource.colorize();
+
+        renderer.setSource(renderSource);
     }
 
 
@@ -49,30 +57,40 @@ class Hub {
         }
     }
 
-    void doAddFile(String file) {
-        settingsUI.doAddFile(file);
+    void doAddFile(FileProxy file) {
+        settingsUI.doAddFile(file.name, file.fullpath);
 
-        var data = CloudGenerator.generate(file);
-        var cloud = new RenderablePointCloud(data);
+        _pointClouds[file.fullpath] = file.create();
 
-        _pointclouds[file] = cloud;
+        renderer.unsetSource();
 
-        statusUI.minx = cloud.low.x;
-        statusUI.maxx = cloud.high.x;
-        statusUI.miny = cloud.low.y;
-        statusUI.maxy = cloud.high.y;
-        statusUI.minz = cloud.low.z;
-        statusUI.maxz = cloud.high.z;
+        var renderSource = new RenderSource();
+        renderSource.addClouds(_pointClouds.values.toList());
+        renderer.setSource(renderSource);
 
-        renderer.setCloud(cloud);
+        statusUI.minx = renderSource.low.x;
+        statusUI.maxx = renderSource.high.x;
+        statusUI.miny = renderSource.low.y;
+        statusUI.maxy = renderSource.high.y;
+        statusUI.minz = renderSource.low.z;
+        statusUI.maxz = renderSource.high.z;
     }
 
 
-    void doRemoveFile(String file) {
-        settingsUI.doRemoveFile(file);
-        _pointclouds.remove(file);
+    void doRemoveFile(String fullpath) {
+        settingsUI.doRemoveFile(fullpath);
 
-        renderer.unsetCloud();
+        renderer.unsetSource();
+
+        var cloud = _pointClouds[fullpath];
+        assert(cloud != null);
+        _pointClouds.remove(fullpath);
+
+        if (_pointClouds.length > 0) {
+            var renderSource = new RenderSource();
+            renderSource.addClouds(_pointClouds.values.toList());
+            renderer.setSource(renderSource);
+        }
     }
 
 

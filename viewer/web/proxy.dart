@@ -1,45 +1,46 @@
-library point_cloud_source;
+library proxy;
 
 import 'dart:core';
 import 'dart:convert';
 import 'comms.dart';
-import 'cloud_generator.dart';
+import 'point_cloud_generator.dart';
+import 'point_cloud.dart';
 
 //import 'package:three/three.dart';
 //import 'dart:math' as Math;
 //import 'package:vector_math/vector_math.dart';
 
 
-abstract class PointCloudSource {
+abstract class Proxy {
 
     bool isLoaded;
-    List<PointCloudSource> sources;
-    PointCloudSource parent;
-    String path;
+    List<Proxy> sources;
+    Proxy parent;
+    String name;
 
-    PointCloudSource(String rpath, PointCloudSource rparent)
+    Proxy(String rname, Proxy rparent)
             : isLoaded = false {
-        path = rpath;
+        name = rname;
         parent = rparent;
 
-        assert(path != null);
+        assert(name != null);
     }
 
     void load();
 
     Comms get comms => parent.comms;
 
-    String getFullPath() {
+    String get fullpath {
         if (parent != null) {
-            String s = parent.getFullPath() + path;
+            String s = parent.fullpath + name;
             return s;
         }
 
-        return path;
+        return name;
     }
 
-    List<PointCloudSource> _parseDirString(Map<String, Object> map) {
-        var list = new List<PointCloudSource>();
+    List<Proxy> _parseDirString(Map<String, Object> map) {
+        var list = new List<Proxy>();
 
         for (var key in map.keys) {
             var value = map[key];
@@ -48,10 +49,10 @@ abstract class PointCloudSource {
 
             switch (key) {
                 case "dirs":
-                    values.forEach((v) => list.add(new PointCloudDirectory(v, this)));
+                    values.forEach((v) => list.add(new DirectoryProxy(v, this)));
                     break;
                 case "files":
-                    values.forEach((v) => list.add(new PointCloudFile(v, this)));
+                    values.forEach((v) => list.add(new FileProxy(v, this)));
                     break;
                 default:
                     throw new Error();
@@ -63,11 +64,11 @@ abstract class PointCloudSource {
 }
 
 
-class PointCloudServer extends PointCloudSource {
+class ServerProxy extends Proxy {
 
     Comms _comms;
 
-    PointCloudServer(String server) : super(server, null) {
+    ServerProxy(String server) : super(server, null) {
         if (server != "http://www.example.com/") throw new Error();
         assert(server.endsWith("/"));
 
@@ -76,7 +77,7 @@ class PointCloudServer extends PointCloudSource {
     }
 
     @override void load() {
-        String json = comms.read(getFullPath());
+        String json = comms.read(fullpath);
         var data = JSON.decode(json);
         sources = _parseDirString(data);
     }
@@ -85,31 +86,31 @@ class PointCloudServer extends PointCloudSource {
 }
 
 
-class PointCloudDirectory extends PointCloudSource {
+class DirectoryProxy extends Proxy {
 
-    PointCloudDirectory(String dirpath, PointCloudSource myparent) : super(dirpath, myparent) {
-        assert(path.endsWith("/"));
+    DirectoryProxy(String dirpath, Proxy myparent) : super(dirpath, myparent) {
+        assert(name.endsWith("/"));
     }
 
     @override void load() {
-        String json = comms.read(getFullPath());
+        String json = comms.read(fullpath);
         var data = JSON.decode(json);
         sources = _parseDirString(data);
     }
 }
 
 
-class PointCloudFile extends PointCloudSource {
-    String path;
+class FileProxy extends Proxy {
+    String name;
     List<String> dims;
     int numPoints;
 
-    PointCloudFile(String filepath, PointCloudSource myparent) : super(filepath, myparent) {
-        assert(!path.endsWith("/"));
+    FileProxy(String filepath, Proxy myparent) : super(filepath, myparent) {
+        assert(!name.endsWith("/"));
     }
 
     @override void load() {
-        String json = comms.read(getFullPath());
+        String json = comms.read(fullpath);
         var data = JSON.decode(json);
         sources = null;
 
@@ -136,18 +137,8 @@ class PointCloudFile extends PointCloudSource {
         }
     }
 
-    Object readData() {
-        switch (path) {
-            case "file1":
-                return CloudGenerator.makeTerrain();
-            case "file2":
-                return CloudGenerator.makeNewCube();
-            case "file3":
-                return CloudGenerator.makeRandom();
-            case "file4":
-                return CloudGenerator.makeLine();
-            default:
-                throw new Error();
-        }
+    PointCloud create() {
+        PointCloud cloud = PointCloudGenerator.generate(name);
+        return cloud;
     }
 }

@@ -2,7 +2,7 @@ library comms;
 
 import 'dart:core';
 import 'dart:convert';
-import "point_cloud_source.dart";
+import "proxy.dart";
 
 
 // root = new PointCloudServer("http://faux");
@@ -42,19 +42,19 @@ class FauxComms extends Comms {
             case "http://www.example.com/":
                 map = {
                     "dirs": ["dir1/", "dir2/"],
-                    "files": ["file1", "file2", "file5"]
+                    "files": ["newcube", "oldcube", "terrain"]
                 };
                 break;
             case "http://www.example.com/dir1/":
                 map = {
                     "dirs": [],
-                    "files": ["file3"]
+                    "files": ["random"]
                 };
                 break;
             case "http://www.example.com/dir2/":
                 map = {
                     "dirs": [],
-                    "files": ["file4"]
+                    "files": ["line"]
                 };
                 break;
             case "http://www.example.com/file1":
@@ -89,13 +89,13 @@ class FauxComms extends Comms {
     }
 
     static void test() {
-        var root = new PointCloudServer("http://www.example.com/");
+        var root = new ServerProxy("http://www.example.com/");
         root.load();
         for (var s in root.sources) {
             assert(s != null);
             s.load();
-            if (s is PointCloudFile) {
-                (s as PointCloudFile).readData();
+            if (s is FileProxy) {
+                (s as FileProxy).create();
             }
         }
         if (root.sources != null) for (var s in root.sources) {
@@ -103,8 +103,8 @@ class FauxComms extends Comms {
             if (s.sources != null) for (var t in s.sources) {
                 assert(t != null);
                 t.load();
-                if (t is PointCloudFile) {
-                    (t as PointCloudFile).readData();
+                if (t is FileProxy) {
+                    (t as FileProxy).create();
                 }
             }
         }
@@ -115,8 +115,8 @@ class FauxComms extends Comms {
                 if (t.sources != null) for (var u in t.sources) {
                     assert(u != null);
                     u.load();
-                    if (u is PointCloudFile) {
-                        (u as PointCloudFile).readData();
+                    if (u is FileProxy) {
+                        (u as FileProxy).create();
                     }
                 }
             }

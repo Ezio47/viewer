@@ -5,7 +5,6 @@ import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
-import '../comms.dart';
 
 
 @CustomTag('viewer-element')
