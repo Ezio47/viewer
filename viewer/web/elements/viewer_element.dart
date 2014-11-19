@@ -5,6 +5,7 @@ import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
+import '../utils.dart';
 
 
 @CustomTag('viewer-element')
@@ -37,6 +38,7 @@ class ViewerElement extends PolymerElement {
         hub.goHome();
 
         //FauxComms.test();
+        //Utils.test_toSI();
     }
 
 

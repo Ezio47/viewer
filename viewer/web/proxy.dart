@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'comms.dart';
 import 'point_cloud_generator.dart';
 import 'point_cloud.dart';
+import 'rialto_exceptions.dart';
 
 //import 'package:three/three.dart';
 //import 'dart:math' as Math;
@@ -39,23 +40,31 @@ abstract class Proxy {
         return name;
     }
 
-    List<Proxy> _parseDirString(Map<String, Object> map) {
+    List<Proxy> _parseString(Map<String, Object> map) {
         var list = new List<Proxy>();
 
         for (var key in map.keys) {
             var value = map[key];
 
-            var values = value as List<String>;
+            var values = value as List<Object>;
 
             switch (key) {
                 case "dirs":
-                    values.forEach((v) => list.add(new DirectoryProxy(v, this)));
+                    for (var v in values) {
+                        assert(v is Map);
+                        Map m = v as Map;
+                        list.add(new DirectoryProxy(m["name"], m, this));
+                    }
                     break;
                 case "files":
-                    values.forEach((v) => list.add(new FileProxy(v, this)));
+                    for (var v in values) {
+                        assert(v is Map);
+                        Map m = v as Map;
+                        list.add(new FileProxy(m["name"], m, this));
+                    }
                     break;
                 default:
-                    throw new Error();
+                    throw new RialtoArgumentError("invalid key in proxy data map");
             }
         }
 
@@ -79,7 +88,7 @@ class ServerProxy extends Proxy {
     @override void load() {
         String json = comms.read(fullpath);
         var data = JSON.decode(json);
-        sources = _parseDirString(data);
+        sources = _parseString(data);
     }
 
     Comms get comms => _comms;
@@ -88,14 +97,31 @@ class ServerProxy extends Proxy {
 
 class DirectoryProxy extends Proxy {
 
-    DirectoryProxy(String dirpath, Proxy myparent) : super(dirpath, myparent) {
+    DirectoryProxy(String dirpath, Map map, Proxy myparent) : super(dirpath, myparent) {
         assert(name.endsWith("/"));
+        _parseDirectoryMap(map);
     }
 
     @override void load() {
         String json = comms.read(fullpath);
         var data = JSON.decode(json);
-        sources = _parseDirString(data);
+        sources = _parseString(data);
+    }
+
+    void _parseDirectoryMap(Map<String, Object> map) {
+
+        for (var key in map.keys) {
+            var value = map[key];
+
+            switch (key) {
+                case "name":
+                    var n = value as String;
+                    if (n != name) throw new RialtoArgumentError("DirectoryProxy parser error on 'name'");
+                    break;
+                default:
+                    throw new RialtoArgumentError("invalid key in DirectoryProxy map");
+            }
+        }
     }
 }
 
@@ -103,21 +129,22 @@ class DirectoryProxy extends Proxy {
 class FileProxy extends Proxy {
     String name;
     List<String> dims;
-    int numPoints;
+    int numPoints = -1;
 
-    FileProxy(String filepath, Proxy myparent) : super(filepath, myparent) {
+    FileProxy(String filepath, Map map, Proxy myparent) : super(filepath, myparent) {
         assert(!name.endsWith("/"));
+        _parseFileMap(map);
     }
 
     @override void load() {
-        String json = comms.read(fullpath);
-        var data = JSON.decode(json);
-        sources = null;
+        //String json = comms.read(fullpath);
+        //var data = JSON.decode(json);
+        //sources = null;
 
-        _parseFileString(data);
+        //_parseFileString(data);
     }
 
-    void _parseFileString(Map<String, Object> map) {
+    void _parseFileMap(Map<String, Object> map) {
 
         for (var key in map.keys) {
             var value = map[key];
@@ -131,8 +158,12 @@ class FileProxy extends Proxy {
                     var n = value as int;
                     numPoints = n;
                     break;
+                case "name":
+                    var n = value as String;
+                    if (n != name) throw new RialtoArgumentError("FileProxy parser error on 'name'");
+                    break;
                 default:
-                    throw new Error();
+                    throw new RialtoArgumentError("invalid key in FileProxy map");
             }
         }
     }

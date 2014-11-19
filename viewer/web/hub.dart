@@ -68,12 +68,13 @@ class Hub {
         renderSource.addClouds(_pointClouds.values.toList());
         renderer.setSource(renderSource);
 
-        statusUI.minx = renderSource.low.x;
-        statusUI.maxx = renderSource.high.x;
-        statusUI.miny = renderSource.low.y;
-        statusUI.maxy = renderSource.high.y;
-        statusUI.minz = renderSource.low.z;
-        statusUI.maxz = renderSource.high.z;
+        settingsUI.minx = renderSource.low.x;
+        settingsUI.maxx = renderSource.high.x;
+        settingsUI.miny = renderSource.low.y;
+        settingsUI.maxy = renderSource.high.y;
+        settingsUI.minz = renderSource.low.z;
+        settingsUI.maxz = renderSource.high.z;
+        settingsUI.numPoints = renderSource.numPoints;
     }
 
 

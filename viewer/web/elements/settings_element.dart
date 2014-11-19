@@ -7,6 +7,7 @@ import 'package:polymer/polymer.dart';
 import '../hub.dart';
 import 'package:paper_elements/paper_dialog.dart';
 import '../proxy.dart';
+import '../utils.dart';
 
 
 @CustomTag('settings-element')
@@ -17,6 +18,9 @@ class SettingsElement extends PolymerElement {
     @published bool axesbool1 = false;
     @published bool axesbool2 = false;
     @published bool axesbool3 = true;
+    @published double minx, maxx, miny, maxy, minz, maxz;
+    @published bool hasData;
+    @published int numPoints;
 
     SettingsElement.created() : super.created();
 
@@ -54,10 +58,12 @@ class SettingsElement extends PolymerElement {
 
     void doAddFile(String name, String fullpath) {
         files.add(new CloudFile(name, fullpath));
+        hasData = files.length > 0;
     }
 
     void doRemoveFile(String fullpath) {
         files.removeWhere((f) => f.fullpath == fullpath);
+        hasData = files.length > 0;
     }
 
     void toggleAxes(Event e, var detail, Node target) {
@@ -73,9 +79,9 @@ class SettingsElement extends PolymerElement {
     void openFile(Event e, var detail, Node target) {
         var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
 
-        _pcSource = null;
-        _pcSource = new ServerProxy("http://www.example.com/");
-        _pcSource.load();
+        _proxy = null;
+        _proxy = new ServerProxy("http://www.example.com/");
+        _proxy.load();
         loadItems();
 
         dlg.toggle();
@@ -134,16 +140,17 @@ class SettingsElement extends PolymerElement {
     @observable bool itemSelectionEnabled = true;
 
     @published ObservableList<Item> items = new ObservableList();
-    Proxy _pcSource = null;
+    Proxy _proxy = null;
     Proxy _currentItem = null;
 
     void loadItems() {
         items.clear();
 
-        if (_pcSource is! ServerProxy) items.add(new Item("..", null));
+        if (_proxy is! ServerProxy) items.add(new Item("..", null, -1));
 
-        for (var s in _pcSource.sources) {
-            items.add(new Item(s.name, s));
+        for (var s in _proxy.sources) {
+            int numPoints = (s is FileProxy) ? (s as FileProxy).numPoints : -1;
+            items.add(new Item(s.name, s, numPoints));
         }
     }
 
@@ -158,15 +165,15 @@ class SettingsElement extends PolymerElement {
         _currentItem = source;
 
         if (item.name == "..") {
-            _pcSource = _pcSource.parent;
+            _proxy = _proxy.parent;
             loadItems();
 
         } else if (source is FileProxy) {
             //window.alert(item.name);
 
         } else if (source is DirectoryProxy) {
-            _pcSource = source;
-            _pcSource.load();
+            _proxy = source;
+            _proxy.load();
             loadItems();
 
         } else {
@@ -178,9 +185,11 @@ class SettingsElement extends PolymerElement {
 
 
 class Item extends Observable {
-    Item(this.name, this.source);
+    Item(this.name, this.source, this.numPoints);
     @observable String name;
     Proxy source;
+    @observable int numPoints;
+    @observable String get size { return Utils.toSI(numPoints); }
 }
 
 

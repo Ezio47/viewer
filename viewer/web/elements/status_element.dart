@@ -10,7 +10,6 @@ import '../hub.dart';
 class StatusElement extends PolymerElement {
     @published double mousePositionX;
     @published double mousePositionY;
-    @published double minx, maxx, miny, maxy, minz, maxz;
 
     StatusElement.created() : super.created();
 

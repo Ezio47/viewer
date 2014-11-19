@@ -61,6 +61,9 @@
                 padding: 1px;
                 margin: 1px;
             }
+            .marginned {
+                margin: 3px;
+            }
             </style>
 
         <core-iconset-svg id="custom-icons" iconSize="12">
@@ -79,7 +82,7 @@
 
         <div vertical layout class="padded">
 
-        <fieldset>
+        <fieldset class="marginned">
             <legend>Files</legend>
 
             <div>
@@ -107,7 +110,7 @@
 
         </fieldset>
 
-        <fieldset>
+        <fieldset class="marginned">
             <legend>Display</legend>
 
               <form action="">
@@ -131,6 +134,33 @@
                 </div>
               </form>
         </fieldset>
+
+        <template if="{{hasData}}">
+        <fieldset class="marginned">
+            <legend>Data</legend>
+
+            <span>Point count: {{numPoints}}</span>
+
+            <table>
+                <tr>
+                    <td>X:</td>
+                    <td>{{minx.toStringAsFixed(3)}}</td>
+                    <td>{{maxx.toStringAsFixed(3)}}</td>
+                </tr>
+                <tr>
+                    <td>Y:</td>
+                    <td>{{miny.toStringAsFixed(3)}}</td>
+                    <td>{{maxy.toStringAsFixed(3)}}</td>
+                </tr>
+                <tr>
+                    <td>Z:</td>
+                    <td>{{minz.toStringAsFixed(3)}}</td>
+                    <td>{{maxz.toStringAsFixed(3)}}</td>
+                </tr>
+            </table>
+
+        </fieldset>
+        </template>
 
     </div>
 
@@ -156,7 +186,12 @@
                             id="file-list2">
                         <template>
                             <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
-                                <span>{{model.name}}</span>
+                                <span>{{model.name}}
+                                    <template if="{{model.numPoints > -1}}">
+                                        <div style="display: inline-block; width: 1em; height: 1em;"></div>
+                                        <span style="font-size: 75%;"><i>{{model.size}}</i></span>
+                                    </template>
+                                </span>
                             </div>
                         </template>
             </core-list-dart>

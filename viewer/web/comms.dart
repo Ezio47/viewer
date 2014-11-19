@@ -26,10 +26,7 @@ abstract class Comms {
 
 class FauxComms extends Comms {
 
-    FauxComms(String server) : super(server) {
-
-    }
-
+    FauxComms(String server) : super(server);
     @override
     void open() {
     }
@@ -41,44 +38,45 @@ class FauxComms extends Comms {
         switch (path) {
             case "http://www.example.com/":
                 map = {
-                    "dirs": ["dir1/", "dir2/"],
-                    "files": ["newcube", "oldcube", "terrain1", "terrain2", "terrain3"]
+                    "dirs": [{
+                            "name": "dir1/"
+                        }, {
+                            "name": "dir2/"
+                        }],
+                    "files": [{
+                            "name": "newcube.dat"
+                        }, {
+                            "name": "oldcube.dat"
+                        }, {
+                            "name": "terrain1.dat",
+                            "numpoints": 512*512
+                        }, {
+                            "name": "terrain2.dat",
+                            "numpoints": 512*512
+                        }, {
+                            "name": "terrain3.dat",
+                            "numpoints": 512*512
+                        }]
                 };
                 break;
             case "http://www.example.com/dir1/":
                 map = {
                     "dirs": [],
-                    "files": ["random"]
+                    "files": [{
+                            "name": "random.dat",
+                            "dims": ["x", "y", "z"],
+                            "numpoints": 1111
+                        }]
                 };
                 break;
             case "http://www.example.com/dir2/":
                 map = {
                     "dirs": [],
-                    "files": ["line"]
-                };
-                break;
-            case "http://www.example.com/file1":
-                map = {
-                    "dims": ["x", "y", "z"],
-                    "numpoints": 1111
-                };
-                break;
-            case "http://www.example.com/file2":
-                map = {
-                    "dims": ["x", "y", "z"],
-                    "numpoints": 2222
-                };
-                break;
-            case "http://www.example.com/dir1/file3":
-                map = {
-                    "dims": ["x", "y", "z"],
-                    "numpoints": 3333
-                };
-                break;
-            case "http://www.example.com/dir2/file4":
-                map = {
-                    "dims": ["x", "y", "z"],
-                    "numpoints": 4444
+                    "files": [{
+                            "name": "line.dat",
+                            "dims": ["x", "y", "z"],
+                            "numpoints": 222
+                        }]
                 };
                 break;
             default:

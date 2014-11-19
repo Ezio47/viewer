@@ -17,19 +17,19 @@ class PointCloudGenerator {
 
     static PointCloud generate(String name) {
         switch (name) {
-            case "line":
+            case "line.dat":
                 return makeLine();
-            case "newcube":
+            case "newcube.dat":
                 return makeNewCube();
-            case "oldcube":
+            case "oldcube.dat":
                 return makeOldCube();
-            case "random":
+            case "random.dat":
                 return makeRandom();
-            case "terrain1":
+            case "terrain1.dat":
                 return makeTerrain(1);
-            case "terrain2":
+            case "terrain2.dat":
                 return makeTerrain(2);
-            case "terrain3":
+            case "terrain3.dat":
                 return makeTerrain(3);
         }
         throw new RialtoArgumentError("invalid file name");
