@@ -42,7 +42,7 @@ class FauxComms extends Comms {
             case "http://www.example.com/":
                 map = {
                     "dirs": ["dir1/", "dir2/"],
-                    "files": ["file1", "file2"]
+                    "files": ["file1", "file2", "file5"]
                 };
                 break;
             case "http://www.example.com/dir1/":

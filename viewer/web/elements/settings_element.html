@@ -40,6 +40,9 @@
             .padded {
                 padding: 4px;
             }
+            .pad10 {
+                padding: 10px;
+            }
             .padright {
                 margin: 0px 5px 0px 0px;
             }
@@ -89,10 +92,8 @@
                         id="file-list">
                     <template>
                         <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
-                            <label>
-                                <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
-                                <span>{{index}} -- {{model.name}} -- {{model.checked}}</span>
-                            </label>
+                            <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
+                            <span>{{model.name}}</span>
                         </div>
                     </template>
                 </core-list-dart>
@@ -135,14 +136,36 @@
 
     <!-- autoFocusDisabled="true" autoCloseDisabled="true" -->
     <paper-dialog heading="Load point cloud file" id="openDialog">
-        <core-field>
-            <label>
-                <span>File name:</span>
-                <input placeholder="" id="filenamearea" type="text" autofocus flex>
-            </label>
-        </core-field>
-        <paper-button dismissive on-click="{{openFileCancel}}">Cancel</paper-button>
-        <paper-button affirmative on-click="{{openFileOkay}}">OK</paper-button>
+
+        <div class="pad10">
+            <core-field>
+                <label>
+                    <span>Server:</span>
+                    <input placeholder="http://www.example.com" id="xxfilenamearea" type="text" style="width:200px;">
+                </label>
+            </core-field>
+        </div>
+
+        <div class="padded">
+            <core-list-dart data="{{items}}" height="20px"
+                            selectionEnabled="{{selectionEnabled}}"
+                            selection="{{selection}}"
+                            on-core-activate = "{{itemSelectionMade}}"
+                            style="width:300px;height:200px;"
+                            multi="false"
+                            id="file-list2">
+                        <template>
+                            <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
+                                <span>{{model.name}}</span>
+                            </div>
+                        </template>
+            </core-list-dart>
+        </div>
+
+        <div>
+            <paper-button dismissive on-click="{{openFileCancel}}">Cancel</paper-button>
+            <paper-button affirmative on-click="{{openFileOkay}}">OK</paper-button>
+        </div>
     </paper-dialog>
 
     </template>

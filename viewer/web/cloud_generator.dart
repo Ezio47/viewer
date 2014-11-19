@@ -26,15 +26,15 @@ class CloudGenerator
   {
     switch (name)
     {
-      case "1":
+      case "file1":
         return makeNewCube();
-      case "2":
+      case "file2":
         return makeOldCube();
-      case "3":
+      case "file3":
         return makeRandom();
-      case "4":
+      case "file4":
         return makeLine();
-      case "5":
+      case "file5":
         return makeTerrain();
       default:
         return makeNewCube();
@@ -129,9 +129,9 @@ class CloudGenerator
     var xx = new Float32List(numPoints);
     var yy = new Float32List(numPoints);
     var zz = new Float32List(numPoints);
-    map["x"] = xx;
-    map["y"] = yy;
-    map["z"] = zz;
+    map["positions.x"] = xx;
+    map["positions.y"] = yy;
+    map["positions.z"] = zz;
 
     double xmin = 0.0;
     double xmax = 500.0;

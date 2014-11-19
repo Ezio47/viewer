@@ -6,6 +6,7 @@ import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
 import 'package:paper_elements/paper_dialog.dart';
+import '../point_cloud_source.dart';
 
 
 @CustomTag('settings-element')
@@ -71,6 +72,12 @@ class SettingsElement extends PolymerElement {
 
     void openFile(Event e, var detail, Node target) {
         var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
+
+        _pcSource = null;
+        _pcSource = new PointCloudServer("http://www.example.com/");
+        _pcSource.load();
+        loadItems();
+
         dlg.toggle();
     }
 
@@ -80,14 +87,17 @@ class SettingsElement extends PolymerElement {
     }
 
     void openFileOkay(Event e, var detail, Node target) {
-        var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
+        /*var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
         dlg.toggle();
         InputElement elem = this.shadowRoot.querySelector("#filenamearea") as InputElement;
         var txt = elem.value;
         if (txt.trim().isEmpty == false) {
             hub.doAddFile(txt);
         }
-        elem.value = "";
+        elem.value = "";*/
+
+        assert(_currentItem != null);
+        hub.doAddFile(_currentItem.path);
     }
 
     void toggleFile(Event e, var detail, Node target) {
@@ -110,7 +120,7 @@ class SettingsElement extends PolymerElement {
         return;
     }
 
-    void selectionMade(e) {
+    void selectionMade(CustomEvent e) {
     }
 
     void handleListChange(e) {
@@ -119,6 +129,57 @@ class SettingsElement extends PolymerElement {
 
     @observable var selection;
     @observable bool selectionEnabled = true;
+
+
+    @published ObservableList<Item> items = new ObservableList();
+    PointCloudSource _pcSource = null;
+    PointCloudSource _currentItem = null;
+
+    void loadItems() {
+        items.clear();
+
+        if (_pcSource is! PointCloudServer)
+            items.add(new Item("..", null));
+
+        for (var s in _pcSource.sources) {
+            items.add(new Item(s.path, s));
+        }
+    }
+
+    void openItem(Event e, var detail, Node target) {
+
+    }
+
+    void itemSelectionMade(CustomEvent e) {
+        var item = e.detail.data as Item;
+        assert(item != null);
+        var source = item.source;
+        _currentItem = source;
+
+        if (item.name == "..") {
+            _pcSource = _pcSource.parent;
+            loadItems();
+
+        } else if (source is PointCloudFile) {
+            //window.alert(item.name);
+
+        } else if (source is PointCloudDirectory) {
+            _pcSource = source;
+            _pcSource.load();
+            loadItems();
+
+        } else {
+            assert(false);
+        }
+
+    }
+}
+
+
+class Item extends Observable {
+    Item(this.name, this.source);
+    @observable String name;
+    PointCloudSource source;
 }
 
 

@@ -24,7 +24,7 @@ class ViewerElement extends PolymerElement {
     void ready() {
 
 
-        hub.doAddFile("5");
+      ///  hub.doAddFile("5");
     }
 
 
@@ -37,7 +37,7 @@ class ViewerElement extends PolymerElement {
     void goHome(Event e, var detail, Node target) {
         hub.goHome();
 
-        FauxComms.test();
+        //FauxComms.test();
     }
 
 
