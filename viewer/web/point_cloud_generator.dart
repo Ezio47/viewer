@@ -113,23 +113,13 @@ class PointCloudGenerator {
 
 
     static PointCloud makeOldCube() {
-        Map<String, Float32List> map = new Map();
 
-        var numPoints = 24;
-
-        var xx = new Float32List(numPoints);
-        var yy = new Float32List(numPoints);
-        var zz = new Float32List(numPoints);
-        map["positions.x"] = xx;
-        map["positions.y"] = yy;
-        map["positions.z"] = zz;
-
-        double xmin = 0.0;
-        double xmax = 500.0;
-        double ymin = 0.0;
-        double ymax = 1000.0;
-        double zmin = 0.0;
-        double zmax = 1500.0;
+        double xmin = -100.0;
+        double xmax = 100.0;
+        double ymin = -100.0;
+        double ymax = 100.0;
+        double zmin = -100.0;
+        double zmax = 100.0;
 
         // x = red
         // y = green
@@ -137,7 +127,6 @@ class PointCloudGenerator {
 
         List points = [];
 
-        // X
         points.addAll([xmin, ymin, zmin]);
         points.addAll([xmax, ymin, zmin]);
         points.addAll([xmin, ymax, zmin]);
@@ -147,31 +136,24 @@ class PointCloudGenerator {
         points.addAll([xmin, ymax, zmax]);
         points.addAll([xmax, ymax, zmax]);
 
-        // Y
-        points.addAll([xmin, ymin, zmin]);
-        points.addAll([xmin, ymax, zmin]);
-        points.addAll([xmax, ymin, zmin]);
-        points.addAll([xmax, ymax, zmin]);
-        points.addAll([xmin, ymin, zmax]);
-        points.addAll([xmin, ymax, zmax]);
-        points.addAll([xmax, ymin, zmax]);
-        points.addAll([xmax, ymax, zmax]);
+        points.addAll([xmin + (xmax-xmin)/2, ymin + (ymax-ymin)/2, ymin + (ymax-ymin)/2]);
 
-        // Z
-        points.addAll([xmin, ymin, zmin]);
-        points.addAll([xmin, ymin, zmax]);
-        points.addAll([xmax, ymin, zmin]);
-        points.addAll([xmax, ymin, zmax]);
-        points.addAll([xmin, ymax, zmin]);
-        points.addAll([xmin, ymax, zmax]);
-        points.addAll([xmax, ymax, zmin]);
-        points.addAll([xmax, ymax, zmax]);
+        final int numPoints = points.length ~/ 3;
+
+        var xx = new Float32List(numPoints);
+        var yy = new Float32List(numPoints);
+        var zz = new Float32List(numPoints);
 
         for (int i = 0; i < numPoints; i++) {
             xx[i] = points[i * 3];
             yy[i] = points[i * 3 + 1];
             zz[i] = points[i * 3 + 2];
         }
+
+        Map<String, Float32List> map = new Map();
+        map["positions.x"] = xx;
+        map["positions.y"] = yy;
+        map["positions.z"] = zz;
 
         var cloud = new PointCloud("oldcube");
         cloud.addDimensions(map);
