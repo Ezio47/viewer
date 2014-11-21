@@ -15,7 +15,7 @@ import 'point_cloud.dart';
 class RenderSource {
     var dims = new Map<String, GeometryAttribute>();
     int numPoints;
-    Vector3 low, high, avg;
+    Vector3 min, max, len;
     List<PointCloud> pointClouds = new List<PointCloud>();
 
     RenderSource();
@@ -58,8 +58,9 @@ class RenderSource {
             zmax = Math.max(zmax, cloud.max["positions.z"]);
         }
 
-        low = new Vector3(xmin, ymin, zmin);
-        high = new Vector3(xmax, ymax, zmax);
+        min = new Vector3(xmin, ymin, zmin);
+        max = new Vector3(xmax, ymax, zmax);
+        len = new Vector3(xmax-xmin, ymax-ymin, zmax-zmin);
     }
 
     void _createRenderArrays() {
@@ -108,14 +109,14 @@ class RenderSource {
     }
 
     void colorize() {
-        double zLen = high.z - low.z;
+        double zLen = max.z - min.z;
 
         var positions = dims["positions"].array;
         var colors = dims["colors"].array;
 
         for (int i = 0; i < numPoints * 3; i += 3) {
             double z = positions[i + 2];
-            double c = (z - low.z) / zLen;
+            double c = (z - min.z) / zLen;
 
             // clip, due to FP math
             assert(c >= -0.1 && c <= 1.1);

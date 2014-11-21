@@ -1,13 +1,14 @@
 library renderer;
 
 import 'dart:html';
-//import 'dart:math' as Math;
+import 'dart:math' as Math;
 import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/controls/trackball_controls.dart';
 import 'render_source.dart';
 import 'render_utils.dart';
-//import 'utils.dart';
+import 'axes_object.dart';
+import 'bbox_object.dart';
 
 
 class Renderer {
@@ -15,7 +16,7 @@ class Renderer {
     double mouseX = 0.0,
             mouseY = 0.0;
     bool _showAxes = false;
-    bool _showBbox = false;
+    bool _showBbox = true;
 
     // private
     PerspectiveCamera _camera;
@@ -31,10 +32,11 @@ class Renderer {
 
     RenderSource _renderTarget;
 
-    Vector3 _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
-    Vector3 _cameraUpPosition = new Vector3(0.0, 1.0, 0.0);
-    List<Line> _axes;
-    List<Line> _bbox;
+    Vector3 _cameraEyePoint;
+    Vector3 _cameraTargetPoint;
+    Vector3 _cameraUpVector;
+    AxesObject _axesObject;
+    Object3D _bboxObject;
 
     // vertically, the two tool bars plus the status bar add up to 159
     //   toolbar(63+1) + toolbar(63+1) + statusbar(14+5+5+1) + mainbody_padding(6) = 159
@@ -60,25 +62,43 @@ class Renderer {
         _webglRenderer.setSize(window.innerWidth - _restOfWindowX, window.innerHeight - _restOfWindowY);
         _canvas.children.add(_webglRenderer.domElement);
 
-        _addCamera();
-        _addCameraControls();
-
         _canvas.onMouseMove.listen(_updateMouseLocalCoords);
         window.onResize.listen(_onMyWindowResize);
     }
 
 
     void goHome() {
-        _camera.position.setFrom(_cameraHomePosition);
-        _camera.up.setFrom(_cameraUpPosition);
+        _camera.position.setFrom(_cameraEyePoint);
+        _camera.up.setFrom(_cameraUpVector);
+        _camera.lookAt(_cameraTargetPoint);
     }
 
+    int get _canvasWidth {
+        return _canvas.clientWidth;
+    }
+    int get _canvasHeight {
+        return _canvas.clientHeight;
+    }
+    int get _canvasOffsetX {
+        return _canvas.documentOffset.x;
+    }
+    int get _canvasOffsetY {
+        return _canvas.documentOffset.y;
+    }
+
+    void _addCamera() {
+        var w = _canvasWidth;
+        var h = _canvasHeight;
+        final double aspect = w.toDouble() / h.toDouble();
+        _camera = new PerspectiveCamera(50.0, aspect, 0.01, 200000.0);
+
+        _scene.add(_camera);
+    }
 
     void _addCameraControls() {
         _cameraControls = new TrackballControls(_camera, _webglRenderer.domElement);
         _cameraControls.zoomSpeed = 0.25;
 
-        //_cameraControls.target = new Vector3(0.0, 2.0, 0.0);
         //_cameraControls.rotateSpeed = 1.0;
         //_cameraControls.panSpeed = 0.8;
         //_cameraControls.noZoom = false;
@@ -87,48 +107,76 @@ class Renderer {
         //_cameraControls.dynamicDampingFactor = 0.3;
     }
 
-    int get _canvasWidth { return _canvas.clientWidth; }
-    int get _canvasHeight { return _canvas.clientHeight; }
-    int get _canvasOffsetX { return _canvas.documentOffset.x; }
-    int get _canvasOffsetY { return _canvas.documentOffset.y; }
-
-    void _addCamera() {
-        var w = _canvasWidth;
-        var h = _canvasHeight;
-        final double aspect = w.toDouble() / h.toDouble();
-        _camera = new PerspectiveCamera(50.0, aspect, 0.1, 2000.0);
-
-        _scene.add(_camera);
-    }
-
-
     void setSource(RenderSource renderTarget) {
         _renderTarget = renderTarget;
 
-        _particleSystem = RenderUtils.drawPoints(renderTarget);
-        _particleSystem.matrixAutoUpdate = false;
-        var m = new Matrix4(1.0,0.0,0.0,0.0,
-                            0.0,1.0,0.0,0.0,
-                            0.0,0.0,1.0,0.0,
-                            0.0,0.0,0.0,1.0);
-        m.scale(200.0,200.0,200.0);
-        _particleSystem.applyMatrix(m);
-        _particleSystem.matrixWorldNeedsUpdate = true;
-        _scene.add(_particleSystem);
+        // model space ...(xmin,ymin,zmin)..(xmax,ymax,zmax)...
+        // world space ...(0,0)..(xlen,ylen)...
+        //
+        // min point of the model becomes the origin of world space
 
-        // when we set the cloud, we need to set the camera relative to it
-        _cameraHomePosition = RenderUtils.getCameraPositionAbove(renderTarget);
+        var modelToWorld = new Matrix4.identity();
+        modelToWorld.rotateZ(-Math.PI / 2.0);  // CCW
+        //modelToWorld.rotateY(Math.PI);
+        modelToWorld.scale(-2.0, 1.0, 1.0);
+        modelToWorld.translate(-renderTarget.min);
+
+        {
+            _particleSystem = RenderUtils.drawPoints(renderTarget);
+            //_particleSystem.matrixAutoUpdate = false;
+            _particleSystem.applyMatrix(modelToWorld);
+            //_particleSystem.matrixWorldNeedsUpdate = true;
+            _scene.add(_particleSystem);
+        }
+
+        {
+            // when we set the cloud, we need to set the camera relative to it
+            // position is returned in model space
+            _cameraEyePoint = RenderUtils.getCameraPointAbove(renderTarget);
+            _cameraTargetPoint = RenderUtils.getCameraPointTarget(renderTarget);
+
+            // move position to world space
+            _cameraEyePoint.applyProjection(modelToWorld);
+            _cameraTargetPoint.applyProjection(modelToWorld);
+            _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
+            //_camera.applyMatrix(modelToWorld);
+
+            _addCamera();
+            goHome();
+            _addCameraControls();
+            _cameraControls.target = _cameraTargetPoint;
+        }
+
+        {
+            // axes model space is (0,0,0)..(100,100,100)
+            _axesObject = new AxesObject();
+            Vector3 a = new Vector3(100.0, 100.0, 100.0);
+            Vector3 b = renderTarget.len.clone();
+            Vector3 c = b.divide(a).scale(1.0 / 4.0);
+            var axesModelToWorld = new Matrix4.identity().scale(c);
+            _axesObject.applyMatrix(axesModelToWorld);
+
+            if (_showAxes) _scene.add(_axesObject);
+        }
+
+        {
+            // bbox model space is (0,0,0)..(100,100,100)
+            _bboxObject = new BboxObject();
+            Vector3 a = new Vector3(100.0, 100.0, 100.0);
+            Vector3 b = renderTarget.len.clone();
+            Vector3 c = b.divide(a);
+            var bboxModelToWorld = new Matrix4.identity().scale(c);
+            bboxModelToWorld.rotateZ(-Math.PI / 2.0);
+            bboxModelToWorld.scale(-2.0, 1.0, 1.0);
+            //bboxModelToWorld.rotateY(Math.PI);
+            _bboxObject.applyMatrix(bboxModelToWorld);
+
+            if (_showBbox) _scene.add(_bboxObject);
+        }
+
+        //_scene.add(new CameraHelper(_camera));
+
         goHome();
-
-        _axes = RenderUtils.drawAxes(renderTarget.low, renderTarget.high);
-        if (_showAxes) {
-            _axes.forEach((l) => _scene.add(l));
-        }
-
-        _bbox = RenderUtils.drawBbox(renderTarget.low, renderTarget.high);
-        if (_showBbox) {
-            _bbox.forEach((l) => _scene.add(l));
-        }
     }
 
 
@@ -140,41 +188,37 @@ class Renderer {
             _particleSystem = null;
         }
 
-        if (_axes != null) {
-            _axes.forEach((l) => _scene.remove(l));
-            _axes.clear();
-            _axes = null;
+        if (_axesObject != null) {
+            _scene.remove(_axesObject);
         }
 
-        if (_bbox != null) {
-            _bbox.forEach((l) => _scene.remove(l));
-            _bbox.clear();
-            _bbox = null;
+        if (_bboxObject != null) {
+            _scene.remove(_bboxObject);
         }
 
-        _cameraHomePosition = new Vector3(0.0, 0.0, 0.0);
+        _cameraEyePoint = new Vector3(0.0, 0.0, 0.0);
     }
 
 
     void toggleAxesDisplay(bool on) {
-        if (_axes == null) return;
+        if (_axesObject == null) return;
 
         if (on) {
-            _axes.forEach((l) => _scene.add(l));
+            _scene.add(_axesObject);
         } else {
-            _axes.forEach((l) => _scene.remove(l));
+            _scene.remove(_axesObject);
         }
         _showAxes = on;
     }
 
 
     void toggleBboxDisplay(bool on) {
-        if (_bbox == null) return;
+        if (_bboxObject == null) return;
 
         if (on) {
-            _bbox.forEach((l) => _scene.add(l));
+            _scene.add(_bboxObject);
         } else {
-            _bbox.forEach((l) => _scene.remove(l));
+            _scene.remove(_bboxObject);
         }
         _showBbox = on;
     }
@@ -221,6 +265,8 @@ class Renderer {
 
 
     void _render() {
+        if (_camera == null) return;
+
         if (_cameraControls != null) {
             _cameraControls.update();
         }

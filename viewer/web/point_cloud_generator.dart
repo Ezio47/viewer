@@ -114,12 +114,21 @@ class PointCloudGenerator {
 
     static PointCloud makeOldCube() {
 
-        double xmin = -100.0;
-        double xmax = 100.0;
-        double ymin = -100.0;
-        double ymax = 100.0;
-        double zmin = -100.0;
-        double zmax = 100.0;
+        const double xmin = 200.0;
+        const double xmax = 400.0;
+        const double ymin = 200.0;
+        const double ymax = 400.0;
+        const double zmin = 200.0;
+        const double zmax = 400.0;
+
+        const double x0 = xmin;
+        const double x1 = xmin + (xmax - xmin) * 0.25;
+        const double x2 = xmin + (xmax - xmin) * 0.5;
+        const double x3 = xmin + (xmax - xmin) * 0.75;
+        const double x4 = xmin + (xmax - xmin);
+
+        const double y2 = ymin + (ymax - ymin) * 0.5;
+        const double z2 = zmin + (zmax - zmin) * 0.5;
 
         // x = red
         // y = green
@@ -127,33 +136,54 @@ class PointCloudGenerator {
 
         List points = [];
 
-        points.addAll([xmin, ymin, zmin]);
-        points.addAll([xmax, ymin, zmin]);
-        points.addAll([xmin, ymax, zmin]);
-        points.addAll([xmax, ymax, zmin]);
-        points.addAll([xmin, ymin, zmax]);
-        points.addAll([xmax, ymin, zmax]);
-        points.addAll([xmin, ymax, zmax]);
-        points.addAll([xmax, ymax, zmax]);
+        points.addAll([x0, ymin, zmin]);
+        points.addAll([x0*1.05, ymin*1.05, zmin]);
+        points.addAll([x0*1.10, ymin*1.10, zmin]);
+        points.addAll([x0, ymin*1.05, zmin*1.05]);
+        points.addAll([x0, ymin*1.10, zmin*1.10]);
+        points.addAll([x0*1.05, ymin, zmin*1.05]);
+        points.addAll([x0*1.10, ymin, zmin*1.10]);
+        points.addAll([x1, ymin, zmin]);
+        points.addAll([x2, ymin, zmin]);
+        points.addAll([x3, ymin, zmin]);
+        points.addAll([x4, ymin, zmin]);
 
-        points.addAll([xmin + (xmax-xmin)/2, ymin + (ymax-ymin)/2, ymin + (ymax-ymin)/2]);
+        points.addAll([x0, ymax, zmin]);
+        points.addAll([x1, ymax, zmin]);
+        points.addAll([x2, ymax, zmin]);
+        points.addAll([x3, ymax, zmin]);
+        points.addAll([x4, ymax, zmin]);
+
+        points.addAll([x0, ymin, zmax]);
+        points.addAll([x1, ymin, zmax]);
+        points.addAll([x2, ymin, zmax]);
+        points.addAll([x3, ymin, zmax]);
+        points.addAll([x4, ymin, zmax]);
+
+        points.addAll([x0, ymax, zmax]);
+        points.addAll([x1, ymax, zmax]);
+        points.addAll([x2, ymax, zmax]);
+        points.addAll([x3, ymax, zmax]);
+        //points.addAll([x4, ymax, zmax]);
+
+        points.addAll([x2, y2, y2]);
 
         final int numPoints = points.length ~/ 3;
 
-        var xx = new Float32List(numPoints);
-        var yy = new Float32List(numPoints);
-        var zz = new Float32List(numPoints);
+        var x = new Float32List(numPoints);
+        var y = new Float32List(numPoints);
+        var z = new Float32List(numPoints);
 
         for (int i = 0; i < numPoints; i++) {
-            xx[i] = points[i * 3];
-            yy[i] = points[i * 3 + 1];
-            zz[i] = points[i * 3 + 2];
+            x[i] = points[i * 3];
+            y[i] = points[i * 3 + 1];
+            z[i] = points[i * 3 + 2];
         }
 
         Map<String, Float32List> map = new Map();
-        map["positions.x"] = xx;
-        map["positions.y"] = yy;
-        map["positions.z"] = zz;
+        map["positions.x"] = x;
+        map["positions.y"] = y;
+        map["positions.z"] = z;
 
         var cloud = new PointCloud("oldcube");
         cloud.addDimensions(map);
@@ -281,6 +311,13 @@ class _Terrain {
 
     void _makeGrid(double xoffset, double yoffset) {
 
+        double minz = getSample(0, 0);
+        for (int w = 0; w < width; w++) {
+              for (int h = 0; h < height; h++) {
+                  minz = Math.min(minz, getSample(w, h));
+              }
+        }
+
         double scale = 5.0;
 
         int i = 0;
@@ -297,6 +334,8 @@ class _Terrain {
                 // for better viewing, center the data at zero and spread it out more
                 x = (x - width / 2) * scale;
                 y = (y - height / 2) * scale;
+
+                if (w<width*0.1 && h<height*0.1) z = minz;
 
                 // for better viewing, exaggerate Z
                 z = z * 200.0;
