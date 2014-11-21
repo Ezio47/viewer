@@ -184,8 +184,6 @@ class Renderer {
         if (_bboxObject != null) {
             _scene.remove(_bboxObject);
         }
-
-        _cameraEyePoint = new Vector3(0.0, 0.0, 0.0);
     }
 
 
@@ -267,7 +265,6 @@ class Renderer {
 
 
     void _updateMouseWorldCoords() {
-        //_camera.lookAt(_scene.position);
 
         var vector = new Vector3(_ndcMouseX, _ndcMouseY, 0.0);
         _projector.unprojectVector(vector, _camera);
