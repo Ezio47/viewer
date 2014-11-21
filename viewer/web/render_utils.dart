@@ -95,19 +95,26 @@ class RenderUtils {
         return particleSystem;
     }
 
-    static Vector3 getDefaultCameraPosition(RenderSource cloud) {
-        // when we change the cloud, we need to change where the camera is
+    static Vector3 getCameraPositionAbove(RenderSource cloud) {
 
         final xlen = cloud.high.x - cloud.low.x;
         final ylen = cloud.high.y - cloud.low.y;
         final zlen = cloud.high.z - cloud.low.z;
 
-        // centered directly above, one Z-unit up
-        /*
-    final double x = cloud.low.x + xlen / 2.0;
-    final double y = cloud.low.y + ylen / 2.0;
-    final double z = cloud.high.z + 5*zlen;
-    */
+        // centered directly above, a few Z-units up
+        final double x = cloud.low.x + xlen / 2.0;
+        final double y = cloud.low.y + ylen / 2.0;
+        final double z = cloud.high.z + 1.5*zlen;
+
+        return new Vector3(50*x/200.0, y/200.0, z/200.0);
+    }
+
+    static Vector3 getCameraPositionAngled(RenderSource cloud) {
+        // when we change the cloud, we need to change where the camera is
+
+        final xlen = cloud.high.x - cloud.low.x;
+        final ylen = cloud.high.y - cloud.low.y;
+        final zlen = cloud.high.z - cloud.low.z;
 
         // from origin,
         // 1/2 unit to right (+x)

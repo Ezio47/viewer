@@ -87,12 +87,16 @@ class Renderer {
         //_cameraControls.dynamicDampingFactor = 0.3;
     }
 
+    int get _canvasWidth { return _canvas.clientWidth; }
+    int get _canvasHeight { return _canvas.clientHeight; }
+    int get _canvasOffsetX { return _canvas.documentOffset.x; }
+    int get _canvasOffsetY { return _canvas.documentOffset.y; }
 
     void _addCamera() {
-        var w = window.innerWidth - _canvas.documentOffset.x;
-        var h = window.innerHeight - _canvas.documentOffset.y;
+        var w = _canvasWidth;
+        var h = _canvasHeight;
         final double aspect = w.toDouble() / h.toDouble();
-        _camera = new PerspectiveCamera(60.0, aspect, 0.1, 20000.0);
+        _camera = new PerspectiveCamera(50.0, aspect, 0.1, 2000.0);
 
         _scene.add(_camera);
     }
@@ -102,10 +106,18 @@ class Renderer {
         _renderTarget = renderTarget;
 
         _particleSystem = RenderUtils.drawPoints(renderTarget);
+        _particleSystem.matrixAutoUpdate = false;
+        var m = new Matrix4(1.0,0.0,0.0,0.0,
+                            0.0,1.0,0.0,0.0,
+                            0.0,0.0,1.0,0.0,
+                            0.0,0.0,0.0,1.0);
+        m.scale(200.0,200.0,200.0);
+        _particleSystem.applyMatrix(m);
+        _particleSystem.matrixWorldNeedsUpdate = true;
         _scene.add(_particleSystem);
 
         // when we set the cloud, we need to set the camera relative to it
-        _cameraHomePosition = RenderUtils.getDefaultCameraPosition(renderTarget);
+        _cameraHomePosition = RenderUtils.getCameraPositionAbove(renderTarget);
         goHome();
 
         _axes = RenderUtils.drawAxes(renderTarget.low, renderTarget.high);
@@ -171,11 +183,22 @@ class Renderer {
     void _updateMouseLocalCoords(event) {
         event.preventDefault();
 
-        var x = event.client.x - _canvas.documentOffset.x;
-        var y = event.client.y - _canvas.documentOffset.y;
+        // event.client.x,y is from upper left (0,0) of entire browser window
 
-        _ndcMouseX = (x / window.innerWidth) * 2 - 1;
-        _ndcMouseY = -(y / window.innerHeight) * 2 + 1;
+        // x,y is from upper left (0,0) of the canvas
+        var x = event.client.x - _canvasOffsetX;
+        var y = event.client.y - _canvasOffsetY;
+
+        //print("screen: $x $y");
+
+        // ncdX,Y is from lower left (-1,-1) to upper right (+1,+1) of the canvas
+        _ndcMouseX = (x / _canvasWidth) * 2 - 1;
+        _ndcMouseY = -(y / _canvasHeight) * 2 + 1;
+
+        assert(_ndcMouseX > -1.01 && _ndcMouseX < 1.01);
+        assert(_ndcMouseY > -1.01 && _ndcMouseY < 1.01);
+
+        //print("ncd: $_ndcMouseX $_ndcMouseY");
     }
 
 
@@ -211,7 +234,7 @@ class Renderer {
     void _updateMouseWorldCoords() {
         //_camera.lookAt(_scene.position);
 
-        var vector = new Vector3(_ndcMouseX, _ndcMouseY, 1.0);
+        var vector = new Vector3(_ndcMouseX, _ndcMouseY, 0.0);
         _projector.unprojectVector(vector, _camera);
         var x = vector.x;
         var y = vector.y;
