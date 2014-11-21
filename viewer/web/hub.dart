@@ -12,9 +12,6 @@ import 'point_cloud.dart';
 import 'proxy.dart';
 
 
-// thje global singleton
-Hub hub = new Hub();
-
 class Hub {
     // the big, public, singleton components
     RenderElement renderUI;
@@ -29,6 +26,12 @@ class Hub {
 
     Hub() {
         return;
+    }
+
+    static Hub _root;
+    static Hub get root {
+        if (_root == null) _root = new Hub();
+        return _root;
     }
 
     void doColorize() {
@@ -105,7 +108,8 @@ class Hub {
         Proxy proxy = new ServerProxy("http://www.example.com/");
         proxy.load();
         List<Proxy> list = proxy.sources;
-        proxy = list.firstWhere((e) => e.name == "terrain1.dat");
+        //proxy = list.firstWhere((e) => e.name == "terrain1.dat");
+        proxy = list.firstWhere((e) => e.name == "oldcube.dat");
         assert(proxy != null);
         doAddFile(proxy);
     }

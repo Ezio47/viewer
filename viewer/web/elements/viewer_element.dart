@@ -5,10 +5,12 @@ import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
-import '../utils.dart';
+
 
 @CustomTag('viewer-element')
 class ViewerElement extends PolymerElement {
+
+    Hub _hub = Hub.root;
 
     ViewerElement.created() : super.created();
 
@@ -24,7 +26,7 @@ class ViewerElement extends PolymerElement {
 
         //hub.doAddFile("5");
 
-        hub.bootup();
+        _hub.bootup();
     }
 
 
@@ -35,7 +37,7 @@ class ViewerElement extends PolymerElement {
 
 
     void goHome(Event e, var detail, Node target) {
-        hub.goHome();
+        _hub.goHome();
 
         //FauxComms.test();
         //Utils.test_toSI();
@@ -43,7 +45,7 @@ class ViewerElement extends PolymerElement {
 
 
     void goColorize(Event e, var detail, Node target) {
-        hub.doColorize();
+        _hub.doColorize();
     }
 
 }

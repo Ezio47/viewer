@@ -22,6 +22,8 @@ class SettingsElement extends PolymerElement {
     @published bool hasData;
     @published int numPoints;
 
+    Hub _hub = Hub.root;
+
     SettingsElement.created() : super.created();
 
     @override
@@ -33,7 +35,7 @@ class SettingsElement extends PolymerElement {
     void ready() {
         $["file-list"].on['core-activate'].listen(handleListChange);
 
-        hub.settingsUI = this;
+        _hub.settingsUI = this;
     }
 
     @override
@@ -42,18 +44,18 @@ class SettingsElement extends PolymerElement {
     }
 
     void axesbool1Changed(var oldvalue) {
-        hub.doToggleAxes(axesbool1);
-        hub.doToggleBbox(axesbool2);
+        _hub.doToggleAxes(axesbool1);
+        _hub.doToggleBbox(axesbool2);
     }
 
     void axesbool2Changed(var oldvalue) {
-        hub.doToggleAxes(axesbool1);
-        hub.doToggleBbox(axesbool2);
+        _hub.doToggleAxes(axesbool1);
+        _hub.doToggleBbox(axesbool2);
     }
 
     void axesbool3Changed(var oldvalue) {
-        hub.doToggleAxes(axesbool1);
-        hub.doToggleBbox(axesbool2);
+        _hub.doToggleAxes(axesbool1);
+        _hub.doToggleBbox(axesbool2);
     }
 
     void doAddFile(String name, String fullpath) {
@@ -68,12 +70,12 @@ class SettingsElement extends PolymerElement {
 
     void toggleAxes(Event e, var detail, Node target) {
         var button = target as InputElement;
-        hub.doToggleAxes(button.checked);
+        _hub.doToggleAxes(button.checked);
     }
 
     void toggleBbox(Event e, var detail, Node target) {
         var button = target as InputElement;
-        hub.doToggleBbox(button.checked);
+        _hub.doToggleBbox(button.checked);
     }
 
     void openFile(Event e, var detail, Node target) {
@@ -103,7 +105,7 @@ class SettingsElement extends PolymerElement {
         elem.value = "";*/
 
         assert(_currentItem != null);
-        hub.doAddFile(_currentItem);
+        _hub.doAddFile(_currentItem);
     }
 
     void toggleFile(Event e, var detail, Node target) {
@@ -121,7 +123,7 @@ class SettingsElement extends PolymerElement {
     void deleteFile(Event e, var detail, Node target) {
         if (selection != null) {
             assert(selection is CloudFile);
-            hub.doRemoveFile(selection.fullpath);
+            _hub.doRemoveFile(selection.fullpath);
         }
         return;
     }

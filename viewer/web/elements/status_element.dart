@@ -11,13 +11,15 @@ class StatusElement extends PolymerElement {
     @published double mousePositionX;
     @published double mousePositionY;
 
+    Hub _hub = Hub.root;
+
     StatusElement.created() : super.created();
 
     @override
     void attached() {
         super.attached();
 
-        hub.statusUI = this;
+        _hub.statusUI = this;
     }
 
     @override

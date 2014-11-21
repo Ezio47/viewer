@@ -8,6 +8,9 @@ import '../hub.dart';
 
 @CustomTag('render-element')
 class RenderElement extends PolymerElement {
+
+    Hub _hub = Hub.root;
+
     RenderElement.created() : super.created();
 
     @override
@@ -17,12 +20,12 @@ class RenderElement extends PolymerElement {
         var canvas = this.shadowRoot.querySelector("#container");
         assert(canvas != null);
 
-        hub.renderUI = this;
-        hub.canvas = canvas;
+        _hub.renderUI = this;
+        _hub.canvas = canvas;
 
         canvas.onMouseMove.listen(onMyMouseMove);
 
-        hub.makeRenderer();
+        _hub.makeRenderer();
     }
 
     @override
@@ -32,6 +35,6 @@ class RenderElement extends PolymerElement {
 
 
     void onMyMouseMove(event) {
-        hub.doMouseMoved();
+        _hub.doMouseMoved();
     }
 }
