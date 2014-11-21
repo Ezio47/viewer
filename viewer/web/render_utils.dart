@@ -45,46 +45,21 @@ class RenderUtils {
 
     static Vector3 getCameraPointTarget(RenderSource cloud) {
 
-        // centered directly above, a few Z-units up
         final double x = cloud.min.x + cloud.len.x / 2.0;
         final double y = cloud.min.y + cloud.len.y / 2.0;
         final double z = cloud.min.z;
 
-        return new Vector3(cloud.min.x, cloud.min.y, cloud.min.z);
+        return new Vector3(x, y, z);
     }
 
-    static Vector3 getCameraPointAbove(RenderSource cloud) {
+    static Vector3 getCameraPointEye(RenderSource cloud) {
 
-        // centered directly above, a few Z-units up
-        /*
-        final double x = cloud.min.x + cloud.len.x / 2.0;
-        final double y = cloud.min.y + cloud.len.y / 2.0;
-        final double z = cloud.max.z + 5 * cloud.len.z;
-        */
         var v = getCameraPointTarget(cloud);
-        final double d = Math.max(cloud.len.x, cloud.len.y);
-        v.z += 2 * d;
 
-        v.x = cloud.max.x * 1.5;//+ cloud.len.x / 2.0;
-        v.y = cloud.max.y * 1.4;//+ cloud.len.y / 2.0;
-        v.z = cloud.max.z * 1.6 ;//* cloud.len.z;
+        v.x = v.x - 0.5 * cloud.len.x;
+        v.y = v.y - 2.0 * cloud.len.y;
+        v.z = cloud.max.z * 2.0;
 
         return v;
-    }
-
-    static Vector3 getCameraPointAngled(RenderSource cloud) {
-        // when we change the cloud, we need to change where the camera is
-
-        // from origin,
-        // 1/2 unit to right (+x)
-        // 1 unit towards viewer (-y)
-        // 3 units up (+z)
-
-        var v = getCameraPointTarget(cloud);
-        final double x = cloud.min.x + cloud.len.x / 2;
-        final double y = cloud.min.y - cloud.len.y * 1;
-        final double z = cloud.max.z + 3 * cloud.len.z;
-
-        return new Vector3(x, y, z);
     }
 }

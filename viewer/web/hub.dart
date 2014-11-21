@@ -108,8 +108,8 @@ class Hub {
         Proxy proxy = new ServerProxy("http://www.example.com/");
         proxy.load();
         List<Proxy> list = proxy.sources;
-        //proxy = list.firstWhere((e) => e.name == "terrain1.dat");
-        proxy = list.firstWhere((e) => e.name == "oldcube.dat");
+        proxy = list.firstWhere((e) => e.name == "terrain1.dat");
+        //proxy = list.firstWhere((e) => e.name == "oldcube.dat");
         assert(proxy != null);
         doAddFile(proxy);
     }

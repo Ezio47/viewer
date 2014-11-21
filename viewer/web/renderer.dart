@@ -16,7 +16,7 @@ class Renderer {
     double mouseX = 0.0,
             mouseY = 0.0;
     bool _showAxes = false;
-    bool _showBbox = true;
+    bool _showBbox = false;
 
     // private
     PerspectiveCamera _camera;
@@ -116,35 +116,24 @@ class Renderer {
         // min point of the model becomes the origin of world space
 
         var modelToWorld = new Matrix4.identity();
-        modelToWorld.rotateZ(-Math.PI / 2.0);  // CCW
-        //modelToWorld.rotateY(Math.PI);
-        modelToWorld.scale(-2.0, 1.0, 1.0);
         modelToWorld.translate(-renderTarget.min);
 
         {
             _particleSystem = RenderUtils.drawPoints(renderTarget);
-            //_particleSystem.matrixAutoUpdate = false;
             _particleSystem.applyMatrix(modelToWorld);
-            //_particleSystem.matrixWorldNeedsUpdate = true;
             _scene.add(_particleSystem);
         }
 
         {
-            // when we set the cloud, we need to set the camera relative to it
-            // position is returned in model space
-            _cameraEyePoint = RenderUtils.getCameraPointAbove(renderTarget);
-            _cameraTargetPoint = RenderUtils.getCameraPointTarget(renderTarget);
+            // bbox model space is (0,0,0)..(100,100,100)
+            _bboxObject = new BboxObject();
+            Vector3 a = new Vector3(100.0, 100.0, 100.0);
+            Vector3 b = renderTarget.len.clone();
+            Vector3 c = b.divide(a);
+            var bboxModelToWorld = new Matrix4.identity().scale(c);
+            _bboxObject.applyMatrix(bboxModelToWorld);
 
-            // move position to world space
-            _cameraEyePoint.applyProjection(modelToWorld);
-            _cameraTargetPoint.applyProjection(modelToWorld);
-            _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
-            //_camera.applyMatrix(modelToWorld);
-
-            _addCamera();
-            goHome();
-            _addCameraControls();
-            _cameraControls.target = _cameraTargetPoint;
+            if (_showBbox) _scene.add(_bboxObject);
         }
 
         {
@@ -160,21 +149,21 @@ class Renderer {
         }
 
         {
-            // bbox model space is (0,0,0)..(100,100,100)
-            _bboxObject = new BboxObject();
-            Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = renderTarget.len.clone();
-            Vector3 c = b.divide(a);
-            var bboxModelToWorld = new Matrix4.identity().scale(c);
-            bboxModelToWorld.rotateZ(-Math.PI / 2.0);
-            bboxModelToWorld.scale(-2.0, 1.0, 1.0);
-            //bboxModelToWorld.rotateY(Math.PI);
-            _bboxObject.applyMatrix(bboxModelToWorld);
+            // when we set the cloud, we need to set the camera relative to it
+            // position is returned in model space
+            _cameraEyePoint = RenderUtils.getCameraPointEye(renderTarget);
+            _cameraTargetPoint = RenderUtils.getCameraPointTarget(renderTarget);
 
-            if (_showBbox) _scene.add(_bboxObject);
+            // move position to world space
+            _cameraEyePoint.applyProjection(modelToWorld);
+            _cameraTargetPoint.applyProjection(modelToWorld);
+            _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
+
+            _addCamera();
+            goHome();
+            _addCameraControls();
+            _cameraControls.target = _cameraTargetPoint;
         }
-
-        //_scene.add(new CameraHelper(_camera));
 
         goHome();
     }
