@@ -169,7 +169,7 @@ class FileProxy extends Proxy {
     }
 
     PointCloud create() {
-        PointCloud cloud = PointCloudGenerator.generate(name);
+        PointCloud cloud = PointCloudGenerator.generate(name, fullpath);
         return cloud;
     }
 }

@@ -12,7 +12,8 @@ import 'rialto_exceptions.dart';
 // GeometryAttribute renderable format)
 
 class PointCloud {
-    String name;
+    String shortname;
+    String longname;
     var dimensions = new Map<String, Float32List>();
     var min = new Map<String, double>();
     var max = new Map<String, double>();
@@ -20,7 +21,7 @@ class PointCloud {
     int numPoints;
 
 
-    PointCloud(String this.name);
+    PointCloud(String this.shortname, String this.longname);
 
 
     void addDimension(String name, Float32List data) {

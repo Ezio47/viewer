@@ -1,11 +1,10 @@
 library renderer;
 
 import 'dart:html';
-import 'dart:math' as Math;
 import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 import 'package:three/extras/controls/trackball_controls.dart';
-import 'render_source.dart';
+import 'renderable_point_cloud_set.dart';
 import 'render_utils.dart';
 import 'axes_object.dart';
 import 'bbox_object.dart';
@@ -30,7 +29,7 @@ class Renderer {
     double _ndcMouseX = 0.0,
             _ndcMouseY = 0.0; // [-1..+1]
 
-    RenderSource _renderTarget;
+    RenderablePointCloudSet _renderSource;
 
     Vector3 _cameraEyePoint;
     Vector3 _cameraTargetPoint;
@@ -56,8 +55,8 @@ class Renderer {
     }
 
 
-    void init() {
-        _scene = new Scene();
+    void init(RenderablePointCloudSet rpcSet) {
+        _scene = null;
         _projector = new Projector();
 
         _webglRenderer = new WebGLRenderer();
@@ -66,6 +65,10 @@ class Renderer {
 
         _canvas.onMouseMove.listen(_updateMouseLocalCoords);
         window.onResize.listen(_onMyWindowResize);
+
+        _renderSource = rpcSet;
+
+        modelToWorld = new Matrix4.identity();
     }
 
 
@@ -109,28 +112,40 @@ class Renderer {
         //_cameraControls.dynamicDampingFactor = 0.3;
     }
 
-    void setSource(RenderSource renderSource) {
-        _renderTarget = renderSource;
+    void update() {
+
+        _scene = new Scene();
 
         // model space ...(xmin,ymin,zmin)..(xmax,ymax,zmax)...
         // world space ...(0,0)..(xlen,ylen)...
         //
         // min point of the model becomes the origin of world space
 
+        var theMin = _renderSource.min;
+        var theLen = _renderSource.len;
+        if (_renderSource.length == 0)
+        {
+            theMin = new Vector3.zero();
+            theLen = new Vector3(100.0, 100.0, 100.0);
+        }
+
         modelToWorld = new Matrix4.identity();
-        modelToWorld.translate(-renderSource.min);
+        modelToWorld.translate(-theMin);
 
         {
-            _particleSystem = RenderUtils.drawPoints(renderSource);
-            _particleSystem.applyMatrix(modelToWorld);
-            _scene.add(_particleSystem);
+            for (var rpc in _renderSource.renderablePointClouds)
+            {
+                var obj = rpc.getParticleSystem();
+                obj.applyMatrix(modelToWorld);
+                _scene.add(obj);
+            }
         }
 
         {
             // bbox model space is (0,0,0)..(100,100,100)
             _bboxObject = new BboxObject();
             Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = renderSource.len.clone();
+            Vector3 b = theLen.clone();
             Vector3 c = b.divide(a);
             var bboxModelToWorld = new Matrix4.identity().scale(c);
             _bboxObject.applyMatrix(bboxModelToWorld);
@@ -142,7 +157,7 @@ class Renderer {
             // axes model space is (0,0,0)..(100,100,100)
             _axesObject = new AxesObject();
             Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = renderSource.len.clone();
+            Vector3 b = theLen.clone();
             Vector3 c = b.divide(a).scale(1.0 / 4.0);
             var axesModelToWorld = new Matrix4.identity().scale(c);
             _axesObject.applyMatrix(axesModelToWorld);
@@ -150,10 +165,11 @@ class Renderer {
             if (_showAxes) _scene.add(_axesObject);
         }
 
+
         {
             // camera positions are computed in geo space, but maintained in world space
-            _cameraEyePoint = RenderUtils.getCameraPointEye(renderSource);
-            _cameraTargetPoint = RenderUtils.getCameraPointTarget(renderSource);
+            _cameraEyePoint = RenderUtils.getCameraPointEye(_renderSource);
+            _cameraTargetPoint = RenderUtils.getCameraPointTarget(_renderSource);
 
             // move position to world space
             _cameraEyePoint.applyProjection(modelToWorld);
@@ -167,24 +183,6 @@ class Renderer {
         }
 
         goHome();
-    }
-
-
-    void unsetSource() {
-        _renderTarget = null;
-
-        if (_particleSystem != null) {
-            _scene.remove(_particleSystem);
-            _particleSystem = null;
-        }
-
-        if (_axesObject != null) {
-            _scene.remove(_axesObject);
-        }
-
-        if (_bboxObject != null) {
-            _scene.remove(_bboxObject);
-        }
     }
 
 
@@ -308,6 +306,7 @@ class Renderer {
         qq.applyProjection(inv);
         //print("WORLD ${q.x.toStringAsFixed(0)} ${q.y.toStringAsFixed(0)} ${q.z.toStringAsFixed(0)} - GEO ${qq.x.toStringAsFixed(0)} ${qq.y.toStringAsFixed(0)} ${qq.z.toStringAsFixed(0)}");
 
+        /*
         var gline = new Geometry()
                 ..vertices.add(new Vector3(0.0, 0.0, 0.0))
                 ..vertices.add(q);
@@ -318,6 +317,7 @@ class Renderer {
         if (l.length > 0) {
             l.forEach((i) => print(i.object.name));
         }
+        */
 
         mouseX = qq.x;
         mouseY = qq.y;

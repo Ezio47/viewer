@@ -1,11 +1,27 @@
 library utils;
 
-
-//import 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math.dart';
 import 'package:three/three.dart';
+import 'dart:math' as Math;
 
 
 class Utils {
+    static Vector3 vectorMin(Vector3 a, Vector3 b) {
+        Vector3 c = new Vector3.zero();
+        c.x = Math.min(a.x, b.x);
+        c.y = Math.min(a.y, b.y);
+        c.z = Math.min(a.z, b.z);
+        return c;
+    }
+
+    static Vector3 vectorMax(Vector3 a, Vector3 b) {
+        Vector3 c = new Vector3.zero();
+        c.x = Math.max(a.x, b.x);
+        c.y = Math.max(a.y, b.y);
+        c.z = Math.max(a.z, b.z);
+        return c;
+    }
+
     static GeometryAttribute clone(GeometryAttribute src) {
         final int count = src.numItems;
 

@@ -15,28 +15,28 @@ import 'rialto_exceptions.dart';
 
 class PointCloudGenerator {
 
-    static PointCloud generate(String name) {
+    static PointCloud generate(String name, String fullname) {
         switch (name) {
             case "line.dat":
-                return makeLine();
+                return makeLine(name, fullname);
             case "newcube.dat":
-                return makeNewCube();
+                return makeNewCube(name, fullname);
             case "oldcube.dat":
-                return makeOldCube();
+                return makeOldCube(name, fullname);
             case "random.dat":
-                return makeRandom();
+                return makeRandom(name, fullname);
             case "terrain1.dat":
-                return makeTerrain(1);
+                return makeTerrain(1, name, fullname);
             case "terrain2.dat":
-                return makeTerrain(2);
+                return makeTerrain(2, name, fullname);
             case "terrain3.dat":
-                return makeTerrain(3);
+                return makeTerrain(3, name, fullname);
         }
         throw new RialtoArgumentError("invalid file name");
     }
 
 
-    static PointCloud makeNewCube() {
+    static PointCloud makeNewCube(String name, String fullname) {
         num particles = 50000;
 
         Map<String, Float32List> map = new Map();
@@ -105,14 +105,14 @@ class PointCloudGenerator {
             }
         }
 
-        var cloud = new PointCloud("newcube");
+        var cloud = new PointCloud(name, fullname);
         cloud.addDimensions(map);
 
         return cloud;
     }
 
 
-    static PointCloud makeOldCube() {
+    static PointCloud makeOldCube(String name, String fullname) {
 
         const double xmin = 200.0;
         const double xmax = 400.0;
@@ -185,14 +185,14 @@ class PointCloudGenerator {
         map["positions.y"] = y;
         map["positions.z"] = z;
 
-        var cloud = new PointCloud("oldcube");
+        var cloud = new PointCloud(name, fullname);
         cloud.addDimensions(map);
 
         return cloud;
     }
 
 
-    static PointCloud makeRandom() {
+    static PointCloud makeRandom(String name, String fullname) {
         Map<String, Float32List> map = new Map();
 
         var numPoints = 50000;
@@ -219,14 +219,14 @@ class PointCloudGenerator {
             positionsZ[i] = z;
         }
 
-        var cloud = new PointCloud("random");
+        var cloud = new PointCloud(name, fullname);
         cloud.addDimensions(map);
 
         return cloud;
     }
 
 
-    static PointCloud makeLine() {
+    static PointCloud makeLine(String name, String fullname) {
         Map<String, Float32List> map = new Map();
 
         var numPoints = 2000;
@@ -246,14 +246,14 @@ class PointCloudGenerator {
             positionsZ[i] = pt;
         }
 
-        var cloud = new PointCloud("line");
+        var cloud = new PointCloud(name, fullname);
         cloud.addDimensions(map);
 
         return cloud;
     }
 
 
-    static PointCloud makeTerrain(int which) {
+    static PointCloud makeTerrain(int which, String name, String fullname) {
         _Terrain terrain = new _Terrain(which);
 
         Map<String, Float32List> map = new Map();
@@ -261,7 +261,7 @@ class PointCloudGenerator {
         map["positions.y"] = terrain.valuesY;
         map["positions.z"] = terrain.valuesZ;
 
-        var cloud = new PointCloud("terrain");
+        var cloud = new PointCloud(name, fullname);
         cloud.addDimensions(map);
 
         return cloud;

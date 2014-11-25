@@ -7,7 +7,7 @@ import 'elements/render_element.dart';
 import 'elements/settings_element.dart';
 import 'elements/status_element.dart';
 import 'renderer.dart';
-import 'render_source.dart';
+import 'renderable_point_cloud_set.dart';
 import 'point_cloud.dart';
 import 'proxy.dart';
 
@@ -20,8 +20,8 @@ class Hub {
     Element canvas;
     Renderer renderer;
 
-    // private - the gloabl repo for loaded data
-    Map<String, PointCloud> _pointClouds = new Map<String, PointCloud>();
+    // private - the global repo for loaded data
+    RenderablePointCloudSet renderablePointCloudSet;
 
 
     Hub() {
@@ -35,61 +35,47 @@ class Hub {
     }
 
     void doColorize() {
-        renderer.unsetSource();
-
-        var renderSource = new RenderSource();
-        renderSource.addClouds(_pointClouds.values.toList());
-
-        renderSource.colorize();
-
-        renderer.setSource(renderSource);
+        renderablePointCloudSet.colorize();
+        renderer.update();
     }
 
 
     void makeRenderer() {
-        // we don't make the renderer until we have to
-        if (renderer == null) {
-            renderer = new Renderer(canvas);
-            renderer.init();
-            renderer.animate(0);
-        }
+        assert(renderer == null);
+
+        renderablePointCloudSet = new RenderablePointCloudSet();
+
+        renderer = new Renderer(canvas);
+        renderer.init(renderablePointCloudSet);
+        renderer.update();
+        renderer.animate(0);
     }
 
     void doAddFile(FileProxy file) {
         settingsUI.doAddFile(file.name, file.fullpath);
 
-        _pointClouds[file.fullpath] = file.create();
+        PointCloud pointCloud = file.create();
 
-        renderer.unsetSource();
+        renderablePointCloudSet.addCloud(pointCloud);
 
-        var renderSource = new RenderSource();
-        renderSource.addClouds(_pointClouds.values.toList());
-        renderer.setSource(renderSource);
+        renderer.update();
 
-        settingsUI.minx = renderSource.min.x;
-        settingsUI.maxx = renderSource.max.x;
-        settingsUI.miny = renderSource.min.y;
-        settingsUI.maxy = renderSource.max.y;
-        settingsUI.minz = renderSource.min.z;
-        settingsUI.maxz = renderSource.max.z;
-        settingsUI.numPoints = renderSource.numPoints;
+        settingsUI.minx = renderablePointCloudSet.min.x;
+        settingsUI.maxx = renderablePointCloudSet.max.x;
+        settingsUI.miny = renderablePointCloudSet.min.y;
+        settingsUI.maxy = renderablePointCloudSet.max.y;
+        settingsUI.minz = renderablePointCloudSet.min.z;
+        settingsUI.maxz = renderablePointCloudSet.max.z;
+        settingsUI.numPoints = renderablePointCloudSet.numPoints;
     }
 
 
     void doRemoveFile(String fullpath) {
         settingsUI.doRemoveFile(fullpath);
 
-        renderer.unsetSource();
+        renderablePointCloudSet.removeCloud(fullpath);
 
-        var cloud = _pointClouds[fullpath];
-        assert(cloud != null);
-        _pointClouds.remove(fullpath);
-
-        if (_pointClouds.length > 0) {
-            var renderSource = new RenderSource();
-            renderSource.addClouds(_pointClouds.values.toList());
-            renderer.setSource(renderSource);
-        }
+        renderer.update();
     }
 
 
@@ -112,5 +98,8 @@ class Hub {
         //proxy = list.firstWhere((e) => e.name == "oldcube.dat");
         assert(proxy != null);
         doAddFile(proxy);
+        proxy = list.firstWhere((e) => e.name == "terrain2.dat");
+        doAddFile(proxy);
+        renderer.toggleBboxDisplay(true);
     }
 }

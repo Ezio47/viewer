@@ -1,11 +1,9 @@
 library render_utils;
 
 import 'dart:core';
-import 'dart:math' as Math;
 import 'package:vector_math/vector_math.dart';
 import 'package:three/three.dart';
-import 'utils.dart';
-import 'render_source.dart';
+import 'renderable_point_cloud_set.dart';
 
 
 class RenderUtils {
@@ -21,44 +19,26 @@ class RenderUtils {
         return line;
     }
 
-    static ParticleSystem drawPoints(RenderSource cloud) {
-        var positions = cloud.dims["positions"];
-        var colors = cloud.dims["colors"];
-        assert(positions != null);
-        assert(colors != null);
+    static Vector3 getCameraPointTarget(RenderablePointCloudSet set) {
 
-        // the underlying system wants to take ownership of these arrays, so we'll
-        // pass them copies
-        BufferGeometry geometry = new BufferGeometry();
-        geometry.attributes = {
-            "position": Utils.clone(positions),
-            "color": Utils.clone(colors)
-        };
+        if (set.length == 0) return new Vector3.zero();
 
-        geometry.computeBoundingSphere();
-        var material = new ParticleBasicMaterial(size: 1, vertexColors: 2);
-
-        var particleSystem = new ParticleSystem(geometry, material);
-
-        return particleSystem;
-    }
-
-    static Vector3 getCameraPointTarget(RenderSource cloud) {
-
-        final double x = cloud.min.x + cloud.len.x / 2.0;
-        final double y = cloud.min.y + cloud.len.y / 2.0;
-        final double z = cloud.min.z;
+        final double x = set.min.x + set.len.x / 2.0;
+        final double y = set.min.y + set.len.y / 2.0;
+        final double z = set.min.z;
 
         return new Vector3(x, y, z);
     }
 
-    static Vector3 getCameraPointEye(RenderSource cloud) {
+    static Vector3 getCameraPointEye(RenderablePointCloudSet set) {
 
-        var v = getCameraPointTarget(cloud);
+        if (set.length == 0) return new Vector3(100.0, 100.0, 100.0);
 
-        v.x = v.x - 0.5 * cloud.len.x;
-        v.y = v.y - 2.0 * cloud.len.y;
-        v.z = cloud.max.z * 2.0;
+        var v = getCameraPointTarget(set);
+
+        v.x = v.x - 0.5 * set.len.x;
+        v.y = v.y - 2.0 * set.len.y;
+        v.z = set.max.z * 2.0;
 
         return v;
     }
