@@ -38,6 +38,8 @@ class Renderer {
     AxesObject _axesObject;
     Object3D _bboxObject;
 
+    Matrix4 modelToWorld;
+
     // vertically, the two tool bars plus the status bar add up to 159
     //   toolbar(63+1) + toolbar(63+1) + statusbar(14+5+5+1) + mainbody_padding(6) = 159
     // horizontally, the sidebar adds up to 261
@@ -107,19 +109,19 @@ class Renderer {
         //_cameraControls.dynamicDampingFactor = 0.3;
     }
 
-    void setSource(RenderSource renderTarget) {
-        _renderTarget = renderTarget;
+    void setSource(RenderSource renderSource) {
+        _renderTarget = renderSource;
 
         // model space ...(xmin,ymin,zmin)..(xmax,ymax,zmax)...
         // world space ...(0,0)..(xlen,ylen)...
         //
         // min point of the model becomes the origin of world space
 
-        var modelToWorld = new Matrix4.identity();
-        modelToWorld.translate(-renderTarget.min);
+        modelToWorld = new Matrix4.identity();
+        modelToWorld.translate(-renderSource.min);
 
         {
-            _particleSystem = RenderUtils.drawPoints(renderTarget);
+            _particleSystem = RenderUtils.drawPoints(renderSource);
             _particleSystem.applyMatrix(modelToWorld);
             _scene.add(_particleSystem);
         }
@@ -128,7 +130,7 @@ class Renderer {
             // bbox model space is (0,0,0)..(100,100,100)
             _bboxObject = new BboxObject();
             Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = renderTarget.len.clone();
+            Vector3 b = renderSource.len.clone();
             Vector3 c = b.divide(a);
             var bboxModelToWorld = new Matrix4.identity().scale(c);
             _bboxObject.applyMatrix(bboxModelToWorld);
@@ -140,7 +142,7 @@ class Renderer {
             // axes model space is (0,0,0)..(100,100,100)
             _axesObject = new AxesObject();
             Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = renderTarget.len.clone();
+            Vector3 b = renderSource.len.clone();
             Vector3 c = b.divide(a).scale(1.0 / 4.0);
             var axesModelToWorld = new Matrix4.identity().scale(c);
             _axesObject.applyMatrix(axesModelToWorld);
@@ -149,15 +151,14 @@ class Renderer {
         }
 
         {
-            // when we set the cloud, we need to set the camera relative to it
-            // position is returned in model space
-            _cameraEyePoint = RenderUtils.getCameraPointEye(renderTarget);
-            _cameraTargetPoint = RenderUtils.getCameraPointTarget(renderTarget);
+            // camera positions are computed in geo space, but maintained in world space
+            _cameraEyePoint = RenderUtils.getCameraPointEye(renderSource);
+            _cameraTargetPoint = RenderUtils.getCameraPointTarget(renderSource);
 
             // move position to world space
             _cameraEyePoint.applyProjection(modelToWorld);
             _cameraTargetPoint.applyProjection(modelToWorld);
-            _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
+            _cameraUpVector = new Vector3(0.0, 1.0, 0.0);
 
             _addCamera();
             goHome();
@@ -262,19 +263,63 @@ class Renderer {
 
         _webglRenderer.render(_scene, _camera);
     }
+    Vector3 VectorAtZ(Vector3 origin, Vector3 direction, double z) {
+        var o = origin.clone();
+        var d = direction.clone();
 
+        if (d.z < 0.001 && d.z > -0.001) {
+            if (d.z < 0.0) {
+                d.z = -0.001;
+            } else {
+                d.z = 0.001;
+            }
+        }
 
+        var t = z - o.z;
+        if (t < 0.001 && t > -0.001) {
+            if (t < 0.0) {
+                t = -0.001;
+            } else {
+                t = 0.001;
+            }
+        }
+
+        var k = t / d.z;
+
+        var vec = o + d * k;
+
+        return vec;
+    }
+
+    Line _line1;
     void _updateMouseWorldCoords() {
+        var vector = new Vector3(_ndcMouseX, _ndcMouseY, 0.5);
 
-        var vector = new Vector3(_ndcMouseX, _ndcMouseY, 0.0);
-        _projector.unprojectVector(vector, _camera);
-        var x = vector.x;
-        var y = vector.y;
-        var z = vector.z;
+        Ray ray = _projector.pickingRay(vector.clone(), _camera);
 
-        //mouseX = _ndcMouseX;
-        //mouseY = _ndcMouseY;
-        mouseX = x;
-        mouseY = y;
+        if (_line1 != null) _scene.remove(_line1);
+
+        var q = VectorAtZ(ray.origin, ray.direction, 0.0);
+
+        Matrix4 inv = modelToWorld.clone();
+        inv.copyInverse(inv);
+
+        var qq = q.clone();
+        qq.applyProjection(inv);
+        //print("WORLD ${q.x.toStringAsFixed(0)} ${q.y.toStringAsFixed(0)} ${q.z.toStringAsFixed(0)} - GEO ${qq.x.toStringAsFixed(0)} ${qq.y.toStringAsFixed(0)} ${qq.z.toStringAsFixed(0)}");
+
+        var gline = new Geometry()
+                ..vertices.add(new Vector3(0.0, 0.0, 0.0))
+                ..vertices.add(q);
+        _line1 = new Line(gline, new LineBasicMaterial(color: 0x0000ff));
+        _scene.add(_line1);
+
+        List<Intersect> l = ray.intersectObject(_scene, recursive:true);
+        if (l.length > 0) {
+            l.forEach((i) => print(i.object.name));
+        }
+
+        mouseX = qq.x;
+        mouseY = qq.y;
     }
 }
