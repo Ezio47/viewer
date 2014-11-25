@@ -10,12 +10,6 @@
                 padding: 0px;
                 margin: 0px;
             }
-            .left {
-
-            }
-            .right {
-
-            }
            .logo {
                 font-family:  Palatino, serif;
                 font-variant: small-caps;
@@ -27,19 +21,19 @@
             .textline {
                 vertical-align: top;
             }
-            </style>
+        </style>
 
-    <div layout horizontal>
-    <div class="left">
-      <span>Mouse=({{mousePositionX.toStringAsFixed(3)}},{{mousePositionY.toStringAsFixed(3)}})</span>
-    </div>
-    <div flex></div>
-    <div class="logo">
-      <span class="textline">Rialto</span>
-    </div>
-    </div>
-  </template>
+        <div layout horizontal>
+            <div class="left">
+                <span>Mouse=({{mousePositionX.toStringAsFixed(3)}},{{mousePositionY.toStringAsFixed(3)}})</span>
+            </div>
+            <div flex></div>
+            <div class="logo">
+                <span class="textline">Rialto</span>
+            </div>
+        </div>
+    </template>
 
-  <script type="application/dart" src="status_element.dart"></script>
+    <script type="application/dart" src="status_element.dart"></script>
 
 </polymer-element>

@@ -4,97 +4,25 @@
 
 <link rel="import" href="packages/polymer/polymer.html">
 
-<link rel="import" href="packages/core_elements/core_scaffold.html">
-<link rel="import" href="packages/core_elements/core_menu.html">
-<link rel="import" href="packages/core_elements/core_item.html">
-<link rel="import" href="packages/core_elements/core_toolbar.html">
-<link rel="import" href="packages/core_elements/core_header_panel.html">
-<link rel="import" href="packages/core_elements/core_drawer_panel.html">
-<link rel="import" href="packages/core_elements/core_scaffold.html">
+<link rel="import" href="packages/core_elements/core_collapse.html">
+
 <link rel="import" href="packages/core_elements/core_icon.html">
 <link rel="import" href="packages/core_elements/core_icons.html">
 <link rel="import" href="packages/core_elements/core_iconset.html">
 <link rel="import" href="packages/core_elements/core_iconset_svg.html">
-<link rel="import" href="packages/core_elements/core_tooltip.html">
-
-<link rel="import" href="packages/paper_elements/paper_button.html">
-<link rel="import" href="packages/paper_elements/paper_toggle_button.html">
-<link rel="import" href="packages/paper_elements/paper_icon_button.html">
-<link rel="import" href="packages/paper_elements/paper_radio_group.html">
-<link rel="import" href="packages/paper_elements/paper_radio_button.html">
-
 <link rel="import" href="packages/core_elements/image_icons.html">
 
 <link rel="import" href="packages/paper_elements/paper_icon_button.html">
-<link rel="import" href="packages/paper_elements/paper_button.html">
-<link rel="import" href="packages/paper_elements/paper_checkbox.html">
-<link rel="import" href="packages/paper_elements/paper_dialog.html">
-<link rel="import" href="packages/paper_elements/paper_dialog_transition.html">
-<link rel="import" href="packages/paper_elements/paper_item.html">
-
-<link rel="import" href="packages/core_elements/core_icon.html">
-<link rel="import" href="packages/core_elements/core_iconset.html">
-<link rel="import" href="packages/core_elements/core_iconset_svg.html">
-<link rel="import" href="packages/core_elements/image_icons.html">
 
 <link rel="import" href="render_element.html">
 <link rel="import" href="settings_element.html">
 <link rel="import" href="status_element.html">
 
 
-
 <polymer-element name="viewer-element">
 
     <template>
         <style>
-            #navheader {
-            }
-            /* drawer is always visible on a wide screen
-               so menu button isn't required */
-            core-drawer-panel:not([narrow]) #navicon {
-              display: none;
-            }
-
-            .side-toolbar {
-                background-color: #242d88;
-                border-top-style: none;
-                border-right-style: solid;
-                border-bottom-style: solid;
-                border-left-style: none;
-                border-width: 1px;
-                border-color: darkgrey;
-                justify: center;
-            }
-            .major-toolbar {
-                background-color: #242d88;
-                border-top-style: none;
-                border-right-style: none;
-                border-bottom-style: solid;
-                border-left-style: none;
-                border-width: 1px;
-                border-color: darkgrey;
-                color: #add8e6;
-            }
-            .minor-toolbar {
-                background-color: #242d88; /* #1a154c */
-                border-top-style: none;
-                border-right-style: none;
-                border-bottom-style: solid;
-                border-left-style: none;
-                border-width: 1px;
-                border-color: darkgrey;
-                color: #add8e6;
-            }
-            .sidebar-body {
-                background-color: #add8e6;
-                border-top-style: none;
-                border-right-style: solid;
-                border-bottom-style: none;
-                border-left-style: none;
-                border-width: 1px;
-                border-color: darkgrey;
-                padding: 5px;
-            }
             .main-body {
                 background-color: black;
                 border-top-style: none;
@@ -114,13 +42,6 @@
                 border-width: 1px;
                 border-color: darkgrey;
                 padding: 5px;
-            }
-            .logo-font {
-                font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-                font-variant: small-caps;
-                font-size: 30px;
-                color: #add8e6;
-                text-align: center;
             }
 
             .overlay {
@@ -159,7 +80,9 @@
                 position: absolute;
                 z-index: 2;
 
-                bottom: 50px;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
             }
             core-icon {
                 color: #a4c639;
@@ -217,15 +140,6 @@
                         <paper-icon-button icon="home" on-click="{{goHome}}"></paper-icon-button>
                         <paper-icon-button icon="image:color-lens" on-click="{{goColorize}}"></paper-icon-button>
                     </div>
-
-                    <!--
-                    <core-toolbar class="minor-toolbar">
-                        <div vertical layout>
-                            <paper-icon-button icon="image:color-lens"></paper-icon-button>
-                            <span style="font-size:75%">COLORIZE</span>
-                        </div>
-                    </core-toolbar>
-                    -->
                     </core-collapse>
                 </div>
 
@@ -235,6 +149,6 @@
 
     </template>
 
-<script type="application/dart" src="viewer_element.dart"></script>
+    <script type="application/dart" src="viewer_element.dart"></script>
 
 </polymer-element>
