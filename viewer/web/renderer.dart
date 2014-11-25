@@ -39,16 +39,6 @@ class Renderer {
 
     Matrix4 modelToWorld;
 
-    // vertically, the two tool bars plus the status bar add up to 159
-    //   toolbar(63+1) + toolbar(63+1) + statusbar(14+5+5+1) + mainbody_padding(6) = 159
-    // horizontally, the sidebar adds up to 261
-    //   sidebar(244+1+10) + mainbody_padding(6) = 261
-    // but for some reason, I still get vertical scrollbars and/or not enough
-    //   main body padding unless I add a little bit
-    static const int _restOfWindowY = 159 + 3;
-    static const int _restOfWindowX = 261 + 1;
-
-
     Renderer(var canvas) {
         assert(canvas != null);
         _canvas = canvas;
@@ -60,7 +50,7 @@ class Renderer {
         _projector = new Projector();
 
         _webglRenderer = new WebGLRenderer();
-        _webglRenderer.setSize(window.innerWidth - _restOfWindowX, window.innerHeight - _restOfWindowY);
+        _webglRenderer.setSize(window.innerWidth, window.innerHeight);
         _canvas.children.add(_webglRenderer.domElement);
 
         _canvas.onMouseMove.listen(_updateMouseLocalCoords);
@@ -233,8 +223,8 @@ class Renderer {
 
 
     _onMyWindowResize(event) {
-        var w = window.innerWidth - _restOfWindowX;
-        var h = window.innerHeight - _restOfWindowY;
+        var w = window.innerWidth ;
+        var h = window.innerHeight;
         _webglRenderer.setSize(w, h);
 
         final double aspect = w.toDouble() / h.toDouble();

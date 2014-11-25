@@ -43,6 +43,19 @@ class SettingsElement extends PolymerElement {
         super.detached();
     }
 
+    void toggleCollapse2(Event e, var detail, Node target) {
+        var e = $["collapse2"];
+        e.toggle();
+    }
+    void toggleCollapse3(Event e, var detail, Node target) {
+        var e = $["collapse3"];
+        e.toggle();
+    }
+    void toggleCollapse4(Event e, var detail, Node target) {
+        var e = $["collapse4"];
+        e.toggle();
+    }
+
     void axesbool1Changed(var oldvalue) {
         _hub.doToggleAxes(axesbool1);
         _hub.doToggleBbox(axesbool2);

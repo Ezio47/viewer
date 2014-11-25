@@ -4,14 +4,39 @@
 
 <polymer-element name="status-element">
 
-  <template>
-    <style>
-      :host {
-      }
-    </style>
+    <template>
+        <style>
+            :host {
+                padding: 0px;
+                margin: 0px;
+            }
+            .left {
 
-    <div>
+            }
+            .right {
+
+            }
+           .logo {
+                font-family:  Palatino, serif;
+                font-variant: small-caps;
+                color: #404040;
+
+                padding: 2px;
+                margin: 0px;
+            }
+            .textline {
+                vertical-align: top;
+            }
+            </style>
+
+    <div layout horizontal>
+    <div class="left">
       <span>Mouse=({{mousePositionX.toStringAsFixed(3)}},{{mousePositionY.toStringAsFixed(3)}})</span>
+    </div>
+    <div flex></div>
+    <div class="logo">
+      <span class="textline">Rialto</span>
+    </div>
     </div>
   </template>
 

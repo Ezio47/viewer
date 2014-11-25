@@ -36,6 +36,15 @@ class ViewerElement extends PolymerElement {
     }
 
 
+    void toggleCollapse1(Event e, var detail, Node target) {
+        var e = $["collapse1"];
+        e.toggle();
+    }
+    void toggleCollapse5(Event e, var detail, Node target) {
+        var e = $["collapse5"];
+        e.toggle();
+    }
+
     void goHome(Event e, var detail, Node target) {
         _hub.goHome();
 
