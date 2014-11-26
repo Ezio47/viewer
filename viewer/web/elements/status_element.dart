@@ -2,6 +2,7 @@ library status_element;
 
 
 import 'dart:core';
+import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
 
@@ -25,5 +26,9 @@ class StatusElement extends PolymerElement {
     @override
     void detached() {
         super.detached();
+    }
+
+    void aboutbox(Event e, var detail, Node target) {
+        window.alert("Copyright © RadiantBlue 2014. All rights reserved.");
     }
 }

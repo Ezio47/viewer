@@ -13,13 +13,23 @@
            .logo {
                 font-family:  Palatino, serif;
                 font-variant: small-caps;
-                color: #404040;
-
+                opacity: 1.0;
+                color: #a0a0a0;
+                background: #242d88;
                 padding: 2px;
-                margin: 0px;
+                border-radius: 3px;
             }
             .textline {
                 vertical-align: top;
+            }
+            span {
+                color: #b0b0b0;
+            }
+            .left {
+                padding: 4px;
+            }
+            .right {
+                padding: 4px;
             }
         </style>
 
@@ -28,8 +38,8 @@
                 <span>Mouse=({{mousePositionX.toStringAsFixed(3)}},{{mousePositionY.toStringAsFixed(3)}})</span>
             </div>
             <div flex></div>
-            <div class="logo">
-                <span class="textline">Rialto</span>
+            <div class="right">
+                <span class="textline logo" on-click="{{aboutbox}}">Rialto</span>
             </div>
         </div>
     </template>
