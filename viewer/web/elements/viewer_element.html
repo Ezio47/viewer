@@ -67,7 +67,7 @@
                 position: absolute;
                 z-index: 2;
                 width: 300px;
-                top: 60px;
+                top: 62px;
                 left: 10px;
             }
             .RIGHT_PANEL {
@@ -75,7 +75,7 @@
                 z-index: 2;
 
                 top: 10px;
-                left: 75px;
+                left: 104px;
             }
             .STATUS_PANEL {
                 position: absolute;
@@ -86,17 +86,27 @@
                 bottom: 0px;
             }
 
+            .regularroundbutton  paper-icon-button /deep/ core-icon[role=img] {
+
+            }
+            .regularroundbutton paper-icon-button {
+                background: #404040;
+                opacity: 0.85;
+                stroke: #c0c0c0;
+                margin: 1px;
+                border-radius: 50%;
+            }
+
             .smallroundbutton  paper-icon-button /deep/ core-icon[role=img] {
                 height: 16px;
                 width: 16px;
             }
             .smallroundbutton paper-icon-button {
+                height: 16px;
+                width: 16px;
                 background: #404040;
                 opacity: 0.85;
                 stroke: #c0c0c0;
-                height: 16px;
-                width: 16px;
-                padding: 6px;
                 margin: 1px;
                 border-radius: 50%;
             }
@@ -114,48 +124,48 @@
                 margin: 1px;
                 border-radius: 4px;
             }
-            .panel {
-                opacity: 0.85;
-                padding: 1px;
+            .darkpanel {
+                opacity: 0.95;
+                background: #202020;
+                padding: 2px;
                 border-radius: 4px;
                 border-style: solid;
                 border-width: 1px;
-                border-color: #202020;
+                border-color: #404040;
+                margin: 2px;
             }
         </style>
 
 
-                <div class="MAIN">
-                    <div class="main-body">
-                        <render-element></render-element>
-                    </div>
-                </div>
+        <div class="MAIN">
+            <div class="main-body">
+                <render-element></render-element>
+            </div>
+        </div>
 
-                <div class="TOGGLES" >
-                    <div horizontal layout class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons:chevdown" on-click="{{toggleCollapse1}}"></paper-icon-button>
-                    <paper-icon-button icon="rialto-icons:chevright" on-click="{{toggleCollapse5}}"></paper-icon-button>
-                    </div>
-                </div>
+        <div class="TOGGLES darkpanel" >
+            <div horizontal layout class="regularroundbutton">
+            <paper-icon-button icon="rialto-icons-regular:chevdown" on-click="{{toggleCollapse1}}"></paper-icon-button>
+            <paper-icon-button icon="rialto-icons-regular:chevright" on-click="{{toggleCollapse5}}"></paper-icon-button>
+            </div>
+        </div>
 
-                <div class="DOWN_PANEL panel">
-                     <core-collapse id="collapse1" duration="0.10">
-                        <settings-element></settings-element>
-                    </core-collapse>
-                </div>
 
-                <div class="RIGHT_PANEL">
-                    <core-collapse id="collapse5" horizontal="true" duration="0.10">
-                    <div horizontal layout class="regularsquarebutton panel">
-                        <paper-icon-button icon="home" on-click="{{goHome}}"></paper-icon-button>
-                        <paper-icon-button icon="image:color-lens" on-click="{{goColorize}}"></paper-icon-button>
-                    </div>
-                    </core-collapse>
-                </div>
+        <core-collapse id="collapse1" class="DOWN_PANEL " duration="0.10">
+            <settings-element></settings-element>
+        </core-collapse>
 
-               <div class="status-body STATUS_PANEL">
-                    <status-element ></status-element>
-               </div>
+
+        <core-collapse id="collapse5" class="RIGHT_PANEL darkpanel" horizontal="true" duration="0.10">
+            <div horizontal layout class="regularsquarebutton panel">
+                <paper-icon-button icon="home" on-click="{{goHome}}"></paper-icon-button>
+                <paper-icon-button icon="image:color-lens" on-click="{{goColorize}}"></paper-icon-button>
+            </div>
+        </core-collapse>
+
+       <div class="status-body STATUS_PANEL">
+            <status-element ></status-element>
+       </div>
 
     </template>
 

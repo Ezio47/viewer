@@ -40,13 +40,13 @@ class ViewerElement extends PolymerElement {
     void toggleCollapse1(Event e, var detail, Node target) {
         var e = $["collapse1"];
         var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
+        button.icon = e.opened ? "rialto-icons-regular:chevdown" : "rialto-icons-regular:chevup";
         e.toggle();
     }
     void toggleCollapse5(Event e, var detail, Node target) {
         var e = $["collapse5"];
         var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons:chevright" : "rialto-icons:chevleft";
+        button.icon = e.opened ? "rialto-icons-regular:chevright" : "rialto-icons-regular:chevleft";
         e.toggle();
     }
 

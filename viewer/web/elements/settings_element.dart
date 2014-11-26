@@ -47,19 +47,19 @@ class SettingsElement extends PolymerElement {
     void toggleCollapse2(Event e, var detail, Node target) {
         var e = $["collapse2"];
         var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
+        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
         e.toggle();
     }
     void toggleCollapse3(Event e, var detail, Node target) {
         var e = $["collapse3"];
         var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
+        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
         e.toggle();
     }
     void toggleCollapse4(Event e, var detail, Node target) {
         var e = $["collapse4"];
         var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
+        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
         e.toggle();
     }
 

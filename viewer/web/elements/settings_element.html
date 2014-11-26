@@ -25,8 +25,6 @@
     <template>
         <style>
             :host {
-                font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
-                font-size: 14px;
             }
             paper-dialog {
             }
@@ -52,121 +50,185 @@
                 border-width: 1px;
                 border-color: grey;
             }
-            paper-icon-button /deep/ core-icon[role=img] {
-                height: 16px;
-                width: 16px;
+
+            .regularroundbutton  paper-icon-button /deep/ core-icon[role=img] {
+
             }
-            paper-icon-button {
+            .regularroundbutton paper-icon-button {
                 background: #404040;
                 opacity: 0.85;
-                border-radius: 50%;
                 stroke: #c0c0c0;
+                margin: 1px;
+                border-radius: 50%;
+            }
+
+            .smallroundbutton paper-icon-button /deep/ core-icon[role=img] {
                 height: 16px;
                 width: 16px;
-                padding: 6px;
             }
-            </style>
+            .smallroundbutton paper-icon-button {
+                height: 16px;
+                width: 16px;
+                background: #404040;
+                opacity: 0.85;
+                stroke: #c0c0c0;
+                margin: 1px;
+                border-radius: 50%;
+            }
+
+            .regularsquarebutton  paper-icon-button /deep/ core-icon[role=img] {
+                height: 24px;
+                width: 24px;
+            }
+            .regularsquarebutton paper-icon-button {
+                height: 24px;
+                width: 24px;
+                background: #404040;
+                opacity: 0.85;
+                color: #c0c0c0;
+                margin: 1px;
+                border-radius: 4px;
+            }
+           .darkpanel {
+                opacity: 0.95;
+                background: #202020;
+                padding: 2px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #404040;
+                margin: 2px;
+            }
+            .lightpanel {
+                opacity: 0.95;
+                background: #404040;
+                padding: 2px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #606060;
+                margin: 2px;
+            }
+            .textlabel {
+                color: #b0b0b0;
+            }
+            td {
+                padding: 0px 10px 0px 0px;
+            }
+        </style>
 
 
+        <div vertical layout class="">
 
 
-        <div vertical layout class="padded">
-
-        <div layout horizontal>
-        <paper-icon-button icon="rialto-icons:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
-        <span>Files</span>
-        </div>
-        <core-collapse id="collapse2" duration="0.10">
-        <div class="marginned">
-            <div>
-                <core-list-dart data="{{files}}" height="20px"
-                        selectionEnabled="{{selectionEnabled}}"
-                        selection="{{selection}}"
-                        on-core-activate = "{{selectionMade}}"
-                        style="height:150px;"
-                        multi="false"
-                        id="file-list">
-                    <template>
-                        <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
-                            <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
-                            <span>{{model.name}}</span>
+            <!-- LAYERS -->
+            <div class="darkpanel">
+                <div layout horizontal center class="smallroundbutton">
+                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
+                    <span class="textlabel">Files</span>
+                </div>
+                <core-collapse id="collapse2" duration="0.10">
+                    <div class="lightpanel">
+                        <div style="padding:2px;">
+                            <core-list-dart data="{{files}}" height="20px"
+                                    selectionEnabled="{{selectionEnabled}}"
+                                    selection="{{selection}}"
+                                    on-core-activate = "{{selectionMade}}"
+                                    style="height:150px;"
+                                    multi="false"
+                                    id="file-list">
+                                <template>
+                                    <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
+                                        <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
+                                        <span>{{model.name}}</span>
+                                    </div>
+                                </template>
+                            </core-list-dart>
                         </div>
+                        <hr>
+                        <div class="smallroundbutton" style="margin:0px;">
+                            <paper-icon-button icon="rialto-icons-small:plus" on-click="{{openFile}}"></paper-icon-button>
+                            <paper-icon-button icon="rialto-icons-small:minus" on-click="{{deleteFile}}"></paper-icon-button>
+                        </div>
+
+                    </div>
+                </core-collapse>
+            </div>
+
+
+            <!-- DISPLAY -->
+            <div class="darkpanel">
+                <div layout horizontal center class="smallroundbutton">
+                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse3}}"></paper-icon-button>
+                    <span class="textlabel">Display</span>
+                </div>
+
+                <core-collapse id="collapse3" duration="0.10">
+                    <div class="lightpanel">
+
+                          <form action="" style="padding:2px;">
+                            <div>
+                                <label>
+                                    <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
+                                    <span>Toggle axes</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label>
+                                    <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
+                                    <span>Toggle bbox</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label>
+                                    <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
+                                    <span>None</span>
+                                </label>
+                            </div>
+                          </form>
+                    </div>
+                </core-collapse>
+            </div>
+
+
+            <!-- DATA -->
+            <div class="darkpanel">
+                <div layout horizontal center class="smallroundbutton">
+                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse4}}"></paper-icon-button>
+                    <span class="textlabel">Data</span>
+                </div>
+
+                <core-collapse id="collapse4" duration="0.10">
+                    <template if="{{hasData}}">
+                    <div class="lightpanel">
+                        <div style="padding:2px;">
+
+                            <table>
+                                <tr>
+                                    <td>Points:</td>
+                                    <td>{{numPoints}}</td>
+                                </tr>
+                                <tr>
+                                    <td>X:</td>
+                                    <td>{{minx.toStringAsFixed(3)}}</td>
+                                    <td>{{maxx.toStringAsFixed(3)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Y:</td>
+                                    <td>{{miny.toStringAsFixed(3)}}</td>
+                                    <td>{{maxy.toStringAsFixed(3)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Z:</td>
+                                    <td>{{minz.toStringAsFixed(3)}}</td>
+                                    <td>{{maxz.toStringAsFixed(3)}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                     </template>
-                </core-list-dart>
+                </core-collapse>
             </div>
-            <hr>
-            <div align="center">
-                <paper-icon-button icon="rialto-icons:plus" on-click="{{openFile}}"></paper-icon-button>
-                <paper-icon-button icon="rialto-icons:minus" on-click="{{deleteFile}}"></paper-icon-button>
-                <paper-icon-button icon="help" on-click="{{infoFile}}"></paper-icon-button>
-            </div>
-
-        </div>
-        </core-collapse>
-
-        <div layout horizontal>
-        <paper-icon-button icon="rialto-icons:chevdown" on-click="{{toggleCollapse3}}"></paper-icon-button>
-        <span>Display</span>
-        </div>
-
-        <core-collapse id="collapse3" duration="0.10">
-        <div class="marginned">
-
-              <form action="">
-                <div>
-                    <label>
-                        <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
-                        <span>Toggle axes</span>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
-                        <span>Toggle bbox</span>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
-                        <span>None</span>
-                    </label>
-                </div>
-              </form>
-        </div>
-        </core-collapse>
-
-        <div layout horizontal>
-        <paper-icon-button icon="rialto-icons:chevdown" on-click="{{toggleCollapse4}}"></paper-icon-button>
-        <span>Data</span>
-        </div>
-
-        <core-collapse id="collapse4" duration="0.10">
-        <template if="{{hasData}}">
-        <div class="marginned">
-
-            <span>Point count: {{numPoints}}</span>
-
-            <table>
-                <tr>
-                    <td>X:</td>
-                    <td>{{minx.toStringAsFixed(3)}}</td>
-                    <td>{{maxx.toStringAsFixed(3)}}</td>
-                </tr>
-                <tr>
-                    <td>Y:</td>
-                    <td>{{miny.toStringAsFixed(3)}}</td>
-                    <td>{{maxy.toStringAsFixed(3)}}</td>
-                </tr>
-                <tr>
-                    <td>Z:</td>
-                    <td>{{minz.toStringAsFixed(3)}}</td>
-                    <td>{{maxz.toStringAsFixed(3)}}</td>
-                </tr>
-            </table>
-
-        </div>
-        </template>
-        </core-collapse>
 
     </div>
 
