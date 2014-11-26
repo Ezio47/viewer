@@ -4,6 +4,7 @@ library viewer_element;
 import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
+import 'package:paper_elements/paper_icon_button.dart';
 import '../hub.dart';
 
 
@@ -38,10 +39,14 @@ class ViewerElement extends PolymerElement {
 
     void toggleCollapse1(Event e, var detail, Node target) {
         var e = $["collapse1"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
         e.toggle();
     }
     void toggleCollapse5(Event e, var detail, Node target) {
         var e = $["collapse5"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons:chevright" : "rialto-icons:chevleft";
         e.toggle();
     }
 

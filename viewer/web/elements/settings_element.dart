@@ -6,6 +6,7 @@ import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
 import 'package:paper_elements/paper_dialog.dart';
+import 'package:paper_elements/paper_icon_button.dart';
 import '../proxy.dart';
 import '../utils.dart';
 
@@ -45,14 +46,20 @@ class SettingsElement extends PolymerElement {
 
     void toggleCollapse2(Event e, var detail, Node target) {
         var e = $["collapse2"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
         e.toggle();
     }
     void toggleCollapse3(Event e, var detail, Node target) {
         var e = $["collapse3"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
         e.toggle();
     }
     void toggleCollapse4(Event e, var detail, Node target) {
         var e = $["collapse4"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons:chevdown" : "rialto-icons:chevup";
         e.toggle();
     }
 
