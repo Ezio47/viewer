@@ -23,14 +23,16 @@ void main() {
 void boot1()
 {
     Hub hub = Hub.root;
-    Proxy proxy = new ServerProxy("http://www.example.com/");
-    proxy.load();
+
+    Proxy proxy = hub.commandRegistry.doOpenServer("http://www.example.com/");
     List<Proxy> list = proxy.sources;
-    proxy = list.firstWhere((e) => e.name == "terrain1.dat");
-    //proxy = list.firstWhere((e) => e.name == "oldcube.dat");
-    assert(proxy != null);
-    hub.commandRegistry.doAddFile(proxy);
-    proxy = list.firstWhere((e) => e.name == "terrain2.dat");
-    hub.commandRegistry.doAddFile(proxy);
+    Proxy file1 = list.firstWhere((e) => e.name == "terrain1.dat");
+    assert(file1 != null);
+    Proxy file2 = list.firstWhere((e) => e.name == "terrain2.dat");
+    assert(file2 != null);
+
+    hub.commandRegistry.doAddFile(file1);
+    hub.commandRegistry.doAddFile(file2);
+
     hub.commandRegistry.doToggleBbox(true);
 }

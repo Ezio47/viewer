@@ -13,6 +13,19 @@ class CommandRegistry {
         _hub = Hub.root;
     }
 
+    ServerProxy doOpenServer(String server) {
+        ServerProxy proxy = new ServerProxy(server);
+        proxy.load();
+        return proxy;
+    }
+
+    void doCloseServer(Proxy proxy) {
+        if (proxy != null)
+        {
+            proxy.close();
+        }
+    }
+
     void doColorize() {
         _hub.renderablePointCloudSet.colorize();
         _hub.renderer.update();

@@ -52,11 +52,8 @@ class ServerBrowserElement extends PolymerElement {
     void doCloseServer(Event e, var detail, Node target) {
         _server = null;
 
-        if (_proxy != null)
-        {
-            _proxy.close();
-            _proxy = null;
-        }
+        _hub.commandRegistry.doCloseServer(_proxy);
+        _proxy = null;
 
         items.clear();
 
@@ -76,9 +73,9 @@ class ServerBrowserElement extends PolymerElement {
         if (!_server.endsWith("/"))
             _server += "/";
 
-        _proxy = new ServerProxy(_server);
-        _proxy.load();
-        loadItems();
+        _proxy = _hub.commandRegistry.doOpenServer(_server);
+
+        _loadItems();
 
         isServerOpen = true;
     }
@@ -94,7 +91,7 @@ class ServerBrowserElement extends PolymerElement {
         _closePanel();
     }
 
-    void loadItems() {
+    void _loadItems() {
         items.clear();
 
         if (_proxy is! ServerProxy) items.add(new _ProxyItem("..", null, -1));
@@ -115,7 +112,7 @@ class ServerBrowserElement extends PolymerElement {
 
         if (item.name == "..") {
             _proxy = _proxy.parent;
-            loadItems();
+            _loadItems();
 
         } else if (source is FileProxy) {
             //window.alert(item.name);
@@ -124,7 +121,7 @@ class ServerBrowserElement extends PolymerElement {
         } else if (source is DirectoryProxy) {
             _proxy = source;
             _proxy.load();
-            loadItems();
+            _loadItems();
 
         } else {
             assert(false);
