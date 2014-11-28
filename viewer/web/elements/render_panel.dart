@@ -1,4 +1,4 @@
-library render_element;
+library render_panel;
 
 
 import 'dart:core';
@@ -6,12 +6,12 @@ import 'package:polymer/polymer.dart';
 import '../hub.dart';
 
 
-@CustomTag('render-element')
-class RenderElement extends PolymerElement {
+@CustomTag('render-panel')
+class RenderPanel extends PolymerElement {
 
     Hub _hub = Hub.root;
 
-    RenderElement.created() : super.created();
+    RenderPanel.created() : super.created();
 
     @override
     void attached() {
@@ -20,7 +20,7 @@ class RenderElement extends PolymerElement {
         var canvas = this.shadowRoot.querySelector("#container");
         assert(canvas != null);
 
-        _hub.renderUI = this;
+        _hub.renderPanel = this;
         _hub.canvas = canvas;
 
         canvas.onMouseMove.listen(onMyMouseMove);

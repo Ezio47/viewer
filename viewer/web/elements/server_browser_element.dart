@@ -5,7 +5,6 @@ import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
-import 'package:paper_elements/paper_dialog.dart';
 import '../proxy.dart';
 import '../utils.dart';
 
@@ -14,6 +13,18 @@ import '../utils.dart';
 class ServerBrowserElement extends PolymerElement {
 
     Hub _hub = Hub.root;
+
+    String _server;
+    @observable bool isServerOpen;
+    @observable bool isFileSelected;
+
+    @observable var selectedItem;
+    @observable bool isSelectionEnabled = true;
+
+    @published ObservableList<Item> items = new ObservableList();
+    Proxy _proxy = null;
+    Proxy _currentItem = null;
+
 
     ServerBrowserElement.created() : super.created();
 
@@ -24,9 +35,7 @@ class ServerBrowserElement extends PolymerElement {
 
     @override
     void ready() {
-        $["file-list2"].on['core-activate'].listen(handleListChange);
-
-       // _hub.settingsUI = this;
+       _hub.serverBrowserElement = this;
     }
 
     @override
@@ -34,54 +43,56 @@ class ServerBrowserElement extends PolymerElement {
         super.detached();
     }
 
+    void _closePanel() {
+        var e = Hub.root.mainWindow.$["collapse6"];
+        assert(e != null);
+        e.toggle();
+    }
 
-    void openFile(Event e, var detail, Node target) {
-        var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
+    void doCloseServer(Event e, var detail, Node target) {
+        _server = null;
 
-        _proxy = null;
-        _proxy = new ServerProxy("http://www.example.com/");
+        if (_proxy != null)
+        {
+            _proxy.close();
+            _proxy = null;
+        }
+
+        items.clear();
+
+        isServerOpen = false;
+        isFileSelected = false;
+    }
+
+    void doOpenServer(Event e, var detail, Node target) {
+        InputElement t = $["servername"];
+        assert(t != null);
+
+        if (t.value == null || t.value.isEmpty)
+            _server = t.placeholder;
+        else
+            _server = t.value;
+
+        if (!_server.endsWith("/"))
+            _server += "/";
+
+        _proxy = new ServerProxy(_server);
         _proxy.load();
         loadItems();
 
-        dlg.toggle();
+        isServerOpen = true;
     }
 
-    void openFileCancel(Event e, var detail, Node target) {
-        var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
-        dlg.toggle();
+    void doCancel(Event e, var detail, Node target) {
+        _closePanel();
     }
 
-    void openFileOkay(Event e, var detail, Node target) {
-        /*var dlg = this.shadowRoot.querySelector("#openDialog") as PaperDialog;
-        dlg.toggle();
-        InputElement elem = this.shadowRoot.querySelector("#filenamearea") as InputElement;
-        var txt = elem.value;
-        if (txt.trim().isEmpty == false) {
-            hub.doAddFile(txt);
-        }
-        elem.value = "";*/
-
+    void doOpenFile(Event e, var detail, Node target) {
         assert(_currentItem != null);
         _hub.doAddFile(_currentItem);
+
+        _closePanel();
     }
-
-    void selectionMade(CustomEvent e) {
-    }
-
-    void handleListChange(e) {
-        _proxy = null;
-        _proxy = new ServerProxy("http://www.example.com/");
-        _proxy.load();
-        loadItems();
-
-    }
-
-    @observable var itemSelection;
-    @observable bool itemSelectionEnabled = true;
-
-    @published ObservableList<Item> items = new ObservableList();
-    Proxy _proxy = null;
-    Proxy _currentItem = null;
 
     void loadItems() {
         items.clear();
@@ -94,15 +105,15 @@ class ServerBrowserElement extends PolymerElement {
         }
     }
 
-    void openItem(Event e, var detail, Node target) {
+    void openItem(Event e, var detail, Node target) {  }
 
-    }
-
-    void itemSelectionMade(CustomEvent e) {
+    void doSelectionMade(CustomEvent e) {
         var item = e.detail.data as Item;
         assert(item != null);
         var source = item.source;
         _currentItem = source;
+
+        isFileSelected = false;
 
         if (item.name == "..") {
             _proxy = _proxy.parent;
@@ -110,6 +121,7 @@ class ServerBrowserElement extends PolymerElement {
 
         } else if (source is FileProxy) {
             //window.alert(item.name);
+            isFileSelected = true;
 
         } else if (source is DirectoryProxy) {
             _proxy = source;

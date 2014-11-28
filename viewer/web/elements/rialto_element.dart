@@ -1,4 +1,4 @@
-library viewer_element;
+library rialto_element;
 
 
 import 'dart:core';
@@ -8,12 +8,12 @@ import 'package:paper_elements/paper_icon_button.dart';
 import '../hub.dart';
 
 
-@CustomTag('viewer-element')
-class ViewerElement extends PolymerElement {
+@CustomTag('rialto-element')
+class RialtoElement extends PolymerElement {
 
     Hub _hub = Hub.root;
 
-    ViewerElement.created() : super.created();
+    RialtoElement.created() : super.created();
 
 
     @override
@@ -24,6 +24,7 @@ class ViewerElement extends PolymerElement {
 
     @override
     void ready() {
+        Hub.root.mainWindow = this;
     }
 
 

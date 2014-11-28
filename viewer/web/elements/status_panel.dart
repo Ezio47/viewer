@@ -7,20 +7,20 @@ import 'package:polymer/polymer.dart';
 import '../hub.dart';
 
 
-@CustomTag('status-element')
-class StatusElement extends PolymerElement {
+@CustomTag('status-panel')
+class StatusPanel extends PolymerElement {
     @published double mousePositionX;
     @published double mousePositionY;
 
     Hub _hub = Hub.root;
 
-    StatusElement.created() : super.created();
+    StatusPanel.created() : super.created();
 
     @override
     void attached() {
         super.attached();
 
-        _hub.statusUI = this;
+        _hub.statusPanel = this;
     }
 
     @override

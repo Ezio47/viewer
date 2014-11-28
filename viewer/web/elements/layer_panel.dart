@@ -46,7 +46,8 @@ class LayerPanel extends PolymerElement {
     }
 
     void openFile(Event e, var detail, Node target) {
-        var e = $["collapse6"];
+        var e = Hub.root.mainWindow.$["collapse6"];
+        assert(e != null);
         e.toggle();
     }
 

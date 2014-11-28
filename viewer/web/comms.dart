@@ -20,6 +20,7 @@ abstract class Comms {
     Comms(String this.server);
 
     void open();
+    void close();
     String read(String path);
 }
 
@@ -27,8 +28,13 @@ abstract class Comms {
 class FauxComms extends Comms {
 
     FauxComms(String server) : super(server);
+
     @override
     void open() {
+    }
+
+    @override
+    void close() {
     }
 
     @override

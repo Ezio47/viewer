@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="../rialto.css">
+
+<link rel="import" href="packages/polymer/polymer.html">
+
+<link rel="import" href="packages/core_elements/core_collapse.html">
+
+<link rel="import" href="packages/core_elements/core_icon.html">
+<link rel="import" href="packages/core_elements/core_icons.html">
+<link rel="import" href="packages/core_elements/core_iconset.html">
+<link rel="import" href="packages/core_elements/core_iconset_svg.html">
+<link rel="import" href="packages/core_elements/image_icons.html">
+
+<link rel="import" href="packages/paper_elements/paper_icon_button.html">
+
+<link rel="import" href="render_panel.html">
+<link rel="import" href="status_panel.html">
+
+<link rel="import" href="layer_panel.html">
+<link rel="import" href="info_panel.html">
+<link rel="import" href="display_panel.html">
+
+<link rel="import" href="rialto_icons.html">
+
+<polymer-element name="rialto-element">
+
+    <template>
+        <style>
+            /*
+             * panel styles
+             */
+            .render-panel-style {
+                background-color: black;
+            }
+            .status-panel-style {
+                background-color: #202020;
+                opacity: 0.85;
+                border-style: solid;
+                border-width: 1px 0px 0px 0px;
+                border-color: #404040;
+            }
+            .dark-panel-style {
+                opacity: 0.95;
+                background: #202020;
+                padding: 2px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #404040;
+                margin: 2px;
+            }
+            .light-panel-style {
+                opacity: 0.95;
+                background: #404040;
+                padding: 2px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #606060;
+                margin: 2px;
+            }
+
+
+            /*
+             * panel positions
+             */
+            .render-panel-position {
+                position: absolute;
+                z-index: 1;
+                top: 0px;
+                left: 0px;
+            }
+            .status-panel-position {
+                position: absolute;
+                z-index: 2;
+                left: 0px;
+                right: 0px;
+                bottom: 0px;
+            }
+            .left-panel-position {
+                position: absolute;
+                z-index: 2;
+                top: 62px;
+                left: 10px;
+            }
+            .tool-panel-position {
+                position: absolute;
+                z-index: 2;
+                top: 10px;
+                left: 104px;
+            }
+            .main-toggles-position {
+                position: absolute;
+                z-index: 2;
+                top: 10px;
+                left: 10px;
+            }
+            .min-panel-width {
+                min-width: 300px;
+            }
+
+
+            /*
+             * button styling
+             */
+            .regularround-button-style  paper-icon-button /deep/ core-icon[role=img] {
+            }
+            .regularround-button-style paper-icon-button {
+                background: #404040;
+                opacity: 0.85;
+                stroke: #c0c0c0;
+                margin: 1px;
+                border-radius: 50%;
+            }
+
+            .smallround-button-style  paper-icon-button /deep/ core-icon[role=img] {
+                height: 16px;
+                width: 16px;
+            }
+            .smallround-button-style paper-icon-button {
+                height: 16px;
+                width: 16px;
+                background: #404040;
+                opacity: 0.85;
+                stroke: #c0c0c0;
+                margin: 1px;
+                border-radius: 50%;
+            }
+
+            .regularsquare-button-style  paper-icon-button /deep/ core-icon[role=img] {
+                height: 24px;
+                width: 24px;
+            }
+            .regularsquare-button-style paper-icon-button {
+                height: 24px;
+                width: 24px;
+                background: #404040;
+                opacity: 0.85;
+                color: #c0c0c0;
+                margin: 1px;
+                border-radius: 4px;
+           }
+
+
+            /*
+             * misc
+             */
+            .text-label-style {
+                color: #b0b0b0;
+            }
+            .hr-style {
+                width:95%;
+            }
+            .selecteditemstyle {
+                background: silver;
+            }
+            .listbox-style {
+                width: 300px;
+                height: 200px;
+                border-style: solid;
+                border-width: 1px;
+            }
+            .listbox-item-style {
+                height: 20px;
+            }
+            .input-textbox-style {
+                width: 200px;
+            }
+        </style>
+
+        <div id="rialto-window">
+
+            <!-- RENDER PANEL -->
+            <div class="render-panel-position">
+                <div class="render-panel-style">
+                    <render-panel></render-panel>
+                </div>
+            </div>
+
+            <!-- TOGGLES PANEL -->
+            <div class="main-toggles-position dark-panel-style" >
+                <div horizontal layout class="regularround-button-style">
+                    <paper-icon-button icon="rialto-icons-regular:chevdown" on-click="{{toggleCollapse1}}"></paper-icon-button>
+                    <paper-icon-button icon="rialto-icons-regular:chevright" on-click="{{toggleCollapse5}}"></paper-icon-button>
+                </div>
+            </div>
+
+
+            <!-- LEFT PANEL -->
+            <core-collapse id="collapse1" class="left-panel-position min-panel-width" duration="0.10">
+                <div vertical layout class="">
+
+
+                    <!-- LAYER PANEL -->
+                    <div class="dark-panel-style">
+                        <div layout horizontal center class="smallround-button-style">
+                            <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
+                            <span class="text-label-style">Files</span>
+                        </div>
+                        <core-collapse id="collapse2" duration="0.10">
+                            <div layout horizontal>
+                            <layer-panel></layer-panel>
+
+                            <!-- SERVER BROWSER -->
+                            <core-collapse id="collapse6" duration="0.10">
+                                <server-browser-element></server-browser-element>
+                            </core-collapse>
+
+                            </div>
+                        </core-collapse>
+
+                    </div>
+
+
+                    <!-- DISPLAY PANEL -->
+                    <div class="dark-panel-style">
+                        <div layout horizontal center class="smallround-button-style">
+                            <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse3}}"></paper-icon-button>
+                            <span class="text-label-style">Display</span>
+                        </div>
+
+                        <core-collapse id="collapse3" duration="0.10">
+                            <display-panel></display-panel>
+                        </core-collapse>
+                    </div>
+
+
+                    <!-- DATA PANEL -->
+                    <div class="dark-panel-style">
+                        <div layout horizontal center class="smallround-button-style">
+                            <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse4}}"></paper-icon-button>
+                            <span class="text-label-style">Data</span>
+                        </div>
+
+                        <core-collapse id="collapse4" duration="0.10">
+                            <info-panel></info-panel>
+                        </core-collapse>
+                    </div>
+
+                </div>
+            </core-collapse>  <!-- left panel -->
+
+
+            <!-- TOOL PANEL -->
+            <core-collapse id="collapse5" class="tool-panel-position dark-panel-style" horizontal="true" duration="0.10">
+                <div horizontal layout class="regularsquare-button-style panel">
+                    <paper-icon-button icon="home" on-click="{{goHome}}"></paper-icon-button>
+                    <paper-icon-button icon="image:color-lens" on-click="{{goColorize}}"></paper-icon-button>
+                </div>
+            </core-collapse>
+
+            <!-- STATUS PANEL -->
+           <div class="status-panel-style status-panel-position">
+                <status-panel ></status-panel>
+           </div>
+
+        </div> <!-- main -->
+    </template>
+
+    <script type="application/dart" src="rialto_element.dart"></script>
+
+</polymer-element>

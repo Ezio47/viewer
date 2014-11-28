@@ -3,11 +3,13 @@ library hub;
 
 import 'dart:core';
 import 'dart:html';
-import 'elements/render_element.dart';
-import 'elements/status_element.dart';
+import 'elements/render_panel.dart';
+import 'elements/status_panel.dart';
 import 'elements/info_panel.dart';
 import 'elements/display_panel.dart';
 import 'elements/layer_panel.dart';
+import 'elements/rialto_element.dart';
+import 'elements/server_browser_element.dart';
 import 'renderer.dart';
 import 'renderable_point_cloud_set.dart';
 import 'point_cloud.dart';
@@ -16,13 +18,16 @@ import 'proxy.dart';
 
 class Hub {
     // the big, public, singleton components
-    RenderElement renderUI;
-    StatusElement statusUI;
-    Element canvas;
-    Renderer renderer;
+    RialtoElement mainWindow;
     InfoPanel infoPanel;
     DisplayPanel displayPanel;
     LayerPanel layerPanel;
+    RenderPanel renderPanel;
+    Element canvas;
+    StatusPanel statusPanel;
+    ServerBrowserElement serverBrowserElement;
+
+    Renderer renderer;
 
     // private - the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -90,8 +95,8 @@ class Hub {
     void goHome() => renderer.goHome();
 
     void doMouseMoved() {
-        statusUI.mousePositionX = renderer.mouseX;
-        statusUI.mousePositionY = renderer.mouseY;
+        statusPanel.mousePositionX = renderer.mouseX;
+        statusPanel.mousePositionY = renderer.mouseY;
     }
 
     void bootup() {

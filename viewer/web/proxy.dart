@@ -28,6 +28,18 @@ abstract class Proxy {
     }
 
     void load();
+    void close() {
+        root._close();
+        comms.close();
+    }
+
+    void _close();
+
+    ServerProxy get root {
+        if (parent != null) return parent.root;
+        assert(this is ServerProxy);
+        return this;
+    }
 
     Comms get comms => parent.comms;
 
@@ -92,6 +104,12 @@ class ServerProxy extends Proxy {
     }
 
     Comms get comms => _comms;
+
+    @override void _close() {
+        if (sources != null) {
+            sources.forEach((p) => p._close());
+        }
+    }
 }
 
 
@@ -121,6 +139,12 @@ class DirectoryProxy extends Proxy {
                 default:
                     throw new RialtoArgumentError("invalid key in DirectoryProxy map");
             }
+        }
+    }
+
+    @override void _close() {
+        if (sources != null) {
+            sources.forEach((p) => p._close());
         }
     }
 }
@@ -171,5 +195,11 @@ class FileProxy extends Proxy {
     PointCloud create() {
         PointCloud cloud = PointCloudGenerator.generate(name, fullpath);
         return cloud;
+    }
+
+    @override void _close() {
+        assert(sources == null);
+
+        // here we should delete the current PointCloud object for this file
     }
 }

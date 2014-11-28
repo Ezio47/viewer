@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 
+
+
 <link rel="import" href="packages/polymer/polymer.html">
 
 <link rel="import" href="packages/core_elements/core_collapse.html">
@@ -92,16 +94,7 @@
                 margin: 1px;
                 border-radius: 4px;
             }
-           .darkpanel {
-                opacity: 0.95;
-                background: #202020;
-                padding: 2px;
-                border-radius: 4px;
-                border-style: solid;
-                border-width: 1px;
-                border-color: #404040;
-                margin: 2px;
-            }
+
             .lightpanel {
                 opacity: 0.95;
                 background: #404040;
@@ -120,33 +113,30 @@
             }
         </style>
 
-
-
-                    <div class="lightpanel">
-                        <div style="padding:2px;">
-                            <core-list-dart data="{{files}}" height="20px"
-                                    selectionEnabled="{{selectionEnabled}}"
-                                    selection="{{selection}}"
-                                    on-core-activate = "{{selectionMade}}"
-                                    style="height:150px;"
-                                    multi="false"
-                                    id="file-list">
-                                <template>
-                                    <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
-                                        <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
-                                        <span>{{model.name}}</span>
-                                    </div>
-                                </template>
-                            </core-list-dart>
+        <div class="lightpanel" style="min-width:300px;">
+            <div style="padding:2px;">
+                <core-list-dart data="{{files}}" height="20px"
+                        selectionEnabled="{{selectionEnabled}}"
+                        selection="{{selection}}"
+                        on-core-activate = "{{selectionMade}}"
+                        style="height:150px;"
+                        multi="false"
+                        id="file-list">
+                    <template>
+                        <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
+                            <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
+                            <span>{{model.name}}</span>
                         </div>
-                        <hr>
-                        <div class="smallroundbutton" style="margin:0px;">
-                            <paper-icon-button icon="rialto-icons-small:plus" on-click="{{openFile}}"></paper-icon-button>
-                            <paper-icon-button icon="rialto-icons-small:minus" on-click="{{deleteFile}}"></paper-icon-button>
-                        </div>
+                    </template>
+                </core-list-dart>
+            </div>
+            <hr>
+            <div class="smallroundbutton" style="margin:0px;">
+                <paper-icon-button icon="rialto-icons-small:plus" on-click="{{openFile}}"></paper-icon-button>
+                <paper-icon-button icon="rialto-icons-small:minus" on-click="{{deleteFile}}"></paper-icon-button>
+            </div>
 
-                    </div>
-
+        </div>
 
     </template>
 
