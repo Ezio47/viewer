@@ -117,7 +117,7 @@ class Renderer {
         if (_renderSource.length == 0)
         {
             theMin = new Vector3.zero();
-            theLen = new Vector3(100.0, 100.0, 100.0);
+            theLen = new Vector3(100.0, 100.0, 25.0);
         }
 
         modelToWorld = new Matrix4.identity();
@@ -165,7 +165,7 @@ class Renderer {
             // move position to world space
             _cameraEyePoint.applyProjection(modelToWorld);
             _cameraTargetPoint.applyProjection(modelToWorld);
-            _cameraUpVector = new Vector3(0.0, 1.0, 0.0);
+            _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
 
             _addCamera();
             goHome();

@@ -21,24 +21,45 @@ class RenderUtils {
 
     static Vector3 getCameraPointTarget(RenderablePointCloudSet set) {
 
-        if (set.length == 0) return new Vector3.zero();
+        double minx = 0.0;
+        double miny = 0.0;
+        double minz = 0.0;
+        double lenx = 100.0;
+        double leny = 100.0;
 
-        final double x = set.min.x + set.len.x / 2.0;
-        final double y = set.min.y + set.len.y / 2.0;
-        final double z = set.min.z;
+        if (set.length > 0) {
+            minx = set.min.x;
+            miny = set.min.y;
+            minz = set.min.z;
+            lenx = set.len.x;
+            leny = set.len.y;
+        }
+
+        final double x = minx + lenx / 2.0;
+        final double y = miny + leny / 2.0;
+        final double z = minz;
 
         return new Vector3(x, y, z);
     }
 
     static Vector3 getCameraPointEye(RenderablePointCloudSet set) {
 
-        if (set.length == 0) return new Vector3(100.0, 100.0, 100.0);
+        double lenx = 100.0;
+        double leny = 100.0;
+        double maxz = 25.0;
+
+        if (set.length > 0) {
+            lenx = set.len.x;
+            leny = set.len.y;
+            maxz = set.max.z;
+
+        }
 
         var v = getCameraPointTarget(set);
 
-        v.x = v.x - 0.5 * set.len.x;
-        v.y = v.y - 2.0 * set.len.y;
-        v.z = set.max.z * 2.0;
+        v.x = v.x - 0.5 * lenx;
+        v.y = v.y - 1.25 * leny;
+        v.z = maxz * 5.0;
 
         return v;
     }
