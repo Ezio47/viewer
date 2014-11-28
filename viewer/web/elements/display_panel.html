@@ -20,10 +20,9 @@
 
 <link rel="import" href="server_browser_element.html">
 <link rel="import" href="info_panel.html">
-<link rel="import" href="display_panel.html">
 <link rel="import" href="rialto_icons.html">
 
-<polymer-element name="settings-element">
+<polymer-element name="display-panel">
 
     <template>
         <style>
@@ -121,78 +120,39 @@
         </style>
 
 
-        <div vertical layout class="">
 
 
-            <!-- LAYERS -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
-                    <span class="textlabel">Files</span>
-                </div>
-                <core-collapse id="collapse2" duration="0.10">
+
+
                     <div class="lightpanel">
-                        <div style="padding:2px;">
-                            <core-list-dart data="{{files}}" height="20px"
-                                    selectionEnabled="{{selectionEnabled}}"
-                                    selection="{{selection}}"
-                                    on-core-activate = "{{selectionMade}}"
-                                    style="height:150px;"
-                                    multi="false"
-                                    id="file-list">
-                                <template>
-                                    <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
-                                        <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
-                                        <span>{{model.name}}</span>
-                                    </div>
-                                </template>
-                            </core-list-dart>
-                        </div>
-                        <hr>
-                        <div class="smallroundbutton" style="margin:0px;">
-                            <paper-icon-button icon="rialto-icons-small:plus" on-click="{{openFile}}"></paper-icon-button>
-                            <paper-icon-button icon="rialto-icons-small:minus" on-click="{{deleteFile}}"></paper-icon-button>
-                        </div>
 
+                          <form action="" style="padding:2px;">
+                            <div>
+                                <label>
+                                    <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
+                                    <span>Toggle axes</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label>
+                                    <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
+                                    <span>Toggle bbox</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label>
+                                    <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
+                                    <span>None</span>
+                                </label>
+                            </div>
+                          </form>
                     </div>
-                </core-collapse>
-
-                <core-collapse id="collapse6">
-                    <server-browser-element></server-browser-element>
-                </core-collapse>
-            </div>
 
 
-            <!-- DISPLAY -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse3}}"></paper-icon-button>
-                    <span class="textlabel">Display</span>
-                </div>
-
-                <core-collapse id="collapse3" duration="0.10">
-                    <display-panel></display-panel>
-                </core-collapse>
-            </div>
-
-
-            <!-- DATA -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse4}}"></paper-icon-button>
-                    <span class="textlabel">Data</span>
-                </div>
-
-                <core-collapse id="collapse4" duration="0.10">
-                    <info-panel></info-panel>
-                </core-collapse>
-            </div>
-
-    </div>
 
 
     </template>
 
-    <script type="application/dart" src="settings_element.dart"></script>
+    <script type="application/dart" src="display_panel.dart"></script>
 
 </polymer-element>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 
 <link rel="import" href="packages/polymer/polymer.html">
 
@@ -18,12 +18,9 @@
 <link rel="import" href="packages/core_elements/core_iconset_svg.html">
 <link rel="import" href="packages/core_elements/image_icons.html">
 
-<link rel="import" href="server_browser_element.html">
-<link rel="import" href="info_panel.html">
-<link rel="import" href="display_panel.html">
 <link rel="import" href="rialto_icons.html">
 
-<polymer-element name="settings-element">
+<polymer-element name="server-browser-element">
 
     <template>
         <style>
@@ -118,81 +115,49 @@
             td {
                 padding: 0px 10px 0px 0px;
             }
+
         </style>
 
 
-        <div vertical layout class="">
 
-
-            <!-- LAYERS -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
-                    <span class="textlabel">Files</span>
-                </div>
-                <core-collapse id="collapse2" duration="0.10">
-                    <div class="lightpanel">
-                        <div style="padding:2px;">
-                            <core-list-dart data="{{files}}" height="20px"
-                                    selectionEnabled="{{selectionEnabled}}"
-                                    selection="{{selection}}"
-                                    on-core-activate = "{{selectionMade}}"
-                                    style="height:150px;"
-                                    multi="false"
-                                    id="file-list">
-                                <template>
-                                    <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
-                                        <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
-                                        <span>{{model.name}}</span>
-                                    </div>
-                                </template>
-                            </core-list-dart>
-                        </div>
-                        <hr>
-                        <div class="smallroundbutton" style="margin:0px;">
-                            <paper-icon-button icon="rialto-icons-small:plus" on-click="{{openFile}}"></paper-icon-button>
-                            <paper-icon-button icon="rialto-icons-small:minus" on-click="{{deleteFile}}"></paper-icon-button>
-                        </div>
-
-                    </div>
-                </core-collapse>
-
-                <core-collapse id="collapse6">
-                    <server-browser-element></server-browser-element>
-                </core-collapse>
-            </div>
-
-
-            <!-- DISPLAY -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse3}}"></paper-icon-button>
-                    <span class="textlabel">Display</span>
-                </div>
-
-                <core-collapse id="collapse3" duration="0.10">
-                    <display-panel></display-panel>
-                </core-collapse>
-            </div>
-
-
-            <!-- DATA -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse4}}"></paper-icon-button>
-                    <span class="textlabel">Data</span>
-                </div>
-
-                <core-collapse id="collapse4" duration="0.10">
-                    <info-panel></info-panel>
-                </core-collapse>
-            </div>
-
+    <!-- autoFocusDisabled="true" autoCloseDisabled="true" -->
+    <div>
+        <div class="pad10">
+            <core-field>
+                <label>
+                    <span>Server:</span>
+                    <input placeholder="http://www.example.com" id="xxfilenamearea" type="text" style="width:200px;">
+                </label>
+            </core-field>
+        </div>
+        <div class="padded">
+            <core-list-dart data="{{items}}" height="20px"
+                            selectionEnabled="{{itemSelectionEnabled}}"
+                            selection="{{itemSelection}}"
+                            on-core-activate = "{{itemSelectionMade}}"
+                            style="width:300px;height:200px;"
+                            multi="false"
+                            id="file-list2">
+                        <template>
+                            <div layout horizontal class="{{ {selectedlistitem: selected} }}" style="height: 20px" id="{{index}}">
+                                <span>{{model.name}}
+                                    <template if="{{model.numPoints > -1}}">
+                                        <div style="display: inline-block; width: 1em; height: 1em;"></div>
+                                        <span style="font-size: 75%;"><i>{{model.size}}</i></span>
+                                    </template>
+                                </span>
+                            </div>
+                        </template>
+            </core-list-dart>
+        </div>
+        <div>
+            <paper-button dismissive on-click="{{openFileCancel}}">Cancel</paper-button>
+            <paper-button affirmative on-click="{{openFileOkay}}">OK</paper-button>
+        </div>
     </div>
-
 
     </template>
 
-    <script type="application/dart" src="settings_element.dart"></script>
+    <script type="application/dart" src="server_browser_element.dart"></script>
 
 </polymer-element>

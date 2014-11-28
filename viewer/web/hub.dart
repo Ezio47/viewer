@@ -6,6 +6,8 @@ import 'dart:html';
 import 'elements/render_element.dart';
 import 'elements/settings_element.dart';
 import 'elements/status_element.dart';
+import 'elements/info_panel.dart';
+import 'elements/display_panel.dart';
 import 'renderer.dart';
 import 'renderable_point_cloud_set.dart';
 import 'point_cloud.dart';
@@ -19,6 +21,8 @@ class Hub {
     StatusElement statusUI;
     Element canvas;
     Renderer renderer;
+    InfoPanel infoPanel;
+    DisplayPanel displayPanel;
 
     // private - the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -60,13 +64,13 @@ class Hub {
 
         renderer.update();
 
-        settingsUI.minx = renderablePointCloudSet.min.x;
-        settingsUI.maxx = renderablePointCloudSet.max.x;
-        settingsUI.miny = renderablePointCloudSet.min.y;
-        settingsUI.maxy = renderablePointCloudSet.max.y;
-        settingsUI.minz = renderablePointCloudSet.min.z;
-        settingsUI.maxz = renderablePointCloudSet.max.z;
-        settingsUI.numPoints = renderablePointCloudSet.numPoints;
+        infoPanel.minx = renderablePointCloudSet.min.x;
+        infoPanel.maxx = renderablePointCloudSet.max.x;
+        infoPanel.miny = renderablePointCloudSet.min.y;
+        infoPanel.maxy = renderablePointCloudSet.max.y;
+        infoPanel.minz = renderablePointCloudSet.min.z;
+        infoPanel.maxz = renderablePointCloudSet.max.z;
+        infoPanel.numPoints = renderablePointCloudSet.numPoints;
     }
 
 
