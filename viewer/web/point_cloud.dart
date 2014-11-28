@@ -23,8 +23,28 @@ class PointCloud {
 
     PointCloud(String this.shortname, String this.longname);
 
+    void addToDimension(String name, Float32List data) {
+        // how to enforce this?
+        //// throw new RialtoArgumentError("all dimensions must be of same length");
 
-    void addDimension(String name, Float32List data) {
+        Float32List oldData = dimensions[name];
+
+        dimensions[name] = new Float32List(oldData.length + data.length);
+        int i = 0;
+        for ( ; i < oldData.length; i++) {
+            dimensions[name][i] = oldData[i];
+        }
+        for ( ; i < oldData.length + data.length; i++) {
+            dimensions[name][i] = data[i];
+        }
+
+        var list = _computeLimits(data);
+        min[name] = list[0];
+        max[name] = list[1];
+        avg[name] = list[2];
+    }
+
+    void createDimension(String name, Float32List data) {
         if (dimensions.keys.length == 0) {
             numPoints = data.length;
         } else {
@@ -39,8 +59,8 @@ class PointCloud {
         avg[name] = list[2];
     }
 
-    void addDimensions(Map<String, Float32List> map) {
-        map.forEach((k, v) => addDimension(k, v));
+    void createDimensions(Map<String, Float32List> map) {
+        map.forEach((k, v) => createDimension(k, v));
     }
 
     static List<double> _computeLimits(Float32List list) {

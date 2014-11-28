@@ -19,13 +19,22 @@ class StatusPanel extends PolymerElement {
     @override
     void attached() {
         super.attached();
+    }
 
+    @override
+    void ready() {
         _hub.statusPanel = this;
+        _hub.eventRegistry.registerMouseMoveHandler(_onMouseMove);
     }
 
     @override
     void detached() {
         super.detached();
+    }
+
+    void _onMouseMove(int x, int y) {
+        mousePositionX = _hub.renderer.mouseX;
+        mousePositionY = _hub.renderer.mouseY;
     }
 
     void aboutbox(Event e, var detail, Node target) {

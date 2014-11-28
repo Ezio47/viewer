@@ -9,8 +9,10 @@ import '../hub.dart';
 
 @CustomTag('layer-panel')
 class LayerPanel extends PolymerElement {
-    @published ObservableList<CloudFile> files = new ObservableList();
+    @published ObservableList<_LayerItem> files = new ObservableList();
     @published bool hasData;
+    @observable var selection;
+    @observable bool selectionEnabled = true;
 
     Hub _hub = Hub.root;
 
@@ -23,8 +25,6 @@ class LayerPanel extends PolymerElement {
 
     @override
     void ready() {
-        $["file-list"].on['core-activate'].listen(handleListChange);
-
         _hub.layerPanel = this;
     }
 
@@ -34,9 +34,8 @@ class LayerPanel extends PolymerElement {
     }
 
 
-
     void doAddFile(String name, String fullpath) {
-        files.add(new CloudFile(name, fullpath));
+        files.add(new _LayerItem(name, fullpath));
         hasData = files.length > 0;
     }
 
@@ -59,30 +58,21 @@ class LayerPanel extends PolymerElement {
 
     void deleteFile(Event e, var detail, Node target) {
         if (selection != null) {
-            assert(selection is CloudFile);
-            _hub.doRemoveFile(selection.fullpath);
+            assert(selection is _LayerItem);
+            _hub.commandRegistry.doRemoveFile(selection.fullpath);
         }
         return;
     }
 
-    void selectionMade(CustomEvent e) {
-    }
-
-    void handleListChange(e) {
-        //window.alert("list change ${e.detail.data.toString()}");
-    }
-
-    @observable var selection;
-    @observable bool selectionEnabled = true;
-
+    void selectionMade(CustomEvent e) { }
 }
 
 
-class CloudFile extends Observable {
+class _LayerItem extends Observable {
     @observable String name;
     @observable String fullpath;
     @observable bool checked;
-    CloudFile(this.name, this.fullpath) {
+    _LayerItem(this.name, this.fullpath) {
         checked = true;
     }
     String toString() => "<$name $checked>";

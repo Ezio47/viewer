@@ -27,7 +27,6 @@ class DisplayPanel extends PolymerElement {
 
     @override
     void ready() {
-
         _hub.displayPanel = this;
     }
 
@@ -38,28 +37,28 @@ class DisplayPanel extends PolymerElement {
 
 
     void axesbool1Changed(var oldvalue) {
-        _hub.doToggleAxes(axesbool1);
-        _hub.doToggleBbox(axesbool2);
+        _hub.commandRegistry.doToggleAxes(axesbool1);
+        _hub.commandRegistry.doToggleBbox(axesbool2);
     }
 
     void axesbool2Changed(var oldvalue) {
-        _hub.doToggleAxes(axesbool1);
-        _hub.doToggleBbox(axesbool2);
+        _hub.commandRegistry.doToggleAxes(axesbool1);
+        _hub.commandRegistry.doToggleBbox(axesbool2);
     }
 
     void axesbool3Changed(var oldvalue) {
-        _hub.doToggleAxes(axesbool1);
-        _hub.doToggleBbox(axesbool2);
+        _hub.commandRegistry.doToggleAxes(axesbool1);
+        _hub.commandRegistry.doToggleBbox(axesbool2);
     }
 
     void toggleAxes(Event e, var detail, Node target) {
         var button = target as InputElement;
-        _hub.doToggleAxes(button.checked);
+        _hub.commandRegistry.doToggleAxes(button.checked);
     }
 
     void toggleBbox(Event e, var detail, Node target) {
         var button = target as InputElement;
-        _hub.doToggleBbox(button.checked);
+        _hub.commandRegistry.doToggleBbox(button.checked);
     }
 
 }

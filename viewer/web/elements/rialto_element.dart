@@ -21,12 +21,10 @@ class RialtoElement extends PolymerElement {
         super.attached();
     }
 
-
     @override
     void ready() {
         Hub.root.mainWindow = this;
     }
-
 
     @override
     void detached() {
@@ -66,7 +64,7 @@ class RialtoElement extends PolymerElement {
     }
 
     void goHome(Event e, var detail, Node target) {
-        _hub.goHome();
+        _hub.commandRegistry.goHome();
 
         //FauxComms.test();
         //Utils.test_toSI();
@@ -74,7 +72,7 @@ class RialtoElement extends PolymerElement {
 
 
     void goColorize(Event e, var detail, Node target) {
-        _hub.doColorize();
+        _hub.commandRegistry.doColorize();
     }
 
 }

@@ -106,7 +106,7 @@ class PointCloudGenerator {
         }
 
         var cloud = new PointCloud(name, fullname);
-        cloud.addDimensions(map);
+        cloud.createDimensions(map);
 
         return cloud;
     }
@@ -186,7 +186,7 @@ class PointCloudGenerator {
         map["positions.z"] = z;
 
         var cloud = new PointCloud(name, fullname);
-        cloud.addDimensions(map);
+        cloud.createDimensions(map);
 
         return cloud;
     }
@@ -220,7 +220,7 @@ class PointCloudGenerator {
         }
 
         var cloud = new PointCloud(name, fullname);
-        cloud.addDimensions(map);
+        cloud.createDimensions(map);
 
         return cloud;
     }
@@ -247,7 +247,7 @@ class PointCloudGenerator {
         }
 
         var cloud = new PointCloud(name, fullname);
-        cloud.addDimensions(map);
+        cloud.createDimensions(map);
 
         return cloud;
     }
@@ -262,7 +262,7 @@ class PointCloudGenerator {
         map["positions.z"] = terrain.valuesZ;
 
         var cloud = new PointCloud(name, fullname);
-        cloud.addDimensions(map);
+        cloud.createDimensions(map);
 
         return cloud;
     }

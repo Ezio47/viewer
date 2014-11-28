@@ -89,7 +89,7 @@ class ServerBrowserElement extends PolymerElement {
 
     void doOpenFile(Event e, var detail, Node target) {
         assert(_currentItem != null);
-        _hub.doAddFile(_currentItem);
+        _hub.commandRegistry.doAddFile(_currentItem);
 
         _closePanel();
     }

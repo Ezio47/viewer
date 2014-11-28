@@ -23,7 +23,6 @@ class InfoPanel extends PolymerElement {
 
     @override
     void ready() {
-
         _hub.infoPanel = this;
     }
 

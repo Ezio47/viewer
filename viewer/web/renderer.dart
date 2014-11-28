@@ -8,7 +8,7 @@ import 'renderable_point_cloud_set.dart';
 import 'render_utils.dart';
 import 'axes_object.dart';
 import 'bbox_object.dart';
-
+import 'hub.dart';
 
 class Renderer {
     // public
@@ -39,27 +39,28 @@ class Renderer {
 
     Matrix4 modelToWorld;
 
-    Renderer(var canvas) {
-        assert(canvas != null);
-        _canvas = canvas;
-    }
-
-
-    void init(RenderablePointCloudSet rpcSet) {
+    Renderer(RenderablePointCloudSet rpcSet) {
         _scene = null;
         _projector = new Projector();
 
         _webglRenderer = new WebGLRenderer();
         _webglRenderer.setSize(window.innerWidth, window.innerHeight);
-        _canvas.children.add(_webglRenderer.domElement);
 
-        _canvas.onMouseMove.listen(_updateMouseLocalCoords);
-        window.onResize.listen(_onMyWindowResize);
+        var parentElement = Hub.root.renderPanel.shadowRoot.querySelector("#container");
+        assert(parentElement != null);
+        parentElement.children.add(_webglRenderer.domElement);
+
+        Hub.root.eventRegistry.registerMouseMoveHandler(_updateMouseLocalCoords);
+        Hub.root.eventRegistry.registerWindowResizeHandler(_onMyWindowResize);
 
         _renderSource = rpcSet;
 
         modelToWorld = new Matrix4.identity();
+
+        _canvas = _webglRenderer.domElement;
     }
+
+    Element get canvas => _canvas;
 
 
     void goHome() {
@@ -200,14 +201,13 @@ class Renderer {
     }
 
 
-    void _updateMouseLocalCoords(event) {
-        event.preventDefault();
+    void _updateMouseLocalCoords(int newX, int newY) {
 
         // event.client.x,y is from upper left (0,0) of entire browser window
 
         // x,y is from upper left (0,0) of the canvas
-        var x = event.client.x - _canvasOffsetX;
-        var y = event.client.y - _canvasOffsetY;
+        var x = newX - _canvasOffsetX;
+        var y = newY - _canvasOffsetY;
 
         //print("screen: $x $y");
 
@@ -222,7 +222,7 @@ class Renderer {
     }
 
 
-    _onMyWindowResize(event) {
+    void _onMyWindowResize() {
         var w = window.innerWidth ;
         var h = window.innerHeight;
         _webglRenderer.setSize(w, h);

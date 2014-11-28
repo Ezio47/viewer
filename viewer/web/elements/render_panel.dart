@@ -16,25 +16,15 @@ class RenderPanel extends PolymerElement {
     @override
     void attached() {
         super.attached();
+    }
 
-        var canvas = this.shadowRoot.querySelector("#container");
-        assert(canvas != null);
-
+    @override
+    void ready() {
         _hub.renderPanel = this;
-        _hub.canvas = canvas;
-
-        canvas.onMouseMove.listen(onMyMouseMove);
-
-        _hub.makeRenderer();
     }
 
     @override
     void detached() {
         super.detached();
-    }
-
-
-    void onMyMouseMove(event) {
-        _hub.doMouseMoved();
     }
 }
