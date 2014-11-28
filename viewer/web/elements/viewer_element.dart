@@ -24,10 +24,6 @@ class ViewerElement extends PolymerElement {
 
     @override
     void ready() {
-
-        //hub.doAddFile("5");
-
-        _hub.bootup();
     }
 
 
@@ -36,6 +32,24 @@ class ViewerElement extends PolymerElement {
         super.detached();
     }
 
+    void toggleCollapse2(Event e, var detail, Node target) {
+        var e = $["collapse2"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
+        e.toggle();
+    }
+    void toggleCollapse3(Event e, var detail, Node target) {
+        var e = $["collapse3"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
+        e.toggle();
+    }
+    void toggleCollapse4(Event e, var detail, Node target) {
+        var e = $["collapse4"];
+        var button = target as PaperIconButton;
+        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
+        e.toggle();
+    }
 
     void toggleCollapse1(Event e, var detail, Node target) {
         var e = $["collapse1"];

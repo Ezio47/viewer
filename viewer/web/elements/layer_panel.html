@@ -23,7 +23,7 @@
 <link rel="import" href="display_panel.html">
 <link rel="import" href="rialto_icons.html">
 
-<polymer-element name="settings-element">
+<polymer-element name="layer-panel">
 
     <template>
         <style>
@@ -121,16 +121,7 @@
         </style>
 
 
-        <div vertical layout class="">
 
-
-            <!-- LAYERS -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
-                    <span class="textlabel">Files</span>
-                </div>
-                <core-collapse id="collapse2" duration="0.10">
                     <div class="lightpanel">
                         <div style="padding:2px;">
                             <core-list-dart data="{{files}}" height="20px"
@@ -155,44 +146,10 @@
                         </div>
 
                     </div>
-                </core-collapse>
-
-                <core-collapse id="collapse6">
-                    <server-browser-element></server-browser-element>
-                </core-collapse>
-            </div>
-
-
-            <!-- DISPLAY -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse3}}"></paper-icon-button>
-                    <span class="textlabel">Display</span>
-                </div>
-
-                <core-collapse id="collapse3" duration="0.10">
-                    <display-panel></display-panel>
-                </core-collapse>
-            </div>
-
-
-            <!-- DATA -->
-            <div class="darkpanel">
-                <div layout horizontal center class="smallroundbutton">
-                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse4}}"></paper-icon-button>
-                    <span class="textlabel">Data</span>
-                </div>
-
-                <core-collapse id="collapse4" duration="0.10">
-                    <info-panel></info-panel>
-                </core-collapse>
-            </div>
-
-    </div>
 
 
     </template>
 
-    <script type="application/dart" src="settings_element.dart"></script>
+    <script type="application/dart" src="layer_panel.dart"></script>
 
 </polymer-element>

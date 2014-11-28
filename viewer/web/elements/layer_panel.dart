@@ -1,21 +1,20 @@
-library settings_element;
+library layer_panel;
 
 
 import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
-import 'package:paper_elements/paper_icon_button.dart';
 
 
-@CustomTag('settings-element')
-class SettingsElement extends PolymerElement {
+@CustomTag('layer-panel')
+class LayerPanel extends PolymerElement {
     @published ObservableList<CloudFile> files = new ObservableList();
     @published bool hasData;
 
     Hub _hub = Hub.root;
 
-    SettingsElement.created() : super.created();
+    LayerPanel.created() : super.created();
 
     @override
     void attached() {
@@ -26,7 +25,7 @@ class SettingsElement extends PolymerElement {
     void ready() {
         $["file-list"].on['core-activate'].listen(handleListChange);
 
-        _hub.settingsUI = this;
+        _hub.layerPanel = this;
     }
 
     @override
@@ -34,24 +33,6 @@ class SettingsElement extends PolymerElement {
         super.detached();
     }
 
-    void toggleCollapse2(Event e, var detail, Node target) {
-        var e = $["collapse2"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
-        e.toggle();
-    }
-    void toggleCollapse3(Event e, var detail, Node target) {
-        var e = $["collapse3"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
-        e.toggle();
-    }
-    void toggleCollapse4(Event e, var detail, Node target) {
-        var e = $["collapse4"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
-        e.toggle();
-    }
 
 
     void doAddFile(String name, String fullpath) {

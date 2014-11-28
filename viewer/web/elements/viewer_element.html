@@ -15,8 +15,11 @@
 <link rel="import" href="packages/paper_elements/paper_icon_button.html">
 
 <link rel="import" href="render_element.html">
-<link rel="import" href="settings_element.html">
 <link rel="import" href="status_element.html">
+
+<link rel="import" href="layer_panel.html">
+<link rel="import" href="info_panel.html">
+<link rel="import" href="display_panel.html">
 
 <link rel="import" href="rialto_icons.html">
 
@@ -113,7 +116,7 @@
                 color: #c0c0c0;
                 margin: 1px;
                 border-radius: 4px;
-            }
+           }
             .darkpanel {
                 opacity: 0.95;
                 background: #202020;
@@ -124,7 +127,38 @@
                 border-color: #404040;
                 margin: 2px;
             }
+
+
+
+            .selectedlistitem {
+                background: silver;
+            }
+            .marginned {
+                margin: 2px;
+                padding: 2px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: grey;
+            }
+            .lightpanel {
+                opacity: 0.95;
+                background: #404040;
+                padding: 2px;
+                border-radius: 4px;
+                border-style: solid;
+                border-width: 1px;
+                border-color: #606060;
+                margin: 2px;
+            }
+            .textlabel {
+                color: #b0b0b0;
+            }
+            td {
+                padding: 0px 10px 0px 0px;
+            }
         </style>
+
+
 
 
         <div class="MAIN">
@@ -142,7 +176,52 @@
 
 
         <core-collapse id="collapse1" class="DOWN_PANEL " duration="0.10">
-            <settings-element></settings-element>
+       <div vertical layout class="">
+
+
+            <!-- LAYERS -->
+            <div class="darkpanel">
+                <div layout horizontal center class="smallroundbutton">
+                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
+                    <span class="textlabel">Files</span>
+                </div>
+                <core-collapse id="collapse2" duration="0.10">
+                    <layer-panel></layer-panel>
+                </core-collapse>
+
+                <core-collapse id="collapse6">
+                    <server-browser-element></server-browser-element>
+                </core-collapse>
+            </div>
+
+
+            <!-- DISPLAY -->
+            <div class="darkpanel">
+                <div layout horizontal center class="smallroundbutton">
+                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse3}}"></paper-icon-button>
+                    <span class="textlabel">Display</span>
+                </div>
+
+                <core-collapse id="collapse3" duration="0.10">
+                    <display-panel></display-panel>
+                </core-collapse>
+            </div>
+
+
+            <!-- DATA -->
+            <div class="darkpanel">
+                <div layout horizontal center class="smallroundbutton">
+                    <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse4}}"></paper-icon-button>
+                    <span class="textlabel">Data</span>
+                </div>
+
+                <core-collapse id="collapse4" duration="0.10">
+                    <info-panel></info-panel>
+                </core-collapse>
+            </div>
+
+    </div>
+
         </core-collapse>
 
 

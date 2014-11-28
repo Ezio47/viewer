@@ -4,10 +4,10 @@ library hub;
 import 'dart:core';
 import 'dart:html';
 import 'elements/render_element.dart';
-import 'elements/settings_element.dart';
 import 'elements/status_element.dart';
 import 'elements/info_panel.dart';
 import 'elements/display_panel.dart';
+import 'elements/layer_panel.dart';
 import 'renderer.dart';
 import 'renderable_point_cloud_set.dart';
 import 'point_cloud.dart';
@@ -17,12 +17,12 @@ import 'proxy.dart';
 class Hub {
     // the big, public, singleton components
     RenderElement renderUI;
-    SettingsElement settingsUI;
     StatusElement statusUI;
     Element canvas;
     Renderer renderer;
     InfoPanel infoPanel;
     DisplayPanel displayPanel;
+    LayerPanel layerPanel;
 
     // private - the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -56,7 +56,7 @@ class Hub {
     }
 
     void doAddFile(FileProxy file) {
-        settingsUI.doAddFile(file.name, file.fullpath);
+        layerPanel.doAddFile(file.name, file.fullpath);
 
         PointCloud pointCloud = file.create();
 
@@ -75,7 +75,7 @@ class Hub {
 
 
     void doRemoveFile(String fullpath) {
-        settingsUI.doRemoveFile(fullpath);
+        layerPanel.doRemoveFile(fullpath);
 
         renderablePointCloudSet.removeCloud(fullpath);
 
