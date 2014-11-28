@@ -13,6 +13,7 @@ import 'renderer.dart';
 import 'renderable_point_cloud_set.dart';
 import 'event_registry.dart';
 import 'command_registry.dart';
+import 'proxy.dart';
 
 
 class Hub {
@@ -31,6 +32,9 @@ class Hub {
 
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
+
+    // the server we're currently connected to
+    Proxy proxy;
 
     // singleton
     static Hub _root;

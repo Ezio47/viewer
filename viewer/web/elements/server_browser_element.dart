@@ -22,7 +22,7 @@ class ServerBrowserElement extends PolymerElement {
     @observable bool isSelectionEnabled = true;
 
     @published ObservableList<_ProxyItem> items = new ObservableList();
-    Proxy _proxy = null;
+
     Proxy _currentItem = null;
 
 
@@ -43,8 +43,22 @@ class ServerBrowserElement extends PolymerElement {
         super.detached();
     }
 
+    void openPanel() {
+        var e = _hub.mainWindow.$["collapse6"];
+        assert(e != null);
+        e.toggle();
+
+        if (_hub.proxy != null) {
+            // This is a special case: only happens when using a boot script.
+            // WHen this happens, we need to prime the items list, as would
+            // normally be done in `this.doOpenServer`.
+            _loadItemsFromProxy();
+            isServerOpen = true;
+        }
+    }
+
     void _closePanel() {
-        var e = Hub.root.mainWindow.$["collapse6"];
+        var e = _hub.mainWindow.$["collapse6"];
         assert(e != null);
         e.toggle();
     }
@@ -52,8 +66,7 @@ class ServerBrowserElement extends PolymerElement {
     void doCloseServer(Event e, var detail, Node target) {
         _server = null;
 
-        _hub.commandRegistry.doCloseServer(_proxy);
-        _proxy = null;
+        _hub.commandRegistry.doCloseServer();
 
         items.clear();
 
@@ -73,9 +86,9 @@ class ServerBrowserElement extends PolymerElement {
         if (!_server.endsWith("/"))
             _server += "/";
 
-        _proxy = _hub.commandRegistry.doOpenServer(_server);
+        _hub.commandRegistry.doOpenServer(_server);
 
-        _loadItems();
+        _loadItemsFromProxy();
 
         isServerOpen = true;
     }
@@ -91,12 +104,15 @@ class ServerBrowserElement extends PolymerElement {
         _closePanel();
     }
 
-    void _loadItems() {
+    void _loadItemsFromProxy() {
         items.clear();
 
-        if (_proxy is! ServerProxy) items.add(new _ProxyItem("..", null, -1));
+        if (_hub.proxy is! ServerProxy) {
+            // add a fake-out item, representing the parent proxy
+            items.add(new _ProxyItem("..", _hub.proxy.parent, -1));
+        }
 
-        for (var s in _proxy.sources) {
+        for (var s in _hub.proxy.sources) {
             int numPoints = (s is FileProxy) ? (s as FileProxy).numPoints : -1;
             items.add(new _ProxyItem(s.name, s, numPoints));
         }
@@ -110,18 +126,13 @@ class ServerBrowserElement extends PolymerElement {
 
         isFileSelected = false;
 
-        if (item.name == "..") {
-            _proxy = _proxy.parent;
-            _loadItems();
-
-        } else if (source is FileProxy) {
-            //window.alert(item.name);
+        if (source is FileProxy) {
             isFileSelected = true;
 
-        } else if (source is DirectoryProxy) {
-            _proxy = source;
-            _proxy.load();
-            _loadItems();
+        } else if (source is DirectoryProxy || source is ServerProxy) {
+            _hub.proxy = source;
+            _hub.proxy.load();
+            _loadItemsFromProxy();
 
         } else {
             assert(false);

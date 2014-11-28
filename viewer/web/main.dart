@@ -24,8 +24,8 @@ void boot1()
 {
     Hub hub = Hub.root;
 
-    Proxy proxy = hub.commandRegistry.doOpenServer("http://www.example.com/");
-    List<Proxy> list = proxy.sources;
+    hub.commandRegistry.doOpenServer("http://www.example.com/");
+    List<Proxy> list = hub.proxy.sources;
     Proxy file1 = list.firstWhere((e) => e.name == "terrain1.dat");
     assert(file1 != null);
     Proxy file2 = list.firstWhere((e) => e.name == "terrain2.dat");

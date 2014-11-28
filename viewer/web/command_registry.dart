@@ -13,16 +13,16 @@ class CommandRegistry {
         _hub = Hub.root;
     }
 
-    ServerProxy doOpenServer(String server) {
-        ServerProxy proxy = new ServerProxy(server);
-        proxy.load();
-        return proxy;
+    void doOpenServer(String server) {
+        _hub.proxy = new ServerProxy(server);
+        _hub.proxy.load();
     }
 
-    void doCloseServer(Proxy proxy) {
+    void doCloseServer() {
         if (proxy != null)
         {
-            proxy.close();
+            _hub.proxy.close();
+            _hub.proxy = null;
         }
     }
 

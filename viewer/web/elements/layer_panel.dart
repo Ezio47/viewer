@@ -45,9 +45,8 @@ class LayerPanel extends PolymerElement {
     }
 
     void openFile(Event e, var detail, Node target) {
-        var e = Hub.root.mainWindow.$["collapse6"];
-        assert(e != null);
-        e.toggle();
+        // kludge so we can set isServerOpen correctly when using a bootscript
+        _hub.serverBrowserElement.openPanel();
     }
 
     void toggleFile(Event e, var detail, Node target) {
