@@ -26,82 +26,10 @@
 
     <template>
         <style>
-            :host {
-            }
-            paper-dialog {
-            }
-            hr {
-                width:95%;
-            }
-            .padded {
-                padding: 4px;
-            }
-            .pad10 {
-                padding: 10px;
-            }
-            .padright {
-                margin: 0px 5px 0px 0px;
-            }
-            .selectedlistitem {
-                background: silver;
-            }
-            .marginned {
-                margin: 2px;
-                padding: 2px;
-                border-style: solid;
-                border-width: 1px;
-                border-color: grey;
-            }
-
-            .regularroundbutton  paper-icon-button /deep/ core-icon[role=img] {
-
-            }
-            .regularroundbutton paper-icon-button {
-                background: #404040;
-                opacity: 0.85;
-                stroke: #c0c0c0;
-                margin: 1px;
-                border-radius: 50%;
-            }
-
-            .smallroundbutton paper-icon-button /deep/ core-icon[role=img] {
-                height: 16px;
-                width: 16px;
-            }
-            .smallroundbutton paper-icon-button {
-                height: 16px;
-                width: 16px;
-                background: #404040;
-                opacity: 0.85;
-                stroke: #c0c0c0;
-                margin: 1px;
-                border-radius: 50%;
-            }
-
-            .regularsquarebutton  paper-icon-button /deep/ core-icon[role=img] {
-                height: 24px;
-                width: 24px;
-            }
-            .regularsquarebutton paper-icon-button {
-                height: 24px;
-                width: 24px;
-                background: #404040;
-                opacity: 0.85;
-                color: #c0c0c0;
-                margin: 1px;
-                border-radius: 4px;
-            }
-           .darkpanel {
-                opacity: 0.95;
-                background: #202020;
-                padding: 2px;
-                border-radius: 4px;
-                border-style: solid;
-                border-width: 1px;
-                border-color: #404040;
-                margin: 2px;
-            }
-            .lightpanel {
+            /*
+             * inherited styles
+             */
+            .light-panel-style {
                 opacity: 0.95;
                 background: #404040;
                 padding: 2px;
@@ -111,45 +39,39 @@
                 border-color: #606060;
                 margin: 2px;
             }
-            .textlabel {
-                color: #b0b0b0;
+            .pad2 {
+                padding: 2px;
             }
-            td {
-                padding: 0px 10px 0px 0px;
+
+            /****/
+            .padright {
+                margin: 0px 5px 0px 0px;
             }
         </style>
 
+        <div class="light-panel-style">
 
-
-
-
-
-                    <div class="lightpanel">
-
-                          <form action="" style="padding:2px;">
-                            <div>
-                                <label>
-                                    <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
-                                    <span>Toggle axes</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label>
-                                    <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
-                                    <span>Toggle bbox</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label>
-                                    <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
-                                    <span>None</span>
-                                </label>
-                            </div>
-                          </form>
-                    </div>
-
-
-
+            <form action="" class="pad2">
+                <div>
+                    <label>
+                        <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
+                        <span>Toggle axes</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
+                        <span>Toggle bbox</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
+                        <span>None</span>
+                    </label>
+                </div>
+            </form>
+        </div>
 
     </template>
 

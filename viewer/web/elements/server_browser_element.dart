@@ -21,7 +21,7 @@ class ServerBrowserElement extends PolymerElement {
     @observable var selectedItem;
     @observable bool isSelectionEnabled = true;
 
-    @published ObservableList<Item> items = new ObservableList();
+    @published ObservableList<_ProxyItem> items = new ObservableList();
     Proxy _proxy = null;
     Proxy _currentItem = null;
 
@@ -97,18 +97,16 @@ class ServerBrowserElement extends PolymerElement {
     void loadItems() {
         items.clear();
 
-        if (_proxy is! ServerProxy) items.add(new Item("..", null, -1));
+        if (_proxy is! ServerProxy) items.add(new _ProxyItem("..", null, -1));
 
         for (var s in _proxy.sources) {
             int numPoints = (s is FileProxy) ? (s as FileProxy).numPoints : -1;
-            items.add(new Item(s.name, s, numPoints));
+            items.add(new _ProxyItem(s.name, s, numPoints));
         }
     }
 
-    void openItem(Event e, var detail, Node target) {  }
-
     void doSelectionMade(CustomEvent e) {
-        var item = e.detail.data as Item;
+        var item = e.detail.data as _ProxyItem;
         assert(item != null);
         var source = item.source;
         _currentItem = source;
@@ -131,16 +129,15 @@ class ServerBrowserElement extends PolymerElement {
         } else {
             assert(false);
         }
-
     }
 }
 
 
-class Item extends Observable {
-    Item(this.name, this.source, this.numPoints);
+class _ProxyItem extends Observable {
     @observable String name;
     Proxy source;
     @observable int numPoints;
     @observable String get size { return Utils.toSI(numPoints); }
-}
 
+    _ProxyItem(this.name, this.source, this.numPoints);
+}
