@@ -3,12 +3,11 @@ description: The Rialto Point Cloud Viewer
 dependencies:
   browser: any
   core_elements: any
+  http: any
   paper_elements: any
   polymer: any
   three:
-    git:
-      ref: 
-      url: https://github.com/threedart/three.dart
+    git: https://github.com/threedart/three.dart
   vector_math: any
 transformers:
 - polymer

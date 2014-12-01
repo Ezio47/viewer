@@ -2,6 +2,7 @@ library proxy;
 
 import 'dart:core';
 import 'dart:convert';
+import 'dart:async';
 import 'comms.dart';
 import 'point_cloud_generator.dart';
 import 'point_cloud.dart';
@@ -90,17 +91,39 @@ class ServerProxy extends Proxy {
     Comms _comms;
 
     ServerProxy(String server) : super(server, null) {
-        if (server != "http://www.example.com/") throw new Error();
+        if (!server.endsWith("/")) server += "/";
         assert(server.endsWith("/"));
 
-        _comms = new FauxComms(server);
+        if (server == "http://www.example.com/") {
+            _comms = new FauxComms(server);
+        } else if (server == "http://localhost:12345/") {
+            _comms = new HttpComms(server);
+        } else {
+            throw new Error();
+        }
+
         _comms.open();
     }
 
-    @override void load() {
-        String json = comms.read(fullpath);
-        var data = JSON.decode(json);
-        sources = _parseString(data);
+    Future<PointCloud> create() {
+        loaded = false;
+        var c = (comms as HttpComms).read2(fullpath).then((s) {
+            var data = JSON.decode(s);
+            print(data);
+            PointCloud cloud = PointCloudGenerator.fromString(data);
+            return cloud;
+        });
+        return c;
+    }
+
+    bool loaded;
+    @override
+    void load() {
+        if (comms is! HttpComms) {
+            String json = comms.read(fullpath);
+            var data = JSON.decode(json);
+            sources = _parseString(data);
+        }
     }
 
     Comms get comms => _comms;

@@ -1,6 +1,7 @@
 library command_registry;
 
 import 'dart:core';
+import 'dart:async';
 import 'hub.dart';
 import 'point_cloud.dart';
 import 'proxy.dart';
@@ -47,6 +48,25 @@ class CommandRegistry {
         _hub.infoPanel.minz = _hub.renderablePointCloudSet.min.z;
         _hub.infoPanel.maxz = _hub.renderablePointCloudSet.max.z;
         _hub.infoPanel.numPoints = _hub.renderablePointCloudSet.numPoints;
+    }
+    void doAddFileX(ServerProxy file) {
+        _hub.layerPanel.doAddFile(file.name, file.fullpath);
+
+        Future<PointCloud> pointCloud = file.create();
+
+        pointCloud.then((pc) {
+            _hub.renderablePointCloudSet.addCloud(pc);
+
+            _hub.renderer.update();
+
+            _hub.infoPanel.minx = _hub.renderablePointCloudSet.min.x;
+            _hub.infoPanel.maxx = _hub.renderablePointCloudSet.max.x;
+            _hub.infoPanel.miny = _hub.renderablePointCloudSet.min.y;
+            _hub.infoPanel.maxy = _hub.renderablePointCloudSet.max.y;
+            _hub.infoPanel.minz = _hub.renderablePointCloudSet.min.z;
+            _hub.infoPanel.maxz = _hub.renderablePointCloudSet.max.z;
+            _hub.infoPanel.numPoints = _hub.renderablePointCloudSet.numPoints;
+        });
     }
 
     void doRemoveFile(String fullpath) {

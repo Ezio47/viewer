@@ -15,6 +15,36 @@ import 'rialto_exceptions.dart';
 
 class PointCloudGenerator {
 
+    static PointCloud fromString(List<List<String>> data)
+    {
+        Map<String, Float32List> map = new Map();
+
+        var numPoints = data.length;
+
+        var positionsX = new Float32List(numPoints);
+        var positionsY = new Float32List(numPoints);
+        var positionsZ = new Float32List(numPoints);
+        map["positions.x"] = positionsX;
+        map["positions.y"] = positionsY;
+        map["positions.z"] = positionsZ;
+
+        int i=0;
+        for (var p in data) {
+            int x = p[0] as int;
+            int y = p[1] as int;
+            int z = p[2] as int;
+            positionsX[i] = x.toDouble();
+            positionsY[i] = y.toDouble();
+            positionsZ[i] = z.toDouble();
+            ++i;
+        }
+
+        var cloud = new PointCloud("fromfile","generatedfromfile");
+        cloud.createDimensions(map);
+
+        return cloud;
+    }
+
     static PointCloud generate(String name, String fullname) {
         switch (name) {
             case "line.dat":

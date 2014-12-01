@@ -1,9 +1,14 @@
 library comms;
 
 import 'dart:core';
-import 'dart:convert';
-import "proxy.dart";
 
+import 'dart:convert';
+import 'dart:async';
+
+import 'package:http/browser_client.dart' as bhttp;
+import 'package:http/http.dart' as http;
+
+import "proxy.dart";
 
 // root = new PointCloudServer("http://faux");
 // root.load(); // reads "/", now "list" is available
@@ -22,6 +27,57 @@ abstract class Comms {
     void open();
     void close();
     String read(String path);
+}
+
+class HttpComms extends Comms {
+    http.Client _client;
+
+    HttpComms(String server) : super(server);
+
+    @override
+    void open() {
+         _client = new bhttp.BrowserClient();
+    }
+
+    @override
+    void close() {
+        _client.close();
+    }
+
+    String myresult;
+
+    void errf(Object o)
+    {
+        return;
+    }
+
+    @override
+    String read(String path) {
+        assert(false);
+        return null;
+    }
+
+    Future<String> read2(String path) {
+        path = "points/foobarbaz";
+
+        String s = '${server}${path}';
+
+        var f = _client.get(s).then((r) {
+            print(r.runtimeType);
+            print(r.body);
+            //List<List<double>> list = [[1.0,1.0,1.0], [4.0,4.0,4.0], [16.0,16.0,16.0]];
+            //myresult = JSON.encode(list);
+            //return myresult;
+            return r.body;
+        }).catchError(errf);
+
+        return f;
+    }
+
+    static void test() {
+        var root = new ServerProxy("http://localhost:12345");
+        root.create();
+    }
 }
 
 
