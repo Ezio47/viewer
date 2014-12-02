@@ -30,6 +30,15 @@ class ProxyFileSystem {
         });
     }
 
+    ProxyItem get(String path) {
+        var fullpath = "${fsPath}/${path}";
+
+        if (!items.containsKey(fullpath))
+            return null;
+
+        return items[fullpath];
+    }
+
     void _add(String path) {
         if (items.containsKey([path])) {
             // race condition...

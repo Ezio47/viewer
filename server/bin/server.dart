@@ -1,24 +1,51 @@
-import 'dart:core';
 import 'dart:async';
-import 'package:watcher/watcher.dart';
-import 'proxy.dart';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
-//import 'package:shelf_route/shelf_route.dart';
 import 'package:shelf_route/shelf_route.dart' as r;
 import 'package:shelf_exception_response/exception_response.dart';
-import 'dart:convert';
+import 'package:watcher/watcher.dart';
+
+import 'proxy.dart';
+
 
 DirectoryWatcher watcher;
+ProxyFileSystem fileSystem;
+
 
 void main() {
+    var srcDir = "/Users/mgerlek/work/data";
 
+    buildFileSystem(srcDir);
+
+    // BUG: a file could be added between the initial crawl and the watching becoming ready
+
+    runWatcher(srcDir);
+
+    runServer();
+}
+
+
+void buildFileSystem(String srcDir) {
+    fileSystem = new ProxyFileSystem.build(srcDir);
+    fileSystem.dump();
+}
+
+
+void runWatcher(String srcDir) {
+    watcher = new DirectoryWatcher(srcDir);
+    watcher.events.listen(fileSystem.handleWatchEvent);
+}
+
+
+void runServer() {
     var router = r.router()
             ..get('/', (_) => new Response.notFound(null), middleware: logRequests())
-            ..get('/points/{+file}', getPoints, middleware: logRequests())
-            ..get('/file/{+file}', getFile, middleware: logRequests());
+            ..get('/points/{+file}', _getPoints, middleware: logRequests())
+            ..get('/file', _getFile, middleware: logRequests())
+            ..get('/file/{+file}', _getFile, middleware: logRequests());
 
     var handler =
             const Pipeline().addMiddleware(logRequests()).addMiddleware(exceptionResponse()).addHandler(router.handler);
@@ -30,67 +57,62 @@ void main() {
     });
 }
 
-Response getPoints(dynamic request) {
-    var a = "Content-Type";
-    var b = "application/json";
-    var m = {
-        a: b,
-        "Access-Control-Allow-Origin": "*, ",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-    };
-    //var s = "Contents of ${r.getPathParameter(request, 'file')}";
-    //var ms = [[0, 0, 0], [1, 1, 1], [2, 2, 2], [4, 4, 4], [16, 16, 16], [64, 64, 64]];
-    //var s = JSON.encode(ms);
+String normalize(Request request) {
+    assert(request.scriptName.startsWith("/file"));
+    var path = request.scriptName.substring("/file".length);
+    if (path.isEmpty) path = "/";
 
-    var r;
-    var d = new File('/Users/mgerlek/work/data/data.txt').readAsStringSync();
-    //var j = JSON.encode(d);
-    r = new Response.ok(d, headers: m);
-    return r;
+    assert(path.startsWith("/"));
+    path = path.substring(1);
+    return path;
 }
 
 
-Response getFile(dynamic request) {
-    var a = "Content-Type";
-    var b = "application/json";
-    var m = {
-        a: b
-    };
-    //var s = "Contents of ${r.getPathParameter(request, 'file')}";
-    var ms = {
-        "a": "alpha",
-        "b": "beta"
-    };
-    var s = JSON.encode(ms);
-    return new Response.ok(s, headers: m);
+var headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*, ",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+};
+
+
+Future<Response> _getPoints(dynamic request) {
+    final String path = normalize(request);
+    print("==> $path");
+
+    var fdata = new File('/Users/mgerlek/work/data/data.txt').readAsString();
+    var resp = fdata.then((data) => new Response.ok(data, headers: headers));
+    return resp;
 }
 
 
+Response _getFile(dynamic request) {
+    final String path = normalize(request);
+    print("==> $path");
 
-void runWatcher(String srcDir) {
-    final String testfile = srcDir + "/foo";
-
-    if (FileSystemEntity.isFileSync(testfile)) {
-        new File(testfile).deleteSync(recursive: false);
-        sleep(new Duration(seconds: 1));
+    var map = makeMapFromProxy(path);
+    if (map == null) {
+        return new Response.notFound(null);
     }
-    assert(FileSystemEntity.isFileSync(testfile) == false);
+    var jdata = JSON.encode(map);
+    return new Response.ok(jdata, headers: headers);
+}
 
-    var fs = new ProxyFileSystem.build(srcDir);
-    fs.dump();
 
-    // BUG: a file could be added between the initial crawl and the watching becoming ready
+Map<String,String> makeMapFromProxy(String path) {
+    var map = new Map<String,String>();
 
-    watcher = new DirectoryWatcher(srcDir);
+    ProxyItem proxy = fileSystem.get(path);
+    if (proxy == null) return null;
 
-    watcher.events.listen(fs.handleWatchEvent);
+    if (proxy is DirectoryProxy) {
+        map["children"] = proxy.children.length.toString();
+    } else if (proxy is FileProxy) {
+        map["size"] = proxy.size.toString();
+    } else {
+        // error
+        return null;
+    }
 
-    watcher.ready.then((onValue) {
-        new File(testfile).createSync(recursive: false);
-        print("*3");
-        fs.dump();
-    });
-
-    print("*4");
+    return map;
 }
