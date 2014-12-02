@@ -44,7 +44,7 @@ Response getPoints(dynamic request) {
     //var s = JSON.encode(ms);
 
     var r;
-    var d = new File('/Users/mgerlek/data.txt').readAsStringSync();
+    var d = new File('/Users/mgerlek/work/data/data.txt').readAsStringSync();
     //var j = JSON.encode(d);
     r = new Response.ok(d, headers: m);
     return r;

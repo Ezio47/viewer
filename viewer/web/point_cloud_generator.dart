@@ -21,9 +21,16 @@ class PointCloudGenerator {
 
         data = data.trim();
         //print("** $data * ${data.length}");
-        List<String> data2 = data.split(new RegExp(r"\s"));
+        List<String> data2 = data.split("\n");
         //print("** $data2 ** ${data2.length}");
-        List<double> ds = data2.map((s) { s = s.trim(); /*print("== $s");*/ return double.parse(s); }).toList();
+        List<double> ds = new List<double>();
+        for (var d3 in data2) {
+            var t = d3.split(" ");
+            var tt = t.map((s) => double.parse(s));
+            ds.addAll(tt);
+        }
+
+        //List<double> ds = data2.map((s) { s = s.trim(); /*print("== $s");*/ return double.parse(s); }).toList();
         //print("** $ds *** ${ds.length}");
 
         int numPoints = ds.length ~/ 3;
