@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:async';
 import 'package:watcher/watcher.dart';
 import 'proxy.dart';
 import 'dart:io';
@@ -39,9 +40,14 @@ Response getPoints(dynamic request) {
         "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
     };
     //var s = "Contents of ${r.getPathParameter(request, 'file')}";
-    var ms = [[0, 0, 0], [1, 1, 1], [2, 2, 2], [4, 4, 4], [16, 16, 16], [64, 64, 64]];
-    var s = JSON.encode(ms);
-    return new Response.ok(s, headers: m);
+    //var ms = [[0, 0, 0], [1, 1, 1], [2, 2, 2], [4, 4, 4], [16, 16, 16], [64, 64, 64]];
+    //var s = JSON.encode(ms);
+
+    var r;
+    var d = new File('/Users/mgerlek/data.txt').readAsStringSync();
+    //var j = JSON.encode(d);
+    r = new Response.ok(d, headers: m);
+    return r;
 }
 
 

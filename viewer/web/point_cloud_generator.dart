@@ -15,11 +15,18 @@ import 'rialto_exceptions.dart';
 
 class PointCloudGenerator {
 
-    static PointCloud fromString(List<List<String>> data)
+    static PointCloud fromString(String data)
     {
         Map<String, Float32List> map = new Map();
 
-        var numPoints = data.length;
+        data = data.trim();
+        //print("** $data * ${data.length}");
+        List<String> data2 = data.split(new RegExp(r"\s"));
+        //print("** $data2 ** ${data2.length}");
+        List<double> ds = data2.map((s) { s = s.trim(); /*print("== $s");*/ return double.parse(s); }).toList();
+        //print("** $ds *** ${ds.length}");
+
+        int numPoints = ds.length ~/ 3;
 
         var positionsX = new Float32List(numPoints);
         var positionsY = new Float32List(numPoints);
@@ -29,10 +36,10 @@ class PointCloudGenerator {
         map["positions.z"] = positionsZ;
 
         int i=0;
-        for (var p in data) {
-            int x = p[0] as int;
-            int y = p[1] as int;
-            int z = p[2] as int;
+        for (int di=0; di<ds.length; di+=3) {
+            var x = ds[di];
+            var y = ds[di+1];
+            var z = ds[di+2];
             positionsX[i] = x.toDouble();
             positionsY[i] = y.toDouble();
             positionsZ[i] = z.toDouble();

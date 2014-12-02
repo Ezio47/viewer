@@ -63,8 +63,8 @@ class HttpComms extends Comms {
         String s = '${server}${path}';
 
         var f = _client.get(s).then((r) {
-            print(r.runtimeType);
-            print(r.body);
+            //print(r.runtimeType);
+            //print(r.body);
             //List<List<double>> list = [[1.0,1.0,1.0], [4.0,4.0,4.0], [16.0,16.0,16.0]];
             //myresult = JSON.encode(list);
             //return myresult;

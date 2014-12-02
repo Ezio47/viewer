@@ -108,9 +108,9 @@ class ServerProxy extends Proxy {
     Future<PointCloud> create() {
         loaded = false;
         var c = (comms as HttpComms).read2(fullpath).then((s) {
-            var data = JSON.decode(s);
-            print(data);
-            PointCloud cloud = PointCloudGenerator.fromString(data);
+            //var data = JSON.decode(s);
+            //print(s);
+            PointCloud cloud = PointCloudGenerator.fromString(s);
             return cloud;
         });
         return c;
