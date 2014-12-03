@@ -24,7 +24,7 @@ class ServerBrowserElement extends PolymerElement {
     @published ObservableList<_ProxyItem> items = new ObservableList();
 
     ProxyItem _currentItem = null;
-
+    DirectoryProxy _currentDir = null;
 
     ServerBrowserElement.created() : super.created();
 
@@ -35,7 +35,7 @@ class ServerBrowserElement extends PolymerElement {
 
     @override
     void ready() {
-       _hub.serverBrowserElement = this;
+        _hub.serverBrowserElement = this;
     }
 
     @override
@@ -52,6 +52,7 @@ class ServerBrowserElement extends PolymerElement {
             // This is a special case: only happens when using a boot script.
             // WHen this happens, we need to prime the items list, as would
             // normally be done in `this.doOpenServer`.
+            _currentDir = _hub.proxy.root;
             _loadItemsFromProxy();
             isServerOpen = true;
         }
@@ -78,19 +79,18 @@ class ServerBrowserElement extends PolymerElement {
         InputElement t = $["servername"];
         assert(t != null);
 
-        if (t.value == null || t.value.isEmpty)
+        if (t.value == null || t.value.isEmpty) {
             _server = t.placeholder;
-        else
+        } else {
             _server = t.value;
+        }
+        if (!_server.endsWith("/")) _server += "/";
 
-        if (!_server.endsWith("/"))
-            _server += "/";
-
-        _hub.commandRegistry.doOpenServer(_server);
-
-        _loadItemsFromProxy();
-
-        isServerOpen = true;
+        _hub.commandRegistry.doOpenServer(_server).then((_) {
+            _currentDir = _hub.proxy.root;
+            _loadItemsFromProxy();
+            isServerOpen = true;
+        });
     }
 
     void doCancel(Event e, var detail, Node target) {
@@ -105,15 +105,22 @@ class ServerBrowserElement extends PolymerElement {
     }
 
     void _loadItemsFromProxy() {
+        assert(_currentDir != null);
+
         items.clear();
 
-        if (_currentItem != _hub.proxy.root) {
+        if (_currentDir != _hub.proxy.root) {
             // add a fake-out item, representing the parent proxy
-            items.add(new _ProxyItem("..", null, -1));
+            items.add(new _ProxyItem("..", _currentDir.parent, -1));
         }
 
-        for (var s in _currentItem.children) {
-            int numPoints = (s is FileProxy) ? (s as FileProxy).map["size"] : -1;
+        for (var s in _currentDir.dirs) {
+            items.add(new _ProxyItem(s.name, s, -1));
+        }
+        for (var s in _currentDir.files) {
+            assert(s != null);
+            assert(s.map != null);
+            final int numPoints = s.map.containsKey("size") ? s.map["size"] : -1;
             items.add(new _ProxyItem(s.name, s, numPoints));
         }
     }
@@ -122,6 +129,7 @@ class ServerBrowserElement extends PolymerElement {
         var item = e.detail.data as _ProxyItem;
         assert(item != null);
         var source = item.source;
+        assert(source != null);
         _currentItem = source;
 
         isFileSelected = false;
@@ -130,6 +138,7 @@ class ServerBrowserElement extends PolymerElement {
             isFileSelected = true;
 
         } else if (source is DirectoryProxy) {
+            _currentDir = _currentItem;
             _loadItemsFromProxy();
 
         } else {
@@ -143,7 +152,9 @@ class _ProxyItem extends Observable {
     @observable String name;
     ProxyItem source;
     @observable int numPoints;
-    @observable String get size { return Utils.toSI(numPoints); }
+    @observable String get size {
+        return Utils.toSI(numPoints);
+    }
 
     _ProxyItem(this.name, this.source, this.numPoints);
 }

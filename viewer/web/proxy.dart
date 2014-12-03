@@ -52,10 +52,9 @@ class ProxyFileSystem {
 abstract class ProxyItem {
     ProxyFileSystem fileSystem;
     DirectoryProxy parent;
-    Map map;
+    Map map = new Map();
     String path;
     String name;
-    List<ProxyItem> children = new List<ProxyItem>();
 
     ProxyItem(ProxyFileSystem this.fileSystem, String this.path, DirectoryProxy this.parent) {
         name = "<${path}>"; // BUG
@@ -81,6 +80,8 @@ abstract class ProxyItem {
 
 
 class DirectoryProxy extends ProxyItem {
+    List<DirectoryProxy> dirs = new List<DirectoryProxy>();
+    List<FileProxy> files = new List<FileProxy>();
 
     DirectoryProxy(ProxyFileSystem fs, String path, DirectoryProxy parent) : super(fs, path, parent) {
         assert(path.startsWith("/"));
@@ -95,17 +96,18 @@ class DirectoryProxy extends ProxyItem {
         subdirs.forEach((subdir) {
             var proxy = new DirectoryProxy(fileSystem, subdir, this);
             proxy._load();
-            children.add(proxy);
+            dirs.add(proxy);
         });
     }
 
     void _loadFiles() {
-        List<String> files = map["files"];
-        if (files == null) return;
+        List<String> paths = map["files"];
+        if (paths == null) return;
 
-        files.forEach((file) {
-            var proxy = new FileProxy(fileSystem, file, this);
+        paths.forEach((path) {
+            var proxy = new FileProxy(fileSystem, path, this);
             proxy._load();
+            files.add(proxy);
         });
     }
 
@@ -128,7 +130,10 @@ class DirectoryProxy extends ProxyItem {
     void dump(int level) {
         var indent = "   " * level;
         print("D $indent =${path}=");
-        children.forEach((child) {
+        dirs.forEach((child) {
+            child.dump(level + 1);
+        });
+        files.forEach((child) {
             child.dump(level + 1);
         });
     }

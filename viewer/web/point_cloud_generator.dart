@@ -59,22 +59,22 @@ class PointCloudGenerator {
         return cloud;
     }
 
-    static PointCloud generate(String name, String fullname) {
-        switch (name) {
-            case "line.dat":
-                return makeLine(name, fullname);
-            case "newcube.dat":
-                return makeNewCube(name, fullname);
-            case "oldcube.dat":
-                return makeOldCube(name, fullname);
-            case "random.dat":
-                return makeRandom(name, fullname);
-            case "terrain1.dat":
-                return makeTerrain(1, name, fullname);
-            case "terrain2.dat":
-                return makeTerrain(2, name, fullname);
-            case "terrain3.dat":
-                return makeTerrain(3, name, fullname);
+    static PointCloud generate(String fullname, String displayname) {
+        switch (fullname) {
+            case "/dir2/line.dat":
+                return makeLine(fullname, displayname);
+            case "/newcube.dat":
+                return makeNewCube(fullname, displayname);
+            case "/oldcube.dat":
+                return makeOldCube(fullname, displayname);
+            case "/dir2/random.dat":
+                return makeRandom(fullname, displayname);
+            case "/terrain1.dat":
+                return makeTerrain(1, fullname, displayname);
+            case "/terrain2.dat":
+                return makeTerrain(2, fullname, displayname);
+            case "/terrain3.dat":
+                return makeTerrain(3, fullname, displayname);
         }
         throw new RialtoArgumentError("invalid file name");
     }

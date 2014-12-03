@@ -27,8 +27,8 @@ void boot2()
     Hub hub = Hub.root;
 
     hub.commandRegistry.doOpenServer("http://localhost:12345");
-    List<ProxyItem> list = hub.proxy.root.children;
-    ProxyItem file1 = list.firstWhere((e) => e.name == "data.txt");
+    List<FileProxy> list = hub.proxy.root.files;
+    FileProxy file1 = list.firstWhere((e) => e.name == "data.txt");
 
     hub.commandRegistry.doAddFile(file1);
 
@@ -40,10 +40,10 @@ void boot1()
     Hub hub = Hub.root;
 
     hub.commandRegistry.doOpenServer("http://www.example.com/").then((_) {
-        List<ProxyItem> list = hub.proxy.root.children;
-        ProxyItem file1 = list.firstWhere((e) => e.name == "terrain1.dat");
+        List<FileProxy> list = hub.proxy.root.files;
+        FileProxy file1 = list.firstWhere((e) => e.name == "</terrain1.dat>");
         assert(file1 != null);
-        ProxyItem file2 = list.firstWhere((e) => e.name == "terrain2.dat");
+        FileProxy file2 = list.firstWhere((e) => e.name == "</terrain2.dat>");
         assert(file2 != null);
 
         hub.commandRegistry.doAddFile(file1);

@@ -111,20 +111,14 @@ class FauxComms extends Comms {
                 map = {
                     "type": "directory",
                     "dirs": [],
-                    "files": [{
-                            "name": "/dir1/random.dat",
-                        }]
+                    "files": ["/dir1/random.dat"]
                 };
                 break;
             case "/dir2":
                 map = {
                     "type": "directory",
                     "dirs": [],
-                    "files": [{
-                            "name": "/dir2/line.dat",
-                            "dims": ["x", "y", "z"],
-                            "size": 222
-                        }]
+                    "files": ["/dir2/line.dat"]
                 };
                 break;
             case "/newcube.dat":
@@ -147,33 +141,44 @@ class FauxComms extends Comms {
     }
 
     static void test() {
-        var root = new ProxyFileSystem("http://www.example.com/").root;
-        for (var s in root.children) {
+        /*
+        DirectoryProxy root = new ProxyFileSystem("http://www.example.com/").root;
+        for (var s in root.dirs) {
             assert(s != null);
             if (s is FileProxy) {
                 (s as FileProxy).create();
             }
         }
-        if (root.children != null) for (var s in root.children) {
-            assert(s != null);
-            if (s.children != null) for (var t in s.children) {
-                assert(t != null);
-                if (t is FileProxy) {
-                    (t as FileProxy).create();
-                }
-            }
-        }
-        if (root.children != null) for (var s in root.children) {
-            assert(s != null);
-            if (s.children != null) for (var t in s.children) {
-                assert(t != null);
-                if (t.children != null) for (var u in t.children) {
-                    assert(u != null);
-                    if (u is FileProxy) {
-                        (u as FileProxy).create();
+        if (root.dirs != null) {
+            for (var s in root.dirs) {
+                assert(s != null);
+                if (s.children != null) {
+                    for (var t in s.children) {
+                        assert(t != null);
+                        if (t is FileProxy) {
+                            (t as FileProxy).create();
+                        }
                     }
                 }
             }
         }
+        if (root.files != null) {
+            for (var s in root.files) {
+                assert(s != null);
+                if (s.children != null) {
+                    for (var t in s.children) {
+                        assert(t != null);
+                        if (t.children != null) {
+                            for (var u in t.children) {
+                                assert(u != null);
+                                if (u is FileProxy) {
+                                    (u as FileProxy).create();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }*/
     }
 }
