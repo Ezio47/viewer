@@ -1,11 +1,19 @@
 library utils;
 
+import 'dart:async';
 import 'package:vector_math/vector_math.dart';
 import 'package:three/three.dart';
 import 'dart:math' as Math;
 
 
 class Utils {
+
+    static Future toFuture(dynamic v) {
+        Completer c = new Completer();
+        c.complete(v);
+        return c.future;
+    }
+
     static Vector3 vectorMin(Vector3 a, Vector3 b) {
         Vector3 c = new Vector3.zero();
         c.x = Math.min(a.x, b.x);

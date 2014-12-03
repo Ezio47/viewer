@@ -3,6 +3,7 @@ description: The Rialto Point Cloud Viewer
 dependencies:
   browser: any
   core_elements: any
+  crypto: any
   http: any
   paper_elements: any
   polymer: any

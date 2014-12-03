@@ -23,7 +23,7 @@ class ServerBrowserElement extends PolymerElement {
 
     @published ObservableList<_ProxyItem> items = new ObservableList();
 
-    Proxy _currentItem = null;
+    ProxyItem _currentItem = null;
 
 
     ServerBrowserElement.created() : super.created();
@@ -107,13 +107,13 @@ class ServerBrowserElement extends PolymerElement {
     void _loadItemsFromProxy() {
         items.clear();
 
-        if (_hub.proxy is! ServerProxy) {
+        if (_currentItem != _hub.proxy.root) {
             // add a fake-out item, representing the parent proxy
-            items.add(new _ProxyItem("..", _hub.proxy.parent, -1));
+            items.add(new _ProxyItem("..", null, -1));
         }
 
-        for (var s in _hub.proxy.sources) {
-            int numPoints = (s is FileProxy) ? (s as FileProxy).numPoints : -1;
+        for (var s in _currentItem.children) {
+            int numPoints = (s is FileProxy) ? (s as FileProxy).map["size"] : -1;
             items.add(new _ProxyItem(s.name, s, numPoints));
         }
     }
@@ -129,9 +129,7 @@ class ServerBrowserElement extends PolymerElement {
         if (source is FileProxy) {
             isFileSelected = true;
 
-        } else if (source is DirectoryProxy || source is ServerProxy) {
-            _hub.proxy = source;
-            _hub.proxy.load();
+        } else if (source is DirectoryProxy) {
             _loadItemsFromProxy();
 
         } else {
@@ -143,7 +141,7 @@ class ServerBrowserElement extends PolymerElement {
 
 class _ProxyItem extends Observable {
     @observable String name;
-    Proxy source;
+    ProxyItem source;
     @observable int numPoints;
     @observable String get size { return Utils.toSI(numPoints); }
 

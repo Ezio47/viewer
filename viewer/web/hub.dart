@@ -34,7 +34,7 @@ class Hub {
     RenderablePointCloudSet renderablePointCloudSet;
 
     // the server we're currently connected to
-    Proxy proxy;
+    ProxyFileSystem proxy;
 
     // singleton
     static Hub _root;

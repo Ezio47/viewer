@@ -1,22 +1,15 @@
 library comms;
 
-import 'dart:core';
-
 import 'dart:convert';
 import 'dart:async';
 
 import 'package:http/browser_client.dart' as bhttp;
 import 'package:http/http.dart' as http;
+import 'package:crypto/crypto.dart';
 
 import "proxy.dart";
+import "utils.dart";
 
-// root = new PointCloudServer("http://faux");
-// root.load(); // reads "/", now "list" is available
-// root.sources has PCD("dir1") and PCF("tst1.las")
-//
-// pcd-dir1.load()  // reads "dir1", list avail
-// pcd-dir1.sources now has PCF("2.las")
-//
 
 abstract class Comms {
     String server;
@@ -26,8 +19,10 @@ abstract class Comms {
 
     void open();
     void close();
-    String read(String path);
+    Future<String> readAsString(String path);
+    Future<List<int>> readAsBytes(String path);
 }
+
 
 class HttpComms extends Comms {
     http.Client _client;
@@ -36,7 +31,7 @@ class HttpComms extends Comms {
 
     @override
     void open() {
-         _client = new bhttp.BrowserClient();
+        _client = new bhttp.BrowserClient();
     }
 
     @override
@@ -44,39 +39,40 @@ class HttpComms extends Comms {
         _client.close();
     }
 
-    String myresult;
-
-    void errf(Object o)
+    void _errf(Object o) // BUG
     {
         return;
     }
 
     @override
-    String read(String path) {
-        assert(false);
-        return null;
-    }
-
-    Future<String> read2(String path) {
-        path = "points/foobarbaz";
+    Future<String> readAsString(String path) {
 
         String s = '${server}${path}';
 
-        var f = _client.get(s).then((r) {
+        var f = _client.get(s).then((response) {
             //print(r.runtimeType);
-            //print(r.body);
-            //List<List<double>> list = [[1.0,1.0,1.0], [4.0,4.0,4.0], [16.0,16.0,16.0]];
-            //myresult = JSON.encode(list);
-            //return myresult;
-            return r.body;
-        }).catchError(errf);
+            print(response.body);
+            return response.body;
+        }).catchError(_errf);
 
         return f;
     }
 
+    @override
+    Future<List<int>> readAsBytes(String path) {
+
+        String s = '${server}${path}';
+
+        var fbytes = _client.get(s).then((response) {
+            print(response.body);
+            return CryptoUtils.base64StringToBytes(response.body);
+        }).catchError(_errf);
+
+        return fbytes;
+    }
+
     static void test() {
-        var root = new ServerProxy("http://localhost:12345");
-        root.create();
+        var root = new ProxyFileSystem("http://localhost:12345");
     }
 }
 
@@ -94,87 +90,85 @@ class FauxComms extends Comms {
     }
 
     @override
-    String read(String path) {
+    Future<List<int>> readAsBytes(String path) {
+        throw new UnimplementedError();
+    }
+
+    @override
+    Future<String> readAsString(String path) {
         var map;
 
         switch (path) {
-            case "http://www.example.com/":
+            //case "http://www.example.com/":
+            case "/":
                 map = {
-                    "dirs": [{
-                            "name": "dir1/"
-                        }, {
-                            "name": "dir2/"
-                        }],
+                    "type": "directory",
+                    "dirs": ["/dir1", "/dir2"],
+                    "files": ["/newcube.dat", "/oldcube.dat", "/terrain1.dat", "/terrain2.dat", "/terrain3.dat"]
+                };
+                break;
+            case "/dir1":
+                map = {
+                    "type": "directory",
+                    "dirs": [],
                     "files": [{
-                            "name": "newcube.dat"
-                        }, {
-                            "name": "oldcube.dat"
-                        }, {
-                            "name": "terrain1.dat",
-                            "numpoints": 512*512
-                        }, {
-                            "name": "terrain2.dat",
-                            "numpoints": 512*512
-                        }, {
-                            "name": "terrain3.dat",
-                            "numpoints": 512*512
+                            "name": "/dir1/random.dat",
                         }]
                 };
                 break;
-            case "http://www.example.com/dir1/":
+            case "/dir2":
                 map = {
+                    "type": "directory",
                     "dirs": [],
                     "files": [{
-                            "name": "random.dat",
+                            "name": "/dir2/line.dat",
                             "dims": ["x", "y", "z"],
-                            "numpoints": 1111
+                            "size": 222
                         }]
                 };
                 break;
-            case "http://www.example.com/dir2/":
+            case "/newcube.dat":
+            case "/oldcube.dat":
+            case "/terrain1.dat":
+            case "/terrain2.dat":
+            case "/terrain3.dat":
+            case "/dir1/random.dat":
+            case "/dir2/line.dat":
                 map = {
-                    "dirs": [],
-                    "files": [{
-                            "name": "line.dat",
-                            "dims": ["x", "y", "z"],
-                            "numpoints": 222
-                        }]
+                    "dims": ["x", "y", "z"],
+                    "size": 1111
                 };
                 break;
             default:
                 throw new Error();
         }
 
-        return JSON.encode(map);
+        return Utils.toFuture(JSON.encode(map));
     }
 
     static void test() {
-        var root = new ServerProxy("http://www.example.com/");
-        root.load();
-        for (var s in root.sources) {
+        var root = new ProxyFileSystem("http://www.example.com/").root;
+        for (var s in root.children) {
             assert(s != null);
-            s.load();
             if (s is FileProxy) {
                 (s as FileProxy).create();
             }
         }
-        if (root.sources != null) for (var s in root.sources) {
+        if (root.children != null) for (var s in root.children) {
             assert(s != null);
-            if (s.sources != null) for (var t in s.sources) {
+            if (s.children != null) for (var t in s.children) {
                 assert(t != null);
-                t.load();
                 if (t is FileProxy) {
                     (t as FileProxy).create();
                 }
             }
         }
-        if (root.sources != null) for (var s in root.sources) {
+        if (root.children != null) for (var s in root.children) {
             assert(s != null);
-            if (s.sources != null) for (var t in s.sources) {
+            if (s.children != null) for (var t in s.children) {
                 assert(t != null);
-                if (t.sources != null) for (var u in t.sources) {
+                if (t.children != null) for (var u in t.children) {
                     assert(u != null);
-                    u.load();
                     if (u is FileProxy) {
                         (u as FileProxy).create();
                     }
