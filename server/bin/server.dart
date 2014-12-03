@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_route/shelf_route.dart' as r;
@@ -30,7 +30,7 @@ void main() {
 
 void buildFileSystem(String srcDir) {
     fileSystem = new ProxyFileSystem.build(srcDir);
-    fileSystem.dump();
+    //fileSystem.dump();
 }
 
 
@@ -57,13 +57,10 @@ void runServer() {
     });
 }
 
-String normalize(Request request) {
-    assert(request.scriptName.startsWith("/file"));
-    var path = request.scriptName.substring("/file".length);
+String normalize(Request request, String prefix) {
+    assert(request.scriptName.startsWith(prefix));
+    var path = request.scriptName.substring(prefix.length);
     if (path.isEmpty) path = "/";
-
-    assert(path.startsWith("/"));
-    path = path.substring(1);
     return path;
 }
 
@@ -76,21 +73,34 @@ var headers = {
 };
 
 
-Future<Response> _getPoints(dynamic request) {
-    final String path = normalize(request);
-    print("==> $path");
+Future toFuture(dynamic v) {
+    Completer c = new Completer();
+    c.complete(v);
+    return c.future;
+}
 
-    var fdata = new File('/Users/mgerlek/work/data/data.txt').readAsString();
-    var resp = fdata.then((data) => new Response.ok(data, headers: headers));
+
+Future<Response> _getPoints(dynamic request) {
+    final String webpath = normalize(request, "/points");
+    print("requesting points from: $webpath");
+
+    var proxy = fileSystem.getEntry(webpath);
+    if (proxy == null) return toFuture(new Response.notFound(null)); // error
+
+    if (proxy is! FileProxy) return toFuture(new Response.notFound(null));
+
+    var fbytes = proxy.file.readAsBytes();
+    var fbase64 = fbytes.then((bytes) => CryptoUtils.bytesToBase64(bytes, addLineSeparator: true));
+    var resp = fbase64.then((data) => new Response.ok(data, headers: headers));
     return resp;
 }
 
 
 Response _getFile(dynamic request) {
-    final String path = normalize(request);
-    print("==> $path");
+    final String webpath = normalize(request, "/file");
+    print("requesting file from: $webpath");
 
-    var map = makeMapFromProxy(path);
+    var map = makeMapFromProxy(webpath);
     if (map == null) {
         return new Response.notFound(null);
     }
@@ -99,16 +109,20 @@ Response _getFile(dynamic request) {
 }
 
 
-Map<String,String> makeMapFromProxy(String path) {
-    var map = new Map<String,String>();
+Map<String, dynamic> makeMapFromProxy(String webpath) {
+    var map = new Map<String, dynamic>();
 
-    ProxyItem proxy = fileSystem.get(path);
+    ProxyItem proxy = fileSystem.getEntry(webpath);
     if (proxy == null) return null;
 
+    map["id"] = webpath;
+
     if (proxy is DirectoryProxy) {
-        map["children"] = proxy.children.length.toString();
+        map["type"] = "directory";
+        map["children"] = proxy.children;
     } else if (proxy is FileProxy) {
-        map["size"] = proxy.size.toString();
+        map["type"] = "file";
+        map["size"] = proxy.size;
     } else {
         // error
         return null;

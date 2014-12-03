@@ -5,23 +5,20 @@ import 'package:path/path.dart' as path;
 
 
 class ProxyFileSystem {
-    Map<String, ProxyItem> items = new Map<String, ProxyItem>();
-    ProxyItem root;
-    String fsPath;
+    Map<String, ProxyItem> _map = new Map<String, ProxyItem>();
+    ProxyItem _root;
+    String _fspathRoot;
 
-    ProxyFileSystem.build(String path) : fsPath = path {
+    ProxyFileSystem.build(String fspath) : _fspathRoot = fspath {
 
-        var dir = new Directory(fsPath);
-        root = new DirectoryProxy(this, dir);
-        root.update();
+        _root = _add(fspath);
+        var dir = new Directory(fspath);
 
         dir.listSync(recursive: true, followLinks: false).forEach((FileSystemEntity entity) {
             if (entity is File) {
-                var proxy = new FileProxy(this, entity);
-                items[entity.path] = proxy;
+                _add(entity.path);
             } else if (entity is Directory) {
-                var proxy = new DirectoryProxy(this, entity);
-                items[entity.path] = proxy;
+                _add(entity.path);
             } else if (entity is Link) {
                 // do nothing
             } else {
@@ -30,59 +27,84 @@ class ProxyFileSystem {
         });
     }
 
-    ProxyItem get(String path) {
-        var fullpath = "${fsPath}/${path}";
-
-        if (!items.containsKey(fullpath))
-            return null;
-
-        return items[fullpath];
+    bool _isWebPath(String webpath) {
+        assert(webpath.startsWith(_fspathRoot) == false);
+        return (webpath[0] == "/");
     }
 
-    void _add(String path) {
-        if (items.containsKey([path])) {
+    String _toWebPath(String fspath) {
+        String webpath = "/" + path.relative(fspath, from: _fspathRoot);
+        if (webpath == "/.") webpath = "/";
+        return webpath;
+    }
+
+    void setEntry(ProxyItem item) {
+        assert(_isWebPath(item.webpath));
+        _map[item.webpath] = item;
+    }
+
+    void clearEntry(String webpath) {
+        assert(_isWebPath(webpath));
+        if (_map.containsKey(webpath)) _map.remove(webpath);
+    }
+
+    ProxyItem getEntry(String webpath) {
+        assert(_isWebPath(webpath));
+
+        if (!_map.containsKey(webpath)) return null;
+
+        return _map[webpath];
+    }
+
+    ProxyItem _add(String fspath) {
+        final String webpath = _toWebPath(fspath);
+        var proxy = getEntry(webpath);
+        if (proxy != null) {
             // race condition...
-            _update(path);
-            return;
+            _update(webpath);
+            return proxy;
         }
 
-        if (FileSystemEntity.isFileSync(path)) {
-            var file = new File(path);
+        if (FileSystemEntity.isFileSync(fspath)) {
+            var file = new File(fspath);
             var proxy = new FileProxy(this, file);
-            items[proxy.webpath] = proxy;
-            return;
+            setEntry(proxy);
+            return proxy;
         }
-        if (FileSystemEntity.isDirectorySync(path)) {
-            var dir = new Directory(path);
+        if (FileSystemEntity.isDirectorySync(fspath)) {
+            var dir = new Directory(fspath);
             var proxy = new DirectoryProxy(this, dir);
-            items[proxy.webpath] = proxy;
-            return;
+            setEntry(proxy);
+            return proxy;
         }
-        if (FileSystemEntity.isLinkSync(path)) {
+        if (FileSystemEntity.isLinkSync(fspath)) {
             // ignore
-            return;
+            return null;
         }
         throw new Exception("unknown file type");
     }
 
-    void _update(String path) {
-        if (!items.containsKey([path])) {
+    void _update(String fspath) {
+        final String webpath = _toWebPath(fspath);
+        var proxy = getEntry(webpath);
+
+        if (proxy == null) {
             // race condition...
-            _add(path);
+            _add(fspath);
             return;
         }
 
-        var proxy = items[path];
         proxy.update();
     }
 
-    void _remove(String path) {
-        if (!items.containsKey([path])) {
+    void _remove(String fspath) {
+        final String webpath = _toWebPath(fspath);
+        if (getEntry(webpath) == null) {
             // race condition...
             return;
         }
 
-        items.remove(path);
+        clearEntry(webpath);
     }
 
     void handleWatchEvent(WatchEvent e) {
@@ -106,18 +128,29 @@ class ProxyFileSystem {
     }
 
     void dump() {
-        root.dump(0);
+        _root.dump(0);
+    }
+
+    void mapdump() {
+        _map.forEach((k,v) {
+            print("** $k");
+            if (v is DirectoryProxy) {
+                v.children.forEach((c) => print("     $c"));
+            }
+        });
     }
 }
 
 
 abstract class ProxyItem {
-    FileSystemEntity entity;
-    ProxyFileSystem proxyFs;
+    FileSystemEntity _entity;
+    ProxyFileSystem _proxyFs;
     String _webpath;
 
-    ProxyItem(ProxyFileSystem this.proxyFs, FileSystemEntity this.entity) {
-        _webpath = path.relative(entity.path, from: proxyFs.fsPath);
+    ProxyItem(ProxyFileSystem proxyFs, FileSystemEntity entity)
+            : _entity = entity,
+              _proxyFs = proxyFs {
+        _webpath = proxyFs._toWebPath(entity.path);
     }
 
     void update();
@@ -133,12 +166,12 @@ abstract class ProxyItem {
 
 
 class DirectoryProxy extends ProxyItem {
-    var children = new List<String>();
-    Directory directory;
+    var children = new List<String>(); // uses webpaths
+    Directory _directory;
 
-    DirectoryProxy(ProxyFileSystem proxyFs, Directory aDirectory)
-            : super(proxyFs, aDirectory),
-              directory = aDirectory {
+    DirectoryProxy(ProxyFileSystem proxyFs, Directory directory)
+            : super(proxyFs, directory),
+              _directory = directory {
         update();
     }
 
@@ -146,11 +179,13 @@ class DirectoryProxy extends ProxyItem {
     void update() {
         children.clear();
 
-        directory.listSync(recursive: false, followLinks: false).forEach((FileSystemEntity entity) {
+        _directory.listSync(recursive: false, followLinks: false).forEach((FileSystemEntity entity) {
             if (entity is File) {
-                children.add(entity.path);
+                final String webpath = _proxyFs._toWebPath(entity.path);
+                children.add(webpath);
             } else if (entity is Directory) {
-                children.add(entity.path);
+                final String webpath = _proxyFs._toWebPath(entity.path);
+                children.add(webpath);
             } else if (entity is Link) {
                 // do nothing
             } else {
@@ -163,9 +198,9 @@ class DirectoryProxy extends ProxyItem {
     @override
     void dump(int level) {
         var indent = "   " * level;
-        print("D $indent $webpath");
+        print("D $indent =${webpath}=");
         children.forEach((e) {
-            var proxy = proxyFs.items[e];
+            var proxy = _proxyFs.getEntry(e);
             proxy.dump(level + 1);
         });
     }
@@ -173,18 +208,18 @@ class DirectoryProxy extends ProxyItem {
 
 
 class FileProxy extends ProxyItem {
-    File file;
+    File _file;
     int size;
 
-    FileProxy(ProxyFileSystem proxyFs, File aFile)
-            : super(proxyFs, aFile),
-              file = aFile {
+    FileProxy(ProxyFileSystem proxyFs, File file)
+            : super(proxyFs, file),
+              _file = file {
         update();
     }
 
     @override
     void update() {
-        size = file.statSync().size;
+        size = _file.statSync().size;
     }
 
     @override
@@ -192,4 +227,6 @@ class FileProxy extends ProxyItem {
         var indent = "   " * level;
         print("F $indent $webpath  ($size)");
     }
+
+    File get file => _file;
 }
