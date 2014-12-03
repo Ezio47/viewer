@@ -38,8 +38,9 @@ class RenderablePointCloudSet {
     }
 
     void removeCloud(String fullpath) {
-        renderablePointClouds.removeWhere((rpc) => rpc.pointCloud.longname == fullpath);
-
+        final int len = renderablePointClouds.length;
+        renderablePointClouds.removeWhere((rpc) => rpc.pointCloud.webpath == fullpath);
+        assert(renderablePointClouds.length == len - 1);
         _computeBounds();
     }
 

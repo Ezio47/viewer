@@ -82,27 +82,31 @@ Future toFuture(dynamic v) {
 
 Future<Response> _getPoints(dynamic request) {
     final String webpath = normalize(request, "/points");
-    print("requesting points from: $webpath");
+    // print("requesting points from: $webpath");
 
     var proxy = fileSystem.getEntry(webpath);
-    if (proxy == null) return toFuture(new Response.notFound(null)); // error
+    if (proxy == null) return toFuture(new Response.notFound(null, headers: headers)); // error
 
-    if (proxy is! FileProxy) return toFuture(new Response.notFound(null));
+    if (proxy is! FileProxy) return toFuture(new Response.notFound(null, headers: headers));
 
-    var fbytes = proxy.file.readAsBytes();
-    var fbase64 = fbytes.then((bytes) => CryptoUtils.bytesToBase64(bytes, addLineSeparator: true));
-    var resp = fbase64.then((data) => new Response.ok(data, headers: headers));
-    return resp;
+    var c = new Completer();
+    var fbytes = proxy.file.readAsBytes().then((intlist) {
+        String base64 = CryptoUtils.bytesToBase64(intlist, addLineSeparator: true);
+        var resp = new Response.ok(base64, headers: headers);
+        c.complete(resp);
+    });
+
+    return c.future;
 }
 
 
 Response _getFile(dynamic request) {
     final String webpath = normalize(request, "/file");
-    print("requesting file from: $webpath");
+    // print("requesting file from: $webpath");
 
     var map = makeMapFromProxy(webpath);
     if (map == null) {
-        return new Response.notFound(null);
+        return new Response.notFound(null, headers: headers);
     }
     var jdata = JSON.encode(map);
     return new Response.ok(jdata, headers: headers);
@@ -119,7 +123,19 @@ Map<String, dynamic> makeMapFromProxy(String webpath) {
 
     if (proxy is DirectoryProxy) {
         map["type"] = "directory";
-        map["children"] = proxy.children;
+        map["dirs"] = [];
+        map["files"] = [];
+        for (var childWebPath in proxy.children) {
+            ProxyItem childProxy = fileSystem.getEntry(childWebPath);
+            assert(childProxy != null);
+            if (childProxy is DirectoryProxy) {
+                map["dirs"].add(childWebPath);
+            } else if (childProxy is FileProxy) {
+                map["files"].add(childWebPath);
+            } else {
+                return null; // error
+            }
+        }
     } else if (proxy is FileProxy) {
         map["type"] = "file";
         map["size"] = proxy.size;

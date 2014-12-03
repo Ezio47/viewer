@@ -27,7 +27,10 @@ abstract class Comms {
 class HttpComms extends Comms {
     http.Client _client;
 
-    HttpComms(String server) : super(server);
+    HttpComms(String myserver) : super(myserver) {
+        if (server.endsWith("/"))
+            server = server.substring(0, server.length-1);
+    }
 
     @override
     void open() {
@@ -47,11 +50,11 @@ class HttpComms extends Comms {
     @override
     Future<String> readAsString(String path) {
 
-        String s = '${server}${path}';
+        String s = '${server}/file${path}';
 
         var f = _client.get(s).then((response) {
             //print(r.runtimeType);
-            print(response.body);
+            //print(response.body);
             return response.body;
         }).catchError(_errf);
 
@@ -61,10 +64,11 @@ class HttpComms extends Comms {
     @override
     Future<List<int>> readAsBytes(String path) {
 
-        String s = '${server}${path}';
+        String s = '${server}/points${path}';
 
         var fbytes = _client.get(s).then((response) {
-            print(response.body);
+            final cnt = Utils.toSI(response.body.length);
+            print("read $path: $cnt bytes");
             return CryptoUtils.base64StringToBytes(response.body);
         }).catchError(_errf);
 
@@ -138,47 +142,5 @@ class FauxComms extends Comms {
         }
 
         return Utils.toFuture(JSON.encode(map));
-    }
-
-    static void test() {
-        /*
-        DirectoryProxy root = new ProxyFileSystem("http://www.example.com/").root;
-        for (var s in root.dirs) {
-            assert(s != null);
-            if (s is FileProxy) {
-                (s as FileProxy).create();
-            }
-        }
-        if (root.dirs != null) {
-            for (var s in root.dirs) {
-                assert(s != null);
-                if (s.children != null) {
-                    for (var t in s.children) {
-                        assert(t != null);
-                        if (t is FileProxy) {
-                            (t as FileProxy).create();
-                        }
-                    }
-                }
-            }
-        }
-        if (root.files != null) {
-            for (var s in root.files) {
-                assert(s != null);
-                if (s.children != null) {
-                    for (var t in s.children) {
-                        assert(t != null);
-                        if (t.children != null) {
-                            for (var u in t.children) {
-                                assert(u != null);
-                                if (u is FileProxy) {
-                                    (u as FileProxy).create();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
     }
 }

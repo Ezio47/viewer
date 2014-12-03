@@ -34,13 +34,13 @@ class LayerPanel extends PolymerElement {
     }
 
 
-    void doAddFile(String name, String fullpath) {
-        files.add(new _LayerItem(name, fullpath));
+    void doAddFile(String webpath, String displayName) {
+        files.add(new _LayerItem(webpath, displayName));
         hasData = files.length > 0;
     }
 
-    void doRemoveFile(String fullpath) {
-        files.removeWhere((f) => f.fullpath == fullpath);
+    void doRemoveFile(String webpath) {
+        files.removeWhere((f) => f.webpath == webpath);
         hasData = files.length > 0;
     }
 
@@ -58,7 +58,7 @@ class LayerPanel extends PolymerElement {
     void deleteFile(Event e, var detail, Node target) {
         if (selection != null) {
             assert(selection is _LayerItem);
-            _hub.commandRegistry.doRemoveFile(selection.fullpath);
+            _hub.commandRegistry.doRemoveFile(selection.webpath);
         }
         return;
     }
@@ -68,11 +68,11 @@ class LayerPanel extends PolymerElement {
 
 
 class _LayerItem extends Observable {
-    @observable String name;
-    @observable String fullpath;
+    @observable String webpath;
+    @observable String displayName;
     @observable bool checked;
-    _LayerItem(this.name, this.fullpath) {
+    _LayerItem(this.webpath, this.displayName) {
         checked = true;
     }
-    String toString() => "<$name $checked>";
+    String toString() => "<$displayName $checked>";
 }

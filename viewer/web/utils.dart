@@ -42,24 +42,25 @@ class Utils {
         return dst;
     }
 
-    static String toSI(int v) {
-        const int K = 1000;
-        const int M = K * K;
-        const int G = K * K * K;
+    static String toSI(num vv, {sigfigs:0}) {
+        double v = vv.toDouble();
+        const double K = 1000.0;
+        const double M = K * K;
+        const double G = K * K * K;
 
         if (v >= G) {
-            v = v ~/ G;
-            return "${v}G";
+            v = v / G;
+            return "${v.toStringAsFixed(sigfigs)}G";
         }
 
         if (v >= M) {
-            v = v ~/ M;
-            return "${v}M";
+            v = v / M;
+            return "${v.toStringAsFixed(sigfigs)}M";
         }
 
         if (v >= K) {
-            v = v ~/ K;
-            return "${v}K";
+            v = v / K;
+            return "${v.toStringAsFixed(sigfigs)}K";
         }
 
         return "$v";

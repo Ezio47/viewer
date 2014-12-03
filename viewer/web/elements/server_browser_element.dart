@@ -23,6 +23,8 @@ class ServerBrowserElement extends PolymerElement {
 
     @published ObservableList<_ProxyItem> items = new ObservableList();
 
+    @observable String defaultServer;
+
     ProxyItem _currentItem = null;
     DirectoryProxy _currentDir = null;
 
@@ -44,6 +46,10 @@ class ServerBrowserElement extends PolymerElement {
     }
 
     void openPanel() {
+        if (defaultServer == null) {
+            defaultServer = _hub.defaultServer;
+        }
+
         var e = _hub.mainWindow.$["collapse6"];
         assert(e != null);
         e.toggle();
@@ -115,13 +121,13 @@ class ServerBrowserElement extends PolymerElement {
         }
 
         for (var s in _currentDir.dirs) {
-            items.add(new _ProxyItem(s.name, s, -1));
+            items.add(new _ProxyItem(s.displayName, s, -1));
         }
         for (var s in _currentDir.files) {
             assert(s != null);
             assert(s.map != null);
             final int numPoints = s.map.containsKey("size") ? s.map["size"] : -1;
-            items.add(new _ProxyItem(s.name, s, numPoints));
+            items.add(new _ProxyItem(s.displayName, s, numPoints));
         }
     }
 
@@ -156,5 +162,10 @@ class _ProxyItem extends Observable {
         return Utils.toSI(numPoints);
     }
 
-    _ProxyItem(this.name, this.source, this.numPoints);
+    _ProxyItem(displayName, this.source, this.numPoints) {
+        name = displayName;
+        if (this.source is DirectoryProxy) {
+            name += "/";
+        }
+    }
 }

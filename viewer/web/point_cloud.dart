@@ -12,8 +12,8 @@ import 'rialto_exceptions.dart';
 // GeometryAttribute renderable format)
 
 class PointCloud {
-    String shortname;
-    String longname;
+    String displayName;
+    String webpath;
     var dimensions = new Map<String, Float32List>();
     var min = new Map<String, double>();
     var max = new Map<String, double>();
@@ -21,7 +21,7 @@ class PointCloud {
     int numPoints;
 
 
-    PointCloud(String this.shortname, String this.longname);
+    PointCloud(String this.webpath, String this.displayName);
 
     void addToDimension(String name, Float32List data) {
         // how to enforce this?

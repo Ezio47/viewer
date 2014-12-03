@@ -14,36 +14,35 @@ void main() {
 
             Hub.root.init();
 
-            //HttpComms.test();
-            boot1();
-
+            boot2();
         });
     });
 }
 
 
-void boot2()
-{
+void boot2() {
     Hub hub = Hub.root;
 
-    hub.commandRegistry.doOpenServer("http://localhost:12345");
-    List<FileProxy> list = hub.proxy.root.files;
-    FileProxy file1 = list.firstWhere((e) => e.name == "data.txt");
+    hub.defaultServer = "http://localhost:12345";
 
-    hub.commandRegistry.doAddFile(file1);
+    hub.commandRegistry.doOpenServer("http://localhost:12345").then((_) {
+        List<FileProxy> list = hub.proxy.root.files;
+        FileProxy file1 = list.firstWhere((e) => e.displayName == "serp-100K.ria");
 
-    hub.commandRegistry.doToggleBbox(true);
+        hub.commandRegistry.doAddFile(file1);
+
+        hub.commandRegistry.doToggleBbox(true);
+    });
 }
 
-void boot1()
-{
+void boot1() {
     Hub hub = Hub.root;
 
     hub.commandRegistry.doOpenServer("http://www.example.com/").then((_) {
         List<FileProxy> list = hub.proxy.root.files;
-        FileProxy file1 = list.firstWhere((e) => e.name == "</terrain1.dat>");
+        FileProxy file1 = list.firstWhere((e) => e.displayName == "terrain1.dat");
         assert(file1 != null);
-        FileProxy file2 = list.firstWhere((e) => e.name == "</terrain2.dat>");
+        FileProxy file2 = list.firstWhere((e) => e.displayName == "terrain2.dat");
         assert(file2 != null);
 
         hub.commandRegistry.doAddFile(file1);

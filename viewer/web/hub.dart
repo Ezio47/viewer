@@ -36,6 +36,8 @@ class Hub {
     // the server we're currently connected to
     ProxyFileSystem proxy;
 
+    String defaultServer = "http://www.example.com";
+
     // singleton
     static Hub _root;
 

@@ -5,7 +5,6 @@ import 'dart:async';
 import 'hub.dart';
 import 'point_cloud.dart';
 import 'proxy.dart';
-import 'utils.dart';
 
 
 class CommandRegistry {
@@ -17,7 +16,7 @@ class CommandRegistry {
 
     Future<bool> doOpenServer(String server) {
         _hub.proxy = new ProxyFileSystem(server);
-        return Utils.toFuture(true);
+        return _hub.proxy.load();
     }
 
     void doCloseServer() {
@@ -34,21 +33,21 @@ class CommandRegistry {
     }
 
     void doAddFile(FileProxy file) {
-        _hub.layerPanel.doAddFile(file.name, file.path);
+        _hub.layerPanel.doAddFile(file.webpath, file.displayName);
 
-        PointCloud pointCloud = file.create();
+        file.create().then((PointCloud pointCloud) {
+            _hub.renderablePointCloudSet.addCloud(pointCloud);
 
-        _hub.renderablePointCloudSet.addCloud(pointCloud);
+            _hub.renderer.update();
 
-        _hub.renderer.update();
-
-        _hub.infoPanel.minx = _hub.renderablePointCloudSet.min.x;
-        _hub.infoPanel.maxx = _hub.renderablePointCloudSet.max.x;
-        _hub.infoPanel.miny = _hub.renderablePointCloudSet.min.y;
-        _hub.infoPanel.maxy = _hub.renderablePointCloudSet.max.y;
-        _hub.infoPanel.minz = _hub.renderablePointCloudSet.min.z;
-        _hub.infoPanel.maxz = _hub.renderablePointCloudSet.max.z;
-        _hub.infoPanel.numPoints = _hub.renderablePointCloudSet.numPoints;
+            _hub.infoPanel.minx = _hub.renderablePointCloudSet.min.x;
+            _hub.infoPanel.maxx = _hub.renderablePointCloudSet.max.x;
+            _hub.infoPanel.miny = _hub.renderablePointCloudSet.min.y;
+            _hub.infoPanel.maxy = _hub.renderablePointCloudSet.max.y;
+            _hub.infoPanel.minz = _hub.renderablePointCloudSet.min.z;
+            _hub.infoPanel.maxz = _hub.renderablePointCloudSet.max.z;
+            _hub.infoPanel.numPoints = _hub.renderablePointCloudSet.numPoints;
+        });
     }
 
     void doRemoveFile(String fullpath) {
