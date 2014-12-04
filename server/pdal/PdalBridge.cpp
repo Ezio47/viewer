@@ -6,7 +6,6 @@ PdalBridge::PdalBridge(bool debug, boost::uint32_t verbosity) :
     m_verbosity(verbosity),
     m_manager(NULL),
     m_reader(NULL),
-    m_statsStage(NULL),
     m_numPoints(0),
     m_buffer(NULL)
 {
@@ -18,7 +17,7 @@ PdalBridge::~PdalBridge()
 }
 
 
-void PdalBridge::open(const std::string& fname, bool pipeline)
+void PdalBridge::open(const std::string& fname)
 {
     m_manager = new pdal::PipelineManager();
     if (!m_manager)
@@ -27,25 +26,6 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
         throw pdal::pdal_error("Failed to create PDAL pipeline manager.");
     }
 
-    if (pipeline)
-    {
-        // fname is an XML file
-        m_reader = new pdal::PipelineReader(*m_manager, m_debug, m_verbosity);
-        if (!m_reader)
-        {
-            close();
-            throw pdal::pdal_error("Failed to create PDAL pipeline reader.");
-        }
-
-        const bool isWriter = m_reader->readPipeline(fname);
-        if (isWriter)
-        {
-            close();
-            throw pdal::pdal_error("PdalBridge doesn't support writing");
-        }
-        
-    }
-    else
     {
         pdal::StageFactory factory;
         const std::string driver = factory.inferReaderDriver(fname);
@@ -57,16 +37,6 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
         reader->setOptions(opts);
     }
 
-    pdal::Stage* stage = m_manager->addFilter("filters.stats", m_manager->getStage());
-    m_statsStage = (pdal::filters::Stats*)stage;
-
-    stage = m_manager->addFilter("filters.splitter", m_manager->getStage());
-    m_splitterStage = (pdal::filters::Splitter*)stage;
-    pdal::Options o;
-    pdal::Option length("length", 1000, "length");
-    o.add(length);
-    m_splitterStage->setOptions(o);
-    
     // for deeply technical reasons, PDAL now requires we read the whole file to
     // find the proper bounds (although this may be fixed again in the future)
     m_numPoints = m_manager->execute();
@@ -92,23 +62,6 @@ void PdalBridge::open(const std::string& fname, bool pipeline)
         ++iter;
     }
 
-    // now sort the split'ed buffers
-    {
-        for (auto it = pbSet.begin(); it != pbSet.end(); ++it)
-            m_splitBuffers.push_back(*it);
-
-        auto sorter = [](pdal::PointBufferPtr p1, pdal::PointBufferPtr p2)
-        {
-            pdal::BOX3D b1 = p1->calculateBounds();
-            pdal::BOX3D b2 = p2->calculateBounds();
-
-            return b1.minx < b2.minx ?  true :
-                b1.minx > b2.minx ? false :
-                b1.miny < b2.miny;
-        };
-        std::sort(m_splitBuffers.begin(), m_splitBuffers.end(), sorter);
-    }
-    
     return;
 }
 
@@ -133,19 +86,7 @@ void PdalBridge::close()
         m_manager = NULL;
     }
     
-    m_statsStage = NULL;
-    
     return;
-}
-
-
-const std::string PdalBridge::getWKT(bool pretty) const
-{
-    const pdal::PointContextRef& context = m_manager->context();
-    const pdal::SpatialReference& srs = context.spatialRef();
-    
-    const std::string wkt = srs.getWKT(pdal::SpatialReference::eCompoundOK, pretty);
-    return wkt;
 }
 
 
@@ -269,13 +210,4 @@ pdal::point_count_t PdalBridge::readPoints(void* buffer, pdal::point_count_t off
     }
 
     return numRead;
-}
-
-
-void PdalBridge::getStats(DimId id, double& min, double& mean, double& max) const
-{
-    const pdal::filters::stats::Summary& summary = m_statsStage->getStats(id);
-    min = summary.minimum();
-    mean = summary.average();
-    max = summary.maximum();
 }

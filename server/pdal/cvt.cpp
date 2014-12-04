@@ -6,17 +6,18 @@ int main(int argc, char *argv[])
 {
     PdalBridge pdal;
     
-    pdal.open(argv[1], false);
-    //pdal.open("./autzen.las", true);
+    pdal.open(argv[1]);
+    
+    FILE* fp = fopen(argv[2], "wb");
+
+    pdal::point_count_t maxPoints = (argc == 4) ? atoi(argv[3]) : 1000*1000*1000;
     
     boost::uint64_t numPoints = pdal.getNumPoints();
-    fprintf(stderr, "num points: %lld\n", numPoints);
-    fflush(stderr);
+    printf("num points: %lld\n", numPoints);
 
     std::vector<pdal::Dimension::Id::Enum> dims = pdal.getFields();
     boost::uint32_t numFields = dims.size();
-    //printf("Num fields: %d\n", numFields);
-    //assert(numFields == 16);
+    printf("Num fields: %d\n", numFields);
         
     pdal::Dimension::Id::Enum id_x = dims[0];
     assert(id_x == pdal::Dimension::Id::X);
@@ -36,21 +37,22 @@ int main(int argc, char *argv[])
     dimList.push_back(pdal::Dimension::Id::Z);
     pdal.setFields(dimList);
     
+    pdal::point_count_t numWritten = 0;
     pdal::point_count_t totNumRead = 0;
     pdal::point_count_t offset = 0;
     const pdal::point_count_t bufferSize = 10650;
     char* buf = new char[bufferSize * 3 * 8];
 
     while (totNumRead < numPoints)
-    {
-        if (totNumRead >= 1000000) break;
-        
+    {        
         pdal::point_count_t numRead = pdal.readPoints(buf, offset, bufferSize);
         assert(numRead <= bufferSize);
        
         char* p = buf;
         for (pdal::point_count_t i=0; i<numRead; i++)
         {
+            if (numWritten >= maxPoints) break;
+
             const double x = *(double*)p;
             p += 8;
             const double y = *(double*)p;
@@ -58,27 +60,23 @@ int main(int argc, char *argv[])
             const double z = *(double*)p;
             p += 8;
 
-            {
-                printf("%f %f %f\n", x, y, z);
-                if ((totNumRead % 1000) == 0) {
-                    fprintf(stderr, ".");
-                    fflush(stderr);
-                }
-                if ((totNumRead % 10000) == 0) {
-                    fprintf(stderr, "10K");
-                    fflush(stderr);
-                }
-            }
+            fwrite(&x, 8, 1, fp);
+            fwrite(&y, 8, 1, fp);
+            fwrite(&z, 8, 1, fp);
+            
+            ++numWritten;
         }
         
         offset += numRead;
         totNumRead += numRead;
-    }
-    
-    //assert(totNumRead == numPoints);
 
+        if (numWritten >= maxPoints) break;
+    }
+
+    printf("Points written: %ld\n", numWritten);
+    
     pdal.close();
-    //printf("pass\n");
+    fclose(fp);
     
     return 0;
 }

@@ -3,8 +3,6 @@
 #include <pdal/PipelineManager.hpp>
 #include <pdal/PipelineReader.hpp>
 #include <pdal/filters/Stats.hpp>
-#include <pdal/filters/Splitter.hpp>
-
 
 class PdalBridge
 {
@@ -16,18 +14,12 @@ public:
 
     ~PdalBridge();
 
-    // if passing an xml pipeline file, set pipeline to true
-    // throws on failure
-    void open(const std::string& fname, bool pipeline=false);
+    void open(const std::string& fname);
     
     void close();
 
-    const std::string getWKT(bool prety=false) const;
     
     pdal::point_count_t getNumPoints() const;
-    
-
-    void getStats(DimId id, double& min, double& mean, double& max) const;
 
     
     std::vector<DimId> getFields() const;
@@ -39,11 +31,6 @@ public:
     // Returns the number of points actually put into the buffer.
     pdal::point_count_t readPoints(void* buffer, pdal::point_count_t offset, pdal::point_count_t numPoints);
 
-    std::vector<pdal::PointBufferPtr>& getSplitBuffers()
-    {
-        return m_splitBuffers;
-    }
-    
 private:    
     bool readNext();
     double getFieldAsDouble(DimId);
@@ -54,12 +41,8 @@ private:
     boost::uint32_t m_verbosity;
     pdal::PipelineManager* m_manager;
     pdal::PipelineReader* m_reader;
-    pdal::filters::Stats* m_statsStage;
-    pdal::filters::Splitter* m_splitterStage;
     pdal::point_count_t m_numPoints;
     std::vector<DimId> m_dimensionIds;
     std::vector<DimType> m_dimensionTypes;
     pdal::PointBuffer* m_buffer;
-    
-    std::vector<pdal::PointBufferPtr> m_splitBuffers;
 };
