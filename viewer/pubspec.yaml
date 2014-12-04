@@ -1,6 +1,7 @@
-name: Rialto
+name: viewer
 description: The Rialto Point Cloud Viewer
 dependencies:
+  barback: any
   browser: any
   core_elements: any
   crypto: any
@@ -12,4 +13,5 @@ dependencies:
     git: https://github.com/threedart/three.dart
   vector_math: any
 transformers:
+- viewer
 - polymer
