@@ -16,3 +16,7 @@ viewer/build/web
 
 
 PdalBridge/cvt
+
+server/pdal/autzen.las
+
+server/pdal/cvt

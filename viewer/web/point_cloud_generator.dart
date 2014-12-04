@@ -6,7 +6,6 @@ import 'dart:math' as Math;
 import 'dart:typed_data';
 import 'point_cloud.dart';
 import 'rialto_exceptions.dart';
-import 'utils.dart';
 
 
 // this class pretends to represent a pointcloud file: all it does is
@@ -16,20 +15,10 @@ import 'utils.dart';
 
 class PointCloudGenerator {
 
-    static PointCloud fromBytes(List<int> listofbytes, String webpath, String displayName)
+    static PointCloud fromRaw(Float32List floats, String webpath, String displayName)
     {
-        final int numBytes = listofbytes.length;
-        final int numDoubles = numBytes ~/ 8;
-        final int numPoints = numDoubles ~/ 3;
-
-        final cnt = Utils.toSI(numPoints);
-        print("made $webpath: $cnt points");
-
-        var buffer = new ByteData(numBytes);
-        for (int i=0; i<numBytes; i++)
-            buffer.setUint8(i, listofbytes[i]);
-
-        var doubles = new Float64List.view(buffer.buffer);
+        final int numFloats = floats.length;
+        final int numPoints = numFloats ~/ 3;
 
         Map<String, Float32List> map = new Map();
 
@@ -41,18 +30,21 @@ class PointCloudGenerator {
         map["positions.z"] = positionsZ;
 
         int i=0;
-        for (int di=0; di<numDoubles; di+=3) {
-            var x = doubles[di];
-            var y = doubles[di+1];
-            var z = doubles[di+2];
-            positionsX[i] = x.toDouble();
-            positionsY[i] = y.toDouble();
-            positionsZ[i] = z.toDouble();
+        for (int di=0; di<numFloats; di+=3) {
+            var x = floats[di];
+            var y = floats[di+1];
+            var z = floats[di+2];
+            positionsX[i] = x;
+            positionsY[i] = y;
+            positionsZ[i] = z;
             ++i;
         }
 
         var cloud = new PointCloud(webpath, displayName);
         cloud.createDimensions(map);
+
+        //final cnt = Utils.toSI(numPoints);
+        print("made $webpath: $numPoints points");
 
         return cloud;
     }

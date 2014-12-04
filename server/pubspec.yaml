@@ -6,4 +6,5 @@ dependencies:
   shelf: any
   shelf_bind: any
   shelf_rest: any
+  shelf_web_socket: any
   watcher: any

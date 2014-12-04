@@ -2,10 +2,11 @@ library comms;
 
 import 'dart:convert';
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:html';
 
 import 'package:http/browser_client.dart' as bhttp;
 import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart';
 
 import "proxy.dart";
 import "utils.dart";
@@ -20,7 +21,7 @@ abstract class Comms {
     void open();
     void close();
     Future<String> readAsString(String path);
-    Future<List<int>> readAsBytes(String path);
+    Future<Float32List> readAsBytes(String path);
 }
 
 
@@ -28,8 +29,7 @@ class HttpComms extends Comms {
     http.Client _client;
 
     HttpComms(String myserver) : super(myserver) {
-        if (server.endsWith("/"))
-            server = server.substring(0, server.length-1);
+        if (server.endsWith("/")) server = server.substring(0, server.length - 1);
     }
 
     @override
@@ -48,9 +48,9 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<String> readAsString(String path) {
+    Future<String> readAsString(String webpath) {
 
-        String s = '${server}/file${path}';
+        String s = '${server}/file${webpath}';
 
         var f = _client.get(s).then((response) {
             //print(r.runtimeType);
@@ -62,17 +62,43 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<List<int>> readAsBytes(String path) {
+    Future<Float32List> readAsBytes(String webpath) {
+        Completer c = new Completer();
 
-        String s = '${server}/points${path}';
+        WebSocket ws = new WebSocket('ws://localhost:12345/points/');
+        ws.onOpen.listen((_) {
+            print("socket opened");
 
-        var fbytes = _client.get(s).then((response) {
-            final cnt = Utils.toSI(response.body.length);
-            print("read $path: $cnt bytes");
-            return CryptoUtils.base64StringToBytes(response.body);
-        }).catchError(_errf);
+            var bufs = new List<ByteBuffer>();
+            int siz = 0;
 
-        return fbytes;
+            ws.send(webpath); // {+file}
+            ws.binaryType = "arraybuffer";
+            ws.onMessage.listen((MessageEvent e) {
+                ByteBuffer buf = e.data;
+                bufs.add(buf);
+                print("read ${buf.lengthInBytes} bytes");
+                siz += buf.lengthInBytes;
+            });
+            ws.onClose.listen((_) {
+                var bigbuf = new Float32List(siz ~/ 4);
+                int j = 0;
+                for (var buf in bufs) {
+                    for (int i = 0; i < buf.lengthInBytes ~/ 4; i++) {
+                        Float32List tmp = new Float32List.view(buf);
+                        bigbuf[j] = tmp[i];
+                        j++;
+                    }
+                }
+                assert(j * 4 == siz);
+                c.complete(bigbuf);
+            });
+            ws.onError.listen((_) {
+                assert(false);
+            });
+        });
+
+        return c.future;
     }
 
     static void test() {
@@ -94,7 +120,7 @@ class FauxComms extends Comms {
     }
 
     @override
-    Future<List<int>> readAsBytes(String path) {
+    Future<Float32List> readAsBytes(String path) {
         throw new UnimplementedError();
     }
 

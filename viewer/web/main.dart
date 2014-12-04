@@ -27,7 +27,7 @@ void boot2() {
 
     hub.commandRegistry.doOpenServer("http://localhost:12345").then((_) {
         List<FileProxy> list = hub.proxy.root.files;
-        FileProxy file1 = list.firstWhere((e) => e.displayName == "serp-100K.ria");
+        FileProxy file1 = list.firstWhere((e) => e.displayName == "autzen-10.ria");
 
         hub.commandRegistry.doAddFile(file1);
 

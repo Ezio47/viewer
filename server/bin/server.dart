@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:shelf/shelf.dart';
-import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf/shelf_io.dart' as shelf_io;
+import 'package:shelf_web_socket/shelf_web_socket.dart';
 import 'package:shelf_route/shelf_route.dart' as r;
 import 'package:shelf_exception_response/exception_response.dart';
 import 'package:watcher/watcher.dart';
@@ -41,21 +44,66 @@ void runWatcher(String srcDir) {
 
 
 void runServer() {
+
     var router = r.router()
             ..get('/', (_) => new Response.notFound(null), middleware: logRequests())
-            ..get('/points/{+file}', _getPoints, middleware: logRequests())
+            ..get('/points', webSocketHandler(_getPoints), middleware: logRequests())
             ..get('/file', _getFile, middleware: logRequests())
             ..get('/file/{+file}', _getFile, middleware: logRequests());
 
-    var handler =
+    var httpHandler =
             const Pipeline().addMiddleware(logRequests()).addMiddleware(exceptionResponse()).addHandler(router.handler);
 
     r.printRoutes(router);
 
-    io.serve(handler, 'localhost', 12345).then((server) {
+    Future<HttpServer> fserver = shelf_io.serve(httpHandler, 'localhost', 12345).then((server) {
         print('Serving at http://${server.address.host}:${server.port}');
+        //fauxClient();
+    });
+
+}
+
+void fauxClient() {
+    Future<WebSocket> fclient = WebSocket.connect('ws://localhost:12345/points/');
+    fclient.then((ws) {
+        ws.add("/a/b/c"); // {+file}
+        ws.listen((List<int> intlist) {
+            print("client hears: $intlist");
+            ws.close();
+            Uint8List list = new Uint8List.fromList(intlist);
+            print("client really hears: $list");
+        });
     });
 }
+
+
+void _getPoints(websocket) {
+    websocket.listen((webpath) {
+        print("server hears request for points for: $webpath");
+
+        ProxyItem proxy = fileSystem.getEntry(webpath);
+        if (proxy is! FileProxy) {
+            return; // BUG error
+        }
+        FileProxy fileProxy = proxy as FileProxy;
+
+        String fspath = fileProxy.file.path;
+        String fspath2 = fileSystem.toFsPath(webpath);
+        assert(fspath == fspath2);
+
+        File f = fileProxy.file;
+        Stream s = f.openRead();
+        s.listen((bytes) {
+            websocket.add(bytes);
+            print("sent ${bytes.length} bytes");
+        }, onDone: () {
+            print("file closed");
+            websocket.close();
+        });
+    });
+    return;
+}
+
 
 String normalize(Request request, String prefix) {
     assert(request.scriptName.startsWith(prefix));
@@ -76,26 +124,6 @@ var headers = {
 Future toFuture(dynamic v) {
     Completer c = new Completer();
     c.complete(v);
-    return c.future;
-}
-
-
-Future<Response> _getPoints(dynamic request) {
-    final String webpath = normalize(request, "/points");
-    // print("requesting points from: $webpath");
-
-    var proxy = fileSystem.getEntry(webpath);
-    if (proxy == null) return toFuture(new Response.notFound(null, headers: headers)); // error
-
-    if (proxy is! FileProxy) return toFuture(new Response.notFound(null, headers: headers));
-
-    var c = new Completer();
-    var fbytes = proxy.file.readAsBytes().then((intlist) {
-        String base64 = CryptoUtils.bytesToBase64(intlist, addLineSeparator: true);
-        var resp = new Response.ok(base64, headers: headers);
-        c.complete(resp);
-    });
-
     return c.future;
 }
 

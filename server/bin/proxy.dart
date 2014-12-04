@@ -38,6 +38,17 @@ class ProxyFileSystem {
         return webpath;
     }
 
+    String toFsPath(String webpath) {
+        assert(!_fspathRoot.endsWith("/"));
+        assert(webpath.startsWith("/"));
+
+        String fspath = _fspathRoot + webpath;
+        print("converted $webpath to $fspath");
+
+        return fspath;
+    }
+
+
     void setEntry(ProxyItem item) {
         assert(_isWebPath(item.webpath));
         _map[item.webpath] = item;

@@ -2,6 +2,7 @@ library proxy;
 
 import 'dart:core';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'comms.dart';
 import 'point_cloud_generator.dart';
 import 'point_cloud.dart';
@@ -199,8 +200,8 @@ class FileProxy extends ProxyItem {
             return Utils.toFuture(cloud);
         }
 
-        var f = fileSystem.comms.readAsBytes(webpath).then((intlist) {
-            PointCloud cloud = PointCloudGenerator.fromBytes(intlist, webpath, displayName);
+        var f = fileSystem.comms.readAsBytes(webpath).then((Float32List data) {
+            PointCloud cloud = PointCloudGenerator.fromRaw(data, webpath, displayName);
             return Utils.toFuture(cloud);
         });
         return f;

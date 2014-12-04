@@ -53,16 +53,20 @@ int main(int argc, char *argv[])
         {
             if (numWritten >= maxPoints) break;
 
-            const double x = *(double*)p;
+            const double xd = *(double*)p;
             p += 8;
-            const double y = *(double*)p;
+            const double yd = *(double*)p;
             p += 8;
-            const double z = *(double*)p;
+            const double zd = *(double*)p;
             p += 8;
 
-            fwrite(&x, 8, 1, fp);
-            fwrite(&y, 8, 1, fp);
-            fwrite(&z, 8, 1, fp);
+            const float x = (float)xd;
+            const float y = (float)yd;
+            const float z = (float)zd;
+            
+            fwrite(&x, 4, 1, fp);
+            fwrite(&y, 4, 1, fp);
+            fwrite(&z, 4, 1, fp);
             
             ++numWritten;
         }
