@@ -1,0 +1,10 @@
+name: rialto_server
+description: A sample command-line application
+dependencies:
+  crypto: any
+  path: any
+  shelf: any
+  shelf_bind: any
+  shelf_rest: any
+  shelf_web_socket: any
+  watcher: any
