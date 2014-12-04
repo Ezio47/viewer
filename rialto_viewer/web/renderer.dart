@@ -1,14 +1,5 @@
-library renderer;
+part of rialto.viewer;
 
-import 'dart:html';
-import 'package:three/three.dart';
-import 'package:vector_math/vector_math.dart' hide Ray;
-import 'package:three/extras/controls/trackball_controls.dart';
-import 'renderable_point_cloud_set.dart';
-import 'render_utils.dart';
-import 'axes_object.dart';
-import 'bbox_object.dart';
-import 'hub.dart';
 
 class Renderer {
     // public
@@ -283,7 +274,7 @@ class Renderer {
     void _updateMouseWorldCoords() {
         var vector = new Vector3(_ndcMouseX, _ndcMouseY, 0.5);
 
-        Ray ray = _projector.pickingRay(vector.clone(), _camera);
+        three.Ray ray = _projector.pickingRay(vector.clone(), _camera);
 
         if (_line1 != null) _scene.remove(_line1);
 

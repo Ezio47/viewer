@@ -1,11 +1,9 @@
-library bbox_object;
-
-import 'dart:core';
-import 'package:vector_math/vector_math.dart';
-import 'package:three/three.dart';
+part of rialto.viewer;
 
 
-class BboxObject extends Object3D {
+
+
+class BboxObject extends Three.Object3D {
     BboxObject() : super() {
         var x1Geometry = new Geometry()
                 ..vertices.add(new Vector3(0.0, 0.0, 0.0))

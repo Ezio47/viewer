@@ -1,11 +1,6 @@
-library renderable_point_cloud;
+part of rialto.viewer;
 
-import 'dart:core';
-import 'point_cloud.dart';
-import 'package:three/three.dart';
-import 'package:vector_math/vector_math.dart';
-import 'dart:typed_data';
-import 'utils.dart';
+
 
 
 // given a point cloud, this will give us an Object3D for WebGL

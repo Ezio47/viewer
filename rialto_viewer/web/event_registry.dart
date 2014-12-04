@@ -1,9 +1,4 @@
-library event_registry;
-
-import 'dart:core';
-import 'dart:html';
-import 'hub.dart';
-
+part of rialto.viewer;
 
 //
 // All components should register themselves with the hub and then

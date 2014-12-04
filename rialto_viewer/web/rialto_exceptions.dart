@@ -1,6 +1,6 @@
-library rialto_exception;
+part of rialto.viewer;
 
-import 'dart:core';
+
 
 class RialtoArgumentError extends ArgumentError {
     RialtoArgumentError(String message) : super(message);

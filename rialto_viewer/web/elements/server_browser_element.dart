@@ -5,8 +5,6 @@ import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
 import '../hub.dart';
-import '../proxy.dart';
-import '../utils.dart';
 
 
 @CustomTag('server-browser-element')

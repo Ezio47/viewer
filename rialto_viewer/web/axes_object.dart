@@ -1,30 +1,27 @@
-library axes_object;
+part of rialto.viewer;
 
-import 'dart:core';
-import 'dart:math' as Math;
-import 'package:vector_math/vector_math.dart';
-import 'package:three/three.dart' as three;
+
 
 // taken from three/extra/helpers/axis_helper.dart
-class AxesObject extends three.Object3D {
+class AxesObject extends Three.Object3D {
     AxesObject() : super() {
 
-        var lineGeometry = new three.Geometry();
-        lineGeometry.vertices.add(new Vector3.zero());
-        lineGeometry.vertices.add(new Vector3(0.0, 100.0, 0.0));
+        var lineGeometry = new Three.Geometry();
+        lineGeometry.vertices.add(new VMath.Vector3.zero());
+        lineGeometry.vertices.add(new VMath.Vector3(0.0, 100.0, 0.0));
 
         // radius top, radius bottom, height, segments-radius, segments-height
-        var coneGeometry = new three.CylinderGeometry(0.0, 3.0, 10.0, 8, 1);
+        var coneGeometry = new Three.CylinderGeometry(0.0, 3.0, 10.0, 8, 1);
 
         var line, cone;
 
         // x
 
-        line = new three.Line(lineGeometry, new three.LineBasicMaterial(color: 0xff0000));
+        line = new Three.Line(lineGeometry, new Three.LineBasicMaterial(color: 0xff0000));
         line.rotation.z = -Math.PI / 2.0;
         this.add(line);
 
-        cone = new three.Mesh(coneGeometry, new three.MeshBasicMaterial(color: 0xff0000));
+        cone = new Three.Mesh(coneGeometry, new Three.MeshBasicMaterial(color: 0xff0000));
         cone.position.x = 100.0;
         cone.rotation.z = -Math.PI / 2.0;
         this.add(cone);

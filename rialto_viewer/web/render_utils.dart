@@ -1,9 +1,6 @@
-library render_utils;
+part of rialto.viewer;
 
-import 'dart:core';
-import 'package:vector_math/vector_math.dart';
-import 'package:three/three.dart';
-import 'renderable_point_cloud_set.dart';
+
 
 
 class RenderUtils {

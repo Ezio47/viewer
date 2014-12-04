@@ -1,11 +1,4 @@
-library renderable_point_cloud_set;
-
-import 'dart:core';
-import 'package:vector_math/vector_math.dart';
-import 'utils.dart';
-import 'rialto_exceptions.dart';
-import 'point_cloud.dart';
-import 'renderable_point_cloud.dart';
+part of rialto.viewer;
 
 
 class RenderablePointCloudSet {

@@ -1,13 +1,4 @@
-library proxy;
-
-import 'dart:core';
-import 'dart:convert';
-import 'dart:typed_data';
-import 'comms.dart';
-import 'point_cloud_generator.dart';
-import 'point_cloud.dart';
-import 'utils.dart';
-import 'dart:async';
+part of rialto.viewer;
 
 class ProxyFileSystem {
     Map<String, ProxyItem> _map = new Map<String, ProxyItem>(); // webpath -> proxy

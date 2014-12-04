@@ -1,6 +1,11 @@
-library hub;
+library rialto.viewer;
 
+import 'dart:async';
+import 'dart:math' as Math;
 import 'dart:core';
+import 'dart:html';
+import 'dart:typed_data';
+import 'dart:convert';
 
 import 'elements/render_panel.dart';
 import 'elements/status_panel.dart';
@@ -9,12 +14,31 @@ import 'elements/display_panel.dart';
 import 'elements/layer_panel.dart';
 import 'elements/rialto_element.dart';
 import 'elements/server_browser_element.dart';
-import 'renderer.dart';
-import 'renderable_point_cloud_set.dart';
-import 'event_registry.dart';
-import 'command_registry.dart';
-import 'proxy.dart';
 
+import 'package:three/three.dart' as Three;
+import 'package:http/browser_client.dart' as BHttp;
+import 'package:http/http.dart' as Http;
+
+import 'package:vector_math/vector_math.dart' as VMath;
+import 'package:three/extras/controls/trackball_controls.dart' as ThreeControls;
+
+
+
+part 'axes_object.dart';
+part 'bbox_object.dart';
+part 'command_registry.dart';
+part 'comms.dart';
+part 'event_registry.dart';
+part 'point_cloud.dart';
+part 'point_cloud_generator.dart';
+part 'proxy.dart';
+part 'renderable_point_cloud.dart';
+
+part 'renderable_point_cloud_set.dart';
+part 'renderer.dart';
+part 'render_utils.dart';
+part 'rialto_exceptions.dart';
+part 'utils.dart';
 
 class Hub {
     // the big, public, singleton components

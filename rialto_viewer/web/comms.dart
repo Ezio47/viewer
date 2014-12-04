@@ -1,15 +1,5 @@
-library comms;
+part of rialto.viewer;
 
-import 'dart:convert';
-import 'dart:async';
-import 'dart:typed_data';
-import 'dart:html';
-
-import 'package:http/browser_client.dart' as bhttp;
-import 'package:http/http.dart' as http;
-
-import "proxy.dart";
-import "utils.dart";
 
 
 abstract class Comms {

@@ -1,10 +1,6 @@
-library command_registry;
+part of rialto.viewer;
 
-import 'dart:core';
-import 'dart:async';
-import 'hub.dart';
-import 'point_cloud.dart';
-import 'proxy.dart';
+
 
 
 class CommandRegistry {

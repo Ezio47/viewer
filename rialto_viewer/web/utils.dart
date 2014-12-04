@@ -1,9 +1,4 @@
-library utils;
-
-import 'dart:async';
-import 'package:vector_math/vector_math.dart';
-import 'package:three/three.dart';
-import 'dart:math' as Math;
+part of rialto.viewer;
 
 
 class Utils {

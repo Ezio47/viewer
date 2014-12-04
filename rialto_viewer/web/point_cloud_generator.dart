@@ -1,11 +1,6 @@
-library point_cloud_generator;
+part of rialto.viewer;
 
-import 'dart:core';
-import 'package:three/three.dart';
-import 'dart:math' as Math;
-import 'dart:typed_data';
-import 'point_cloud.dart';
-import 'rialto_exceptions.dart';
+
 
 
 // this class pretends to represent a pointcloud file: all it does is

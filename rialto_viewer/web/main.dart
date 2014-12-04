@@ -1,7 +1,6 @@
 import 'dart:core';
 import 'package:polymer/polymer.dart';
 import 'hub.dart';
-import 'proxy.dart';
 
 void main() {
     initPolymer().run(() {

@@ -1,10 +1,4 @@
-library point_cloud;
-
-import 'dart:core';
-import 'dart:math' as Math;
-import 'dart:typed_data';
-
-import 'rialto_exceptions.dart';
+part of rialto.viewer;
 
 
 // holds the data once a cloud has been loaded
