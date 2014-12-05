@@ -1,4 +1,4 @@
-library layer_panel;
+library rialto.viewer.layer_panel;
 
 
 import 'dart:core';

@@ -1,4 +1,4 @@
-library server_browser_element;
+library rialto.viewer.server_browser_element;
 
 
 import 'dart:core';

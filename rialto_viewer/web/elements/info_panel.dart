@@ -1,4 +1,4 @@
-library info_panel;
+library rialto.viewer.info_panel;
 
 
 import 'dart:core';

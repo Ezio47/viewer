@@ -1,4 +1,4 @@
-library rialto_element;
+library rialto.viewer.rialto_element;
 
 
 import 'dart:core';

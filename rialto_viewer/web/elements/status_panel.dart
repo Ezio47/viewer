@@ -1,4 +1,4 @@
-library status_element;
+library rialto.viewer.status_element;
 
 
 import 'dart:core';

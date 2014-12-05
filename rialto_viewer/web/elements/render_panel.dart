@@ -1,4 +1,4 @@
-library render_panel;
+library rialto.viewer.render_panel;
 
 
 import 'dart:core';
