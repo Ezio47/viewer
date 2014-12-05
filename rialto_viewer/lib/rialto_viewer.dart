@@ -1,5 +1,10 @@
+// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
 import 'package:barback/barback.dart';
 import 'dart:async';
+
 
 class InlineCss extends Transformer {
 

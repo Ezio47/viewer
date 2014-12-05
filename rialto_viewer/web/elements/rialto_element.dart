@@ -1,5 +1,8 @@
-library rialto.viewer.rialto_element;
+// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
 
+library rialto.viewer.rialto_element;
 
 import 'dart:core';
 import 'dart:html';

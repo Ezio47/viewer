@@ -1,6 +1,8 @@
+// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
 part of rialto.viewer;
-
-
 
 
 // given a point cloud, this will give us an Object3D for WebGL
