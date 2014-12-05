@@ -52,29 +52,33 @@
 
 
             <!-- LEFT PANEL -->
-            <core-collapse id="collapse1" class="left-panel-position min-panel-width dark-panel-style" duration="0.10">
+            <core-collapse id="collapse1" class="left-panel-position  dark-panel-style2" duration="0.10">
                 <div vertical layout class="">
 
 
-                    <!-- LAYER PANEL -->
-                    <div class="dark-panel-style">
-                        <div layout horizontal center class="smallround-button-style">
-                            <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
-                            <span class="text-label-style">Files</span>
-                        </div>
-                        <core-collapse id="collapse2" duration="0.10">
-                            <div layout horizontal>
-                            <layer-panel class="border-radius"></layer-panel>
+                    <!-- LAYER PANEL and children -->
 
-                            <!-- SERVER BROWSER -->
-                            <core-collapse id="collapse6" duration="0.10">
+                    <div layout horizontal >
+
+                        <!-- layer panel -->
+                        <div layout vertical class="dark-panel-style layer-panel-min-width">
+                            <div layout horizontal center class="smallround-button-style">
+                                <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
+                                <span class="text-label-style">Files</span>
+                            </div>
+                            <core-collapse id="collapse2" duration="0.10" class="light-panel-style">
+                                <layer-panel class="light-panel-style "></layer-panel>
+                            </core-collapse>
+                        </div>
+
+                        <!-- server browser -->
+                        <div>
+                            <core-collapse id="collapse6" class="dark-panel-style" duration="0.10">
                                 <server-browser-element></server-browser-element>
                             </core-collapse>
-
-                            </div>
-                        </core-collapse>
-
+                        </div>
                     </div>
+
 
 
                     <!-- DISPLAY PANEL -->
@@ -108,7 +112,7 @@
 
             <!-- TOOL PANEL -->
             <core-collapse id="collapse5" class="tool-panel-position dark-panel-style" horizontal="true" duration="0.10">
-                <div horizontal layout class="regularsquare-button-style panel">
+                <div horizontal layout class="regularsquare-button-style">
                     <paper-icon-button icon="home" on-click="{{goHome}}"></paper-icon-button>
                     <paper-icon-button icon="image:color-lens" on-click="{{goColorize}}"></paper-icon-button>
                 </div>
