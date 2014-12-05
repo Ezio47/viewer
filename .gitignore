@@ -6,10 +6,9 @@ build
 # C++ things
 *.dSYM
 
-
 PdalBridge/main
 
-rialto_server/pdal/autzen.las
-rialto_server/pdal/cvt
+rialto_pdal/autzen.las
+rialto_pdal/cvt
 
 rialto_server/packages
