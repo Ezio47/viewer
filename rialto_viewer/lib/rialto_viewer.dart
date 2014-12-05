@@ -11,7 +11,7 @@ class InlineCss extends Transformer {
     InlineCss.asPlugin();
 
     Future<String> getCss(Transform transform) {
-        var id = new AssetId("rialto_viewer", "web/inlined.css");
+        var id = new AssetId("rialto_viewer", "web/elements/elements.css");
         return transform.readInputAsString(id);
     }
 

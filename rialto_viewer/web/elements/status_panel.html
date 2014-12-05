@@ -9,40 +9,16 @@
 
     <template>
         <style>
-            :host {
-                padding: 0px;
-                margin: 0px;
-            }
-           .logo {
-                font-family:  Palatino, serif;
-                font-variant: small-caps;
-                opacity: 1.0;
-                color: #a0a0a0;
-                background: #242d88;
-                padding: 2px;
-                border-radius: 3px;
-            }
-            .textline {
-                vertical-align: top;
-            }
-            span {
-                color: #b0b0b0;
-            }
-            .left {
-                padding: 4px;
-            }
-            .right {
-                padding: 4px;
-            }
+            /*** RIALTO-CSS-GOES-HERE ***/
         </style>
 
         <div layout horizontal>
-            <div class="left">
-                <span>Mouse=({{mousePositionX.toStringAsFixed(3)}},{{mousePositionY.toStringAsFixed(3)}})</span>
+            <div class="pad4">
+                <span class="status-span">Mouse=({{mousePositionX.toStringAsFixed(3)}},{{mousePositionY.toStringAsFixed(3)}})</span>
             </div>
             <div flex></div>
-            <div class="right">
-                <span class="textline logo" on-click="{{aboutbox}}">Rialto</span>
+            <div class="pad4">
+                <span class="status-span status-textline status-logo" on-click="{{aboutbox}}">Rialto</span>
             </div>
         </div>
     </template>
