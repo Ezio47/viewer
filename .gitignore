@@ -1,21 +1,15 @@
-rialto_server/pubspec.lock
-rialto_server/bin/packages
-rialto_server/packages
+# dart pub things
+packages
+.pub
+build
 
-rialto_viewer/.pub
-rialto_viewer/packages
-rialto_viewer/pubspec.lock
-rialto_viewer/web/packages
-rialto_viewer/web/vendors/packages
-rialto_viewer/web/templates/packages
-rialto_viewer/web/templates/css/packages
-rialto_viewer/build/web
-
+# C++ things
 *.dSYM
+
 
 PdalBridge/main
 
 rialto_server/pdal/autzen.las
 rialto_server/pdal/cvt
 
-rialto_viewer/web/elements/packages
+rialto_server/packages
