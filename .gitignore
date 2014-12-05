@@ -17,3 +17,5 @@ PdalBridge/main
 
 rialto_server/pdal/autzen.las
 rialto_server/pdal/cvt
+
+rialto_viewer/web/elements/packages

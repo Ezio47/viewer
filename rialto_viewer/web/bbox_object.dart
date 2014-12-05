@@ -3,7 +3,7 @@ part of rialto.viewer;
 
 
 
-class BboxObject extends Three.Object3D {
+class BboxObject extends Object3D {
     BboxObject() : super() {
         var x1Geometry = new Geometry()
                 ..vertices.add(new Vector3(0.0, 0.0, 0.0))

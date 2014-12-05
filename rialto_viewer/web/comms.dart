@@ -16,7 +16,7 @@ abstract class Comms {
 
 
 class HttpComms extends Comms {
-    http.Client _client;
+    Http.Client _client;
 
     HttpComms(String myserver) : super(myserver) {
         if (server.endsWith("/")) server = server.substring(0, server.length - 1);
@@ -24,7 +24,7 @@ class HttpComms extends Comms {
 
     @override
     void open() {
-        _client = new bhttp.BrowserClient();
+        _client = new BHttp.BrowserClient();
     }
 
     @override

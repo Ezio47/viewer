@@ -274,7 +274,7 @@ class Renderer {
     void _updateMouseWorldCoords() {
         var vector = new Vector3(_ndcMouseX, _ndcMouseY, 0.5);
 
-        three.Ray ray = _projector.pickingRay(vector.clone(), _camera);
+        Ray ray = _projector.pickingRay(vector.clone(), _camera);
 
         if (_line1 != null) _scene.remove(_line1);
 
