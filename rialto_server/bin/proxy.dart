@@ -1,7 +1,4 @@
-import 'dart:core';
-import 'dart:io';
-import 'package:watcher/watcher.dart';
-import 'package:path/path.dart' as path;
+part of rialto.server;
 
 
 class ProxyFileSystem {

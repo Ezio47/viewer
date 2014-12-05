@@ -1,17 +1,19 @@
+library rialto.server;
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_web_socket/shelf_web_socket.dart';
-import 'package:shelf_route/shelf_route.dart' as r;
+import 'package:shelf_route/shelf_route.dart' as shelf_route;
 import 'package:shelf_exception_response/exception_response.dart';
 import 'package:watcher/watcher.dart';
+import 'package:path/path.dart' as path;
 
-import 'proxy.dart';
+part 'proxy.dart';
 
 
 DirectoryWatcher watcher;
@@ -45,7 +47,7 @@ void runWatcher(String srcDir) {
 
 void runServer() {
 
-    var router = r.router()
+    var router = shelf_route.router()
             ..get('/', (_) => new Response.notFound(null), middleware: logRequests())
             ..get('/points', webSocketHandler(_getPoints), middleware: logRequests())
             ..get('/file', _getFile, middleware: logRequests())
@@ -54,7 +56,7 @@ void runServer() {
     var httpHandler =
             const Pipeline().addMiddleware(logRequests()).addMiddleware(exceptionResponse()).addHandler(router.handler);
 
-    r.printRoutes(router);
+    shelf_route.printRoutes(router);
 
     Future<HttpServer> fserver = shelf_io.serve(httpHandler, 'localhost', 12345).then((server) {
         print('Serving at http://${server.address.host}:${server.port}');
