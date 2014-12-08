@@ -122,6 +122,7 @@ class Renderer {
             for (var rpc in _renderSource.renderablePointClouds)
             {
                 var obj = rpc.getParticleSystem();
+                obj.visible = rpc.visible;
                 obj.applyMatrix(modelToWorld);
                 _scene.add(obj);
             }

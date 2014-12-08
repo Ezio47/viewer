@@ -44,8 +44,8 @@
                         multi="false"
                         id="file-list">
                     <template>
-                        <div layout horizontal class="{{ {selecteditemstyle: selected} }} listbox-item-style" id="{{index}}">
-                            <input type="checkbox" name="filescheck" checked="{{model.checked}}" class="padright">
+                        <div layout horizontal class="{{ {selecteditemstyle: selected} }} listbox-item-style">
+                            <input type="checkbox" name="filescheck" checked="{{model.checked}}" id="{{index}}" on-click="{{toggleLayer}}" class="padright">
                             <span>{{model.displayName}}</span>
                         </div>
                     </template>

@@ -12,9 +12,11 @@ class RenderablePointCloud {
     int numPoints;
     Vector3 min, max, len;
     ParticleSystem _particleSystem;
+    bool visible;
 
     RenderablePointCloud(PointCloud pc) {
         pointCloud = pc;
+        visible = true;
 
         _createRenderArrays();
         _computeBounds();

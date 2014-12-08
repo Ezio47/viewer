@@ -48,10 +48,10 @@ class CommandRegistry {
         });
     }
 
-    void doRemoveFile(String fullpath) {
-        _hub.layerPanel.doRemoveFile(fullpath);
+    void doRemoveFile(String webpath) {
+        _hub.layerPanel.doRemoveFile(webpath);
 
-        _hub.renderablePointCloudSet.removeCloud(fullpath);
+        _hub.renderablePointCloudSet.removeCloud(webpath);
 
         _hub.renderer.update();
     }
@@ -59,6 +59,11 @@ class CommandRegistry {
     void doToggleAxes(bool on) => _hub.renderer.toggleAxesDisplay(on);
 
     void doToggleBbox(bool on) => _hub.renderer.toggleBboxDisplay(on);
+
+    void doToggleLayer(String webpath, bool on) {
+        _hub.renderablePointCloudSet.toggleCloud(webpath, on);
+        _hub.renderer.update();
+    }
 
     void goHome() => _hub.renderer.goHome();
 }

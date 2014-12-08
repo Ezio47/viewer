@@ -34,11 +34,16 @@ class RenderablePointCloudSet {
         _computeBounds();
     }
 
-    void removeCloud(String fullpath) {
+    void removeCloud(String webpath) {
         final int len = renderablePointClouds.length;
-        renderablePointClouds.removeWhere((rpc) => rpc.pointCloud.webpath == fullpath);
+        renderablePointClouds.removeWhere((rpc) => rpc.pointCloud.webpath == webpath);
         assert(renderablePointClouds.length == len - 1);
         _computeBounds();
+    }
+
+    void toggleCloud(String webpath, bool on) {
+        var rpc = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath);
+        rpc.visible = on;
     }
 
     void _computeBounds() {
