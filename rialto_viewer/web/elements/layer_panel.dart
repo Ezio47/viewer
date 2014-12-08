@@ -52,6 +52,11 @@ class LayerPanel extends PolymerElement {
         _hub.serverBrowserElement.openPanel();
     }
 
+    void openServer(Event e, var detail, Node target) {
+        Hub.root.serverBrowserElement.openPanel();
+        return;
+    }
+
     void toggleFile(Event e, var detail, Node target) {
         var button = target as ButtonElement;
         window.alert("toggle for ${button.id.toString()}");
@@ -66,7 +71,8 @@ class LayerPanel extends PolymerElement {
         return;
     }
 
-    void selectionMade(CustomEvent e) { }
+    void selectionMade(CustomEvent e) {
+    }
 }
 
 

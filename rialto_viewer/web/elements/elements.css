@@ -61,19 +61,17 @@
     border-style: none;
     margin: 2px;
 }
-.dark-panel-style2 {
-    opacity: 0.85;
-    color: #112;
-    padding: 4px;
+.dark-panel-style2 {        /* surrounds the div of all the left side label bars */
+    background: #aaa;
     border-radius: 4px;
     border-style: none;
-    margin: 2px;
 }
 .light-panel-style {
-    background: #888;
+    background: #bbb;
     color: #112;
-
+    margin: 2px;
     border-style: none;
+    border-width: 1px;
     border-radius: 4px;
 
 }
@@ -171,6 +169,18 @@
     color: #c0c0c0;
     margin: 1px;
     border-radius: 4px;
+}
+.regulartextbutton {
+
+    background: #ccc;
+    border-radius: 4px;
+    width: 100px;
+    height: 35px;
+    margin: 2px;
+    padding: 2px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
 }
 
 

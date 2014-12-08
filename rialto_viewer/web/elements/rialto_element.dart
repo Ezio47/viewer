@@ -27,6 +27,7 @@ class RialtoElement extends PolymerElement {
     @override
     void ready() {
         Hub.root.mainWindow = this;
+        Hub.root.serverDialog = $["serverdialog"];
     }
 
     @override
@@ -64,6 +65,10 @@ class RialtoElement extends PolymerElement {
         var button = target as PaperIconButton;
         button.icon = e.opened ? "rialto-icons-regular:chevright" : "rialto-icons-regular:chevleft";
         e.toggle();
+    }
+
+    void closeServerDialog(Event e, var detail, Node target) {
+        Hub.root.serverBrowserElement.closePanel();
     }
 
     void goHome(Event e, var detail, Node target) {

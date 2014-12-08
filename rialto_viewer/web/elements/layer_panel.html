@@ -33,8 +33,9 @@
             /*** RIALTO-CSS-GOES-HERE ***/
         </style>
 
-        <div class="">
-            <div >
+
+        <div layout horizontal >
+            <div class="light-panel-style">
                 <core-list-dart data="{{files}}" height="20px"
                         selectionEnabled="{{selectionEnabled}}"
                         selection="{{selection}}"
@@ -49,11 +50,13 @@
                         </div>
                     </template>
                 </core-list-dart>
-            </div>
-            <hr class="hr-style mar3 noborder">
-            <div class="smallroundbutton mar0">
-                <paper-icon-button icon="rialto-icons-small:plus" on-click="{{openFile}}"></paper-icon-button>
-                <paper-icon-button icon="rialto-icons-small:minus" on-click="{{deleteFile}}"></paper-icon-button>
+
+                <hr class="hr-style mar3 noborder">
+
+                <div class="smallroundbutton mar0">
+                    <button on-click="{{openFile}}"><b>+</b></button>
+                    <button on-click="{{deleteFile}}"><b>-</b></button>
+                </div>
             </div>
 
         </div>

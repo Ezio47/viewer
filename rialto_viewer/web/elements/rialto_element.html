@@ -61,22 +61,21 @@
                     <div layout horizontal >
 
                         <!-- layer panel -->
-                        <div layout vertical class="dark-panel-style layer-panel-min-width">
-                            <div layout horizontal center class="smallround-button-style">
+                        <div layout vertical class=" layer-panel-min-width">
+                            <div layout horizontal center class="dark-panel-style smallround-button-style">
                                 <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
                                 <span class="text-label-style">Files</span>
                             </div>
-                            <core-collapse id="collapse2" duration="0.10" class="light-panel-style">
-                                <layer-panel class="light-panel-style "></layer-panel>
+                            <core-collapse id="collapse2" duration="0.10" >
+                                <layer-panel></layer-panel>
                             </core-collapse>
                         </div>
 
                         <!-- server browser -->
-                        <div>
-                            <core-collapse id="collapse6" class="dark-panel-style" duration="0.10">
-                                <server-browser-element></server-browser-element>
-                            </core-collapse>
-                        </div>
+                        <dialog id="serverdialog" >
+                            <server-browser-element></server-browser-element>
+                        </dialog>
+
                     </div>
 
 
@@ -124,6 +123,9 @@
            </div>
 
         </div> <!-- main -->
+
+
+
     </template>
 
     <script type="application/dart" src="rialto_element.dart"></script>

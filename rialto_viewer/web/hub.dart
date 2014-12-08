@@ -50,6 +50,7 @@ class Hub {
     RenderPanel renderPanel;
     StatusPanel statusPanel;
     ServerBrowserElement serverBrowserElement;
+    DialogElement serverDialog;
 
     Renderer renderer;
     EventRegistry eventRegistry;
@@ -62,6 +63,7 @@ class Hub {
     ProxyFileSystem proxy;
 
     String defaultServer = "http://www.example.com";
+    String currentServer;
 
     // singleton
     static Hub _root;

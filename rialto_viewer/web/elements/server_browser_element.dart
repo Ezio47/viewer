@@ -16,6 +16,7 @@ class ServerBrowserElement extends PolymerElement {
     Hub _hub = Hub.root;
 
     String _server;
+    @observable String selectedServer;
     @observable bool isServerOpen;
     @observable bool isFileSelected;
 
@@ -39,6 +40,11 @@ class ServerBrowserElement extends PolymerElement {
     @override
     void ready() {
         _hub.serverBrowserElement = this;
+
+        if (defaultServer == null) {
+            defaultServer = _hub.defaultServer;
+        }
+        selectedServer = defaultServer;
     }
 
     @override
@@ -47,14 +53,6 @@ class ServerBrowserElement extends PolymerElement {
     }
 
     void openPanel() {
-        if (defaultServer == null) {
-            defaultServer = _hub.defaultServer;
-        }
-
-        var e = _hub.mainWindow.$["collapse6"];
-        assert(e != null);
-        e.toggle();
-
         if (_hub.proxy != null) {
             // This is a special case: only happens when using a boot script.
             // WHen this happens, we need to prime the items list, as would
@@ -63,12 +61,16 @@ class ServerBrowserElement extends PolymerElement {
             _loadItemsFromProxy();
             isServerOpen = true;
         }
+
+        $["button1"].disabled = !isServerOpen;
+        $["button2"].disabled = isServerOpen;
+        $["button3"].disabled = true;
+
+        Hub.root.serverDialog.showModal();
     }
 
-    void _closePanel() {
-        var e = _hub.mainWindow.$["collapse6"];
-        assert(e != null);
-        e.toggle();
+    void closePanel() {
+        Hub.root.serverDialog.close("");
     }
 
     void doCloseServer(Event e, var detail, Node target) {
@@ -80,6 +82,9 @@ class ServerBrowserElement extends PolymerElement {
 
         isServerOpen = false;
         isFileSelected = false;
+
+        $["button1"].disabled = !isServerOpen;
+        $["button2"].disabled = isServerOpen;
     }
 
     void doOpenServer(Event e, var detail, Node target) {
@@ -97,18 +102,22 @@ class ServerBrowserElement extends PolymerElement {
             _currentDir = _hub.proxy.root;
             _loadItemsFromProxy();
             isServerOpen = true;
+
         });
+
+        $["button1"].disabled = !isServerOpen;
+        $["button2"].disabled = isServerOpen;
     }
 
     void doCancel(Event e, var detail, Node target) {
-        _closePanel();
+        closePanel();
     }
 
     void doOpenFile(Event e, var detail, Node target) {
         assert(_currentItem != null);
         _hub.commandRegistry.doAddFile(_currentItem);
 
-        _closePanel();
+        closePanel();
     }
 
     void _loadItemsFromProxy() {
@@ -151,6 +160,8 @@ class ServerBrowserElement extends PolymerElement {
         } else {
             assert(false);
         }
+
+        $["button3"].disabled = false;
     }
 }
 
