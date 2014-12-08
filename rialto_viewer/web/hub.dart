@@ -33,6 +33,7 @@ part 'event_registry.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
 part 'proxy.dart';
+part 'pubsub.dart';
 part 'renderable_point_cloud.dart';
 part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
