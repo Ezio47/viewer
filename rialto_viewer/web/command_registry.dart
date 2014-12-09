@@ -56,14 +56,5 @@ class CommandRegistry {
         _hub.renderer.update();
     }
 
-    void doToggleAxes(bool on) => _hub.renderer.toggleAxesDisplay(on);
-
-    void doToggleBbox(bool on) => _hub.renderer.toggleBboxDisplay(on);
-
-    void doToggleLayer(String webpath, bool on) {
-        _hub.renderablePointCloudSet.toggleCloud(webpath, on);
-        _hub.renderer.update();
-    }
-
     void goHome() => _hub.renderer.goHome();
 }

@@ -7,8 +7,8 @@ part of rialto.viewer;
 
 class Renderer {
     // public
-    double mouseX = 0.0,
-            mouseY = 0.0;
+    double _mouseGeoX = 0.0;
+    double _mouseGeoY = 0.0;
     bool _showAxes = false;
     bool _showBbox = false;
 
@@ -47,6 +47,9 @@ class Renderer {
 
         Hub.root.eventRegistry.subscribeMouseMove(_updateMouseLocalCoords);
         Hub.root.eventRegistry.subscribeWindowResize(_onMyWindowResize);
+        Hub.root.eventRegistry.subscribeDisplayAxes(_displayAxesHandler);
+        Hub.root.eventRegistry.subscribeDisplayBbox(_displayBboxHandler);
+        Hub.root.eventRegistry.subscribeUpdateRenderer((_) => update());
 
         _renderSource = rpcSet;
 
@@ -173,7 +176,8 @@ class Renderer {
     }
 
 
-    void toggleAxesDisplay(bool on) {
+    void _displayAxesHandler(BoolData data) {
+        final bool on = data.v;
         if (_axesObject == null) return;
 
         if (on) {
@@ -184,8 +188,8 @@ class Renderer {
         _showAxes = on;
     }
 
-
-    void toggleBboxDisplay(bool on) {
+    void _displayBboxHandler(BoolData data) {
+        final bool on = data.v;
         if (_bboxObject == null) return;
 
         if (on) {
@@ -307,7 +311,9 @@ class Renderer {
         }
         */
 
-        mouseX = qq.x;
-        mouseY = qq.y;
+        _mouseGeoX = qq.x;
+        _mouseGeoY = qq.y;
+
+        Hub.root.eventRegistry.fireMouseGeoCoord(new GeoCoordsData(_mouseGeoX, _mouseGeoY));
     }
 }

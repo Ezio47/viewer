@@ -40,28 +40,28 @@ class DisplayPanel extends PolymerElement {
 
 
     void axesbool1Changed(var oldvalue) {
-        _hub.commandRegistry.doToggleAxes(axesbool1);
-        _hub.commandRegistry.doToggleBbox(axesbool2);
+        _hub.eventRegistry.fireDisplayAxes(new BoolData(axesbool1));
+        _hub.eventRegistry.fireDisplayBbox(new BoolData(axesbool2));
     }
 
     void axesbool2Changed(var oldvalue) {
-        _hub.commandRegistry.doToggleAxes(axesbool1);
-        _hub.commandRegistry.doToggleBbox(axesbool2);
+        _hub.eventRegistry.fireDisplayAxes(new BoolData(axesbool1));
+        _hub.eventRegistry.fireDisplayBbox(new BoolData(axesbool2));
     }
 
     void axesbool3Changed(var oldvalue) {
-        _hub.commandRegistry.doToggleAxes(axesbool1);
-        _hub.commandRegistry.doToggleBbox(axesbool2);
+        _hub.eventRegistry.fireDisplayAxes(new BoolData(axesbool1));
+        _hub.eventRegistry.fireDisplayBbox(new BoolData(axesbool2));
     }
 
     void toggleAxes(Event e, var detail, Node target) {
         var button = target as InputElement;
-        _hub.commandRegistry.doToggleAxes(button.checked);
+        _hub.eventRegistry.fireDisplayAxes(new BoolData(button.checked));
     }
 
     void toggleBbox(Event e, var detail, Node target) {
         var button = target as InputElement;
-        _hub.commandRegistry.doToggleBbox(button.checked);
+        _hub.eventRegistry.fireDisplayBbox(new BoolData(button.checked));
     }
 
 }

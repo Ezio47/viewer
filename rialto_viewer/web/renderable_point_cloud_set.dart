@@ -14,6 +14,8 @@ class RenderablePointCloudSet {
         min = new Vector3.zero();
         max = new Vector3.zero();
         len = new Vector3.zero();
+
+        Hub.root.eventRegistry.subscribeDisplayLayer(_displayLayerHandler);
     }
 
     int get length => renderablePointClouds.length;
@@ -41,9 +43,12 @@ class RenderablePointCloudSet {
         _computeBounds();
     }
 
-    void toggleCloud(String webpath, bool on) {
+    void _displayLayerHandler(DisplayLayerData data) {
+        final String webpath = data.webpath;
+        final bool on = data.on;
         var rpc = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath);
         rpc.visible = on;
+        Hub.root.eventRegistry.fireUpdateRenderer();
     }
 
     void _computeBounds() {

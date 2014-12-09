@@ -12,20 +12,18 @@ part of rialto.viewer;
 // For polymer elements, this is done in ready() or maybe attached()
 //
 
-typedef void MouseMoveHandler(int newX, int newY);
-typedef void MouseDownHandler();
-typedef void MouseUpHandler();
-typedef void WindowResizeHandler();
-
-
 class EventRegistry {
-    // global handlers
+    Hub _hub;
+
     Signal<MouseMoveData> _mouseMoveSignal = new Signal<MouseMoveData>();
     Signal<MouseDownData> _mouseDownSignal = new Signal<MouseDownData>();
     Signal<MouseUpData> _mouseUpSignal = new Signal<MouseUpData>();
     Signal<WindowResizeData> _windowResizeSignal = new Signal<WindowResizeData>();
-
-    Hub _hub;
+    Signal<GeoCoordsData> _mouseGeoCoordsSignal = new Signal<GeoCoordsData>();
+    Signal<BoolData> _displayAxesSignal = new Signal<BoolData>();
+    Signal<BoolData> _displayBboxSignal = new Signal<BoolData>();
+    Signal<DisplayLayerData> _displayLayerSignal = new Signal<DisplayLayerData>();
+    Signal _updateRendererSignal = new Signal();
 
     EventRegistry() {
         _hub = Hub.root;
@@ -54,6 +52,26 @@ class EventRegistry {
     void subscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.subscribe(handler);
     void unsubscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.unsubscribe(handler);
     void fireWindowResize(WindowResizeData data) => _windowResizeSignal.fire(data);
+
+    void subscribeMouseGeoCoords(Handler<GeoCoordsData> handler) => _mouseGeoCoordsSignal.subscribe(handler);
+    void unsubscribeMouseGeoCoord(Handler<GeoCoordsData> handler) => _mouseGeoCoordsSignal.unsubscribe(handler);
+    void fireMouseGeoCoord(GeoCoordsData data) => _mouseGeoCoordsSignal.fire(data);
+
+    void subscribeDisplayAxes(Handler<BoolData> handler) => _displayAxesSignal.subscribe(handler);
+    void unsubscribeDisplayAxes(Handler<BoolData> handler) => _displayAxesSignal.unsubscribe(handler);
+    void fireDisplayAxes(BoolData data) => _displayAxesSignal.fire(data);
+
+    void subscribeDisplayBbox(Handler<BoolData> handler) => _displayBboxSignal.subscribe(handler);
+    void unsubscribeDisplayBbox(Handler<BoolData> handler) => _displayBboxSignal.unsubscribe(handler);
+    void fireDisplayBbox(BoolData data) => _displayBboxSignal.fire(data);
+
+    void subscribeDisplayLayer(Handler<DisplayLayerData> handler) => _displayLayerSignal.subscribe(handler);
+    void unsubscribeDisplayLayer(Handler<DisplayLayerData> handler) => _displayLayerSignal.unsubscribe(handler);
+    void fireDisplayLayer(DisplayLayerData data) => _displayLayerSignal.fire(data);
+
+    void subscribeUpdateRenderer(Handler handler) => _updateRendererSignal.subscribe(handler);
+    void unsubscribeUpdateRenderer(Handler handler) => _updateRendererSignal.unsubscribe(handler);
+    void fireUpdateRenderer() => _updateRendererSignal.fire(null);
 }
 
 
@@ -75,4 +93,21 @@ class WindowResizeData extends SignalData {
     int newWidth;
     int newHeight;
     WindowResizeData(this.newWidth, this.newHeight);
+}
+
+class GeoCoordsData extends SignalData {
+    double x;
+    double y;
+    GeoCoordsData(this.x, this.y);
+}
+
+class BoolData {
+    bool v;
+    BoolData(this.v);
+}
+
+class DisplayLayerData {
+    String webpath;
+    bool on;
+    DisplayLayerData(this.webpath, this.on);
 }

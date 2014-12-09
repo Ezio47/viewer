@@ -12,8 +12,8 @@ import '../hub.dart';
 
 @CustomTag('status-panel')
 class StatusPanel extends PolymerElement {
-    @published double mousePositionX;
-    @published double mousePositionY;
+    @observable double mousePositionX;
+    @observable double mousePositionY;
 
     Hub _hub = Hub.root;
 
@@ -27,19 +27,15 @@ class StatusPanel extends PolymerElement {
     @override
     void ready() {
         _hub.statusPanel = this;
-        _hub.eventRegistry.subscribeMouseMove(_onMouseMove);
+        _hub.eventRegistry.subscribeMouseGeoCoords((data) {
+            mousePositionX = data.x;
+            mousePositionY = data.y;
+        });
     }
 
     @override
     void detached() {
         super.detached();
-    }
-
-    void _onMouseMove(MouseMoveData data) {
-        final int x = data.newX;
-        final int y = data.newY;
-        mousePositionX = _hub.renderer.mouseX;
-        mousePositionY = _hub.renderer.mouseY;
     }
 
     void aboutbox(Event e, var detail, Node target) {
