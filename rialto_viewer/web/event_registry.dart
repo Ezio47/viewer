@@ -19,7 +19,7 @@ class EventRegistry {
     Signal _mouseDownSignal = new Signal();
     Signal _mouseUpSignal = new Signal();
     Signal<WindowResizeData> _windowResizeSignal = new Signal<WindowResizeData>();
-    Signal<GeoCoordsData> _mouseGeoCoordsSignal = new Signal<GeoCoordsData>();
+    Signal<Vector3> _mouseGeoCoordsSignal = new Signal<Vector3>();
     Signal<bool> _displayAxesSignal = new Signal<bool>();
     Signal<bool> _displayBboxSignal = new Signal<bool>();
     Signal<DisplayLayerData> _displayLayerSignal = new Signal<DisplayLayerData>();
@@ -57,9 +57,9 @@ class EventRegistry {
     void unsubscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.unsubscribe(handler);
     void fireWindowResize(WindowResizeData data) => _windowResizeSignal.fire(data);
 
-    void subscribeMouseGeoCoords(Handler<GeoCoordsData> handler) => _mouseGeoCoordsSignal.subscribe(handler);
-    void unsubscribeMouseGeoCoord(Handler<GeoCoordsData> handler) => _mouseGeoCoordsSignal.unsubscribe(handler);
-    void fireMouseGeoCoord(GeoCoordsData data) => _mouseGeoCoordsSignal.fire(data);
+    void subscribeMouseGeoCoords(Handler<Vector3> handler) => _mouseGeoCoordsSignal.subscribe(handler);
+    void unsubscribeMouseGeoCoord(Handler<Vector3> handler) => _mouseGeoCoordsSignal.unsubscribe(handler);
+    void fireMouseGeoCoord(Vector3 data) => _mouseGeoCoordsSignal.fire(data);
 
     void subscribeDisplayAxes(Handler<bool> handler) => _displayAxesSignal.subscribe(handler);
     void unsubscribeDisplayAxes(Handler<bool> handler) => _displayAxesSignal.unsubscribe(handler);
@@ -107,12 +107,6 @@ class WindowResizeData {
     int newWidth;
     int newHeight;
     WindowResizeData(this.newWidth, this.newHeight);
-}
-
-class GeoCoordsData {
-    double x;
-    double y;
-    GeoCoordsData(this.x, this.y);
 }
 
 class DisplayLayerData {

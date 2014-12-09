@@ -14,6 +14,7 @@ import '../hub.dart';
 class StatusPanel extends PolymerElement {
     @observable double mousePositionX;
     @observable double mousePositionY;
+    @observable double mousePositionZ;
 
     Hub _hub = Hub.root;
 
@@ -30,6 +31,7 @@ class StatusPanel extends PolymerElement {
         _hub.eventRegistry.subscribeMouseGeoCoords((data) {
             mousePositionX = data.x;
             mousePositionY = data.y;
+            mousePositionZ = data.z;
         });
     }
 

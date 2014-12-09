@@ -334,6 +334,6 @@ class Renderer {
         _mouseGeoX = qq.x;
         _mouseGeoY = qq.y;
 
-        Hub.root.eventRegistry.fireMouseGeoCoord(new GeoCoordsData(_mouseGeoX, _mouseGeoY));
+        Hub.root.eventRegistry.fireMouseGeoCoord(new Vector3(_mouseGeoX, _mouseGeoY, this._renderSource.min.z));
     }
 }
