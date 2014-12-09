@@ -7,11 +7,12 @@ library rialto.viewer.server_browser_element;
 import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
+import 'idialog.dart';
 import '../hub.dart';
 
 
 @CustomTag('server-browser-element')
-class ServerBrowserElement extends PolymerElement {
+class ServerBrowserElement extends PolymerElement implements IDialog {
 
     Hub _hub = Hub.root;
 
@@ -52,7 +53,7 @@ class ServerBrowserElement extends PolymerElement {
         super.detached();
     }
 
-    void openPanel() {
+    void openDialog() {
         if (_hub.proxy != null) {
             // This is a special case: only happens when using a boot script.
             // WHen this happens, we need to prime the items list, as would
@@ -69,7 +70,7 @@ class ServerBrowserElement extends PolymerElement {
         Hub.root.serverDialog.showModal();
     }
 
-    void closePanel() {
+    void closeDialog() {
         Hub.root.serverDialog.close("");
     }
 
@@ -110,14 +111,14 @@ class ServerBrowserElement extends PolymerElement {
     }
 
     void doCancel(Event e, var detail, Node target) {
-        closePanel();
+        closeDialog();
     }
 
     void doOpenFile(Event e, var detail, Node target) {
         assert(_currentItem != null);
         _hub.commandRegistry.doAddFile(_currentItem);
 
-        closePanel();
+        closeDialog();
     }
 
     void _loadItemsFromProxy() {
