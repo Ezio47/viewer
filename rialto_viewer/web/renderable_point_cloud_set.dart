@@ -9,6 +9,7 @@ class RenderablePointCloudSet {
     List<RenderablePointCloud> renderablePointClouds = new List<RenderablePointCloud>();
     Vector3 min, max, len;
     int numPoints;
+    String _colorRamp = "Spectral";
 
     RenderablePointCloudSet() {
         min = new Vector3.zero();
@@ -17,6 +18,10 @@ class RenderablePointCloudSet {
 
         Hub.root.eventRegistry.subscribeDisplayLayer(_displayLayerHandler);
         Hub.root.eventRegistry.subscribeColorizeLayers((_) => _colorizeLayersHandler());
+        Hub.root.eventRegistry.subscribeUpdateColorizationSettings((s) {
+            _colorRamp = s;
+            Hub.root.eventRegistry.fireColorizeLayers();
+        });
     }
 
     int get length => renderablePointClouds.length;
@@ -75,7 +80,7 @@ class RenderablePointCloudSet {
 
     void _colorizeLayersHandler() {
         //var colorizer = new FauxColorizer();
-        var colorizer = new RampColorizer("Spectral");
+        var colorizer = new RampColorizer(_colorRamp);
 
         for (var cloud in renderablePointClouds) {
             colorizer.run(cloud);

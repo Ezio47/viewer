@@ -12,10 +12,11 @@ import '../hub.dart';
 
 @CustomTag('colorization-dialog')
 class ColorizationDialog extends PolymerElement implements IDialog {
-
     Hub _hub = Hub.root;
 
-    String _server;
+    @published ObservableList<_ColorizationItem> items = new ObservableList();
+    @observable var selectedItem;
+    @observable bool isSelectionEnabled = true;
 
     ColorizationDialog.created() : super.created();
 
@@ -26,6 +27,9 @@ class ColorizationDialog extends PolymerElement implements IDialog {
 
     @override
     void ready() {
+        var names = RampColorizer.names;
+        names.forEach((s) => items.add(new _ColorizationItem(s)));
+        $["button3"].disabled = true;
     }
 
     @override
@@ -46,6 +50,25 @@ class ColorizationDialog extends PolymerElement implements IDialog {
     }
 
     void doOkay(Event e, var detail, Node target) {
+        assert(selectedItem != null);
+
+        _hub.eventRegistry.fireUpdateColorizationSettings(selectedItem.name);
+
         closeDialog();
     }
+    void doSelectionMade(CustomEvent e) {
+        $["button3"].disabled = false;
+
+        //var item = e.detail.data as _ColorizationItem;
+        //assert(item != null);
+        //_currentItem = item.name;
+
+    }
+}
+
+class _ColorizationItem extends Observable {
+    @observable String name;
+    ProxyItem source;
+
+    _ColorizationItem(this.name);
 }

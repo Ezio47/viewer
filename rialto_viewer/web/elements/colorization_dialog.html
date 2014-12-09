@@ -33,6 +33,20 @@
 
         <div class="dark-panel-style">
 
+            <core-list-dart data="{{items}}" height="20px" class="listbox-style pad4"
+                            selectionEnabled="{{isSelectionEnabled}}"
+                            selection="{{selectedItem}}"
+                            on-core-activate = "{{doSelectionMade}}"
+                            multi="false"
+                            id="file-list2">
+                        <template>
+                            <div layout horizontal class="{{ {selecteditemstyle: selected} }} listbox-item-style" id="{{index}}">
+                                <span>{{model.name}}
+                                </span>
+                            </div>
+                        </template>
+            </core-list-dart>
+
             <div>
                 Colorization settings go here
                 <button class="regulartextbutton" type="button" on-click="{{doCancel}}">

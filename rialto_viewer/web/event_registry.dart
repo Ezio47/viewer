@@ -28,6 +28,7 @@ class EventRegistry {
     Signal<Vector3> _updateCameraPositionSignal = new Signal<Vector3>();
     Signal<Vector3> _updateEyePositionSignal = new Signal<Vector3>();
     //Signal<double> _updateZScaleSignal = new Signal<double>();
+    Signal<String> _updateColorizationSettingsSignal = new Signal<String>();
 
     EventRegistry() {
         _hub = Hub.root;
@@ -92,8 +93,12 @@ class EventRegistry {
     void fireUpdateEyePosition(Vector3 data) => _updateEyePositionSignal.fire(data);
 
     //void subscribeUpdateZScale(Handler<double> handler) => _updateZScaleSignal.subscribe(handler);
-    //void unsubscribeUpdateZSca(Handler<double> handler) => _updateZScaleSignal.unsubscribe(handler);
+    //void unsubscribeUpdateZScale(Handler<double> handler) => _updateZScaleSignal.unsubscribe(handler);
     //void fireUpdateZScale(double data) => _updateZScaleSignal.fire(data);
+
+    void subscribeUpdateColorizationSettings(Handler<String> handler) => _updateColorizationSettingsSignal.subscribe(handler);
+    void unsubscribeUpdateColorizationSettings(Handler<String> handler) => _updateColorizationSettingsSignal.unsubscribe(handler);
+    void fireUpdateColorizationSettings(String data) => _updateColorizationSettingsSignal.fire(data);
 }
 
 

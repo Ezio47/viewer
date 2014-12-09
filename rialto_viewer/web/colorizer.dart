@@ -57,6 +57,12 @@ class RampColorizer extends Colorizer {
     final String _name;
     RampColorizer(this._name);
 
+    static List<String> get names {
+        List<String> l = (_Ramps.list as Map).keys.toList();
+        l.sort();
+        return l;
+    }
+
     void _algorithm(double zmin, double zmax, Float32List positions, Float32List colors, int numPoints) {
         assert(_Ramps.list.containsKey(_name));
 
