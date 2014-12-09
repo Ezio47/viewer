@@ -16,6 +16,7 @@ class RenderablePointCloudSet {
         len = new Vector3.zero();
 
         Hub.root.eventRegistry.subscribeDisplayLayer(_displayLayerHandler);
+        Hub.root.eventRegistry.subscribeColorizeLayers((_) => _colorizeLayersHandler());
     }
 
     int get length => renderablePointClouds.length;
@@ -72,9 +73,10 @@ class RenderablePointCloudSet {
         len = max - min;
     }
 
-    void colorize() {
+    void _colorizeLayersHandler() {
         for (var cloud in renderablePointClouds) {
             cloud.colorize();
         }
+        Hub.root.eventRegistry.fireUpdateRenderer();
     }
 }

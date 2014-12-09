@@ -25,11 +25,6 @@ class CommandRegistry {
         }
     }
 
-    void doColorize() {
-        _hub.renderablePointCloudSet.colorize();
-        _hub.renderer.update();
-    }
-
     void doAddFile(FileProxy file) {
         _hub.layerPanel.doAddFile(file.webpath, file.displayName);
 

@@ -24,6 +24,7 @@ class EventRegistry {
     Signal<BoolData> _displayBboxSignal = new Signal<BoolData>();
     Signal<DisplayLayerData> _displayLayerSignal = new Signal<DisplayLayerData>();
     Signal _updateRendererSignal = new Signal();
+    Signal _colorizeLayersSignal = new Signal();
 
     EventRegistry() {
         _hub = Hub.root;
@@ -69,9 +70,14 @@ class EventRegistry {
     void unsubscribeDisplayLayer(Handler<DisplayLayerData> handler) => _displayLayerSignal.unsubscribe(handler);
     void fireDisplayLayer(DisplayLayerData data) => _displayLayerSignal.fire(data);
 
+    // BUG: you can't unsubscribe the "empty" handler, since is an anonymous lambda
     void subscribeUpdateRenderer(Handler handler) => _updateRendererSignal.subscribe(handler);
     void unsubscribeUpdateRenderer(Handler handler) => _updateRendererSignal.unsubscribe(handler);
     void fireUpdateRenderer() => _updateRendererSignal.fire(null);
+
+    void subscribeColorizeLayers(Handler handler) => _colorizeLayersSignal.subscribe(handler);
+    void unsubscriberColorizeLayers(Handler handler) => _colorizeLayersSignal.unsubscribe(handler);
+    void fireColorizeLayers() => _colorizeLayersSignal.fire(null);
 }
 
 
