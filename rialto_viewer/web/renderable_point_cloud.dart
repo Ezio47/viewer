@@ -76,7 +76,7 @@ class RenderablePointCloud {
         }
     }
 
-    ParticleSystem getParticleSystem() {
+    ParticleSystem buildParticleSystem() {
         var positions = dims["positions"];
         var colors = dims["colors"];
         assert(positions != null);
@@ -97,37 +97,4 @@ class RenderablePointCloud {
         _particleSystem.name = pointCloud.webpath;
         return _particleSystem;
     }
-
-    void colorize() {
-        double zLen = max.z - min.z;
-
-        var positions = dims["positions"].array;
-        var colors = dims["colors"].array;
-
-        for (int i = 0; i < numPoints * 3; i += 3) {
-            double z = positions[i + 2];
-            double c = (z - min.z) / zLen;
-
-            // clip, due to FP math
-            assert(c >= -0.1 && c <= 1.1);
-            if (c < 0.0) c = 0.0;
-            if (c > 1.0) c = 1.0;
-
-            // a silly ramp
-            if (c < 0.3333) {
-                colors[i] = c * 3.0;
-                colors[i + 1] = 0.0;
-                colors[i + 2] = 0.0;
-            } else if (c < 0.6666) {
-                colors[i] = 0.0;
-                colors[i + 1] = (c - 0.3333) * 3.0;
-                colors[i + 2] = 0.0;
-            } else {
-                colors[i] = 0.0;
-                colors[i + 1] = 0.0;
-                colors[i + 2] = (c - 0.6666) * 3.0;
-            }
-        }
-    }
-
 }

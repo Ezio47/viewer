@@ -74,8 +74,11 @@ class RenderablePointCloudSet {
     }
 
     void _colorizeLayersHandler() {
+        //var colorizer = new FauxColorizer();
+        var colorizer = new RampColorizer("Spectral");
+
         for (var cloud in renderablePointClouds) {
-            cloud.colorize();
+            colorizer.run(cloud);
         }
         Hub.root.eventRegistry.fireUpdateRenderer();
     }

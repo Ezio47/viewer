@@ -27,6 +27,7 @@ import 'elements/status_panel.dart';
 
 part 'axes_object.dart';
 part 'bbox_object.dart';
+part 'colorizer.dart';
 part 'command_registry.dart';
 part 'comms.dart';
 part 'event_registry.dart';

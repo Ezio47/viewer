@@ -24,21 +24,6 @@ void main() {
 }
 
 
-void boot2() {
-    Hub hub = Hub.root;
-
-    hub.defaultServer = "http://localhost:12345";
-
-    hub.commandRegistry.doOpenServer("http://localhost:12345").then((_) {
-        List<FileProxy> list = hub.proxy.root.files;
-        FileProxy file1 = list.firstWhere((e) => e.displayName == "autzen-10.ria");
-
-        hub.commandRegistry.doAddFile(file1);
-
-        hub.eventRegistry.fireDisplayBbox(true);
-    });
-}
-
 void boot1() {
     Hub hub = Hub.root;
 
@@ -53,5 +38,25 @@ void boot1() {
         hub.commandRegistry.doAddFile(file2);
 
         hub.eventRegistry.fireDisplayBbox(true);
+
+        hub.eventRegistry.fireColorizeLayers();
+    });
+}
+
+
+void boot2() {
+    Hub hub = Hub.root;
+
+    hub.defaultServer = "http://localhost:12345";
+
+    hub.commandRegistry.doOpenServer("http://localhost:12345").then((_) {
+        List<FileProxy> list = hub.proxy.root.files;
+        FileProxy file1 = list.firstWhere((e) => e.displayName == "autzen-10.ria");
+
+        hub.commandRegistry.doAddFile(file1);
+
+        hub.eventRegistry.fireDisplayBbox(true);
+
+        hub.eventRegistry.fireColorizeLayers();
     });
 }
