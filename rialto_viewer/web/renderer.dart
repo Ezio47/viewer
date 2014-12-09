@@ -45,8 +45,8 @@ class Renderer {
         assert(parentElement != null);
         parentElement.children.add(_webglRenderer.domElement);
 
-        Hub.root.eventRegistry.registerMouseMoveHandler(_updateMouseLocalCoords);
-        Hub.root.eventRegistry.registerWindowResizeHandler(_onMyWindowResize);
+        Hub.root.eventRegistry.subscribeMouseMove(_updateMouseLocalCoords);
+        Hub.root.eventRegistry.subscribeWindowResize(_onMyWindowResize);
 
         _renderSource = rpcSet;
 
@@ -197,7 +197,9 @@ class Renderer {
     }
 
 
-    void _updateMouseLocalCoords(int newX, int newY) {
+    void _updateMouseLocalCoords(MouseMoveData data) {
+        final int newX = data.newX;
+        final int newY = data.newY;
 
         // event.client.x,y is from upper left (0,0) of entire browser window
 
@@ -218,9 +220,9 @@ class Renderer {
     }
 
 
-    void _onMyWindowResize() {
-        var w = window.innerWidth ;
-        var h = window.innerHeight;
+    void _onMyWindowResize(WindowResizeData data) {
+        final w = window.innerWidth ;
+        final h = window.innerHeight;
         _webglRenderer.setSize(w, h);
 
         final double aspect = w.toDouble() / h.toDouble();

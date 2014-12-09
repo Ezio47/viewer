@@ -27,7 +27,7 @@ class StatusPanel extends PolymerElement {
     @override
     void ready() {
         _hub.statusPanel = this;
-        _hub.eventRegistry.registerMouseMoveHandler(_onMouseMove);
+        _hub.eventRegistry.subscribeMouseMove(_onMouseMove);
     }
 
     @override
@@ -35,12 +35,14 @@ class StatusPanel extends PolymerElement {
         super.detached();
     }
 
-    void _onMouseMove(int x, int y) {
+    void _onMouseMove(MouseMoveData data) {
+        final int x = data.newX;
+        final int y = data.newY;
         mousePositionX = _hub.renderer.mouseX;
         mousePositionY = _hub.renderer.mouseY;
     }
 
     void aboutbox(Event e, var detail, Node target) {
-        window.alert("Copyright © RadiantBlue 2014. All rights reserved.");
+        window.alert("Copyright © RadiantBlue 2014.");
     }
 }

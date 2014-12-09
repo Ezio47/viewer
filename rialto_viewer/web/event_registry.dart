@@ -20,10 +20,10 @@ typedef void WindowResizeHandler();
 
 class EventRegistry {
     // global handlers
-    List<MouseMoveHandler> _mouseMoveHandlers = new List<MouseMoveHandler>();
-    List<MouseDownHandler> _mouseDownHandlers = new List<MouseDownHandler>();
-    List<MouseUpHandler> _mouseUpHandlers = new List<MouseUpHandler>();
-    List<WindowResizeHandler> _windowResizeHandlers = new List<WindowResizeHandler>();
+    Signal<MouseMoveData> _mouseMoveSignal = new Signal<MouseMoveData>();
+    Signal<MouseDownData> _mouseDownSignal = new Signal<MouseDownData>();
+    Signal<MouseUpData> _mouseUpSignal = new Signal<MouseUpData>();
+    Signal<WindowResizeData> _windowResizeSignal = new Signal<WindowResizeData>();
 
     Hub _hub;
 
@@ -32,82 +32,47 @@ class EventRegistry {
     }
 
     void start(var domElement) {
-        domElement.onMouseMove.listen(_handleMouseMove);
-        domElement.onMouseDown.listen(_handleMouseDown);
-        domElement.onMouseUp.listen(_handleMouseUp);
-        window.onResize.listen(_handleWindowResize);
+        // translate system events into our kinds of signals
+        domElement.onMouseMove.listen((e) => _mouseMoveSignal.fire(new MouseMoveData(e.client.x, e.client.y)));
+        domElement.onMouseDown.listen((e) => _mouseDownSignal.fire(new MouseDownData()));
+        domElement.onMouseUp.listen((e) => _mouseUpSignal.fire(new MouseUpData()));
+        window.onResize.listen((e) => _windowResizeSignal.fire(new WindowResizeData(e.client.x, e.client.y)));
     }
 
-    //
-    // Mouse Move
-    //
+    void subscribeMouseMove(Handler<MouseMoveData> handler) => _mouseMoveSignal.subscribe(handler);
+    void unsubscribeMouseMove(Handler<MouseMoveData> handler) => _mouseMoveSignal.unsubscribe(handler);
+    void fireMouseMoveHandler(MouseMoveData data) => _mouseMoveSignal.fire(data);
 
-    void _handleMouseMove(var event) {
-         //event.preventDefault();
+    void subscribeMouseDown(Handler<MouseDownData> handler) => _mouseDownSignal.subscribe(handler);
+    void unsubscribeMouseDown(Handler<MouseDownData> handler) => _mouseDownSignal.unsubscribe(handler);
+    void fireMouseDown(MouseDownData data) => _mouseDownSignal.fire(data);
 
-         final int newX = event.client.x;
-         final int newY = event.client.y;
+    void subscribeMouseUp(Handler<MouseUpData> handler) => _mouseUpSignal.subscribe(handler);
+    void unsubscribeMouseUp(Handler<MouseUpData> handler) => _mouseUpSignal.unsubscribe(handler);
+    void fireMouseUp(MouseUpData data) => _mouseUpSignal.fire(data);
 
-         _mouseMoveHandlers.forEach((h) => h(newX, newY));
-     }
+    void subscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.subscribe(handler);
+    void unsubscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.unsubscribe(handler);
+    void fireWindowResize(WindowResizeData data) => _windowResizeSignal.fire(data);
+}
 
-     void registerMouseMoveHandler(MouseMoveHandler handler) {
-         if (!_mouseMoveHandlers.contains(handler))
-             _mouseMoveHandlers.add(handler);
-     }
 
-     void unregisterMouseMoveHandler(MouseMoveHandler handler) {
-         _mouseMoveHandlers.remove(handler);
-     }
+class MouseMoveData extends SignalData {
+    int newX;
+    int newY;
+    MouseMoveData(this.newX, this.newY);
+}
 
-     //
-     // Window Resize
-     //
+class MouseDownData extends SignalData {
+    MouseDownData();
+}
 
-     void _handleWindowResize(var event) {
-         _windowResizeHandlers.forEach((h) => h());
-     }
+class MouseUpData extends SignalData {
+    MouseUpData();
+}
 
-     void registerWindowResizeHandler(WindowResizeHandler handler) {
-         if (!_windowResizeHandlers.contains(handler))
-             _windowResizeHandlers.add(handler);
-     }
-
-     void unregisterWindowResizeHandler(WindowResizeHandler handler) {
-         _windowResizeHandlers.remove(handler);
-     }
-
-     //
-     // Mouse Down
-     //
-
-     void _handleMouseDown(var event) {
-         _mouseDownHandlers.forEach((h) => h());
-     }
-
-     void registerMouseDownHandler(MouseDownHandler handler) {
-         if (!_mouseDownHandlers.contains(handler))
-             _mouseDownHandlers.add(handler);
-     }
-
-     void unregisterMouseDownHandler(MouseDownHandler handler) {
-         _mouseDownHandlers.remove(handler);
-     }
-
-     //
-     // Mouse Up
-     //
-
-     void _handleMouseUp(var event) {
-         _mouseUpHandlers.forEach((h) => h());
-     }
-
-     void registerMouseUpHandler(MouseUpHandler handler) {
-         if (!_mouseUpHandlers.contains(handler))
-             _mouseUpHandlers.add(handler);
-     }
-
-     void unregisterMouseUpHandler(MouseUpHandler handler) {
-         _mouseUpHandlers.remove(handler);
-     }
+class WindowResizeData extends SignalData {
+    int newWidth;
+    int newHeight;
+    WindowResizeData(this.newWidth, this.newHeight);
 }
