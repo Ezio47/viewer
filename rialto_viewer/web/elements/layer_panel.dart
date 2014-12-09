@@ -49,11 +49,11 @@ class LayerPanel extends PolymerElement {
 
     void openFile(Event e, var detail, Node target) {
         // kludge so we can set isServerOpen correctly when using a bootscript
-        _hub.serverBrowserElement.openDialog();
+        _hub.serverDialog.openDialog();
     }
 
     void openServer(Event e, var detail, Node target) {
-        Hub.root.serverBrowserElement.openDialog();
+        Hub.root.serverDialog.openDialog();
         return;
     }
 

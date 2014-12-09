@@ -21,47 +21,32 @@
 <link rel="import" href="packages/core_elements/core_iconset_svg.html">
 <link rel="import" href="packages/core_elements/image_icons.html">
 
-<link rel="import" href="server_browser_element.html">
-<link rel="import" href="info_panel.html">
 <link rel="import" href="rialto_icons.html">
 
-<polymer-element name="display-panel">
+<polymer-element name="colorization-dialog">
 
     <template>
         <style>
             /*** RIALTO-CSS-GOES-HERE ***/
         </style>
 
-        <div class="light-panel-style">
 
-            <form action="" class="pad2">
-                <div>
-                    <label>
-                        <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
-                        <span>Toggle axes</span>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
-                        <span>Toggle bbox</span>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
-                        <span>None</span>
-                    </label>
-                </div>
-            </form>
+        <div class="dark-panel-style">
 
-            <button class="regulartextbutton" type="button" on-click="{{doColorization}}">
-                <span>Colorization...</span>
-            </button>
+            <div>
+                Colorization settings go here
+                <button class="regulartextbutton" type="button" on-click="{{doCancel}}">
+                    <span>Cancel</span>
+                </button>
+                <button class="regulartextbutton" id="button3" type="button" on-click="{{doOkay}}">
+                    <span>Okay</span>
+                </button>
+            </div>
+
         </div>
 
     </template>
 
-    <script type="application/dart" src="display_panel.dart"></script>
+    <script type="application/dart" src="colorization_dialog.dart"></script>
 
 </polymer-element>

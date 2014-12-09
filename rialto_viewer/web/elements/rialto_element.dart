@@ -27,7 +27,10 @@ class RialtoElement extends PolymerElement {
     @override
     void ready() {
         Hub.root.mainWindow = this;
-        Hub.root.serverDialog = $["serverdialog"];
+        Hub.root.serverDialogElement = $["server-dialog-element"];
+        Hub.root.serverDialog = $["server-dialog"];
+        Hub.root.colorizationDialogElement = $["colorization-dialog-element"];
+        Hub.root.colorizationDialog = $["colorization-dialog"];
     }
 
     @override
@@ -68,7 +71,7 @@ class RialtoElement extends PolymerElement {
     }
 
     void closeServerDialog(Event e, var detail, Node target) {
-        Hub.root.serverBrowserElement.closeDialog();
+        Hub.root.serverDialog.closeDialog();
     }
 
     void goHome(Event e, var detail, Node target) {

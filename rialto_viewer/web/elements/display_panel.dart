@@ -64,4 +64,7 @@ class DisplayPanel extends PolymerElement {
         _hub.eventRegistry.fireDisplayBbox(button.checked);
     }
 
+    void doColorization(Event e, var detail, Node target) {
+        _hub.colorizationDialog.openDialog();
+    }
 }

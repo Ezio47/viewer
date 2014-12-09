@@ -40,7 +40,7 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
 
     @override
     void ready() {
-        _hub.serverBrowserElement = this;
+        _hub.serverDialog = this;
 
         if (defaultServer == null) {
             defaultServer = _hub.defaultServer;
@@ -67,11 +67,11 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
         $["button2"].disabled = isServerOpen;
         $["button3"].disabled = true;
 
-        Hub.root.serverDialog.showModal();
+        Hub.root.serverDialogElement.showModal();
     }
 
     void closeDialog() {
-        Hub.root.serverDialog.close("");
+        Hub.root.serverDialogElement.close("");
     }
 
     void doCloseServer(Event e, var detail, Node target) {

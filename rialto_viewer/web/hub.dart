@@ -16,6 +16,7 @@ import 'package:three/extras/controls/trackball_controls.dart';
 import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 
+import 'elements/colorization_dialog.dart';
 import 'elements/display_panel.dart';
 import 'elements/info_panel.dart';
 import 'elements/layer_panel.dart';
@@ -51,8 +52,10 @@ class Hub {
     LayerPanel layerPanel;
     RenderPanel renderPanel;
     StatusPanel statusPanel;
-    ServerBrowserElement serverBrowserElement;
-    DialogElement serverDialog;
+    DialogElement serverDialogElement;
+    ServerBrowserElement serverDialog;
+    DialogElement colorizationDialogElement;
+    ColorizationDialog colorizationDialog;
 
     Renderer renderer;
     EventRegistry eventRegistry;

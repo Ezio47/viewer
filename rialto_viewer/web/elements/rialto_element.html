@@ -23,6 +23,7 @@
 <link rel="import" href="layer_panel.html">
 <link rel="import" href="info_panel.html">
 <link rel="import" href="display_panel.html">
+<link rel="import" href="colorization_dialog.html">
 
 <link rel="import" href="rialto_icons.html">
 
@@ -61,7 +62,7 @@
                     <div layout horizontal >
 
                         <!-- layer panel -->
-                        <div layout vertical class=" layer-panel-min-width">
+                        <div layout vertical class="layer-panel-min-width">
                             <div layout horizontal center class="dark-panel-style smallround-button-style">
                                 <paper-icon-button icon="rialto-icons-small:chevdown" on-click="{{toggleCollapse2}}"></paper-icon-button>
                                 <span class="text-label-style">Files</span>
@@ -72,8 +73,13 @@
                         </div>
 
                         <!-- server browser -->
-                        <dialog id="serverdialog" >
-                            <server-browser-element></server-browser-element>
+                        <dialog id="server-dialog-element">
+                            <server-browser-element id="server-dialog"></server-browser-element>
+                        </dialog>
+
+                        <!-- colorization -->
+                        <dialog id="colorization-dialog-element">
+                            <colorization-dialog id="colorization-dialog"></colorization-dialog>
                         </dialog>
 
                     </div>
