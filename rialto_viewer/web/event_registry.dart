@@ -18,7 +18,7 @@ class EventRegistry {
     Signal<MouseMoveData> _mouseMoveSignal = new Signal<MouseMoveData>();
     Signal _mouseDownSignal = new Signal();
     Signal _mouseUpSignal = new Signal();
-    Signal<WindowResizeData> _windowResizeSignal = new Signal<WindowResizeData>();
+    Signal _windowResizeSignal = new Signal();
     Signal<Vector3> _mouseGeoCoordsSignal = new Signal<Vector3>();
     Signal<bool> _displayAxesSignal = new Signal<bool>();
     Signal<bool> _displayBboxSignal = new Signal<bool>();
@@ -38,7 +38,7 @@ class EventRegistry {
         domElement.onMouseMove.listen((e) => _mouseMoveSignal.fire(new MouseMoveData(e.client.x, e.client.y)));
         domElement.onMouseDown.listen((e) => _mouseDownSignal.fire(null));
         domElement.onMouseUp.listen((e) => _mouseUpSignal.fire(null));
-        window.onResize.listen((e) => _windowResizeSignal.fire(new WindowResizeData(e.client.x, e.client.y)));
+        window.onResize.listen((e) => _windowResizeSignal.fire(null));
     }
 
     void subscribeMouseMove(Handler<MouseMoveData> handler) => _mouseMoveSignal.subscribe(handler);
@@ -53,9 +53,9 @@ class EventRegistry {
     void unsubscribeMouseUp(Handler handler) => _mouseUpSignal.unsubscribe(handler);
     void fireMouseUp() => _mouseUpSignal.fire(null);
 
-    void subscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.subscribe(handler);
-    void unsubscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.unsubscribe(handler);
-    void fireWindowResize(WindowResizeData data) => _windowResizeSignal.fire(data);
+    void subscribeWindowResize(Handler handler) => _windowResizeSignal.subscribe(handler);
+    void unsubscribeWindowResize(Handler handler) => _windowResizeSignal.unsubscribe(handler);
+    void fireWindowResize() => _windowResizeSignal.fire(null);
 
     void subscribeMouseGeoCoords(Handler<Vector3> handler) => _mouseGeoCoordsSignal.subscribe(handler);
     void unsubscribeMouseGeoCoord(Handler<Vector3> handler) => _mouseGeoCoordsSignal.unsubscribe(handler);
@@ -101,12 +101,6 @@ class MouseMoveData {
     int newX;
     int newY;
     MouseMoveData(this.newX, this.newY);
-}
-
-class WindowResizeData {
-    int newWidth;
-    int newHeight;
-    WindowResizeData(this.newWidth, this.newHeight);
 }
 
 class DisplayLayerData {

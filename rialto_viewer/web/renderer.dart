@@ -49,7 +49,7 @@ class Renderer {
         parentElement.children.add(_webglRenderer.domElement);
 
         Hub.root.eventRegistry.subscribeMouseMove(_updateMouseLocalCoords);
-        Hub.root.eventRegistry.subscribeWindowResize(_onMyWindowResize);
+        Hub.root.eventRegistry.subscribeWindowResize((_) => _onMyWindowResize());
         Hub.root.eventRegistry.subscribeDisplayAxes(_displayAxesHandler);
         Hub.root.eventRegistry.subscribeDisplayBbox(_displayBboxHandler);
         Hub.root.eventRegistry.subscribeUpdateRenderer((_) => update());
@@ -244,7 +244,7 @@ class Renderer {
     }
 
 
-    void _onMyWindowResize(WindowResizeData data) {
+    void _onMyWindowResize() {
         final w = window.innerWidth ;
         final h = window.innerHeight;
         _webglRenderer.setSize(w, h);
