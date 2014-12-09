@@ -35,7 +35,7 @@ void boot2() {
 
         hub.commandRegistry.doAddFile(file1);
 
-        hub.eventRegistry.fireDisplayBbox(new BoolData(true));
+        hub.eventRegistry.fireDisplayBbox(true);
     });
 }
 
@@ -52,6 +52,6 @@ void boot1() {
         hub.commandRegistry.doAddFile(file1);
         hub.commandRegistry.doAddFile(file2);
 
-        hub.eventRegistry.fireDisplayBbox(new BoolData(true));
+        hub.eventRegistry.fireDisplayBbox(true);
     });
 }

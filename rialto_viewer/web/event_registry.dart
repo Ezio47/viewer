@@ -16,12 +16,12 @@ class EventRegistry {
     Hub _hub;
 
     Signal<MouseMoveData> _mouseMoveSignal = new Signal<MouseMoveData>();
-    Signal<MouseDownData> _mouseDownSignal = new Signal<MouseDownData>();
-    Signal<MouseUpData> _mouseUpSignal = new Signal<MouseUpData>();
+    Signal _mouseDownSignal = new Signal();
+    Signal _mouseUpSignal = new Signal();
     Signal<WindowResizeData> _windowResizeSignal = new Signal<WindowResizeData>();
     Signal<GeoCoordsData> _mouseGeoCoordsSignal = new Signal<GeoCoordsData>();
-    Signal<BoolData> _displayAxesSignal = new Signal<BoolData>();
-    Signal<BoolData> _displayBboxSignal = new Signal<BoolData>();
+    Signal<bool> _displayAxesSignal = new Signal<bool>();
+    Signal<bool> _displayBboxSignal = new Signal<bool>();
     Signal<DisplayLayerData> _displayLayerSignal = new Signal<DisplayLayerData>();
     Signal _updateRendererSignal = new Signal();
     Signal _colorizeLayersSignal = new Signal();
@@ -36,8 +36,8 @@ class EventRegistry {
     void start(var domElement) {
         // translate system events into our kinds of signals
         domElement.onMouseMove.listen((e) => _mouseMoveSignal.fire(new MouseMoveData(e.client.x, e.client.y)));
-        domElement.onMouseDown.listen((e) => _mouseDownSignal.fire(new MouseDownData()));
-        domElement.onMouseUp.listen((e) => _mouseUpSignal.fire(new MouseUpData()));
+        domElement.onMouseDown.listen((e) => _mouseDownSignal.fire(null));
+        domElement.onMouseUp.listen((e) => _mouseUpSignal.fire(null));
         window.onResize.listen((e) => _windowResizeSignal.fire(new WindowResizeData(e.client.x, e.client.y)));
     }
 
@@ -45,13 +45,13 @@ class EventRegistry {
     void unsubscribeMouseMove(Handler<MouseMoveData> handler) => _mouseMoveSignal.unsubscribe(handler);
     void fireMouseMoveHandler(MouseMoveData data) => _mouseMoveSignal.fire(data);
 
-    void subscribeMouseDown(Handler<MouseDownData> handler) => _mouseDownSignal.subscribe(handler);
-    void unsubscribeMouseDown(Handler<MouseDownData> handler) => _mouseDownSignal.unsubscribe(handler);
-    void fireMouseDown(MouseDownData data) => _mouseDownSignal.fire(data);
+    void subscribeMouseDown(Handler handler) => _mouseDownSignal.subscribe(handler);
+    void unsubscribeMouseDown(Handler handler) => _mouseDownSignal.unsubscribe(handler);
+    void fireMouseDown() => _mouseDownSignal.fire(null);
 
-    void subscribeMouseUp(Handler<MouseUpData> handler) => _mouseUpSignal.subscribe(handler);
-    void unsubscribeMouseUp(Handler<MouseUpData> handler) => _mouseUpSignal.unsubscribe(handler);
-    void fireMouseUp(MouseUpData data) => _mouseUpSignal.fire(data);
+    void subscribeMouseUp(Handler handler) => _mouseUpSignal.subscribe(handler);
+    void unsubscribeMouseUp(Handler handler) => _mouseUpSignal.unsubscribe(handler);
+    void fireMouseUp() => _mouseUpSignal.fire(null);
 
     void subscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.subscribe(handler);
     void unsubscribeWindowResize(Handler<WindowResizeData> handler) => _windowResizeSignal.unsubscribe(handler);
@@ -61,19 +61,20 @@ class EventRegistry {
     void unsubscribeMouseGeoCoord(Handler<GeoCoordsData> handler) => _mouseGeoCoordsSignal.unsubscribe(handler);
     void fireMouseGeoCoord(GeoCoordsData data) => _mouseGeoCoordsSignal.fire(data);
 
-    void subscribeDisplayAxes(Handler<BoolData> handler) => _displayAxesSignal.subscribe(handler);
-    void unsubscribeDisplayAxes(Handler<BoolData> handler) => _displayAxesSignal.unsubscribe(handler);
-    void fireDisplayAxes(BoolData data) => _displayAxesSignal.fire(data);
+    void subscribeDisplayAxes(Handler<bool> handler) => _displayAxesSignal.subscribe(handler);
+    void unsubscribeDisplayAxes(Handler<bool> handler) => _displayAxesSignal.unsubscribe(handler);
+    void fireDisplayAxes(bool data) => _displayAxesSignal.fire(data);
 
-    void subscribeDisplayBbox(Handler<BoolData> handler) => _displayBboxSignal.subscribe(handler);
-    void unsubscribeDisplayBbox(Handler<BoolData> handler) => _displayBboxSignal.unsubscribe(handler);
-    void fireDisplayBbox(BoolData data) => _displayBboxSignal.fire(data);
+    void subscribeDisplayBbox(Handler<bool> handler) => _displayBboxSignal.subscribe(handler);
+    void unsubscribeDisplayBbox(Handler<bool> handler) => _displayBboxSignal.unsubscribe(handler);
+    void fireDisplayBbox(bool data) => _displayBboxSignal.fire(data);
 
     void subscribeDisplayLayer(Handler<DisplayLayerData> handler) => _displayLayerSignal.subscribe(handler);
     void unsubscribeDisplayLayer(Handler<DisplayLayerData> handler) => _displayLayerSignal.unsubscribe(handler);
     void fireDisplayLayer(DisplayLayerData data) => _displayLayerSignal.fire(data);
 
-    // BUG: you can't unsubscribe the "empty" handler, since is an anonymous lambda
+    // BUG: note you can't unsubscribe a handler that is an anonymous lambda
+    // which might be the case of 0-arity handler functions
     void subscribeUpdateRenderer(Handler handler) => _updateRendererSignal.subscribe(handler);
     void unsubscribeUpdateRenderer(Handler handler) => _updateRendererSignal.unsubscribe(handler);
     void fireUpdateRenderer() => _updateRendererSignal.fire(null);
@@ -96,35 +97,22 @@ class EventRegistry {
 }
 
 
-class MouseMoveData extends SignalData {
+class MouseMoveData {
     int newX;
     int newY;
     MouseMoveData(this.newX, this.newY);
 }
 
-class MouseDownData extends SignalData {
-    MouseDownData();
-}
-
-class MouseUpData extends SignalData {
-    MouseUpData();
-}
-
-class WindowResizeData extends SignalData {
+class WindowResizeData {
     int newWidth;
     int newHeight;
     WindowResizeData(this.newWidth, this.newHeight);
 }
 
-class GeoCoordsData extends SignalData {
+class GeoCoordsData {
     double x;
     double y;
     GeoCoordsData(this.x, this.y);
-}
-
-class BoolData {
-    bool v;
-    BoolData(this.v);
 }
 
 class DisplayLayerData {
@@ -139,4 +127,3 @@ class CameraModelData {
     double zExaggeartion;
     CameraModelData(this.cameraPosition, this.eyePosition, this.zExaggeartion);
 }
-

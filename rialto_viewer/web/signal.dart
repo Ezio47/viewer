@@ -33,7 +33,3 @@ class Signal<T> {
         _controller.add(t);
     }
 }
-
-class SignalData {
-    SignalData();
-}

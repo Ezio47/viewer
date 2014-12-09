@@ -198,8 +198,7 @@ class Renderer {
     }
 
 
-    void _displayAxesHandler(BoolData data) {
-        final bool on = data.v;
+    void _displayAxesHandler(bool on) {
         if (_axesObject == null) return;
 
         if (on) {
@@ -210,8 +209,7 @@ class Renderer {
         _showAxes = on;
     }
 
-    void _displayBboxHandler(BoolData data) {
-        final bool on = data.v;
+    void _displayBboxHandler(bool on) {
         if (_bboxObject == null) return;
 
         if (on) {
