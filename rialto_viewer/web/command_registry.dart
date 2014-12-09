@@ -50,6 +50,4 @@ class CommandRegistry {
 
         _hub.renderer.update();
     }
-
-    void goHome() => _hub.renderer.goHome();
 }

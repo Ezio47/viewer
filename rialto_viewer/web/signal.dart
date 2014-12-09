@@ -34,6 +34,6 @@ class Signal<T> {
     }
 }
 
-class SignalData{
+class SignalData {
     SignalData();
 }

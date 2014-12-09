@@ -26,9 +26,12 @@ class Renderer {
 
     RenderablePointCloudSet _renderSource;
 
-    Vector3 _cameraEyePoint;
-    Vector3 _cameraTargetPoint;
+    Vector3 _cameraHomeEyePoint;
+    Vector3 _cameraHomeTargetPoint;
     Vector3 _cameraUpVector;
+    Vector3 _cameraCurrentEyePoint = new Vector3.zero();
+    Vector3 _cameraCurrentTargetPoint = new Vector3.zero();
+
     AxesObject _axesObject;
     Object3D _bboxObject;
 
@@ -50,6 +53,8 @@ class Renderer {
         Hub.root.eventRegistry.subscribeDisplayAxes(_displayAxesHandler);
         Hub.root.eventRegistry.subscribeDisplayBbox(_displayBboxHandler);
         Hub.root.eventRegistry.subscribeUpdateRenderer((_) => update());
+        Hub.root.eventRegistry.subscribeUpdateCameraPosition(_updateCameraPositionHandler);
+        Hub.root.eventRegistry.subscribeUpdateEyePosition(_updateEyePositionHandler);
 
         _renderSource = rpcSet;
 
@@ -61,10 +66,27 @@ class Renderer {
     Element get canvas => _canvas;
 
 
-    void goHome() {
-        _camera.position.setFrom(_cameraEyePoint);
+    void _updateCameraPositionHandler(Vector3 data) {
+        if (data==null) data = _cameraHomeTargetPoint;
+        data.copyInto(_cameraCurrentTargetPoint);
+        _updateCameraModel();
+    }
+
+    void _updateEyePositionHandler(Vector3 data) {
+        if (data==null) data = _cameraHomeEyePoint;
+        data.copyInto(_cameraCurrentEyePoint);
+        _updateCameraModel();
+    }
+
+    void _updateCameraModel() {
+        _camera.position.setFrom(_cameraCurrentEyePoint);
         _camera.up.setFrom(_cameraUpVector);
-        _camera.lookAt(_cameraTargetPoint);
+        _camera.lookAt(_cameraCurrentTargetPoint);
+    }
+
+    void _goHome() {
+        Hub.root.eventRegistry.fireUpdateCameraPosition(null);
+        Hub.root.eventRegistry.fireUpdateEyePosition(null);
     }
 
     int get _canvasWidth {
@@ -158,21 +180,21 @@ class Renderer {
 
         {
             // camera positions are computed in geo space, but maintained in world space
-            _cameraEyePoint = RenderUtils.getCameraPointEye(_renderSource);
-            _cameraTargetPoint = RenderUtils.getCameraPointTarget(_renderSource);
+            _cameraHomeEyePoint = RenderUtils.getCameraPointEye(_renderSource);
+            _cameraHomeTargetPoint = RenderUtils.getCameraPointTarget(_renderSource);
 
             // move position to world space
-            _cameraEyePoint.applyProjection(modelToWorld);
-            _cameraTargetPoint.applyProjection(modelToWorld);
+            _cameraHomeEyePoint.applyProjection(modelToWorld);
+            _cameraHomeTargetPoint.applyProjection(modelToWorld);
             _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
 
             _addCamera();
-            goHome();
+            _goHome(); // BUG: needed here *and* at end of function?
             _addCameraControls();
-            _cameraControls.target = _cameraTargetPoint;
+            _cameraControls.target = _cameraHomeTargetPoint;
         }
 
-        goHome();
+        _goHome();
     }
 
 

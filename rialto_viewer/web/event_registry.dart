@@ -25,6 +25,9 @@ class EventRegistry {
     Signal<DisplayLayerData> _displayLayerSignal = new Signal<DisplayLayerData>();
     Signal _updateRendererSignal = new Signal();
     Signal _colorizeLayersSignal = new Signal();
+    Signal<Vector3> _updateCameraPositionSignal = new Signal<Vector3>();
+    Signal<Vector3> _updateEyePositionSignal = new Signal<Vector3>();
+    //Signal<double> _updateZScaleSignal = new Signal<double>();
 
     EventRegistry() {
         _hub = Hub.root;
@@ -76,8 +79,20 @@ class EventRegistry {
     void fireUpdateRenderer() => _updateRendererSignal.fire(null);
 
     void subscribeColorizeLayers(Handler handler) => _colorizeLayersSignal.subscribe(handler);
-    void unsubscriberColorizeLayers(Handler handler) => _colorizeLayersSignal.unsubscribe(handler);
+    void unsubscribeColorizeLayers(Handler handler) => _colorizeLayersSignal.unsubscribe(handler);
     void fireColorizeLayers() => _colorizeLayersSignal.fire(null);
+
+    void subscribeUpdateCameraPosition(Handler<Vector3> handler) => _updateCameraPositionSignal.subscribe(handler);
+    void unsubscribeUpdateCameraPosition(Handler<Vector3> handler) => _updateCameraPositionSignal.unsubscribe(handler);
+    void fireUpdateCameraPosition(Vector3 data) => _updateCameraPositionSignal.fire(data);
+
+    void subscribeUpdateEyePosition(Handler<Vector3> handler) => _updateEyePositionSignal.subscribe(handler);
+    void unsubscribeUpdateEyePosition(Handler<Vector3> handler) => _updateEyePositionSignal.unsubscribe(handler);
+    void fireUpdateEyePosition(Vector3 data) => _updateEyePositionSignal.fire(data);
+
+    //void subscribeUpdateZScale(Handler<double> handler) => _updateZScaleSignal.subscribe(handler);
+    //void unsubscribeUpdateZSca(Handler<double> handler) => _updateZScaleSignal.unsubscribe(handler);
+    //void fireUpdateZScale(double data) => _updateZScaleSignal.fire(data);
 }
 
 
@@ -117,3 +132,11 @@ class DisplayLayerData {
     bool on;
     DisplayLayerData(this.webpath, this.on);
 }
+
+class CameraModelData {
+    Vector3 cameraPosition;
+    Vector3 eyePosition;
+    double zExaggeartion;
+    CameraModelData(this.cameraPosition, this.eyePosition, this.zExaggeartion);
+}
+
