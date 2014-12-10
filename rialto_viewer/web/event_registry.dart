@@ -15,6 +15,9 @@ part of rialto.viewer;
 class EventRegistry {
     Hub _hub;
 
+    // BUG: note you can't unsubscribe a handler that is an anonymous lambda
+    // which might be the case of 0-arity handler functions
+
     Signal<MouseMoveData> _mouseMoveSignal = new Signal<MouseMoveData>();
     Signal _mouseDownSignal = new Signal();
     Signal _mouseUpSignal = new Signal();
@@ -23,10 +26,9 @@ class EventRegistry {
     Signal<bool> _displayAxesSignal = new Signal<bool>();
     Signal<bool> _displayBboxSignal = new Signal<bool>();
     Signal<DisplayLayerData> _displayLayerSignal = new Signal<DisplayLayerData>();
-    Signal _updateRendererSignal = new Signal();
     Signal _colorizeLayersSignal = new Signal();
-    Signal<Vector3> _updateCameraPositionSignal = new Signal<Vector3>();
-    Signal<Vector3> _updateEyePositionSignal = new Signal<Vector3>();
+    Signal<Vector3> _updateCameraEyePositionSignal = new Signal<Vector3>();
+    Signal<Vector3> _updateCameraTargetPositionSignal = new Signal<Vector3>();
     //Signal<double> _updateZScaleSignal = new Signal<double>();
     Signal<String> _updateColorizationSettingsSignal = new Signal<String>();
 
@@ -74,23 +76,17 @@ class EventRegistry {
     void unsubscribeDisplayLayer(Handler<DisplayLayerData> handler) => _displayLayerSignal.unsubscribe(handler);
     void fireDisplayLayer(DisplayLayerData data) => _displayLayerSignal.fire(data);
 
-    // BUG: note you can't unsubscribe a handler that is an anonymous lambda
-    // which might be the case of 0-arity handler functions
-    void subscribeUpdateRenderer(Handler handler) => _updateRendererSignal.subscribe(handler);
-    void unsubscribeUpdateRenderer(Handler handler) => _updateRendererSignal.unsubscribe(handler);
-    void fireUpdateRenderer() => _updateRendererSignal.fire(null);
-
     void subscribeColorizeLayers(Handler handler) => _colorizeLayersSignal.subscribe(handler);
     void unsubscribeColorizeLayers(Handler handler) => _colorizeLayersSignal.unsubscribe(handler);
     void fireColorizeLayers() => _colorizeLayersSignal.fire(null);
 
-    void subscribeUpdateCameraPosition(Handler<Vector3> handler) => _updateCameraPositionSignal.subscribe(handler);
-    void unsubscribeUpdateCameraPosition(Handler<Vector3> handler) => _updateCameraPositionSignal.unsubscribe(handler);
-    void fireUpdateCameraPosition(Vector3 data) => _updateCameraPositionSignal.fire(data);
+    void subscribeUpdateCameraEyePosition(Handler<Vector3> handler) => _updateCameraEyePositionSignal.subscribe(handler);
+    void unsubscribeUpdateCameraEyePosition(Handler<Vector3> handler) => _updateCameraEyePositionSignal.unsubscribe(handler);
+    void fireUpdateCameraEyePosition(Vector3 data) => _updateCameraEyePositionSignal.fire(data);
 
-    void subscribeUpdateEyePosition(Handler<Vector3> handler) => _updateEyePositionSignal.subscribe(handler);
-    void unsubscribeUpdateEyePosition(Handler<Vector3> handler) => _updateEyePositionSignal.unsubscribe(handler);
-    void fireUpdateEyePosition(Vector3 data) => _updateEyePositionSignal.fire(data);
+    void subscribeUpdateCameraTargetPosition(Handler<Vector3> handler) => _updateCameraTargetPositionSignal.subscribe(handler);
+    void unsubscribeUpdateCameraTargetPosition(Handler<Vector3> handler) => _updateCameraTargetPositionSignal.unsubscribe(handler);
+    void fireUpdateCameraTargetPosition(Vector3 data) => _updateCameraTargetPositionSignal.fire(data);
 
     //void subscribeUpdateZScale(Handler<double> handler) => _updateZScaleSignal.subscribe(handler);
     //void unsubscribeUpdateZScale(Handler<double> handler) => _updateZScaleSignal.unsubscribe(handler);

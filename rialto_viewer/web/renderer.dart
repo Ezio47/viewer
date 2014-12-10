@@ -52,9 +52,8 @@ class Renderer {
         Hub.root.eventRegistry.subscribeWindowResize((_) => _onMyWindowResize());
         Hub.root.eventRegistry.subscribeDisplayAxes(_displayAxesHandler);
         Hub.root.eventRegistry.subscribeDisplayBbox(_displayBboxHandler);
-        Hub.root.eventRegistry.subscribeUpdateRenderer((_) => update());
-        Hub.root.eventRegistry.subscribeUpdateCameraPosition(_updateCameraPositionHandler);
-        Hub.root.eventRegistry.subscribeUpdateEyePosition(_updateEyePositionHandler);
+        Hub.root.eventRegistry.subscribeUpdateCameraEyePosition(_updateCameraEyePositionHandler);
+        Hub.root.eventRegistry.subscribeUpdateCameraTargetPosition(_updateCameraTargetPositionHandler);
 
         _renderSource = rpcSet;
 
@@ -69,13 +68,13 @@ class Renderer {
     Element get canvas => _canvas;
 
 
-    void _updateCameraPositionHandler(Vector3 data) {
+    void _updateCameraTargetPositionHandler(Vector3 data) {
         if (data==null) data = _cameraHomeTargetPoint;
         data.copyInto(_cameraCurrentTargetPoint);
         _updateCameraModel();
     }
 
-    void _updateEyePositionHandler(Vector3 data) {
+    void _updateCameraEyePositionHandler(Vector3 data) {
         if (data==null) data = _cameraHomeEyePoint;
         data.copyInto(_cameraCurrentEyePoint);
         _updateCameraModel();
@@ -85,11 +84,6 @@ class Renderer {
         _camera.position.setFrom(_cameraCurrentEyePoint);
         _camera.up.setFrom(_cameraUpVector);
         _camera.lookAt(_cameraCurrentTargetPoint);
-    }
-
-    void _goHome() {
-        Hub.root.eventRegistry.fireUpdateCameraPosition(null);
-        Hub.root.eventRegistry.fireUpdateEyePosition(null);
     }
 
     int get _canvasWidth {
@@ -199,9 +193,10 @@ class Renderer {
             _addCamera();
             _addCameraControls();
             _cameraControls.target = _cameraHomeTargetPoint;
+
+            _updateCameraModel();
         }
 
-        _goHome();
     }
 
 
@@ -212,7 +207,6 @@ class Renderer {
         } else {
             _scene.remove(_axesObject);
         }
-        Hub.root.eventRegistry.fireUpdateRenderer();
     }
 
     void _displayBboxHandler(bool v) {
@@ -222,7 +216,6 @@ class Renderer {
         } else {
             _scene.remove(_bboxObject);
         }
-        Hub.root.eventRegistry.fireUpdateRenderer();
     }
 
 

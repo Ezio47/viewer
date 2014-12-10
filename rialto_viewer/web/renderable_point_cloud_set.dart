@@ -54,7 +54,7 @@ class RenderablePointCloudSet {
         final bool on = data.on;
         var rpc = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath);
         rpc.visible = on;
-        Hub.root.eventRegistry.fireUpdateRenderer();
+        Hub.root.renderer.update();
     }
 
     void _computeBounds() {
@@ -79,12 +79,11 @@ class RenderablePointCloudSet {
     }
 
     void _colorizeLayersHandler() {
-        //var colorizer = new FauxColorizer();
         var colorizer = new RampColorizer(_colorRamp);
 
         for (var cloud in renderablePointClouds) {
             colorizer.run(cloud);
         }
-        Hub.root.eventRegistry.fireUpdateRenderer();
+        Hub.root.renderer.update();
     }
 }

@@ -35,15 +35,15 @@ void boot1() {
         FileProxy file2 = list.firstWhere((e) => e.displayName == "terrain2.dat");
         assert(file2 != null);
 
-        //hub.commandRegistry.doAddFile(file1);
-        //hub.commandRegistry.doAddFile(file2);
+        hub.commandRegistry.doAddFile(file1);
+        hub.commandRegistry.doAddFile(file2);
 
-        //hub.eventRegistry.fireDisplayBbox(true);
+        hub.eventRegistry.fireDisplayBbox(true);
 
-        //hub.eventRegistry.fireColorizeLayers();
+        hub.eventRegistry.fireColorizeLayers();
 
-        //hub.eventRegistry.fireUpdateCameraPosition(new Vector3(5000.0,5000.0,1000.0));
-        //hub.eventRegistry.fireUpdateEyePosition(new Vector3(2.0,4.0,6.0));
+        hub.eventRegistry.fireUpdateCameraEyePosition(new Vector3(-200.0,-500.0,-200.0));
+        hub.eventRegistry.fireUpdateCameraTargetPosition(new Vector3(1500.0,1500.0,1500.0));
     });
 }
 
