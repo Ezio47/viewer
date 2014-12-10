@@ -29,8 +29,8 @@ class Renderer {
     Vector3 _cameraHomeEyePoint;
     Vector3 _cameraHomeTargetPoint;
     Vector3 _cameraUpVector;
-    Vector3 _cameraCurrentEyePoint = new Vector3.zero();
-    Vector3 _cameraCurrentTargetPoint = new Vector3.zero();
+    Vector3 _cameraCurrentEyePoint;
+    Vector3 _cameraCurrentTargetPoint;
 
     AxesObject _axesObject;
     Object3D _bboxObject;
@@ -48,12 +48,12 @@ class Renderer {
         assert(parentElement != null);
         parentElement.children.add(_webglRenderer.domElement);
 
-        Hub.root.eventRegistry.subscribeMouseMove(_updateMouseLocalCoords);
-        Hub.root.eventRegistry.subscribeWindowResize((_) => _onMyWindowResize());
-        Hub.root.eventRegistry.subscribeDisplayAxes(_displayAxesHandler);
-        Hub.root.eventRegistry.subscribeDisplayBbox(_displayBboxHandler);
-        Hub.root.eventRegistry.subscribeUpdateCameraEyePosition(_updateCameraEyePositionHandler);
-        Hub.root.eventRegistry.subscribeUpdateCameraTargetPosition(_updateCameraTargetPositionHandler);
+        Hub.root.eventRegistry.subscribeMouseMove(_handleMouseMove);
+        Hub.root.eventRegistry.subscribeWindowResize((_) => _handleWindowResize());
+        Hub.root.eventRegistry.subscribeDisplayAxes(_handleDisplayAxes);
+        Hub.root.eventRegistry.subscribeDisplayBbox(_handleDisplayBbox);
+        Hub.root.eventRegistry.subscribeUpdateCameraEyePosition(_handleUpdateCameraEyePosition);
+        Hub.root.eventRegistry.subscribeUpdateCameraTargetPosition(_handleUpdateCameraTargetPosition);
 
         _renderSource = rpcSet;
 
@@ -68,13 +68,13 @@ class Renderer {
     Element get canvas => _canvas;
 
 
-    void _updateCameraTargetPositionHandler(Vector3 data) {
+    void _handleUpdateCameraTargetPosition(Vector3 data) {
         if (data==null) data = _cameraHomeTargetPoint;
         data.copyInto(_cameraCurrentTargetPoint);
         _updateCameraModel();
     }
 
-    void _updateCameraEyePositionHandler(Vector3 data) {
+    void _handleUpdateCameraEyePosition(Vector3 data) {
         if (data==null) data = _cameraHomeEyePoint;
         data.copyInto(_cameraCurrentEyePoint);
         _updateCameraModel();
@@ -200,7 +200,7 @@ class Renderer {
     }
 
 
-    void _displayAxesHandler(bool v) {
+    void _handleDisplayAxes(bool v) {
         _axesVisible = v;
         if (_axesVisible) {
             _scene.add(_axesObject);
@@ -209,7 +209,7 @@ class Renderer {
         }
     }
 
-    void _displayBboxHandler(bool v) {
+    void _handleDisplayBbox(bool v) {
         _bboxVisible = v;
         if (_bboxVisible) {
             _scene.add(_bboxObject);
@@ -219,7 +219,7 @@ class Renderer {
     }
 
 
-    void _updateMouseLocalCoords(MouseMoveData data) {
+    void _handleMouseMove(MouseMoveData data) {
         final int newX = data.newX;
         final int newY = data.newY;
 
@@ -242,7 +242,7 @@ class Renderer {
     }
 
 
-    void _onMyWindowResize() {
+    void _handleWindowResize() {
         final w = window.innerWidth ;
         final h = window.innerHeight;
         _webglRenderer.setSize(w, h);

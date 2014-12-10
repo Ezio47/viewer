@@ -16,8 +16,8 @@ class RenderablePointCloudSet {
         max = new Vector3.zero();
         len = new Vector3.zero();
 
-        Hub.root.eventRegistry.subscribeDisplayLayer(_displayLayerHandler);
-        Hub.root.eventRegistry.subscribeColorizeLayers((_) => _colorizeLayersHandler());
+        Hub.root.eventRegistry.subscribeDisplayLayer(_handleDisplayLayer);
+        Hub.root.eventRegistry.subscribeColorizeLayers((_) => _handleColorizeLayers());
         Hub.root.eventRegistry.subscribeUpdateColorizationSettings((s) {
             _colorRamp = s;
             Hub.root.eventRegistry.fireColorizeLayers();
@@ -49,7 +49,7 @@ class RenderablePointCloudSet {
         _computeBounds();
     }
 
-    void _displayLayerHandler(DisplayLayerData data) {
+    void _handleDisplayLayer(DisplayLayerData data) {
         final String webpath = data.webpath;
         final bool on = data.on;
         var rpc = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath);
@@ -78,7 +78,7 @@ class RenderablePointCloudSet {
         len = max - min;
     }
 
-    void _colorizeLayersHandler() {
+    void _handleColorizeLayers() {
         var colorizer = new RampColorizer(_colorRamp);
 
         for (var cloud in renderablePointClouds) {
