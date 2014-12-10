@@ -7,6 +7,7 @@ library rialto.viewer.display_panel;
 import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
+import 'package:vector_math/vector_math.dart';
 import '../hub.dart';
 
 
@@ -14,6 +15,8 @@ import '../hub.dart';
 class DisplayPanel extends PolymerElement {
     @published bool axesChecked;
     @published bool bboxChecked;
+    @published String eyePositionString;
+    @published String targetPositionString;
 
     Hub _hub = Hub.root;
 
@@ -48,5 +51,32 @@ class DisplayPanel extends PolymerElement {
 
     void doColorization(Event e, var detail, Node target) {
         _hub.colorizationDialog.openDialog();
+    }
+
+    Vector3 parseTriplet(String triplet)
+    {
+        if (triplet == null || triplet.isEmpty) return null;
+        var vec = new Vector3.zero();
+        var list = triplet.split(",");
+        try {
+            vec.x = double.parse(list[0]);
+            vec.y = double.parse(list[1]);
+            vec.z = double.parse(list[2]);
+        } catch (e) {
+            // BUG: error check
+            return null;
+        }
+        return vec;
+    }
+
+    void doCamera(Event e, var detail, Node target) {
+        var eyeVec = parseTriplet(eyePositionString);
+        if (eyeVec != null) {
+            _hub.eventRegistry.fireUpdateCameraEyePosition(eyeVec);
+        }
+        var cameraVec = parseTriplet(targetPositionString);
+        if (cameraVec != null) {
+            _hub.eventRegistry.fireUpdateCameraTargetPosition(cameraVec);
+        }
     }
 }

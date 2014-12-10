@@ -32,7 +32,7 @@
             /*** RIALTO-CSS-GOES-HERE ***/
         </style>
 
-        <div class="light-panel-style">
+        <div class="light-panel-style" layout vertical>
 
             <div class="pad2">
                 <div>
@@ -49,9 +49,27 @@
                 </div>
             </div>
 
+            <hr/>
+
             <button class="regulartextbutton" type="button" on-click="{{doColorization}}">
                 <span>Colorization...</span>
             </button>
+
+            <hr/>
+
+            <div layout vertical>
+                <label>
+                    <span>Camera eye point (x,y,z):</span>
+                    <input value="{{eyePositionString}}" id="cameraposition" type="text" class="input-textbox-style">
+                </label>
+                <label>
+                    <span>Camera target point (x,y,z):</span>
+                    <input value="{{targetPositionString}}" id="eyeposition" type="text" class="input-textbox-style">
+                </label>
+                <button class="regulartextbutton" type="button" on-click="{{doCamera}}">
+                    <span>Update Camera</span>
+                </button>
+            </div>
         </div>
 
     </template>
