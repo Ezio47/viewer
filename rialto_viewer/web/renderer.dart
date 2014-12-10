@@ -39,18 +39,30 @@ class Renderer {
 
     Matrix4 modelToWorld;
 
-    Renderer(RenderablePointCloudSet rpcSet) {
+    String _name;
+
+    Renderer(RenderPanel renderPanel, RenderablePointCloudSet rpcSet, String name) {
         _hub = Hub.root;
+        _name = name;
 
         _scene = null;
         _projector = new Projector();
 
         _webglRenderer = new WebGLRenderer();
-        _webglRenderer.setSize(window.innerWidth, window.innerHeight);
 
-        var parentElement = _hub.renderPanel.shadowRoot.querySelector("#container");
-        assert(parentElement != null);
-        parentElement.children.add(_webglRenderer.domElement);
+        var containerElement = renderPanel.shadowRoot.querySelector("#container");
+        assert(containerElement != null);
+        containerElement.children.add(_webglRenderer.domElement);
+
+        if (name == "nav") {
+            _webglRenderer.setSize(
+                    renderPanel.parent.parent.clientWidth,
+                    renderPanel.parent.parent.clientHeight);
+        } else if (name=="main") {
+            _webglRenderer.setSize(window.innerWidth, window.innerHeight);
+        } else {
+            assert(false);
+        }
 
         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.WindowResize.subscribe(_handleWindowResize);
@@ -73,13 +85,13 @@ class Renderer {
 
 
     void _handleUpdateCameraTargetPosition(Vector3 data) {
-        if (data==null) data = _cameraHomeTargetPoint;
+        if (data == null) data = _cameraHomeTargetPoint;
         data.copyInto(_cameraCurrentTargetPoint);
         _updateCameraModel();
     }
 
     void _handleUpdateCameraEyePosition(Vector3 data) {
-        if (data==null) data = _cameraHomeEyePoint;
+        if (data == null) data = _cameraHomeEyePoint;
         data.copyInto(_cameraCurrentEyePoint);
         _updateCameraModel();
     }
@@ -135,8 +147,7 @@ class Renderer {
 
         var theMin = _renderSource.min;
         var theLen = _renderSource.len;
-        if (_renderSource.length == 0)
-        {
+        if (_renderSource.length == 0) {
             theMin = new Vector3.zero();
             theLen = new Vector3(100.0, 100.0, 25.0);
         }
@@ -145,8 +156,7 @@ class Renderer {
         modelToWorld.translate(-theMin);
 
         {
-            for (var rpc in _renderSource.renderablePointClouds)
-            {
+            for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.visible = rpc.visible;
                 obj.applyMatrix(modelToWorld);
@@ -224,6 +234,8 @@ class Renderer {
 
 
     void _handleMouseMove(MouseMoveData data) {
+        if (this.canvas != data.canvas) return;
+
         final int newX = data.newX;
         final int newY = data.newY;
 
@@ -247,7 +259,7 @@ class Renderer {
 
 
     void _handleWindowResize() {
-        final w = window.innerWidth ;
+        final w = window.innerWidth;
         final h = window.innerHeight;
         _webglRenderer.setSize(w, h);
 
@@ -318,7 +330,8 @@ class Renderer {
 
         var qq = q.clone();
         qq.applyProjection(inv);
-        //print("WORLD ${q.x.toStringAsFixed(0)} ${q.y.toStringAsFixed(0)} ${q.z.toStringAsFixed(0)} - GEO ${qq.x.toStringAsFixed(0)} ${qq.y.toStringAsFixed(0)} ${qq.z.toStringAsFixed(0)}");
+
+                //print("WORLD ${q.x.toStringAsFixed(0)} ${q.y.toStringAsFixed(0)} ${q.z.toStringAsFixed(0)} - GEO ${qq.x.toStringAsFixed(0)} ${qq.y.toStringAsFixed(0)} ${qq.z.toStringAsFixed(0)}");
 
         /*
         var gline = new Geometry()

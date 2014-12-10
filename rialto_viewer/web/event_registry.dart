@@ -58,7 +58,8 @@ class EventRegistry {
 class MouseMoveData {
     int newX;
     int newY;
-    MouseMoveData(this.newX, this.newY);
+    CanvasElement canvas;
+    MouseMoveData(this.newX, this.newY, this.canvas);
 }
 
 class DisplayLayerData {

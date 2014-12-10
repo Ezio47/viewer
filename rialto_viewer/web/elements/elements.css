@@ -86,7 +86,11 @@
 .render-panel-style {
     background-color: black;
 }
-
+.nav-panel-style {
+    background-color: black;
+    border-style: solid;
+    border-width:2px;
+}
 
 /*************************************************
                 Main Panel Positionings
@@ -123,6 +127,14 @@
     z-index: 2;
     top: 10px;
     left: 10px;
+}
+.nav-panel-position {
+    position: absolute;
+    z-index: 2;
+    bottom: 50px;
+    right: 40px;
+    width: 200px;
+    height: 200px;
 }
 .layer-panel-min-width {
     min-width: 130px;

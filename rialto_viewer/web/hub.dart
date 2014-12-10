@@ -40,12 +40,15 @@ part 'utils.dart';
 
 
 class Hub {
-    RenderPanel renderPanel;
+    RenderPanel mainRenderPanel;
+    RenderPanel navRenderPanel;
     ServerDialog serverDialog;
     ColorizationDialog colorizationDialog;
     RialtoElement rialtoElement;
 
-    Renderer renderer;
+    Renderer mainRenderer;
+    Renderer navRenderer;
+
     EventRegistry eventRegistry;
 
     // the global repo for loaded data
@@ -81,20 +84,39 @@ class Hub {
     }
 
     void _createRenderer() {
-        assert(renderer == null);
+        assert(mainRenderer == null);
+        assert(navRenderer == null);
 
         renderablePointCloudSet = new RenderablePointCloudSet();
 
-        renderer = new Renderer(renderablePointCloudSet);
-        renderer.update();
-        renderer.animate(0);
+        {
+            mainRenderer = new Renderer(mainRenderPanel, renderablePointCloudSet, "main");
+            mainRenderer.update();
+            mainRenderer.animate(0);
 
-        var domElement = renderer.canvas;
+            var domElement = mainRenderer.canvas;
+            //domElement.text = "main";
 
-        domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y)));
-        domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire());
-        domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire());
-        window.onResize.listen((e) => eventRegistry.WindowResize.fire());
+            domElement.onMouseMove.listen(
+                    (e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y, e.target)));
+            domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire());
+            domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire());
+            window.onResize.listen((e) => eventRegistry.WindowResize.fire());
+        }
+        /*{
+            navRenderer = new Renderer(navRenderPanel, renderablePointCloudSet, "nav");
+            navRenderer.update();
+            navRenderer.animate(0);
+
+            var domElement = navRenderer.canvas;
+            //domElement.text = "nav";
+
+            domElement.onMouseMove.listen(
+                    (e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y, e.target)));
+            domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire());
+            domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire());
+            window.onResize.listen((e) => eventRegistry.WindowResize.fire());
+        }*/
     }
 
     void _handleOpenServer(String server) {
@@ -115,7 +137,10 @@ class Hub {
         file.create().then((PointCloud pointCloud) {
             renderablePointCloudSet.addCloud(pointCloud);
 
-            renderer.update();
+            mainRenderer.update();
+            if (navRenderer != null) {
+                navRenderer.update();
+            }
         });
 
         eventRegistry.OpenFileCompleted.fire(webpath);
@@ -125,7 +150,10 @@ class Hub {
 
         renderablePointCloudSet.removeCloud(webpath);
 
-        renderer.update();
+        mainRenderer.update();
+        if (navRenderer != null) {
+            navRenderer.update();
+        }
 
         eventRegistry.CloseFileCompleted.fire(webpath);
     }
