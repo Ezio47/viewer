@@ -22,14 +22,6 @@ class EventRegistry {
         _hub = Hub.root;
     }
 
-    void start(var domElement) {
-        // translate system events into our kinds of signals
-        domElement.onMouseMove.listen((e) => MouseMove.fire(new MouseMoveData(e.client.x, e.client.y)));
-        domElement.onMouseDown.listen((e) => MouseDown.fire());
-        domElement.onMouseUp.listen((e) => MouseUp.fire());
-        window.onResize.listen((e) => WindowResize.fire());
-    }
-
     SignalFunctionsT<MouseMoveData> MouseMove = new SignalFunctionsT<MouseMoveData>();
 
     SignalFunctions0 MouseDown = new SignalFunctions0();

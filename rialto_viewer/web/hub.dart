@@ -100,7 +100,12 @@ class Hub {
         renderer.update();
         renderer.animate(0);
 
-        eventRegistry.start(renderer.canvas);
+        var domElement = renderer.canvas;
+
+        domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y)));
+        domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire());
+        domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire());
+        window.onResize.listen((e) => eventRegistry.WindowResize.fire());
     }
 
     void _handleOpenServer(String server) {
