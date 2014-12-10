@@ -32,6 +32,16 @@ class EventRegistry {
     //Signal<double> _updateZScaleSignal = new Signal<double>();
     Signal<String> _updateColorizationSettingsSignal = new Signal<String>();
 
+    Signal<String> _openServerSignal = new Signal<String>();
+    Signal _openServerCompletedSignal = new Signal();
+    Signal _closeServerSignal = new Signal();
+    Signal _closeServerCompletedSignal = new Signal();
+
+    Signal<String> _openFileSignal = new Signal<String>();
+    Signal _openFileCompletedSignal = new Signal();
+    Signal<String> _closeFileSignal = new Signal<String>();
+    Signal _closeFileCompletedSignal = new Signal();
+
     EventRegistry() {
         _hub = Hub.root;
     }
@@ -95,6 +105,40 @@ class EventRegistry {
     void subscribeUpdateColorizationSettings(Handler<String> handler) => _updateColorizationSettingsSignal.subscribe(handler);
     void unsubscribeUpdateColorizationSettings(Handler<String> handler) => _updateColorizationSettingsSignal.unsubscribe(handler);
     void fireUpdateColorizationSettings(String data) => _updateColorizationSettingsSignal.fire(data);
+
+    ///
+    void subscribeOpenServer(Handler<String> handler) => _openServerSignal.subscribe(handler);
+    void unsubscribeOpenServer(Handler<String> handler) => _openServerSignal.unsubscribe(handler);
+    void fireOpenServer(String data) => _openServerSignal.fire(data);
+
+    void subscribeOpenServerCompleted(Handler handler) => _openServerCompletedSignal.subscribe(handler);
+    void unsubscribeOpenServerCompleted(Handler handler) => _openServerCompletedSignal.unsubscribe(handler);
+    void fireOpenServerCompleted() => _openServerCompletedSignal.fire(null);
+
+    void subscribeCloseServer(Handler handler) => _closeServerSignal.subscribe(handler);
+    void unsubscribeCloseServer(Handler handler) => _closeServerSignal.unsubscribe(handler);
+    void fireCloseServer() => _closeServerSignal.fire(null);
+
+    void subscribeCloseServerCompleted(Handler handler) => _closeServerCompletedSignal.subscribe(handler);
+    void unsubscribeCloseServerCompleted(Handler handler) => _closeServerCompletedSignal.unsubscribe(handler);
+    void fireCloseServerCompleted() => _closeServerCompletedSignal.fire(null);
+
+    ///
+    void subscribeOpenFile(Handler<String> handler) => _openFileSignal.subscribe(handler);
+    void unsubscribeOpenFile(Handler<String> handler) => _openFileSignal.unsubscribe(handler);
+    void fireOpenFile(String data) => _openFileSignal.fire(data);
+
+    void subscribeOpenFileCompleted(Handler handler) => _openFileCompletedSignal.subscribe(handler);
+    void unsubscribeOpenFileCompleted(Handler handler) => _openFileCompletedSignal.unsubscribe(handler);
+    void fireOpenFileCompleted() => _openFileCompletedSignal.fire(null);
+
+    void subscribeCloseFile(Handler<String> handler) => _closeServerSignal.subscribe(handler);
+    void unsubscribeCloseFile(Handler<String> handler) => _closeServerSignal.unsubscribe(handler);
+    void fireCloseFile(String data) => _closeServerSignal.fire(data);
+
+    void subscribeCloseFileCompleted(Handler handler) => _closeFileCompletedSignal.subscribe(handler);
+    void unsubscribeCloseFileCompleted(Handler handler) => _closeFileCompletedSignal.unsubscribe(handler);
+    void fireCloseFileCompleted() => _closeFileCompletedSignal.fire(null);
 }
 
 

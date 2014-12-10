@@ -67,7 +67,7 @@ class LayerPanel extends PolymerElement {
     void deleteFile(Event e, var detail, Node target) {
         if (selection != null) {
             assert(selection is _LayerItem);
-            _hub.commandRegistry.doRemoveFile(selection.webpath);
+            _hub.eventRegistry.fireCloseFile(selection.webpath);
         }
         return;
     }

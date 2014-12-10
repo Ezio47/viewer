@@ -10,23 +10,27 @@ class CommandRegistry {
 
     CommandRegistry() {
         _hub = Hub.root;
+        _hub.eventRegistry.subscribeOpenServer(_handleOpenServer);
+        _hub.eventRegistry.subscribeCloseServer((_) => _handleCloseServer());
+        _hub.eventRegistry.subscribeOpenFile(_handleOpenFile);
+        _hub.eventRegistry.subscribeCloseFile(_handleCloseFile);
     }
 
-    Future<bool> doOpenServer(String server) {
+    void _handleOpenServer(String server) {
         _hub.proxy = new ProxyFileSystem(server);
-        return _hub.proxy.load();
+        _hub.proxy.load().then((_) => _hub.eventRegistry.fireOpenServerCompleted());
     }
 
-    void doCloseServer() {
-        if (proxy != null)
+    void _handleCloseServer() {
+        if (_hub.proxy != null)
         {
             _hub.proxy.close();
             _hub.proxy = null;
         }
     }
 
-    void doAddFile(FileProxy file) {
-        _hub.layerPanel.doAddFile(file.webpath, file.displayName);
+    void _handleOpenFile(String webpath) {
+        FileProxy file = _hub.proxy.getFileProxy(webpath);
 
         file.create().then((PointCloud pointCloud) {
             _hub.renderablePointCloudSet.addCloud(pointCloud);
@@ -41,9 +45,11 @@ class CommandRegistry {
             _hub.infoPanel.maxz = _hub.renderablePointCloudSet.max.z;
             _hub.infoPanel.numPoints = _hub.renderablePointCloudSet.numPoints;
         });
+
+        _hub.layerPanel.doAddFile(file.webpath, file.displayName);
     }
 
-    void doRemoveFile(String webpath) {
+    void _handleCloseFile(String webpath) {
         _hub.layerPanel.doRemoveFile(webpath);
 
         _hub.renderablePointCloudSet.removeCloud(webpath);

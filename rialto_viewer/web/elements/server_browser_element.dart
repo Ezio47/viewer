@@ -46,6 +46,9 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
             defaultServer = _hub.defaultServer;
         }
         selectedServer = defaultServer;
+
+        Hub.root.eventRegistry.subscribeOpenServerCompleted((_) => _handleOpenServerCompleted());
+        Hub.root.eventRegistry.subscribeCloseServerCompleted((_) => _handleCloseServerCompleted());
     }
 
     @override
@@ -77,8 +80,10 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
     void doCloseServer(Event e, var detail, Node target) {
         _server = null;
 
-        _hub.commandRegistry.doCloseServer();
+        _hub.eventRegistry.fireCloseServer();
+    }
 
+    void _handleCloseServerCompleted() {
         items.clear();
 
         isServerOpen = false;
@@ -99,12 +104,13 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
         }
         if (!_server.endsWith("/")) _server += "/";
 
-        _hub.commandRegistry.doOpenServer(_server).then((_) {
-            _currentDir = _hub.proxy.root;
-            _loadItemsFromProxy();
-            isServerOpen = true;
+        _hub.eventRegistry.fireOpenServer(_server);
+    }
 
-        });
+    void _handleOpenServerCompleted() {
+        _currentDir = _hub.proxy.root;
+        _loadItemsFromProxy();
+        isServerOpen = true;
 
         $["button1"].disabled = !isServerOpen;
         $["button2"].disabled = isServerOpen;
@@ -116,7 +122,8 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
 
     void doOpenFile(Event e, var detail, Node target) {
         assert(_currentItem != null);
-        _hub.commandRegistry.doAddFile(_currentItem);
+
+        _hub.eventRegistry.fireOpenFile(_currentItem.webpath);
 
         closeDialog();
     }

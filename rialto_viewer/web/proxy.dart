@@ -36,6 +36,19 @@ class ProxyFileSystem {
 
     Comms get comms => _comms;
 
+    FileProxy getFileProxy(String webpath) {
+        var p = _map[webpath];
+        if (p == null || p is! FileProxy) return null;
+        return p;
+    }
+
+    void _addToMap(ProxyItem proxy) {
+        String key = proxy.webpath;
+        assert(!_map.containsKey(key));
+        assert(!_map.containsValue(proxy));
+        _map[key] = proxy;
+    }
+
     void close() {
         _map.forEach((k, v) {
             v.close();
@@ -96,6 +109,7 @@ class DirectoryProxy extends ProxyItem {
             var proxy = new DirectoryProxy(fileSystem, subdir, this);
             var f = proxy._load().then((_) {
                 dirs.add(proxy);
+                fileSystem._addToMap(proxy);
             });
             fs.add(f);
         });
@@ -120,6 +134,7 @@ class DirectoryProxy extends ProxyItem {
             var proxy = new FileProxy(fileSystem, path, this);
             var f = proxy._load().then((_) {
                 files.add(proxy);
+                fileSystem._addToMap(proxy);
             });
             fs.add(f);
         });
