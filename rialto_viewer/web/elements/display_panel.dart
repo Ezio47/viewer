@@ -12,12 +12,8 @@ import '../hub.dart';
 
 @CustomTag('display-panel')
 class DisplayPanel extends PolymerElement {
-    @published bool showAxes = false;
-    @published bool showBbox = false;
-    @published bool axesbool1 = false;
-    @published bool axesbool2 = false;
-    @published bool axesbool3 = true;
-    @published bool hasData;
+    @published bool axesChecked;
+    @published bool bboxChecked;
 
     Hub _hub = Hub.root;
 
@@ -31,6 +27,10 @@ class DisplayPanel extends PolymerElement {
     @override
     void ready() {
         _hub.displayPanel = this;
+        _hub.eventRegistry.subscribeDisplayAxes((v) => axesChecked = v);
+        _hub.eventRegistry.subscribeDisplayBbox((v) => bboxChecked = v);
+        axesChecked = false;
+        bboxChecked = false;
     }
 
     @override
@@ -38,30 +38,12 @@ class DisplayPanel extends PolymerElement {
         super.detached();
     }
 
-
-    void axesbool1Changed(var oldvalue) {
-        _hub.eventRegistry.fireDisplayAxes(axesbool1);
-        _hub.eventRegistry.fireDisplayBbox(axesbool2);
+    void doAxesChecked(var mouseEvent) {
+        _hub.eventRegistry.fireDisplayAxes(axesChecked);
     }
 
-    void axesbool2Changed(var oldvalue) {
-        _hub.eventRegistry.fireDisplayAxes(axesbool1);
-        _hub.eventRegistry.fireDisplayBbox(axesbool2);
-    }
-
-    void axesbool3Changed(var oldvalue) {
-        _hub.eventRegistry.fireDisplayAxes(axesbool1);
-        _hub.eventRegistry.fireDisplayBbox(axesbool2);
-    }
-
-    void toggleAxes(Event e, var detail, Node target) {
-        var button = target as InputElement;
-        _hub.eventRegistry.fireDisplayAxes(button.checked);
-    }
-
-    void toggleBbox(Event e, var detail, Node target) {
-        var button = target as InputElement;
-        _hub.eventRegistry.fireDisplayBbox(button.checked);
+    void doBboxChecked(var mouseEvent) {
+        _hub.eventRegistry.fireDisplayBbox(bboxChecked);
     }
 
     void doColorization(Event e, var detail, Node target) {

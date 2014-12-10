@@ -34,26 +34,20 @@
 
         <div class="light-panel-style">
 
-            <form action="" class="pad2">
+            <div class="pad2">
                 <div>
                     <label>
-                        <input type="radio" name="axescontrol" checked="{{axesbool1}}" class="padright">
+                        <input type="checkbox" checked="{{axesChecked}}" on-click="{{doAxesChecked}}" class="padright">
                         <span>Toggle axes</span>
                     </label>
                 </div>
                 <div>
                     <label>
-                        <input type="radio" name="axescontrol" checked={{axesbool2}} class="padright">
+                        <input type="checkbox" checked="{{bboxChecked}}" on-click={{doBboxChecked}} class="padright">
                         <span>Toggle bbox</span>
                     </label>
                 </div>
-                <div>
-                    <label>
-                        <input type="radio" name="axescontrol" checked="{{axesbool3}}" class="padright">
-                        <span>None</span>
-                    </label>
-                </div>
-            </form>
+            </div>
 
             <button class="regulartextbutton" type="button" on-click="{{doColorization}}">
                 <span>Colorization...</span>

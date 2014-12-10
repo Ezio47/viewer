@@ -9,8 +9,8 @@ class Renderer {
     // public
     double _mouseGeoX = 0.0;
     double _mouseGeoY = 0.0;
-    bool _showAxes = false;
-    bool _showBbox = false;
+    bool _axesVisible;
+    bool _bboxVisible;
 
     // private
     PerspectiveCamera _camera;
@@ -61,6 +61,9 @@ class Renderer {
         modelToWorld = new Matrix4.identity();
 
         _canvas = _webglRenderer.domElement;
+
+        _axesVisible = false;
+        _bboxVisible = false;
     }
 
     Element get canvas => _canvas;
@@ -161,8 +164,9 @@ class Renderer {
             Vector3 c = b.divide(a);
             var bboxModelToWorld = new Matrix4.identity().scale(c);
             _bboxObject.applyMatrix(bboxModelToWorld);
-
-            if (_showBbox) _scene.add(_bboxObject);
+            if (_bboxVisible) {
+                _scene.add(_bboxObject);
+            }
         }
 
         {
@@ -173,8 +177,9 @@ class Renderer {
             Vector3 c = b.divide(a).scale(1.0 / 4.0);
             var axesModelToWorld = new Matrix4.identity().scale(c);
             _axesObject.applyMatrix(axesModelToWorld);
-
-            if (_showAxes) _scene.add(_axesObject);
+            if (_axesVisible) {
+                _scene.add(_axesObject);
+            }
         }
 
 
@@ -188,8 +193,10 @@ class Renderer {
             _cameraHomeTargetPoint.applyProjection(modelToWorld);
             _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
 
+            _cameraCurrentEyePoint = _cameraHomeEyePoint;
+            _cameraCurrentTargetPoint = _cameraHomeTargetPoint;
+
             _addCamera();
-            _goHome(); // BUG: needed here *and* at end of function?
             _addCameraControls();
             _cameraControls.target = _cameraHomeTargetPoint;
         }
@@ -198,26 +205,24 @@ class Renderer {
     }
 
 
-    void _displayAxesHandler(bool on) {
-        if (_axesObject == null) return;
-
-        if (on) {
+    void _displayAxesHandler(bool v) {
+        _axesVisible = v;
+        if (_axesVisible) {
             _scene.add(_axesObject);
         } else {
             _scene.remove(_axesObject);
         }
-        _showAxes = on;
+        Hub.root.eventRegistry.fireUpdateRenderer();
     }
 
-    void _displayBboxHandler(bool on) {
-        if (_bboxObject == null) return;
-
-        if (on) {
+    void _displayBboxHandler(bool v) {
+        _bboxVisible = v;
+        if (_bboxVisible) {
             _scene.add(_bboxObject);
         } else {
             _scene.remove(_bboxObject);
         }
-        _showBbox = on;
+        Hub.root.eventRegistry.fireUpdateRenderer();
     }
 
 

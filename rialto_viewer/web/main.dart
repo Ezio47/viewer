@@ -3,6 +3,7 @@
 // license found in the accompanying LICENSE.txt file.
 
 import 'dart:core';
+import 'package:vector_math/vector_math.dart';
 import 'package:polymer/polymer.dart';
 import 'hub.dart';
 
@@ -34,12 +35,15 @@ void boot1() {
         FileProxy file2 = list.firstWhere((e) => e.displayName == "terrain2.dat");
         assert(file2 != null);
 
-        hub.commandRegistry.doAddFile(file1);
-        hub.commandRegistry.doAddFile(file2);
+        //hub.commandRegistry.doAddFile(file1);
+        //hub.commandRegistry.doAddFile(file2);
 
-        hub.eventRegistry.fireDisplayBbox(true);
+        //hub.eventRegistry.fireDisplayBbox(true);
 
-        hub.eventRegistry.fireColorizeLayers();
+        //hub.eventRegistry.fireColorizeLayers();
+
+        //hub.eventRegistry.fireUpdateCameraPosition(new Vector3(5000.0,5000.0,1000.0));
+        //hub.eventRegistry.fireUpdateEyePosition(new Vector3(2.0,4.0,6.0));
     });
 }
 
