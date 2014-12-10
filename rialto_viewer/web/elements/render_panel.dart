@@ -12,7 +12,7 @@ import '../hub.dart';
 @CustomTag('render-panel')
 class RenderPanel extends PolymerElement {
 
-    Hub _hub = Hub.root;
+    Hub _hub;
 
     RenderPanel.created() : super.created();
 
@@ -23,6 +23,7 @@ class RenderPanel extends PolymerElement {
 
     @override
     void ready() {
+        _hub = Hub.root;
         _hub.renderPanel = this;
     }
 

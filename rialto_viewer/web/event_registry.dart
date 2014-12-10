@@ -50,9 +50,9 @@ class EventRegistry {
     SignalFunctions0 CloseServerCompleted = new SignalFunctions0();
 
     SignalFunctionsT<String> OpenFile = new SignalFunctionsT<String>();
-    SignalFunctionsT<String> OpenFileCompleted = new SignalFunctionsT();
+    SignalFunctionsT<String> OpenFileCompleted = new SignalFunctionsT<String>();
     SignalFunctionsT<String> CloseFile = new SignalFunctionsT<String>();
-    SignalFunctions0 CloseFileCompleted = new SignalFunctions0();
+    SignalFunctionsT<String> CloseFileCompleted = new SignalFunctionsT<String>();
 }
 
 class MouseMoveData {

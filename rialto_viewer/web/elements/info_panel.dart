@@ -15,7 +15,7 @@ class InfoPanel extends PolymerElement {
     @published bool hasData = true;
     @published int numPoints;
 
-    Hub _hub = Hub.root;
+    Hub _hub;
 
     InfoPanel.created() : super.created();
 
@@ -26,7 +26,17 @@ class InfoPanel extends PolymerElement {
 
     @override
     void ready() {
-        _hub.infoPanel = this;
+        _hub = Hub.root;
+
+        _hub.eventRegistry.OpenFileCompleted.subscribe((_) {
+            minx = _hub.renderablePointCloudSet.min.x;
+            maxx = _hub.renderablePointCloudSet.max.x;
+            miny = _hub.renderablePointCloudSet.min.y;
+            maxy = _hub.renderablePointCloudSet.max.y;
+            minz = _hub.renderablePointCloudSet.min.z;
+            maxz = _hub.renderablePointCloudSet.max.z;
+            numPoints = _hub.renderablePointCloudSet.numPoints;
+        });
     }
 
     @override

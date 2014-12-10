@@ -6,21 +6,24 @@ part of rialto.viewer;
 
 
 class RenderablePointCloudSet {
+    Hub _hub;
     List<RenderablePointCloud> renderablePointClouds = new List<RenderablePointCloud>();
     Vector3 min, max, len;
     int numPoints;
     String _colorRamp = "Spectral";
 
     RenderablePointCloudSet() {
+        _hub = Hub.root;
+
         min = new Vector3.zero();
         max = new Vector3.zero();
         len = new Vector3.zero();
 
-        Hub.root.eventRegistry.DisplayLayer.subscribe(_handleDisplayLayer);
-        Hub.root.eventRegistry.ColorizeLayers.subscribe(_handleColorizeLayers);
-        Hub.root.eventRegistry.UpdateColorizationSettings.subscribe((s) {
+        _hub.eventRegistry.DisplayLayer.subscribe(_handleDisplayLayer);
+        _hub.eventRegistry.ColorizeLayers.subscribe(_handleColorizeLayers);
+        _hub.eventRegistry.UpdateColorizationSettings.subscribe((s) {
             _colorRamp = s;
-            Hub.root.eventRegistry.ColorizeLayers.fire();
+            _hub.eventRegistry.ColorizeLayers.fire();
         });
     }
 
@@ -54,7 +57,7 @@ class RenderablePointCloudSet {
         final bool on = data.on;
         var rpc = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath);
         rpc.visible = on;
-        Hub.root.renderer.update();
+        _hub.renderer.update();
     }
 
     void _computeBounds() {
@@ -84,6 +87,6 @@ class RenderablePointCloudSet {
         for (var cloud in renderablePointClouds) {
             colorizer.run(cloud);
         }
-        Hub.root.renderer.update();
+        _hub.renderer.update();
     }
 }

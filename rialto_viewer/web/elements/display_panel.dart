@@ -18,7 +18,7 @@ class DisplayPanel extends PolymerElement {
     @published String eyePositionString;
     @published String targetPositionString;
 
-    Hub _hub = Hub.root;
+    Hub _hub;
 
     DisplayPanel.created() : super.created();
 
@@ -29,7 +29,7 @@ class DisplayPanel extends PolymerElement {
 
     @override
     void ready() {
-        _hub.displayPanel = this;
+        _hub = Hub.root;
         _hub.eventRegistry.DisplayAxes.subscribe((v) => axesChecked = v);
         _hub.eventRegistry.DisplayBbox.subscribe((v) => bboxChecked = v);
         axesChecked = false;

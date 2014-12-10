@@ -13,8 +13,7 @@ import '../hub.dart';
 
 @CustomTag('rialto-element')
 class RialtoElement extends PolymerElement {
-
-    Hub _hub = Hub.root;
+    Hub _hub;
 
     RialtoElement.created() : super.created();
 
@@ -26,16 +25,17 @@ class RialtoElement extends PolymerElement {
 
     @override
     void ready() {
-        Hub.root.mainWindow = this;
-        Hub.root.serverDialogElement = $["server-dialog-element"];
-        Hub.root.serverDialog = $["server-dialog"];
-        Hub.root.colorizationDialogElement = $["colorization-dialog-element"];
-        Hub.root.colorizationDialog = $["colorization-dialog"];
+        _hub = Hub.root;
+        _hub.rialtoElement = this;
     }
 
     @override
     void detached() {
         super.detached();
+    }
+
+    Element elementLookup(s) {
+        return $[s];
     }
 
     void toggleCollapse2(Event e, var detail, Node target) {
@@ -71,7 +71,7 @@ class RialtoElement extends PolymerElement {
     }
 
     void closeServerDialog(Event e, var detail, Node target) {
-        Hub.root.serverDialog.closeDialog();
+        _hub.serverBrowserElement.closeDialog();
     }
 
     void goHome(Event e, var detail, Node target) {

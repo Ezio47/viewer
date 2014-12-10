@@ -14,7 +14,7 @@ import '../hub.dart';
 @CustomTag('server-browser-element')
 class ServerBrowserElement extends PolymerElement implements IDialog {
 
-    Hub _hub = Hub.root;
+    Hub _hub;
 
     String _server;
     @observable String selectedServer;
@@ -40,7 +40,9 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
 
     @override
     void ready() {
-        _hub.serverDialog = this;
+        _hub = Hub.root;
+
+        _hub.serverBrowserElement = this;
 
         if (defaultServer == null) {
             defaultServer = _hub.defaultServer;
@@ -70,11 +72,13 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
         $["button2"].disabled = isServerOpen;
         $["button3"].disabled = true;
 
-        Hub.root.serverDialogElement.showModal();
+        var e = _hub.elementLookup("server-dialog-element");
+        e.showModal();
     }
 
     void closeDialog() {
-        Hub.root.serverDialogElement.close("");
+        var e = _hub.elementLookup("server-dialog-element");
+        e.close("");
     }
 
     void doCloseServer(Event e, var detail, Node target) {

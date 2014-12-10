@@ -12,7 +12,7 @@ import '../hub.dart';
 
 @CustomTag('colorization-dialog')
 class ColorizationDialog extends PolymerElement implements IDialog {
-    Hub _hub = Hub.root;
+    Hub _hub;
 
     @published ObservableList<_ColorizationItem> items = new ObservableList();
     @observable var selectedItem;
@@ -27,6 +27,8 @@ class ColorizationDialog extends PolymerElement implements IDialog {
 
     @override
     void ready() {
+        _hub = Hub.root;
+        _hub.colorizationDialog = this;
         var names = RampColorizer.names;
         names.forEach((s) => items.add(new _ColorizationItem(s)));
         $["button3"].disabled = true;
@@ -38,11 +40,13 @@ class ColorizationDialog extends PolymerElement implements IDialog {
     }
 
     void openDialog() {
-        Hub.root.colorizationDialogElement.showModal();
+        var e = _hub.elementLookup("colorization-dialog-element");
+        e.showModal();
     }
 
     void closeDialog() {
-        Hub.root.colorizationDialogElement.close("");
+        var e = _hub.elementLookup("colorization-dialog-element");
+        e.close("");
     }
 
     void doCancel(Event e, var detail, Node target) {

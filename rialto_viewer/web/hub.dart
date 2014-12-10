@@ -17,13 +17,9 @@ import 'package:three/three.dart';
 import 'package:vector_math/vector_math.dart' hide Ray;
 
 import 'elements/colorization_dialog.dart';
-import 'elements/display_panel.dart';
-import 'elements/info_panel.dart';
-import 'elements/layer_panel.dart';
 import 'elements/render_panel.dart';
-import 'elements/rialto_element.dart';
 import 'elements/server_browser_element.dart';
-import 'elements/status_panel.dart';
+import 'elements/rialto_element.dart';
 
 
 part 'axes_object.dart';
@@ -44,17 +40,10 @@ part 'utils.dart';
 
 
 class Hub {
-    // the big, public, singleton components
-    RialtoElement mainWindow;
-    InfoPanel infoPanel;
-    DisplayPanel displayPanel;
-    LayerPanel layerPanel;
     RenderPanel renderPanel;
-    StatusPanel statusPanel;
-    DialogElement serverDialogElement;
-    ServerBrowserElement serverDialog;
-    DialogElement colorizationDialogElement;
+    ServerBrowserElement serverBrowserElement;
     ColorizationDialog colorizationDialog;
+    RialtoElement rialtoElement;
 
     Renderer renderer;
     EventRegistry eventRegistry;
@@ -89,6 +78,10 @@ class Hub {
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
         _createRenderer();
+    }
+
+    Element elementLookup(s) {
+        return rialtoElement.elementLookup(s);
     }
 
     void _createRenderer() {
@@ -127,26 +120,17 @@ class Hub {
             renderablePointCloudSet.addCloud(pointCloud);
 
             renderer.update();
-
-            infoPanel.minx = renderablePointCloudSet.min.x;
-            infoPanel.maxx = renderablePointCloudSet.max.x;
-            infoPanel.miny = renderablePointCloudSet.min.y;
-            infoPanel.maxy = renderablePointCloudSet.max.y;
-            infoPanel.minz = renderablePointCloudSet.min.z;
-            infoPanel.maxz = renderablePointCloudSet.max.z;
-            infoPanel.numPoints = renderablePointCloudSet.numPoints;
         });
-
-        layerPanel.doAddFile(file.webpath, file.displayName);
 
         eventRegistry.OpenFileCompleted.fire(webpath);
     }
 
     void _handleCloseFile(String webpath) {
-        layerPanel.doRemoveFile(webpath);
 
         renderablePointCloudSet.removeCloud(webpath);
 
         renderer.update();
+
+        eventRegistry.CloseFileCompleted.fire(webpath);
     }
 }

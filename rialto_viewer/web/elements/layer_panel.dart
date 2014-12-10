@@ -17,7 +17,7 @@ class LayerPanel extends PolymerElement {
     @observable var selection;
     @observable bool selectionEnabled = true;
 
-    Hub _hub = Hub.root;
+    Hub _hub;
 
     LayerPanel.created() : super.created();
 
@@ -28,7 +28,18 @@ class LayerPanel extends PolymerElement {
 
     @override
     void ready() {
-        _hub.layerPanel = this;
+        _hub = Hub.root;
+
+        _hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
+            final String displayName = _hub.proxy.getFileProxy(webpath).displayName;
+            files.add(new _LayerItem(webpath, displayName));
+            hasData = files.length > 0;
+        });
+
+        _hub.eventRegistry.CloseFileCompleted.subscribe((webpath) {
+            files.removeWhere((f) => f.webpath == webpath);
+            hasData = files.length > 0;
+        });
     }
 
     @override
@@ -36,25 +47,8 @@ class LayerPanel extends PolymerElement {
         super.detached();
     }
 
-
-    void doAddFile(String webpath, String displayName) {
-        files.add(new _LayerItem(webpath, displayName));
-        hasData = files.length > 0;
-    }
-
-    void doRemoveFile(String webpath) {
-        files.removeWhere((f) => f.webpath == webpath);
-        hasData = files.length > 0;
-    }
-
     void openFile(Event e, var detail, Node target) {
-        // kludge so we can set isServerOpen correctly when using a bootscript
-        _hub.serverDialog.openDialog();
-    }
-
-    void openServer(Event e, var detail, Node target) {
-        Hub.root.serverDialog.openDialog();
-        return;
+        _hub.serverBrowserElement.openDialog();
     }
 
     void toggleLayer(Event e, var detail, Node target) {

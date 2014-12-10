@@ -12,6 +12,8 @@ class Renderer {
     bool _axesVisible;
     bool _bboxVisible;
 
+    Hub _hub;
+
     // private
     PerspectiveCamera _camera;
     Scene _scene;
@@ -38,22 +40,24 @@ class Renderer {
     Matrix4 modelToWorld;
 
     Renderer(RenderablePointCloudSet rpcSet) {
+        _hub = Hub.root;
+
         _scene = null;
         _projector = new Projector();
 
         _webglRenderer = new WebGLRenderer();
         _webglRenderer.setSize(window.innerWidth, window.innerHeight);
 
-        var parentElement = Hub.root.renderPanel.shadowRoot.querySelector("#container");
+        var parentElement = _hub.renderPanel.shadowRoot.querySelector("#container");
         assert(parentElement != null);
         parentElement.children.add(_webglRenderer.domElement);
 
-        Hub.root.eventRegistry.MouseMove.subscribe(_handleMouseMove);
-        Hub.root.eventRegistry.WindowResize.subscribe(_handleWindowResize);
-        Hub.root.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
-        Hub.root.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
-        Hub.root.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
-        Hub.root.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
+        _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
+        _hub.eventRegistry.WindowResize.subscribe(_handleWindowResize);
+        _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
+        _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
+        _hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
+        _hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
 
         _renderSource = rpcSet;
 
@@ -332,6 +336,6 @@ class Renderer {
         _mouseGeoX = qq.x;
         _mouseGeoY = qq.y;
 
-        Hub.root.eventRegistry.MouseGeoCoords.fire(new Vector3(_mouseGeoX, _mouseGeoY, this._renderSource.min.z));
+        _hub.eventRegistry.MouseGeoCoords.fire(new Vector3(_mouseGeoX, _mouseGeoY, this._renderSource.min.z));
     }
 }
