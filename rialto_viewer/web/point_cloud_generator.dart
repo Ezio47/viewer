@@ -54,7 +54,7 @@ class PointCloudGenerator {
                 return _makeNewCube(webpath, displayName);
             case "/oldcube.dat":
                 return _makeOldCube(webpath, displayName);
-            case "/dir2/random.dat":
+            case "/dir1/random.dat":
                 return _makeRandom(webpath, displayName);
             case "/terrain1.dat":
                 return _makeTerrain(1, webpath, displayName);
