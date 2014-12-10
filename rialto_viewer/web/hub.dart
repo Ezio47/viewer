@@ -138,6 +138,8 @@ class Hub {
         });
 
         layerPanel.doAddFile(file.webpath, file.displayName);
+
+        eventRegistry.OpenFileCompleted.fire(webpath);
     }
 
     void _handleCloseFile(String webpath) {
