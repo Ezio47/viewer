@@ -29,7 +29,6 @@ import 'elements/status_panel.dart';
 part 'axes_object.dart';
 part 'bbox_object.dart';
 part 'colorizer.dart';
-part 'command_registry.dart';
 part 'comms.dart';
 part 'event_registry.dart';
 part 'point_cloud.dart';
@@ -59,7 +58,6 @@ class Hub {
 
     Renderer renderer;
     EventRegistry eventRegistry;
-    CommandRegistry commandRegistry;
 
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -77,7 +75,6 @@ class Hub {
     Hub() {
         _root = this;
         eventRegistry = new EventRegistry();
-        commandRegistry = new CommandRegistry();
     }
 
     static Hub get root {
@@ -86,7 +83,11 @@ class Hub {
     }
 
     void init() {
-        commandRegistry.start();
+        eventRegistry.OpenServer.subscribe(_handleOpenServer);
+        eventRegistry.CloseServer.subscribe(_handleCloseServer);
+        eventRegistry.OpenFile.subscribe(_handleOpenFile);
+        eventRegistry.CloseFile.subscribe(_handleCloseFile);
+
         _createRenderer();
     }
 
@@ -100,5 +101,45 @@ class Hub {
         renderer.animate(0);
 
         eventRegistry.start(renderer.canvas);
+    }
+
+    void _handleOpenServer(String server) {
+        proxy = new ProxyFileSystem(server);
+        proxy.load().then((_) => eventRegistry.OpenServerCompleted.fire());
+    }
+
+    void _handleCloseServer() {
+        if (proxy != null) {
+            proxy.close();
+            proxy = null;
+        }
+    }
+
+    void _handleOpenFile(String webpath) {
+        FileProxy file = proxy.getFileProxy(webpath);
+
+        file.create().then((PointCloud pointCloud) {
+            renderablePointCloudSet.addCloud(pointCloud);
+
+            renderer.update();
+
+            infoPanel.minx = renderablePointCloudSet.min.x;
+            infoPanel.maxx = renderablePointCloudSet.max.x;
+            infoPanel.miny = renderablePointCloudSet.min.y;
+            infoPanel.maxy = renderablePointCloudSet.max.y;
+            infoPanel.minz = renderablePointCloudSet.min.z;
+            infoPanel.maxz = renderablePointCloudSet.max.z;
+            infoPanel.numPoints = renderablePointCloudSet.numPoints;
+        });
+
+        layerPanel.doAddFile(file.webpath, file.displayName);
+    }
+
+    void _handleCloseFile(String webpath) {
+        layerPanel.doRemoveFile(webpath);
+
+        renderablePointCloudSet.removeCloud(webpath);
+
+        renderer.update();
     }
 }
