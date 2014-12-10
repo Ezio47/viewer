@@ -71,7 +71,7 @@ class RialtoElement extends PolymerElement {
     }
 
     void closeServerDialog(Event e, var detail, Node target) {
-        _hub.serverBrowserElement.closeDialog();
+        _hub.serverDialog.closeDialog();
     }
 
     void goHome(Event e, var detail, Node target) {

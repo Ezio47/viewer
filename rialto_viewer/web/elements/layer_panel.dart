@@ -48,7 +48,7 @@ class LayerPanel extends PolymerElement {
     }
 
     void openFile(Event e, var detail, Node target) {
-        _hub.serverBrowserElement.openDialog();
+        _hub.serverDialog.openDialog();
     }
 
     void toggleLayer(Event e, var detail, Node target) {

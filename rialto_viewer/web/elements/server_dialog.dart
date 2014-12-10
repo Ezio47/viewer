@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-library rialto.viewer.server_browser_element;
+library rialto.viewer.server_dialog;
 
 import 'dart:core';
 import 'dart:html';
@@ -11,8 +11,8 @@ import 'idialog.dart';
 import '../hub.dart';
 
 
-@CustomTag('server-browser-element')
-class ServerBrowserElement extends PolymerElement implements IDialog {
+@CustomTag('server-dialog')
+class ServerDialog extends PolymerElement implements IDialog {
 
     Hub _hub;
 
@@ -31,7 +31,7 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
     ProxyItem _currentItem = null;
     DirectoryProxy _currentDir = null;
 
-    ServerBrowserElement.created() : super.created();
+    ServerDialog.created() : super.created();
 
     @override
     void attached() {
@@ -42,7 +42,7 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
     void ready() {
         _hub = Hub.root;
 
-        _hub.serverBrowserElement = this;
+        _hub.serverDialog = this;
 
         if (defaultServer == null) {
             defaultServer = _hub.defaultServer;

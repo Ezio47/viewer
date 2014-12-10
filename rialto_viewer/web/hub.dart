@@ -18,7 +18,7 @@ import 'package:vector_math/vector_math.dart' hide Ray;
 
 import 'elements/colorization_dialog.dart';
 import 'elements/render_panel.dart';
-import 'elements/server_browser_element.dart';
+import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
 
@@ -41,7 +41,7 @@ part 'utils.dart';
 
 class Hub {
     RenderPanel renderPanel;
-    ServerBrowserElement serverBrowserElement;
+    ServerDialog serverDialog;
     ColorizationDialog colorizationDialog;
     RialtoElement rialtoElement;
 
