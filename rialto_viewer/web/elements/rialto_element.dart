@@ -34,10 +34,6 @@ class RialtoElement extends PolymerElement {
         super.detached();
     }
 
-    Element elementLookup(s) {
-        return $[s];
-    }
-
     void toggleCollapse2(Event e, var detail, Node target) {
         var e = $["collapse2"];
         var button = target as PaperIconButton;

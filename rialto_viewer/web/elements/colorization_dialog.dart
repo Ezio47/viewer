@@ -40,12 +40,12 @@ class ColorizationDialog extends PolymerElement implements IDialog {
     }
 
     void openDialog() {
-        var e = _hub.elementLookup("colorization-dialog-element");
+        DialogElement e = this.parent;
         e.showModal();
     }
 
     void closeDialog() {
-        var e = _hub.elementLookup("colorization-dialog-element");
+        DialogElement e = this.parent;
         e.close("");
     }
 

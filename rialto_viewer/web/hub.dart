@@ -80,10 +80,6 @@ class Hub {
         _createRenderer();
     }
 
-    Element elementLookup(s) {
-        return rialtoElement.elementLookup(s);
-    }
-
     void _createRenderer() {
         assert(renderer == null);
 

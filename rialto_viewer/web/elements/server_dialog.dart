@@ -72,12 +72,12 @@ class ServerDialog extends PolymerElement implements IDialog {
         $["button2"].disabled = isServerOpen;
         $["button3"].disabled = true;
 
-        var e = _hub.elementLookup("server-dialog-element");
+        DialogElement e = this.parent;
         e.showModal();
     }
 
     void closeDialog() {
-        var e = _hub.elementLookup("server-dialog-element");
+        DialogElement e = this.parent;
         e.close("");
     }
 
