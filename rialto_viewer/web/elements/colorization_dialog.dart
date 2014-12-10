@@ -52,7 +52,7 @@ class ColorizationDialog extends PolymerElement implements IDialog {
     void doOkay(Event e, var detail, Node target) {
         assert(selectedItem != null);
 
-        _hub.eventRegistry.fireUpdateColorizationSettings(selectedItem.name);
+        _hub.eventRegistry.UpdateColorizationSettings.fire(selectedItem.name);
 
         closeDialog();
     }

@@ -48,12 +48,12 @@ class Renderer {
         assert(parentElement != null);
         parentElement.children.add(_webglRenderer.domElement);
 
-        Hub.root.eventRegistry.subscribeMouseMove(_handleMouseMove);
-        Hub.root.eventRegistry.subscribeWindowResize((_) => _handleWindowResize());
-        Hub.root.eventRegistry.subscribeDisplayAxes(_handleDisplayAxes);
-        Hub.root.eventRegistry.subscribeDisplayBbox(_handleDisplayBbox);
-        Hub.root.eventRegistry.subscribeUpdateCameraEyePosition(_handleUpdateCameraEyePosition);
-        Hub.root.eventRegistry.subscribeUpdateCameraTargetPosition(_handleUpdateCameraTargetPosition);
+        Hub.root.eventRegistry.MouseMove.subscribe(_handleMouseMove);
+        Hub.root.eventRegistry.WindowResize.subscribe(_handleWindowResize);
+        Hub.root.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
+        Hub.root.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
+        Hub.root.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
+        Hub.root.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
 
         _renderSource = rpcSet;
 
@@ -332,6 +332,6 @@ class Renderer {
         _mouseGeoX = qq.x;
         _mouseGeoY = qq.y;
 
-        Hub.root.eventRegistry.fireMouseGeoCoord(new Vector3(_mouseGeoX, _mouseGeoY, this._renderSource.min.z));
+        Hub.root.eventRegistry.MouseGeoCoords.fire(new Vector3(_mouseGeoX, _mouseGeoY, this._renderSource.min.z));
     }
 }

@@ -16,11 +16,11 @@ class RenderablePointCloudSet {
         max = new Vector3.zero();
         len = new Vector3.zero();
 
-        Hub.root.eventRegistry.subscribeDisplayLayer(_handleDisplayLayer);
-        Hub.root.eventRegistry.subscribeColorizeLayers((_) => _handleColorizeLayers());
-        Hub.root.eventRegistry.subscribeUpdateColorizationSettings((s) {
+        Hub.root.eventRegistry.DisplayLayer.subscribe(_handleDisplayLayer);
+        Hub.root.eventRegistry.ColorizeLayers.subscribe(_handleColorizeLayers);
+        Hub.root.eventRegistry.UpdateColorizationSettings.subscribe((s) {
             _colorRamp = s;
-            Hub.root.eventRegistry.fireColorizeLayers();
+            Hub.root.eventRegistry.ColorizeLayers.fire();
         });
     }
 

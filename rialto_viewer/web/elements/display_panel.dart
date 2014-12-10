@@ -30,8 +30,8 @@ class DisplayPanel extends PolymerElement {
     @override
     void ready() {
         _hub.displayPanel = this;
-        _hub.eventRegistry.subscribeDisplayAxes((v) => axesChecked = v);
-        _hub.eventRegistry.subscribeDisplayBbox((v) => bboxChecked = v);
+        _hub.eventRegistry.DisplayAxes.subscribe((v) => axesChecked = v);
+        _hub.eventRegistry.DisplayBbox.subscribe((v) => bboxChecked = v);
         axesChecked = false;
         bboxChecked = false;
     }
@@ -42,11 +42,11 @@ class DisplayPanel extends PolymerElement {
     }
 
     void doAxesChecked(var mouseEvent) {
-        _hub.eventRegistry.fireDisplayAxes(axesChecked);
+        _hub.eventRegistry.DisplayAxes.fire(axesChecked);
     }
 
     void doBboxChecked(var mouseEvent) {
-        _hub.eventRegistry.fireDisplayBbox(bboxChecked);
+        _hub.eventRegistry.DisplayBbox.fire(bboxChecked);
     }
 
     void doColorization(Event e, var detail, Node target) {
@@ -72,11 +72,11 @@ class DisplayPanel extends PolymerElement {
     void doCamera(Event e, var detail, Node target) {
         var eyeVec = parseTriplet(eyePositionString);
         if (eyeVec != null) {
-            _hub.eventRegistry.fireUpdateCameraEyePosition(eyeVec);
+            _hub.eventRegistry.UpdateCameraEyePosition.fire(eyeVec);
         }
         var cameraVec = parseTriplet(targetPositionString);
         if (cameraVec != null) {
-            _hub.eventRegistry.fireUpdateCameraTargetPosition(cameraVec);
+            _hub.eventRegistry.UpdateCameraTargetPosition.fire(cameraVec);
         }
     }
 }

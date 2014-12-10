@@ -86,6 +86,7 @@ class Hub {
     }
 
     void init() {
+        commandRegistry.start();
         _createRenderer();
     }
 

@@ -30,15 +30,15 @@ void boot1() {
 
     hub.defaultServer = "http://www.example.com/";
 
-    hub.eventRegistry.fireOpenServer(hub.defaultServer);
+    hub.eventRegistry.OpenServer.fire(hub.defaultServer);
 
-    hub.eventRegistry.subscribeOpenServerCompleted((_) {
-        hub.eventRegistry.fireOpenFile("/terrain1.dat");
-        hub.eventRegistry.fireOpenFile("/terrain2.dat");
+    hub.eventRegistry.OpenServerCompleted.subscribe(() {
+        hub.eventRegistry.OpenFile.fire("/terrain1.dat");
+        hub.eventRegistry.OpenFile.fire("/terrain2.dat");
 
-        hub.eventRegistry.fireDisplayBbox(true);
+        hub.eventRegistry.DisplayBbox.fire(true);
 
-        hub.eventRegistry.fireColorizeLayers();
+        hub.eventRegistry.ColorizeLayers.fire();
 
         //hub.eventRegistry.fireUpdateCameraEyePosition(new Vector3(-200.0,-500.0,-200.0));
         //hub.eventRegistry.fireUpdateCameraTargetPosition(new Vector3(1500.0,1500.0,1500.0));
@@ -51,16 +51,16 @@ void boot2() {
 
     hub.defaultServer = "http://localhost:12345";
 
-    hub.eventRegistry.fireOpenServer(hub.defaultServer);
+    hub.eventRegistry.OpenServer.fire(hub.defaultServer);
 
-    hub.eventRegistry.subscribeOpenServerCompleted((_) {
+    hub.eventRegistry.OpenServerCompleted.subscribe(() {
         List<FileProxy> list = hub.proxy.root.files;
         FileProxy file1 = list.firstWhere((e) => e.displayName == "autzen-10.ria");
 
-        hub.eventRegistry.fireOpenFile("/autzen-10.ria");
+        hub.eventRegistry.OpenFile.fire("/autzen-10.ria");
 
-        hub.eventRegistry.fireDisplayBbox(true);
+        hub.eventRegistry.DisplayBbox.fire(true);
 
-        hub.eventRegistry.fireColorizeLayers();
+        hub.eventRegistry.ColorizeLayers.fire();
     });
 }

@@ -47,8 +47,8 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
         }
         selectedServer = defaultServer;
 
-        Hub.root.eventRegistry.subscribeOpenServerCompleted((_) => _handleOpenServerCompleted());
-        Hub.root.eventRegistry.subscribeCloseServerCompleted((_) => _handleCloseServerCompleted());
+        Hub.root.eventRegistry.OpenServerCompleted.subscribe(_handleOpenServerCompleted);
+        Hub.root.eventRegistry.CloseServerCompleted.subscribe(_handleCloseServerCompleted);
     }
 
     @override
@@ -80,7 +80,7 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
     void doCloseServer(Event e, var detail, Node target) {
         _server = null;
 
-        _hub.eventRegistry.fireCloseServer();
+        _hub.eventRegistry.CloseServer.fire();
     }
 
     void _handleCloseServerCompleted() {
@@ -104,7 +104,7 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
         }
         if (!_server.endsWith("/")) _server += "/";
 
-        _hub.eventRegistry.fireOpenServer(_server);
+        _hub.eventRegistry.OpenServer.fire(_server);
     }
 
     void _handleOpenServerCompleted() {
@@ -123,7 +123,7 @@ class ServerBrowserElement extends PolymerElement implements IDialog {
     void doOpenFile(Event e, var detail, Node target) {
         assert(_currentItem != null);
 
-        _hub.eventRegistry.fireOpenFile(_currentItem.webpath);
+        _hub.eventRegistry.OpenFile.fire(_currentItem.webpath);
 
         closeDialog();
     }

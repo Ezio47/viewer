@@ -28,7 +28,7 @@ class StatusPanel extends PolymerElement {
     @override
     void ready() {
         _hub.statusPanel = this;
-        _hub.eventRegistry.subscribeMouseGeoCoords((data) {
+        _hub.eventRegistry.MouseGeoCoords.subscribe((data) {
             mousePositionX = data.x;
             mousePositionY = data.y;
             mousePositionZ = data.z;

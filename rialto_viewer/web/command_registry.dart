@@ -10,15 +10,18 @@ class CommandRegistry {
 
     CommandRegistry() {
         _hub = Hub.root;
-        _hub.eventRegistry.subscribeOpenServer(_handleOpenServer);
-        _hub.eventRegistry.subscribeCloseServer((_) => _handleCloseServer());
-        _hub.eventRegistry.subscribeOpenFile(_handleOpenFile);
-        _hub.eventRegistry.subscribeCloseFile(_handleCloseFile);
+    }
+
+    void start() {
+        _hub.eventRegistry.OpenServer.subscribe(_handleOpenServer);
+        _hub.eventRegistry.CloseServer.subscribe(_handleCloseServer);
+        _hub.eventRegistry.OpenFile.subscribe(_handleOpenFile);
+        _hub.eventRegistry.CloseFile.subscribe(_handleCloseFile);
     }
 
     void _handleOpenServer(String server) {
         _hub.proxy = new ProxyFileSystem(server);
-        _hub.proxy.load().then((_) => _hub.eventRegistry.fireOpenServerCompleted());
+        _hub.proxy.load().then((_) => _hub.eventRegistry.OpenServerCompleted.fire());
     }
 
     void _handleCloseServer() {

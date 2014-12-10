@@ -60,14 +60,14 @@ class LayerPanel extends PolymerElement {
     void toggleLayer(Event e, var detail, Node target) {
         var checkbox = target as InputElement;
         var item = files[int.parse(checkbox.id)];
-        _hub.eventRegistry.fireDisplayLayer(new DisplayLayerData(item.webpath, checkbox.checked));
+        _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
     }
 
 
     void deleteFile(Event e, var detail, Node target) {
         if (selection != null) {
             assert(selection is _LayerItem);
-            _hub.eventRegistry.fireCloseFile(selection.webpath);
+            _hub.eventRegistry.CloseFile.fire(selection.webpath);
         }
         return;
     }
