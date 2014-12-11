@@ -30,7 +30,7 @@ void boot1() {
 
     hub.defaultServer = "http://www.example.com/";
 
-    hub.eventRegistry.OpenServerCompleted.subscribe(() {
+    hub.eventRegistry.OpenServerCompleted.subscribe0(() {
         hub.eventRegistry.OpenFile.fire("/terrain1.dat");
         hub.eventRegistry.OpenFile.fire("/terrain2.dat");
     });
@@ -38,7 +38,7 @@ void boot1() {
     hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
         if (webpath == "/terrain2.dat") {
             hub.eventRegistry.DisplayBbox.fire(true);
-            hub.eventRegistry.ColorizeLayers.fire();
+            hub.eventRegistry.ColorizeLayers.fire0();
             hub.eventRegistry.UpdateCameraEyePosition.fire(new Vector3(-200.0, -500.0, -200.0));
             hub.eventRegistry.UpdateCameraTargetPosition.fire(new Vector3(1500.0, 1500.0, 1500.0));
         }
@@ -53,13 +53,13 @@ void boot2() {
 
     hub.defaultServer = "http://localhost:12345";
 
-    hub.eventRegistry.OpenServerCompleted.subscribe(() {
+    hub.eventRegistry.OpenServerCompleted.subscribe0(() {
         hub.eventRegistry.OpenFile.fire("/autzen-10.ria");
     });
 
     hub.eventRegistry.OpenFileCompleted.subscribe((_) {
         hub.eventRegistry.DisplayBbox.fire(true);
-        hub.eventRegistry.ColorizeLayers.fire();
+        hub.eventRegistry.ColorizeLayers.fire0();
     });
 
     hub.eventRegistry.OpenServer.fire(hub.defaultServer);

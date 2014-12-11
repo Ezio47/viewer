@@ -76,7 +76,7 @@ class Hub {
 
     void init() {
         eventRegistry.OpenServer.subscribe(_handleOpenServer);
-        eventRegistry.CloseServer.subscribe(_handleCloseServer);
+        eventRegistry.CloseServer.subscribe0(_handleCloseServer);
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
@@ -99,9 +99,9 @@ class Hub {
 
             domElement.onMouseMove.listen(
                     (e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y, e.target)));
-            domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire());
-            domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire());
-            window.onResize.listen((e) => eventRegistry.WindowResize.fire());
+            domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire0());
+            domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire0());
+            window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
         }
         /*{
             navRenderer = new Renderer(navRenderPanel, renderablePointCloudSet, "nav");
@@ -121,7 +121,7 @@ class Hub {
 
     void _handleOpenServer(String server) {
         proxy = new ProxyFileSystem(server);
-        proxy.load().then((_) => eventRegistry.OpenServerCompleted.fire());
+        proxy.load().then((_) => eventRegistry.OpenServerCompleted.fire0());
     }
 
     void _handleCloseServer() {

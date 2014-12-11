@@ -20,10 +20,10 @@ class RenderablePointCloudSet {
         len = new Vector3.zero();
 
         _hub.eventRegistry.DisplayLayer.subscribe(_handleDisplayLayer);
-        _hub.eventRegistry.ColorizeLayers.subscribe(_handleColorizeLayers);
+        _hub.eventRegistry.ColorizeLayers.subscribe0(_handleColorizeLayers);
         _hub.eventRegistry.UpdateColorizationSettings.subscribe((s) {
             _colorRamp = s;
-            _hub.eventRegistry.ColorizeLayers.fire();
+            _hub.eventRegistry.ColorizeLayers.fire0();
         });
     }
 

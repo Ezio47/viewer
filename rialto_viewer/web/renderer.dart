@@ -65,7 +65,7 @@ class Renderer {
         }
 
         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
-        _hub.eventRegistry.WindowResize.subscribe(_handleWindowResize);
+        _hub.eventRegistry.WindowResize.subscribe0(_handleWindowResize);
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
         _hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);

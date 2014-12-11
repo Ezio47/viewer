@@ -4,7 +4,6 @@
 
 part of rialto.viewer;
 
-
 //
 // All components should register themselves with the hub and then
 // express interest in whatever events they care about.
@@ -22,37 +21,37 @@ class EventRegistry {
         _hub = Hub.root;
     }
 
-    SignalFunctionsT<MouseMoveData> MouseMove = new SignalFunctionsT<MouseMoveData>();
+    SignalFunctions<MouseMoveData> MouseMove = new SignalFunctions<MouseMoveData>();
 
-    SignalFunctions0 MouseDown = new SignalFunctions0();
-    SignalFunctions0 MouseUp = new SignalFunctions0();
+    SignalFunctions MouseDown = new SignalFunctions();
+    SignalFunctions MouseUp = new SignalFunctions();
 
-    SignalFunctions0 WindowResize = new SignalFunctions0();
+    SignalFunctions WindowResize = new SignalFunctions();
 
-    SignalFunctionsT<Vector3> MouseGeoCoords = new SignalFunctionsT<Vector3>();
+    SignalFunctions<Vector3> MouseGeoCoords = new SignalFunctions<Vector3>();
 
-    SignalFunctionsT<bool> DisplayAxes = new SignalFunctionsT<bool>();
+    SignalFunctions<bool> DisplayAxes = new SignalFunctions<bool>();
 
-    SignalFunctionsT<bool> DisplayBbox = new SignalFunctionsT<bool>();
+    SignalFunctions<bool> DisplayBbox = new SignalFunctions<bool>();
 
-    SignalFunctionsT<DisplayLayerData> DisplayLayer = new SignalFunctionsT<DisplayLayerData>();
+    SignalFunctions<DisplayLayerData> DisplayLayer = new SignalFunctions<DisplayLayerData>();
 
-    SignalFunctions0 ColorizeLayers = new SignalFunctions0();
+    SignalFunctions ColorizeLayers = new SignalFunctions();
 
-    SignalFunctionsT<Vector3> UpdateCameraEyePosition = new SignalFunctionsT<Vector3>();
-    SignalFunctionsT<Vector3> UpdateCameraTargetPosition = new SignalFunctionsT<Vector3>();
+    SignalFunctions<Vector3> UpdateCameraEyePosition = new SignalFunctions<Vector3>();
+    SignalFunctions<Vector3> UpdateCameraTargetPosition = new SignalFunctions<Vector3>();
 
-    SignalFunctionsT<String> UpdateColorizationSettings = new SignalFunctionsT<String>();
+    SignalFunctions<String> UpdateColorizationSettings = new SignalFunctions<String>();
 
-    SignalFunctionsT<String> OpenServer = new SignalFunctionsT<String>();
-    SignalFunctions0 OpenServerCompleted = new SignalFunctions0();
-    SignalFunctions0 CloseServer = new SignalFunctions0();
-    SignalFunctions0 CloseServerCompleted = new SignalFunctions0();
+    SignalFunctions<String> OpenServer = new SignalFunctions<String>();
+    SignalFunctions OpenServerCompleted = new SignalFunctions();
+    SignalFunctions CloseServer = new SignalFunctions();
+    SignalFunctions CloseServerCompleted = new SignalFunctions();
 
-    SignalFunctionsT<String> OpenFile = new SignalFunctionsT<String>();
-    SignalFunctionsT<String> OpenFileCompleted = new SignalFunctionsT<String>();
-    SignalFunctionsT<String> CloseFile = new SignalFunctionsT<String>();
-    SignalFunctionsT<String> CloseFileCompleted = new SignalFunctionsT<String>();
+    SignalFunctions<String> OpenFile = new SignalFunctions<String>();
+    SignalFunctions<String> OpenFileCompleted = new SignalFunctions<String>();
+    SignalFunctions<String> CloseFile = new SignalFunctions<String>();
+    SignalFunctions<String> CloseFileCompleted = new SignalFunctions<String>();
 }
 
 class MouseMoveData {

@@ -49,8 +49,8 @@ class ServerDialog extends PolymerElement implements IDialog {
         }
         selectedServer = defaultServer;
 
-        Hub.root.eventRegistry.OpenServerCompleted.subscribe(_handleOpenServerCompleted);
-        Hub.root.eventRegistry.CloseServerCompleted.subscribe(_handleCloseServerCompleted);
+        Hub.root.eventRegistry.OpenServerCompleted.subscribe0(_handleOpenServerCompleted);
+        Hub.root.eventRegistry.CloseServerCompleted.subscribe0(_handleCloseServerCompleted);
     }
 
     @override
@@ -84,7 +84,7 @@ class ServerDialog extends PolymerElement implements IDialog {
     void doCloseServer(Event e, var detail, Node target) {
         _server = null;
 
-        _hub.eventRegistry.CloseServer.fire();
+        _hub.eventRegistry.CloseServer.fire0();
     }
 
     void _handleCloseServerCompleted() {

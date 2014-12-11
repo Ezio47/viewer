@@ -77,7 +77,7 @@ class RialtoElement extends PolymerElement {
 
 
     void goColorize(Event e, var detail, Node target) {
-        _hub.eventRegistry.ColorizeLayers.fire();
+        _hub.eventRegistry.ColorizeLayers.fire0();
     }
 
 }
