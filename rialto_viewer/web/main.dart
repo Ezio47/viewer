@@ -3,7 +3,7 @@
 // license found in the accompanying LICENSE.txt file.
 
 import 'dart:core';
-import 'package:vector_math/vector_math.dart';
+//import 'package:vector_math/vector_math.dart';
 import 'package:polymer/polymer.dart';
 import 'hub.dart';
 
@@ -38,9 +38,9 @@ void boot1() {
     hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
         if (webpath == "/terrain2.dat") {
             hub.eventRegistry.DisplayBbox.fire(true);
-            hub.eventRegistry.ColorizeLayers.fire0();
-            hub.eventRegistry.UpdateCameraEyePosition.fire(new Vector3(-200.0, -500.0, -200.0));
-            hub.eventRegistry.UpdateCameraTargetPosition.fire(new Vector3(1500.0, 1500.0, 1500.0));
+            //hub.eventRegistry.ColorizeLayers.fire0();
+            //hub.eventRegistry.UpdateCameraEyePosition.fire(new Vector3(-200.0, -500.0, -200.0));
+            //hub.eventRegistry.UpdateCameraTargetPosition.fire(new Vector3(1500.0, 1500.0, 1500.0));
         }
     });
 

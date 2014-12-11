@@ -23,6 +23,9 @@ class SignalFunctions<T> {
     }
     void fire0() => signal.fire(null);
 
+    SignalSubscription get exclusive => signal.exclusive;
+    set exclusive(SignalSubscription value) => signal.exclusive = value;
+
     SignalFunctions();
 }
 
@@ -54,7 +57,7 @@ class SignalSubscription {
 class Signal<T> {
     String _name;
     StreamController<_SignalData<T>> _controller;
-    SignalSubscription exclusiveSignalSubscription;
+    SignalSubscription exclusive;
 
     Signal({String name}) {
         _name = name;
@@ -99,7 +102,7 @@ class Signal<T> {
     }
 
     void fire(T t) {
-        var data = new _SignalData<T>(t, exclusiveSignalSubscription);
+        var data = new _SignalData<T>(t, exclusive);
         ////var exName = (data.exclusiveSignalSubscription==null) ? "*" : data.exclusiveSignalSubscription.name;
         ////print("firing for ${data.data} with exclusive for $exName");
         _controller.add(data);

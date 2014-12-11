@@ -22,6 +22,7 @@ import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
 
+part 'annotator.dart';
 part 'axes_object.dart';
 part 'bbox_object.dart';
 part 'colorizer.dart';
@@ -51,6 +52,8 @@ class Hub {
 
     EventRegistry eventRegistry;
 
+    Annotator annotator;
+
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
 
@@ -67,6 +70,7 @@ class Hub {
     Hub() {
         _root = this;
         eventRegistry = new EventRegistry();
+        annotator = new Annotator();
     }
 
     static Hub get root {

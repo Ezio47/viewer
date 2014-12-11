@@ -52,6 +52,8 @@ class EventRegistry {
     SignalFunctions<String> OpenFileCompleted = new SignalFunctions<String>();
     SignalFunctions<String> CloseFile = new SignalFunctions<String>();
     SignalFunctions<String> CloseFileCompleted = new SignalFunctions<String>();
+
+    SignalFunctions AnnotationMode = new SignalFunctions();
 }
 
 class MouseMoveData {
