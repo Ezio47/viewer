@@ -153,25 +153,25 @@ class _Ramps {
                 const _Stop(0.78, const _Color(33, 113, 181)),
                 const _Stop(0.90, const _Color(8, 81, 156)),
                 const _Stop(1.00, const _Color(8, 48, 107))],
-        "BrBG": [
+        "Brown-Blue-Green": [
                 const _Stop(0.00, const _Color(166, 97, 26)),
                 const _Stop(0.25, const _Color(223, 194, 125)),
                 const _Stop(0.5, const _Color(245, 245, 245)),
                 const _Stop(0.75, const _Color(128, 205, 193)),
                 const _Stop(1.00, const _Color(1, 133, 113))],
-        "BuGn": [
+        "Blue-Green": [
                 const _Stop(0.00, const _Color(237, 248, 251)),
                 const _Stop(0.25, const _Color(178, 226, 226)),
                 const _Stop(0.50, const _Color(102, 194, 164)),
                 const _Stop(0.75, const _Color(44, 162, 95)),
                 const _Stop(1.00, const _Color(0, 109, 44))],
-        "BuPu": [
+        "Blue-Purple": [
                 const _Stop(0.00, const _Color(237, 248, 251)),
                 const _Stop(0.25, const _Color(179, 205, 227)),
                 const _Stop(0.50, const _Color(140, 150, 198)),
                 const _Stop(0.75, const _Color(136, 86, 167)),
                 const _Stop(1.00, const _Color(129, 15, 124))],
-        "GnBu": [
+        "Green-Blue": [
                 const _Stop(0.00, const _Color(240, 249, 232)),
                 const _Stop(0.25, const _Color(186, 228, 188)),
                 const _Stop(0.50, const _Color(123, 204, 196)),
@@ -188,7 +188,7 @@ class _Ramps {
                 const _Stop(0.90, const _Color(0, 109, 44)),
                 const _Stop(1.00, const _Color(0, 68, 27))],
         "Greys": [const _Stop(0.00, const _Color(250, 250, 250)), const _Stop(1.00, const _Color(5, 5, 5))],
-        "OrRd": [
+        "Orange-Red": [
                 const _Stop(0.00, const _Color(254, 240, 217)),
                 const _Stop(0.25, const _Color(253, 204, 138)),
                 const _Stop(0.50, const _Color(252, 141, 89)),
@@ -204,37 +204,37 @@ class _Ramps {
                 const _Stop(0.78, const _Color(217, 72, 1)),
                 const _Stop(0.90, const _Color(166, 54, 3)),
                 const _Stop(1.00, const _Color(127, 39, 4))],
-        "PRGn": [
+        "Pink-Red-Green": [
                 const _Stop(0.00, const _Color(123, 50, 148)),
                 const _Stop(0.25, const _Color(194, 165, 207)),
                 const _Stop(0.50, const _Color(247, 247, 247)),
                 const _Stop(0.75, const _Color(166, 219, 160)),
                 const _Stop(1.00, const _Color(0, 136, 55))],
-        "PiYG": [
+        "Pink-Yellow-Green": [
                 const _Stop(0.00, const _Color(208, 28, 139)),
                 const _Stop(0.25, const _Color(241, 182, 218)),
                 const _Stop(0.50, const _Color(247, 247, 247)),
                 const _Stop(0.75, const _Color(184, 225, 134)),
                 const _Stop(1.00, const _Color(77, 172, 38))],
-        "PuBu": [
+        "Purple-Blue": [
                 const _Stop(0.00, const _Color(241, 238, 246)),
                 const _Stop(0.25, const _Color(189, 201, 225)),
                 const _Stop(0.50, const _Color(116, 169, 207)),
                 const _Stop(0.75, const _Color(43, 140, 190)),
                 const _Stop(1.00, const _Color(4, 90, 141))],
-        "PuBuGn": [
+        "Purple-Blue-Green": [
                 const _Stop(0.00, const _Color(246, 239, 247)),
                 const _Stop(0.25, const _Color(189, 201, 225)),
                 const _Stop(0.50, const _Color(103, 169, 207)),
                 const _Stop(0.75, const _Color(28, 144, 153)),
                 const _Stop(1.00, const _Color(1, 108, 89))],
-        "PuOr": [
+        "Purple-Orange": [
                 const _Stop(0.00, const _Color(230, 97, 1)),
                 const _Stop(0.25, const _Color(253, 184, 99)),
                 const _Stop(0.50, const _Color(247, 247, 247)),
                 const _Stop(0.75, const _Color(178, 171, 210)),
                 const _Stop(1.00, const _Color(94, 60, 153))],
-        "PuRd": [
+        "Purple-Red": [
                 const _Stop(0.00, const _Color(241, 238, 246)),
                 const _Stop(0.25, const _Color(215, 181, 216)),
                 const _Stop(0.50, const _Color(223, 101, 176)),
@@ -250,25 +250,25 @@ class _Ramps {
                 const _Stop(0.75, const _Color(106, 81, 163)),
                 const _Stop(0.90, const _Color(84, 39, 143)),
                 const _Stop(1.00, const _Color(63, 0, 125))],
-        "RdBu": [
+        "Red-Blue": [
                 const _Stop(0.00, const _Color(202, 0, 32)),
                 const _Stop(0.25, const _Color(244, 165, 130)),
                 const _Stop(0.50, const _Color(247, 247, 247)),
                 const _Stop(0.75, const _Color(146, 197, 222)),
                 const _Stop(1.00, const _Color(5, 113, 176))],
-        "RdGy": [
+        "Red-Grey": [
                 const _Stop(0.00, const _Color(202, 0, 32)),
                 const _Stop(0.25, const _Color(244, 165, 130)),
                 const _Stop(0.50, const _Color(255, 255, 255)),
                 const _Stop(0.75, const _Color(186, 186, 186)),
                 const _Stop(1.00, const _Color(64, 64, 64))],
-        "RdPu": [
+        "Red-Purple": [
                 const _Stop(0.00, const _Color(254, 235, 226)),
                 const _Stop(0.25, const _Color(251, 180, 185)),
                 const _Stop(0.50, const _Color(247, 104, 161)),
                 const _Stop(0.75, const _Color(197, 27, 138)),
                 const _Stop(1.00, const _Color(122, 1, 119))],
-        "RdYlBu": [
+        "Red-Yellow-Blue": [
                 const _Stop(0.00, const _Color(215, 25, 28)),
                 const _Stop(0.25, const _Color(253, 174, 97)),
                 const _Stop(0.50, const _Color(255, 255, 191)),
@@ -296,25 +296,25 @@ class _Ramps {
                 const _Stop(0.50, const _Color(255, 255, 191)),
                 const _Stop(0.75, const _Color(171, 221, 164)),
                 const _Stop(1.00, const _Color(43, 131, 186))],
-        "YlGn": [
+        "Yellow-Green": [
                 const _Stop(0.00, const _Color(255, 255, 204)),
                 const _Stop(0.25, const _Color(194, 230, 153)),
                 const _Stop(0.50, const _Color(120, 198, 121)),
                 const _Stop(0.75, const _Color(49, 163, 84)),
                 const _Stop(1.00, const _Color(0, 104, 55))],
-        "YlGnBu": [
+        "Yellow-Green-Blue": [
                 const _Stop(0.00, const _Color(255, 255, 204)),
                 const _Stop(0.25, const _Color(161, 218, 180)),
                 const _Stop(0.50, const _Color(65, 182, 196)),
                 const _Stop(0.75, const _Color(44, 127, 184)),
                 const _Stop(1.00, const _Color(37, 52, 148))],
-        "YlOrBr": [
+        "Yellow-Orange-Brown": [
                 const _Stop(0.00, const _Color(255, 255, 212)),
                 const _Stop(0.25, const _Color(254, 217, 142)),
                 const _Stop(0.50, const _Color(254, 153, 41)),
                 const _Stop(0.75, const _Color(217, 95, 14)),
                 const _Stop(1.00, const _Color(153, 52, 4))],
-        "YlOrRd": [
+        "Yellow-Orange-Red": [
                 const _Stop(0.00, const _Color(255, 255, 178)),
                 const _Stop(0.25, const _Color(254, 204, 92)),
                 const _Stop(0.50, const _Color(253, 141, 60)),
