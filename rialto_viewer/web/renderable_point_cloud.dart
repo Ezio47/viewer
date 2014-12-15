@@ -82,6 +82,8 @@ class RenderablePointCloud {
         assert(positions != null);
         assert(colors != null);
 
+        var xyz = positions.array;
+
         // the underlying system wants to take ownership of these arrays, so we'll
         // pass them copies
         BufferGeometry geometry = new BufferGeometry();
