@@ -14,7 +14,7 @@ import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
 import 'package:three/extras/controls/trackball_controls.dart';
 import 'package:three/three.dart';
-import 'package:vector_math/vector_math.dart' hide Ray;
+import 'package:vector_math/vector_math.dart' hide Ray, Frustum;
 
 import 'elements/colorization_dialog.dart';
 import 'elements/render_panel.dart';

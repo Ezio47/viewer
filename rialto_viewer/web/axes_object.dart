@@ -14,7 +14,7 @@ class AxesObject extends Object3D {
         lineGeometry.vertices.add(new Vector3(0.0, 100.0, 0.0));
 
         // radius top, radius bottom, height, segments-radius, segments-height
-        var coneGeometry = new CylinderGeometry(0.0, 3.0, 10.0, 8, 1);
+        var coneGeometry = new CylinderGeometry(0.0, 10.0, 20.0, 8, 1);
 
         var line, cone;
 

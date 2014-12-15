@@ -7,34 +7,52 @@ part of rialto.viewer;
 class Annotator {
     Hub _hub;
     SignalSubscription _mouseMoveSubscription;
-    bool _running = false;
+    bool running = false;
+    Object3D _graphic;
 
     Annotator() {
         _hub = Hub.root;
 
         _hub.eventRegistry.AnnotationMode.subscribe0(_handleModeChange);
-        _mouseMoveSubscription = _hub.eventRegistry.MouseMove.subscribe0(_handleMouseMove);
     }
 
     void _handleModeChange() {
-        if (_running) {
-            _running = false;
+        if (running) {
+            running = false;
             _end();
         } else {
-            _running = true;
+            running = true;
             _start();
         }
     }
 
     void _start() {
+        _mouseMoveSubscription = _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.MouseMove.signal.exclusive = _mouseMoveSubscription;
     }
 
     void _end() {
         _hub.eventRegistry.MouseMove.signal.exclusive = null;
+        _hub.eventRegistry.MouseMove.unsubscribe(_mouseMoveSubscription);
     }
 
-    void _handleMouseMove() {
-        print("d");
+    Vector3 point;
+    Object3D get graphic {
+        if (point == null) return null;
+        var gline = new Geometry();
+        gline.vertices.add(point);
+        gline.vertices.add(point * 1.1);
+        var line = new Line(gline, new LineBasicMaterial(color: 0x0000ff));
+        point = null;
+        return line;
+    }
+
+    void _handleMouseMove(MouseMoveData data) {
+        //print("${new DateTime.now().millisecond}");
+        assert(running);
+
+        Vector3 ndc = _hub.mainRenderer.fromMouseToNdc(data.newX, data.newY);
+        Vector3 world = _hub.mainRenderer.fromNdcToModel(ndc.x, ndc.y);
+        point = world;
     }
 }
