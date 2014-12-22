@@ -24,6 +24,7 @@ class EventRegistry {
     SignalFunctions<MouseData> MouseMove = new SignalFunctions<MouseData>();
     SignalFunctions<MouseData> MouseDown = new SignalFunctions<MouseData>();
     SignalFunctions<MouseData> MouseUp = new SignalFunctions<MouseData>();
+    SignalFunctions<WheelData> MouseWheel = new SignalFunctions<WheelData>();
 
     SignalFunctions<KeyboardData> KeyDown = new SignalFunctions<KeyboardData>();
     SignalFunctions<KeyboardData> KeyUp = new SignalFunctions<KeyboardData>();
@@ -72,6 +73,18 @@ class MouseData {
     }
 }
 
+class WheelData {
+    double delta;
+    WheelData(WheelEvent event) {
+        // (taken from Three.dart's trackball control)
+        if (event.deltaY != 0) { // WebKit / Opera / Explorer 9
+            delta = event.deltaY / 40;
+        } else if (event.detail != 0) { // Firefox
+            delta = -event.detail / 3;
+        }
+    }
+}
+
 class KeyboardData {
     bool controlKey;
     bool altKey;
@@ -86,17 +99,17 @@ class KeyboardData {
     static const int KEY_N = 78;
 
     KeyboardData(KeyboardEvent ev) {
-       controlKey = ev.ctrlKey;
-       shiftKey = ev.shiftKey;
-       altKey = ev.altKey;
-       keyCode = ev.keyCode;
+        controlKey = ev.ctrlKey;
+        shiftKey = ev.shiftKey;
+        altKey = ev.altKey;
+        keyCode = ev.keyCode;
     }
 }
 
 class DisplayLayerData {
     String webpath;
-    bool on;
-    DisplayLayerData(this.webpath, this.on);
+    bool visible;
+    DisplayLayerData(this.webpath, this.visible);
 }
 
 class CameraModelData {

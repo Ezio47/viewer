@@ -39,6 +39,8 @@ class Renderer {
         _canvas.width = _hub.width;
         _canvas.height = _hub.height;
 
+        _renderSource = rpcSet;
+
         var attribs = ['aVertexPosition', 'aVertexColor'];
         var uniforms = ['uMVMatrix', 'uPMatrix', 'uPickingColor', 'uOffscreen'];
         _glProgram = new GlProgram(gl, fragmentShader, vertexShader, attribs, uniforms);
@@ -48,9 +50,8 @@ class Renderer {
 
         mvMatrix = new Matrix4.identity();
 
-        _camera = new Camera(CameraType.Orbiting);
+        _camera = new Camera(Camera.ORBITING);
         _camera.goHome(new Vector3(0.0, 0.0, 50.0));
-        _camera.setFocus(new Vector3(0.0, 0.0, 0.0));
         //  camera.setElevation(-22);
         // camera.setAzimuth(37);
 
@@ -59,13 +60,12 @@ class Renderer {
         _interactor = new CameraInteractor(_camera, _canvas, _picker);
 
         makeObjects();
+        update();
 
         _picker.shapes = shapes;
 
         _axesVisible = false;
         _bboxVisible = false;
-
-        _renderSource = rpcSet;
 
         //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
@@ -77,31 +77,76 @@ class Renderer {
     }
 
     void makeObjects() {
-        var axes = new AxesShape(gl);
-        axes.modelMatrix.scale(10.0, 10.0, 10.0);
-        shapes.add(axes);
-        _axesShape = axes;
+        //var axes = new AxesShape(gl);
+        //axes.init();
+        //axes.modelMatrix.scale(10.0, 10.0, 10.0);
+        //shapes.add(axes);
+        //_axesShape = axes;
 
-        var axes2 = new AxesShape(gl);
-        axes2.modelMatrix.scale(2.5, 2.5, 2.5);
-        axes2.modelMatrix.rotate(new Vector3(-1.0, -1.0, -1.0), 90.0);
-        axes2.modelMatrix.translate(-0.5, -0.5, -0.5);
-        shapes.add(axes2);
+        //var axes2 = new AxesShape(gl);
+        //axes2.init();
+        //axes2.modelMatrix.scale(2.5, 2.5, 2.5);
+        //axes2.modelMatrix.rotate(new Vector3(-1.0, -1.0, -1.0), 90.0);
+        //axes2.modelMatrix.translate(-0.5, -0.5, -0.5);
+        //shapes.add(axes2);
 
-        var line = new LineShape(gl);
-        shapes.add(line);
+        //var line = new LineShape(gl);
+        //line.init();
+        //shapes.add(line);
 
-        var box = new BoxShape(gl);
-        box.modelMatrix.translate(-9.0, -9.0, -9.0);
-        shapes.add(box);
-        _bboxShape = box;
-
-        var blob = new CloudShape(gl);
-        shapes.add(blob);
+        //var box = new BoxShape(gl);
+        //box.init();
+        //box.modelMatrix.translate(-9.0, -9.0, -9.0);
+        //shapes.add(box);
+        //_bboxShape = box;
     }
 
+    // this gets called whenever something major changes, e.g. add a new cloud
     void update() {
-        // ???
+        // model space: cloud's (xmin,ymin,zmin)..cloud's (xmax,ymax,zmax)
+        // world space: (0,0,0).. cloud's (xlen,ylen,zlen)
+        //
+        // note min point of the cloud model gets tranlated to the origin of world space
+
+        var theMin = _renderSource.min;
+        var theLen = _renderSource.len;
+        if (_renderSource.length == 0) {
+            // a reasonable default
+            theMin = new Vector3.zero();
+            theLen = new Vector3(100.0, 100.0, 100.0);
+        }
+
+        {
+            // axes model space is (0,0,0)..(0.25 * theLen)
+            _axesShape = new AxesShape(gl);
+            _axesShape.init();
+            Vector3 a = new Vector3(100.0, 100.0, 100.0);
+            Vector3 b = theLen.clone();
+            Vector3 c = b.divide(a).scale(1.0 / 4.0);
+            _axesShape.modelMatrix.scale(c);
+            shapes.add(_axesShape);
+        }
+
+
+        {
+            // bbox model space is (0,0,0)..(theLen)
+            _bboxShape = new BoxShape(gl);
+            _bboxShape.init();
+            Vector3 a = new Vector3(100.0, 100.0, 100.0);
+            Vector3 b = theLen.clone();
+            Vector3 c = b.divide(a);
+            //_bboxShape.modelMatrix.scale(c);
+            shapes.add(_bboxShape);
+        }
+
+        {
+            for (var rpc in _renderSource.renderablePointClouds) {
+                var obj = rpc.buildParticleSystem();
+                obj.visible = rpc.visible;
+               // obj.modelMatrix.translate(theMin);
+                shapes.add(obj);
+            }
+        }
     }
 
     void draw(num viewWidth, num viewHeight, num aspect) {
@@ -123,7 +168,7 @@ class Renderer {
         gl.enable(DEPTH_TEST);
         gl.disable(BLEND);
 
-        pMatrix = makePerspectiveMatrix(degToRad(_camera.fovy), aspect, 0.1, 100.0);
+        pMatrix = makePerspectiveMatrix(degToRad(_camera.fovy), aspect, 0.001, 1000.0);
 
         for (var renderable in shapes) {
             var vMatrix = _camera.getViewTransform();
@@ -191,83 +236,11 @@ class Renderer {
         _camera.up.setFrom(_cameraUpVector);
         _camera.lookAt(_cameraCurrentTargetPoint);
     }
+***/
 
 
-    void update() {
-        // model space ...(xmin,ymin,zmin)..(xmax,ymax,zmax)...
-        // world space ...(0,0)..(xlen,ylen)...
-        //
-        // min point of the model becomes the origin of world space
 
-        var theMin = _renderSource.min;
-        var theLen = _renderSource.len;
-        if (_renderSource.length == 0) {
-            theMin = new Vector3.zero();
-            theLen = new Vector3(100.0, 100.0, 100.0);
-        }
-
-        modelToWorld = new Matrix4.identity();
-        modelToWorld.translate(-theMin);
-
-        {
-            for (var rpc in _renderSource.renderablePointClouds) {
-                var obj = rpc.buildParticleSystem();
-                obj.visible = rpc.visible;
-                obj.applyMatrix(modelToWorld);
-                _scene.add(obj);
-            }
-        }
-
-        {
-            // bbox model space is (0,0,0)..(100,100,100)
-            _bboxObject = new BboxObject();
-            Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = theLen.clone();
-            Vector3 c = b.divide(a);
-            var bboxModelToWorld = new Matrix4.identity().scale(c);
-            _bboxObject.applyMatrix(bboxModelToWorld);
-            if (_bboxVisible) {
-                _scene.add(_bboxObject);
-            }
-        }
-
-        {
-            // axes model space is (0,0,0)..(100,100,100)
-            _axesObject = new AxesObject();
-            Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = theLen.clone();
-            Vector3 c = b.divide(a).scale(1.0 / 4.0);
-            var axesModelToWorld = new Matrix4.identity().scale(c);
-            _axesObject.applyMatrix(axesModelToWorld);
-            //if (_axesVisible) {
-            _scene.add(_axesObject);
-            //}
-        }
-
-
-        {
-            // camera positions are computed in geo space, but maintained in world space
-            _cameraHomeEyePoint = RenderUtils.getCameraPointEye(_renderSource);
-            _cameraHomeTargetPoint = RenderUtils.getCameraPointTarget(_renderSource);
-
-            // move position to world space
-            _cameraHomeEyePoint.applyProjection(modelToWorld);
-            _cameraHomeTargetPoint.applyProjection(modelToWorld);
-            _cameraUpVector = new Vector3(0.0, 0.0, 1.0);
-
-            _cameraCurrentEyePoint = _cameraHomeEyePoint;
-            _cameraCurrentTargetPoint = _cameraHomeTargetPoint;
-
-            _addCamera();
-            _addCameraControls();
-            _cameraControls.target = _cameraHomeTargetPoint;
-
-            _updateCameraModel();
-        }
-
-    }
-
-
+/***
     Vector3 fromMouseToNdc(int newX, int newY) {
 
         // event.client.x,y is from upper left (0,0) of entire browser window
@@ -304,8 +277,6 @@ class Renderer {
 
         return qq;
     }
-
-
 
     void _handleMouseMove(MouseMoveData data) {
         if (this.canvas != data.canvas) return;
@@ -345,7 +316,6 @@ class Renderer {
 
         return vec;
     }
-
 
     void _updateMouseWorldCoords() {
         {

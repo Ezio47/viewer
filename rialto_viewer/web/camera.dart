@@ -1,7 +1,7 @@
 part of rialto.viewer;
 
 
-// when mouse button 1 is prerssedl: camera around center of image
+// when mouse button 1 is prerssed: camera around center of image
 // when mouse 1 is pressed and with the ALT key pressed: camera will dolly (move forward / zoom in)
 //    according to how much the mouse is moved in the Y direction
 //    BUG: X direction seems to have an effect also, hmmm
@@ -12,147 +12,139 @@ part of rialto.viewer;
 // NEED TO IMPLEMENT a switch between tracking and orbital modes
 // NEED TO IMPLEMENT a 'home' button
 
-enum CameraType {
-    Orbiting,
-    Tracking
-}
 
 class Camera {
+    static const ORBITING = 0;
+    static const TRACKING = 1;
 
-    final Vector3 xAxis = new Vector3(1.0, 0.0, 0.0);
-    final Vector3 yAxis = new Vector3(0.0, 1.0, 0.0);
-    final Vector3 zAxis = new Vector3(0.0, 0.0, 1.0);
+    final Vector3 _zero = new Vector3.zero();
+    final Vector3 _xAxis = new Vector3(1.0, 0.0, 0.0);
+    final Vector3 _yAxis = new Vector3(0.0, 1.0, 0.0);
+    final Vector3 _zAxis = new Vector3(0.0, 0.0, 1.0);
 
-    Matrix4 matrix = new Matrix4.zero();
-    Vector3 up = new Vector3.zero();
-    Vector3 right = new Vector3.zero();
-    Vector3 normal = new Vector3.zero();
-    Vector3 position = new Vector3.zero();
-    Vector3 focus = new Vector3.zero();
-    Vector3 home = new Vector3.zero();
-    double azimuth = 0.0;
-    double elevation = 0.0;
-    CameraType cameraType = CameraType.Orbiting;
-    double steps = 0.0;
-    double fovy = 65.0;
+    Matrix4 _matrix = new Matrix4.zero();
+    Vector3 _up = new Vector3.zero();
+    Vector3 _right = new Vector3.zero();
+    Vector3 _normal = new Vector3.zero();
+    Vector3 _position = new Vector3.zero();
+    Vector3 _home = new Vector3.zero();
+    double _azimuth = 0.0;
+    double _elevation = 0.0;
+    int _cameraType = ORBITING;
+    double _fovy = 65.0;
+    double _zoom = 0.0;
 
-    Camera(CameraType this.cameraType) { }
+    Camera(int cameraType) : _cameraType = cameraType;
 
     void goHome(Vector3 h) {
         if (h != null) {
-            home = h;
+            _home = h;
         }
-        setPosition(home);
-        setAzimuth(0.0);
-        setElevation(0.0);
-        steps = 0.0;
+        position = _home;
+        azimuth = 0.0;
+        elevation = 0.0;
+        _zoom = 0.0;
     }
 
-    void dolly(double s) {
+    double get zoom => _zoom;
+    void set zoom(double target) {
+        _zoom = target;
+        _dolly();
+    }
+
+    void _dolly() {
         var p = new Vector3.copy(position);
 
         var n = new Vector3.zero();
-        normal.normalizeInto(n);
-
-        final double step = s - steps;
+        _normal.normalizeInto(n);
 
         var newPosition = new Vector3.zero();
 
-        switch(cameraType) {
-            case CameraType.Tracking:
-                newPosition.x = p.x - step * n.x;
-                newPosition.y = p.y - step * n.y;
-                newPosition.z = p.z - step * n.z;
+        switch (_cameraType) {
+            case TRACKING:
+                newPosition.x = p.x - _zoom * n.x;
+                newPosition.y = p.y - _zoom * n.y;
+                newPosition.z = p.z - _zoom * n.z;
                 break;
-            case CameraType.Orbiting:
+            case ORBITING:
                 newPosition.x = p.x;
                 newPosition.y = p.y;
-                newPosition.z = p.z - step;
+                newPosition.z = p.z - _zoom;
                 break;
             default:
-               assert(false); // BUG
+                assert(false); // BUG
         }
 
-        setPosition(newPosition);
-        steps = s;
+        position = newPosition;
+        update();
     }
 
-    void setPosition(Vector3 p) {
+    Vector3 get position => _position;
+    void set position(Vector3 p) {
         p.copyInto(position);
         update();
     }
 
-    void setFocus(Vector3 f) {
-        f.copyInto(focus);
+    double get fovy => _fovy;
+    void set fovy(double degrees) {
+        _fovy = clamp(degrees, 20.0, 160.0);
+        //print("Fovy: $_fovy");
         update();
     }
 
-    void setFovy(double degrees) {
-        fovy = clamp(degrees, 20.0, 160.0);
-        print("Fovy: $fovy");
-    }
-
-    void changeFovy(double degrees) {
-        setFovy(fovy + degrees);
-    }
-
-    void setAzimuth(double degrees) {
-        changeAzimuth(degrees - azimuth);
-    }
-
-    void changeAzimuth(double degrees) {
-        azimuth = clamp360(azimuth + degrees);
+    double get azimuth => _azimuth;
+    void set azimuth(double degrees) {
+        _azimuth = clamp(degrees, -90.0, 90.0);
+        //print("Azimuth: $_azimuth");
         update();
     }
 
-    void setElevation(double degrees) {
-        changeElevation(degrees - elevation);
-    }
-
-    void changeElevation(double degrees) {
-        elevation = clamp360(elevation + degrees);
+    double get elevation => _elevation;
+    void set elevation(degrees) {
+        _elevation = clamp(degrees, -90.0, 90.0);
+        //print("Elevation: $_elevation");
         update();
     }
 
     void _calculateOrientation() {
-        right = matrix * xAxis;
-        up = matrix * yAxis;
-        normal = matrix * zAxis;
+        _right = _matrix * _xAxis;
+        _up = _matrix * _yAxis;
+        _normal = _matrix * _zAxis;
     }
 
     void update() {
-        matrix.setIdentity();
+        _matrix.setIdentity();
 
         _calculateOrientation();
 
-        switch (cameraType) {
-            case CameraType.Tracking :
-            matrix.translate(position);
-            matrix.rotateY(degToRad(azimuth));
-            matrix.rotateX(degToRad(elevation));
-            break;
-            case CameraType.Orbiting:
-            matrix.rotateY(degToRad(azimuth));
-        matrix.rotateX(degToRad(elevation));
-            matrix.translate(position);
-            //var trxLook = new Matrix4.zero();
-            //mat4.lookAt(position, focus, up, trxLook);
-            //mat4.inverse(trxLook);
-            //mat4.multiply(matrix,trxLook);
-            break;
+        switch (_cameraType) {
+            case TRACKING:
+                _matrix.translate(position);
+                _matrix.rotateY(degToRad(azimuth));
+                _matrix.rotateX(degToRad(elevation));
+                break;
+            case ORBITING:
+                _matrix.rotateY(degToRad(azimuth));
+                _matrix.rotateX(degToRad(elevation));
+                _matrix.translate(position);
+                //var trxLook = new Matrix4.zero();
+                //mat4.lookAt(position, focus, up, trxLook);
+                //mat4.inverse(trxLook);
+                //mat4.multiply(matrix,trxLook);
+                break;
             default:
                 assert(false);
         }
 
         _calculateOrientation();
 
-        if (cameraType == CameraType.Tracking) {
-            position = matrix * new Vector3.zero();
+        if (_cameraType == TRACKING) {
+            position = _matrix * _zero;
         }
     }
 
     Matrix4 getViewTransform() {
-        var m = new Matrix4.copy(matrix);
+        var m = new Matrix4.copy(_matrix);
         m.invert();
         return m;
     }

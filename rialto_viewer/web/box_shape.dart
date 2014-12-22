@@ -11,53 +11,91 @@ class BoxShape extends Shape {
 
     @override
     void setArrays() {
-        const double x = 10.0;
-        const double y = 10.0;
-        const double z = 10.0;
-        const double xx = 11.0;
-        const double yy = 11.0;
-        const double zz = 11.0;
+        const double x = 0.0;
+        const double y = 0.0;
+        const double z = 0.0;
+        const double xx = 1.0;
+        const double yy = 1.0;
+        const double zz = 1.0;
+
+        final red = new Color.red().toList();
+        final blue = new Color.blue().toList();
+        final green = new Color.green().toList();
+
+        final a = [x, y, z];
+        final b = [xx, y, z];
+        final c = [x, yy, z];
+        final d = [xx, yy, z];
+        final aa = [x, y, zz];
+        final bb = [xx, y, zz];
+        final cc = [x, yy, zz];
+        final dd = [xx, yy, zz];
+
         var vertices = [];
-        var a = [x, y, z];
-        var b = [xx, y, z];
-        var c = [x, yy, z];
-        var d = [xx, yy, z];
-        var aa = [x, y, zz];
-        var bb = [xx, y, zz];
-        var cc = [x, yy, zz];
-        var dd = [xx, yy, zz];
-
-        vertices.addAll(a);
-        vertices.addAll(b);
-        vertices.addAll(b);
-        vertices.addAll(d);
-        vertices.addAll(d);
-        vertices.addAll(c);
-        vertices.addAll(c);
-        vertices.addAll(a);
-
-        vertices.addAll(aa);
-        vertices.addAll(bb);
-        vertices.addAll(bb);
-        vertices.addAll(dd);
-        vertices.addAll(dd);
-        vertices.addAll(cc);
-        vertices.addAll(cc);
-        vertices.addAll(aa);
-
-        vertices.addAll(a);
-        vertices.addAll(aa);
-        vertices.addAll(b);
-        vertices.addAll(bb);
-        vertices.addAll(c);
-        vertices.addAll(cc);
-        vertices.addAll(d);
-        vertices.addAll(dd);
-
         var colors = [];
-        for (int i = 0; i < 8 + 8 + 8; i++) {
-            colors.addAll([1.0, 1.0, 1.0, 1.0]);
-        }
+
+        // bottom square
+        vertices.addAll(a); // 0
+        vertices.addAll(b); // 1
+        colors.addAll(red);
+        colors.addAll(red);
+
+        vertices.addAll(b); // 2
+        vertices.addAll(d); // 3
+        colors.addAll(green);
+        colors.addAll(green);
+
+        vertices.addAll(d); // 4
+        vertices.addAll(c); // 5
+        colors.addAll(red);
+        colors.addAll(red);
+
+        vertices.addAll(c); // 6
+        vertices.addAll(a); // 7
+        colors.addAll(green);
+        colors.addAll(green);
+
+        // top square
+        vertices.addAll(aa); // 8
+        vertices.addAll(bb); // 9
+        colors.addAll(red);
+        colors.addAll(red);
+
+        vertices.addAll(bb); // 10
+        vertices.addAll(dd); // 11
+        colors.addAll(green);
+        colors.addAll(green);
+
+        vertices.addAll(dd); // 12
+        vertices.addAll(cc); // 13
+        colors.addAll(red);
+        colors.addAll(red);
+
+        vertices.addAll(cc);
+        vertices.addAll(aa);
+        colors.addAll(green);
+        colors.addAll(green);
+
+        // vertical lines
+        vertices.addAll(a);
+        vertices.addAll(aa);
+        colors.addAll(blue);
+        colors.addAll(blue);
+
+        vertices.addAll(b);
+        vertices.addAll(bb);
+        colors.addAll(blue);
+        colors.addAll(blue);
+
+        vertices.addAll(c);
+        vertices.addAll(cc);
+        colors.addAll(blue);
+        colors.addAll(blue);
+
+        vertices.addAll(d);
+        vertices.addAll(dd);
+        colors.addAll(blue);
+        colors.addAll(blue);
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
@@ -66,7 +104,7 @@ class BoxShape extends Shape {
 
     @override
     void drawImpl() {
-        gl.drawArrays(LINES, 0/*first elem*/, 8 + 8 + 8/*total num vertices*/);
+        gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
     }
 }
 

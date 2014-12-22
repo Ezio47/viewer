@@ -88,7 +88,7 @@ class PointCloudGenerator {
 
         var rnd = new Random();
 
-        var color = new Color.zero();
+        var color = new Color.black();
 
         var n = 1000.0,
                 n2 = n / 2.0; // particles spread in the cube

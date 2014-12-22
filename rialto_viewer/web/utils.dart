@@ -12,19 +12,6 @@ num clamp(num v, num low, num high) => (v < low) ? low : ((v > high) ? high : v)
 num clamp360(num degrees) => (degrees > 360 || degrees < -360) ? degrees % 360 : degrees;
 
 
-class Color {
-    double r,g,b,a;
-    Color.zero();
-    Color(this.r, this.g, this.b, this.a);
-    void setRGB(double rr, double gg, double bb) {
-        r = rr;
-        g = gg;
-        b = bb;
-        a = 1.0;
-    }
-}
-
-
 class Utils {
     static bool _checkInts(int r, int g, int b) => (r >= 0 && r <= 255) && (g >= 0 && g <= 255) && (b >= 0 && b <= 255);
     static bool _checkFloats(double r, double g, double b) =>

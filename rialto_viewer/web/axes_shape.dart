@@ -33,7 +33,7 @@ class AxesShape extends Shape {
 
     @override
     void drawImpl() {
-        gl.drawArrays(LINES, 0/*first elem*/, 6/*total num vertices*/);
+        gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
     }
 }
 

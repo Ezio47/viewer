@@ -13,9 +13,8 @@ class CameraInteractor {
     int _lastX = 0;
     int _lastY = 0;
     int _button = 0;
-    bool _isMoving = false;
+    bool _isMouseDown = false;
     bool isPickingEnabled = true;
-    bool _altKeyDown;
 
     static const double MOTION_FACTOR = 10.0;
 
@@ -26,6 +25,7 @@ class CameraInteractor {
         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
         _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
+        _hub.eventRegistry.MouseWheel.subscribe(_handleMouseWheel);
         _hub.eventRegistry.KeyDown.subscribe(_handleKeyDown);
         _hub.eventRegistry.KeyUp.subscribe(_handleKeyUp);
     }
@@ -51,11 +51,11 @@ class CameraInteractor {
     }
 
     void _handleMouseUp(ev) {
-        _isMoving = false;
+        _isMouseDown = false;
     }
 
     void _handleMouseDown(MouseData ev) {
-        _isMoving = true;
+        _isMouseDown = true;
         _currentX = ev.x;
         _currentY = ev.y;
         _button = ev.button;
@@ -67,65 +67,55 @@ class CameraInteractor {
         }
     }
 
+    void _handleMouseWheel(WheelData ev) {
+        double d = ( 1 / ev.delta ) * 0.05;
+        _camera.zoom += d;
+        //print("${ev.delta} ${_camera.zoom}");
+    }
+
     void _handleMouseMove(MouseData ev) {
         _lastX = _currentX;
         _lastY = _currentY;
         _currentX = ev.x;
         _currentY = ev.y;
 
-        if (!_isMoving) return;
+        if (!_isMouseDown) return;
 
         final bool alt = ev.altKey;
         final double dx = (_currentX - _lastX).toDouble();
         final double dy = (_currentY - _lastY).toDouble();
 
         if (_button == 0) {
-            if (alt) {
-                dolly(dy);
-            } else {
-                rotate(dx, dy);
-            }
+            rotate(dx, dy);
         }
     }
 
     void _handleKeyDown(KeyboardData ev) {
         var c = _camera;
 
-        _altKeyDown = ev.altKey;
-
         switch (ev.keyCode) {
             case KeyboardData.KEY_UP:
-                c.changeElevation(10.0);
+                c.elevation += 10.0;
                 break;
             case KeyboardData.KEY_DOWN:
-                c.changeElevation(-10.0);
+                c.elevation += -10.0;
                 break;
             case KeyboardData.KEY_LEFT:
-                c.changeAzimuth(-10.0);
+                c.azimuth += -10.0;
                 break;
             case KeyboardData.KEY_RIGHT:
-                c.changeAzimuth(10.0);
+                c.azimuth += 10.0;
                 break;
             case KeyboardData.KEY_W:
-                c.changeFovy(10.0);
+                c.fovy += 10.0;
                 break;
             case KeyboardData.KEY_N:
-                c.changeFovy(-10.0);
+                c.fovy += -10.0;
                 break;
         }
     }
 
     void _handleKeyUp(KeyboardData ev) {
-        _altKeyDown = !ev.altKey;
-    }
-
-    void dolly(double value) {
-        if (value > 0) {
-            _dollyLoc += _dollyStep;
-        } else {
-            _dollyLoc -= _dollyStep;
-        }
-        _camera.dolly(_dollyLoc);
     }
 
     void rotate(double dx, double dy) {
@@ -135,8 +125,8 @@ class CameraInteractor {
         final double nAzimuth = dx * delta_azimuth * MOTION_FACTOR;
         final double nElevation = dy * delta_elevation * MOTION_FACTOR;
 
-        _camera.changeAzimuth(nAzimuth);
-        _camera.changeElevation(nElevation);
+        _camera.azimuth += nAzimuth;
+        _camera.elevation += nElevation;
     }
 }
 

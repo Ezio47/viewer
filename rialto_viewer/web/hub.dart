@@ -27,6 +27,7 @@ part 'box_shape.dart';
 part 'camera.dart';
 part 'camera_interactor.dart';
 part 'cloud_shape.dart';
+part 'color.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'event_registry.dart';
@@ -97,7 +98,7 @@ class Hub {
         RenderingContext gl = canvas.getContext3d();
         assert(gl != null);
 
-        renderablePointCloudSet = new RenderablePointCloudSet();
+        renderablePointCloudSet = new RenderablePointCloudSet(gl);
 
         mainRenderer = new Renderer(canvas, gl, renderablePointCloudSet);
 
@@ -105,8 +106,9 @@ class Hub {
         domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
         domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
         domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));
-        domElement.onKeyUp.listen((e) => eventRegistry.KeyUp.fire(new KeyboardData(e)));
-        domElement.onKeyDown.listen((e) => eventRegistry.KeyDown.fire(new KeyboardData(e)));
+        domElement.onMouseWheel.listen((e) => eventRegistry.MouseWheel.fire(new WheelData(e)));
+        window.onKeyUp.listen((e) => eventRegistry.KeyUp.fire(new KeyboardData(e)));
+        window.onKeyDown.listen((e) => eventRegistry.KeyDown.fire(new KeyboardData(e)));
         window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
 
         mainRenderer.tick(0);
@@ -135,9 +137,6 @@ class Hub {
             renderablePointCloudSet.addCloud(pointCloud);
 
             mainRenderer.update();
-            if (navRenderer != null) {
-                navRenderer.update();
-            }
         });
 
         eventRegistry.OpenFileCompleted.fire(webpath);
@@ -148,9 +147,6 @@ class Hub {
         renderablePointCloudSet.removeCloud(webpath);
 
         mainRenderer.update();
-        if (navRenderer != null) {
-            navRenderer.update();
-        }
 
         eventRegistry.CloseFileCompleted.fire(webpath);
     }

@@ -29,7 +29,9 @@ abstract class Shape {
         visible = true;
 
         shapes[id] = this;
+    }
 
+    void init() {
         setArrays();
         assert(_vertexArray != null);
         assert(_colorArray != null);
@@ -48,7 +50,7 @@ abstract class Shape {
         gl.bufferDataTyped(ARRAY_BUFFER, _idArray, STATIC_DRAW);
 
         var pcode = Utils.convertIdToFvec(id);
-        print("creted ${this.runtimeType}: $id ($pcode)");
+        //print("created ${this.runtimeType}: $id ($pcode)");
     }
 
     static int getNewId() => _ids++;
