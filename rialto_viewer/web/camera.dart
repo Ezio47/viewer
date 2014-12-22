@@ -22,12 +22,13 @@ class Camera {
     final Vector3 _yAxis = new Vector3(0.0, 1.0, 0.0);
     final Vector3 _zAxis = new Vector3(0.0, 0.0, 1.0);
 
-    Matrix4 _matrix = new Matrix4.zero();
+    Matrix4 _viewMatrix = new Matrix4.zero();
+    Matrix4 _perspective = new Matrix4.zero();
     Vector3 _up = new Vector3.zero();
     Vector3 _right = new Vector3.zero();
     Vector3 _normal = new Vector3.zero();
     Vector3 _position = new Vector3.zero();
-    Vector3 _home = new Vector3.zero();
+    Vector3 _target = new Vector3.zero();
     double _azimuth = 0.0;
     double _elevation = 0.0;
     int _cameraType = ORBITING;
@@ -36,11 +37,15 @@ class Camera {
 
     Camera(int cameraType) : _cameraType = cameraType;
 
-    void goHome(Vector3 h) {
-        if (h != null) {
-            _home = h;
-        }
-        position = _home;
+    Matrix4 getPerspectiveMatrix(double aspect) {
+        return makePerspectiveMatrix(degToRad(fovy), aspect, 0.001, 10000.0);
+    }
+
+    void setEye(double x, double y, double z) {
+        position.x = x;
+        position.y = y;
+        position.z = z;
+
         azimuth = 0.0;
         elevation = 0.0;
         _zoom = 0.0;
@@ -76,57 +81,63 @@ class Camera {
         }
 
         position = newPosition;
-        update();
+        //update();
     }
 
     Vector3 get position => _position;
     void set position(Vector3 p) {
         p.copyInto(position);
-        update();
+        //update();
+    }
+
+    Vector3 get target => _target;
+    void set target(Vector3 p) {
+        p.copyInto(target);
+        //update();
     }
 
     double get fovy => _fovy;
     void set fovy(double degrees) {
         _fovy = clamp(degrees, 20.0, 160.0);
         //print("Fovy: $_fovy");
-        update();
+        //update();
     }
 
     double get azimuth => _azimuth;
     void set azimuth(double degrees) {
         _azimuth = clamp(degrees, -90.0, 90.0);
         //print("Azimuth: $_azimuth");
-        update();
+        //update();
     }
 
     double get elevation => _elevation;
     void set elevation(degrees) {
         _elevation = clamp(degrees, -90.0, 90.0);
         //print("Elevation: $_elevation");
-        update();
+        //update();
     }
 
     void _calculateOrientation() {
-        _right = _matrix * _xAxis;
-        _up = _matrix * _yAxis;
-        _normal = _matrix * _zAxis;
+        _right = _viewMatrix * _xAxis;
+        _up = _viewMatrix * _yAxis;
+        _normal = _viewMatrix * _zAxis;
     }
 
     void update() {
-        _matrix.setIdentity();
+        _viewMatrix.setIdentity();
 
         _calculateOrientation();
 
         switch (_cameraType) {
             case TRACKING:
-                _matrix.translate(position);
-                _matrix.rotateY(degToRad(azimuth));
-                _matrix.rotateX(degToRad(elevation));
+                _viewMatrix.translate(position);
+                _viewMatrix.rotateY(degToRad(azimuth));
+                _viewMatrix.rotateX(degToRad(elevation));
                 break;
             case ORBITING:
-                _matrix.rotateY(degToRad(azimuth));
-                _matrix.rotateX(degToRad(elevation));
-                _matrix.translate(position);
+                _viewMatrix.rotateY(degToRad(azimuth));
+                _viewMatrix.rotateX(degToRad(elevation));
+                _viewMatrix.translate(position);
                 //var trxLook = new Matrix4.zero();
                 //mat4.lookAt(position, focus, up, trxLook);
                 //mat4.inverse(trxLook);
@@ -139,13 +150,19 @@ class Camera {
         _calculateOrientation();
 
         if (_cameraType == TRACKING) {
-            position = _matrix * _zero;
+            position = _viewMatrix * _zero;
         }
+
+        var cameraPosition = new Vector3(_viewMatrix[12], _viewMatrix[13], _viewMatrix[14]);
+        Vector3 target = new Vector3(0.0, 0.0, 0.0);
+        var cameraMatrix = makeViewMatrix(cameraPosition, target, _yAxis);
+        cameraMatrix.copyInto(_viewMatrix);
+        //_viewMatrix.invert();
     }
 
-    Matrix4 getViewTransform() {
-        var m = new Matrix4.copy(_matrix);
-        m.invert();
+    Matrix4 getViewMatrix() {
+        var m = new Matrix4.copy(_viewMatrix);
+        //m.invert();
         return m;
     }
 }

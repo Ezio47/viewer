@@ -3,6 +3,7 @@ part of rialto.viewer;
 class CloudShape extends Shape {
     int numPoints;
     Float32List points;
+    Float32List colors;
 
     double scaleX = 10.0;
     double scaleY = 10.0;
@@ -11,34 +12,23 @@ class CloudShape extends Shape {
     double offsetY = 0.0;
     double offsetZ = 0.0;
 
-    CloudShape(RenderingContext gl, Float32List pointsss) : super(gl) {
-        numPoints = pointsss.length ~/ 3;
-        points = pointsss;
+    CloudShape(RenderingContext gl, Float32List this.points, Float32List this.colors) : super(gl) {
+        numPoints = points.length ~/ 3;
     }
 
     @override
     void setArrays() {
-
-        /*List<double> points = makePoints();
-
-        numPoints = points.length ~/ 3;
-        var vertices = [];
-        for (int i = 0; i < points.length; i += 3) {
-            double x = points[i];
-            double y = points[i + 1];
-            double z = points[i + 2];
-            vertices.addAll([x, y, z]);
-        }
-        _vertexArray = new Float32List.fromList(points);
-        */
-
         _vertexArray = new Float32List.fromList(points.toList());
 
-        var colors = [];
-        var white = new Color.white().toList();
-        for (int i = 0; i < numPoints; i++) {
-            colors.addAll(white);
+        if (colors == null) {
+            var white = new Color.white().toList();
+            _colorArray = new Float32List(numPoints * 4);
+            for (int i = 0; i < numPoints; i++) {
+                colors.addAll(white);
+            }
         }
+
+        assert(colors.length == _vertexArray.length);
 
         _colorArray = new Float32List.fromList(colors);
 
@@ -46,7 +36,6 @@ class CloudShape extends Shape {
         _idArray = new Float32List(_colorArray.length);
         for (int i = 0; i < _idArray.length; i += 4) {
             final int pointId = Shape.getNewId();
-            print(pointId);
             var pointCode = Utils.convertIdToFvec(pointId);
             _idArray[i] = pointCode[0];
             _idArray[i + 1] = pointCode[1];

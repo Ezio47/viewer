@@ -41,7 +41,6 @@ part 'proxy.dart';
 part 'renderable_point_cloud.dart';
 part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
-part 'render_utils.dart';
 part 'rialto_exceptions.dart';
 part 'shape.dart';
 part 'signal.dart';

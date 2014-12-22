@@ -8,21 +8,26 @@ abstract class Colorizer {
     Colorizer();
 
     void run(RenderablePointCloud cloud) {
-        _algorithm(
+        var newColors = _algorithm(
                 cloud.min.z,
                 cloud.max.z,
                 cloud.dims["positions"],
                 cloud.dims["colors"],
                 cloud.numPoints);
+
+        cloud.dims["oldcolors"] = cloud.dims["colors"];
+        cloud.dims["colors"] = newColors;
     }
 
-    void _algorithm(double zmin, double zmax, Float32List positions, Float32List colors, int numPoints);
+    Float32List _algorithm(double zmin, double zmax, Float32List positions, Float32List oldColors, int numPoints);
 }
 
 
 class FauxColorizer extends Colorizer {
 
-    void _algorithm(double zmin, double zmax, Float32List positions, Float32List colors, int numPoints) {
+    Float32List _algorithm(double zmin, double zmax, Float32List positions, Float32List oldColors, int numPoints) {
+        Float32List newColors = new Float32List(oldColors.length);
+
         double zLen = zmax - zmin;
 
         for (int i = 0; i < numPoints * 3; i += 3) {
@@ -36,19 +41,21 @@ class FauxColorizer extends Colorizer {
 
             // a silly ramp
             if (c < 0.3333) {
-                colors[i] = c * 3.0;
-                colors[i + 1] = 0.0;
-                colors[i + 2] = 0.0;
+                newColors[i] = c * 3.0;
+                newColors[i + 1] = 0.0;
+                newColors[i + 2] = 0.0;
             } else if (c < 0.6666) {
-                colors[i] = 0.0;
-                colors[i + 1] = (c - 0.3333) * 3.0;
-                colors[i + 2] = 0.0;
+                newColors[i] = 0.0;
+                newColors[i + 1] = (c - 0.3333) * 3.0;
+                newColors[i + 2] = 0.0;
             } else {
-                colors[i] = 0.0;
-                colors[i + 1] = 0.0;
-                colors[i + 2] = (c - 0.6666) * 3.0;
+                newColors[i] = 0.0;
+                newColors[i + 1] = 0.0;
+                newColors[i + 2] = (c - 0.6666) * 3.0;
             }
         }
+
+        return newColors;
     }
 }
 
@@ -63,7 +70,9 @@ class RampColorizer extends Colorizer {
         return l;
     }
 
-    void _algorithm(double zmin, double zmax, Float32List positions, Float32List colors, int numPoints) {
+    Float32List _algorithm(double zmin, double zmax, Float32List positions, Float32List oldColors, int numPoints) {
+        Float32List newColors = new Float32List(oldColors.length);
+
         assert(_Ramps.list.containsKey(_name));
 
         final double zLen = zmax - zmin;
@@ -97,10 +106,12 @@ class RampColorizer extends Colorizer {
             }
             assert(result != null);
 
-            colors[i + 0] = result.r / 255.0;
-            colors[i + 1] = result.g / 255.0;
-            colors[i + 2] = result.b / 255.0;
+            newColors[i + 0] = result.r / 255.0;
+            newColors[i + 1] = result.g / 255.0;
+            newColors[i + 2] = result.b / 255.0;
         }
+
+        return newColors;
     }
 
     _Color _interpolate(double z, double startRange, double endRange, _Color startColor, _Color endColor) {

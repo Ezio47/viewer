@@ -14,7 +14,7 @@ class CameraInteractor {
     int _lastY = 0;
     int _button = 0;
     bool _isMouseDown = false;
-    bool isPickingEnabled = true;
+    bool isPickingEnabled = false;
 
     static const double MOTION_FACTOR = 10.0;
 
@@ -28,6 +28,9 @@ class CameraInteractor {
         _hub.eventRegistry.MouseWheel.subscribe(_handleMouseWheel);
         _hub.eventRegistry.KeyDown.subscribe(_handleKeyDown);
         _hub.eventRegistry.KeyUp.subscribe(_handleKeyUp);
+
+        _hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateEye);
+        _hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateTarget);
     }
 
     Point _get2DCoords(MouseData ev) {
@@ -68,7 +71,7 @@ class CameraInteractor {
     }
 
     void _handleMouseWheel(WheelData ev) {
-        double d = ( 1 / ev.delta ) * 0.05;
+        double d = ( 1 / ev.delta ) * 0.5;
         _camera.zoom += d;
         //print("${ev.delta} ${_camera.zoom}");
     }
@@ -116,6 +119,20 @@ class CameraInteractor {
     }
 
     void _handleKeyUp(KeyboardData ev) {
+    }
+
+    void _handleUpdateEye(Vector3 eye) {
+        if (eye == null) {
+            eye = new Vector3(0.0, 0.0, 1000.0);
+        }
+        _camera.position = eye;
+    }
+
+    void _handleUpdateTarget(Vector3 target) {
+        if (target == null) {
+            target = new Vector3(0.0, 0.0, 0.0);
+        }
+        _camera.target = target;
     }
 
     void rotate(double dx, double dy) {

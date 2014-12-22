@@ -51,7 +51,7 @@ class Renderer {
         mvMatrix = new Matrix4.identity();
 
         _camera = new Camera(Camera.ORBITING);
-        _camera.goHome(new Vector3(0.0, 0.0, 50.0));
+        _camera.setEye(0.0, 0.0, 50.0);
         //  camera.setElevation(-22);
         // camera.setAzimuth(37);
 
@@ -59,7 +59,6 @@ class Renderer {
 
         _interactor = new CameraInteractor(_camera, _canvas, _picker);
 
-        makeObjects();
         update();
 
         _picker.shapes = shapes;
@@ -76,31 +75,6 @@ class Renderer {
         _hub.eventRegistry.WindowResize.subscribe0(_handleWindowResize);
     }
 
-    void makeObjects() {
-        //var axes = new AxesShape(gl);
-        //axes.init();
-        //axes.modelMatrix.scale(10.0, 10.0, 10.0);
-        //shapes.add(axes);
-        //_axesShape = axes;
-
-        //var axes2 = new AxesShape(gl);
-        //axes2.init();
-        //axes2.modelMatrix.scale(2.5, 2.5, 2.5);
-        //axes2.modelMatrix.rotate(new Vector3(-1.0, -1.0, -1.0), 90.0);
-        //axes2.modelMatrix.translate(-0.5, -0.5, -0.5);
-        //shapes.add(axes2);
-
-        //var line = new LineShape(gl);
-        //line.init();
-        //shapes.add(line);
-
-        //var box = new BoxShape(gl);
-        //box.init();
-        //box.modelMatrix.translate(-9.0, -9.0, -9.0);
-        //shapes.add(box);
-        //_bboxShape = box;
-    }
-
     // this gets called whenever something major changes, e.g. add a new cloud
     void update() {
         // model space: cloud's (xmin,ymin,zmin)..cloud's (xmax,ymax,zmax)
@@ -108,22 +82,24 @@ class Renderer {
         //
         // note min point of the cloud model gets tranlated to the origin of world space
 
+        shapes.clear();
+
         var theMin = _renderSource.min;
         var theLen = _renderSource.len;
+
         if (_renderSource.length == 0) {
             // a reasonable default
             theMin = new Vector3.zero();
             theLen = new Vector3(100.0, 100.0, 100.0);
         }
 
+        _camera.setEye(0.0, 0.0, 3000.0);
+
         {
             // axes model space is (0,0,0)..(0.25 * theLen)
             _axesShape = new AxesShape(gl);
             _axesShape.init();
-            Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = theLen.clone();
-            Vector3 c = b.divide(a).scale(1.0 / 4.0);
-            _axesShape.modelMatrix.scale(c);
+            _axesShape.modelMatrix.scale(theLen * 0.5);
             shapes.add(_axesShape);
         }
 
@@ -132,10 +108,8 @@ class Renderer {
             // bbox model space is (0,0,0)..(theLen)
             _bboxShape = new BoxShape(gl);
             _bboxShape.init();
-            Vector3 a = new Vector3(100.0, 100.0, 100.0);
-            Vector3 b = theLen.clone();
-            Vector3 c = b.divide(a);
-            //_bboxShape.modelMatrix.scale(c);
+            //_bboxShape.modelMatrix.translate(-theMin);
+            _bboxShape.modelMatrix.scale(theLen);
             shapes.add(_bboxShape);
         }
 
@@ -143,7 +117,7 @@ class Renderer {
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.visible = rpc.visible;
-               // obj.modelMatrix.translate(theMin);
+                obj.modelMatrix.translate(-theMin);
                 shapes.add(obj);
             }
         }
@@ -153,8 +127,8 @@ class Renderer {
 
         Shape.offscreen = 1;
         //off-screen rendering
-        gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
-        _drawScene(viewWidth, viewHeight, aspect);
+     //   gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
+     //   _drawScene(viewWidth, viewHeight, aspect);
 
         Shape.offscreen = 0;
         //on-screen rendering
@@ -163,15 +137,17 @@ class Renderer {
     }
 
     void _drawScene(num viewWidth, num viewHeight, num aspect) {
+        _camera.update();
+
         gl.viewport(0, 0, viewWidth, viewHeight);
         gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
         gl.enable(DEPTH_TEST);
         gl.disable(BLEND);
 
-        pMatrix = makePerspectiveMatrix(degToRad(_camera.fovy), aspect, 0.001, 1000.0);
+        pMatrix = _camera.getPerspectiveMatrix(aspect);
 
         for (var renderable in shapes) {
-            var vMatrix = _camera.getViewTransform();
+            var vMatrix = _camera.getViewMatrix();
             var mMatrix = renderable.modelMatrix;
             mvMatrix = vMatrix * mMatrix;
             renderable.draw(

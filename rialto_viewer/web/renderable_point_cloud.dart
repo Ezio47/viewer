@@ -99,7 +99,7 @@ class RenderablePointCloud {
         var material = new ParticleBasicMaterial(size: 1, vertexColors: 2);
 **/
         assert(gl != null);
-        _particleSystem = new CloudShape(gl, xyz);
+        _particleSystem = new CloudShape(gl, xyz, colors);
         _particleSystem.init();
         _particleSystem.name = pointCloud.webpath;
         return _particleSystem;

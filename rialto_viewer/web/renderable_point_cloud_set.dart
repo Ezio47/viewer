@@ -78,8 +78,8 @@ class RenderablePointCloudSet {
 
         numPoints = 0;
         for (var cloud in renderablePointClouds) {
-            min = Utils.vectorMin(min, cloud.min);
-            max = Utils.vectorMax(max, cloud.max);
+            min = Utils.vectorMinV(min, cloud.min);
+            max = Utils.vectorMaxV(max, cloud.max);
             numPoints += cloud.numPoints;
         }
 
@@ -93,8 +93,5 @@ class RenderablePointCloudSet {
             colorizer.run(cloud);
         }
         _hub.mainRenderer.update();
-        if (_hub.navRenderer != null) {
-            _hub.navRenderer.update();
-        }
     }
 }
