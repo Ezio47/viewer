@@ -11,8 +11,8 @@ abstract class Colorizer {
         _algorithm(
                 cloud.min.z,
                 cloud.max.z,
-                cloud.dims["positions"].array,
-                cloud.dims["colors"].array,
+                cloud.dims["positions"],
+                cloud.dims["colors"],
                 cloud.numPoints);
     }
 

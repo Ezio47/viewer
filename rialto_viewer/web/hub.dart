@@ -7,14 +7,13 @@ library rialto.viewer;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'dart:math' as Math;
+import 'dart:math';
 import 'dart:typed_data';
+import 'dart:web_gl';
 
 import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
-import 'package:three/extras/controls/trackball_controls.dart';
-import 'package:three/three.dart';
-import 'package:vector_math/vector_math.dart' hide Ray, Frustum;
+import 'package:vector_math/vector_math.dart';
 
 import 'elements/colorization_dialog.dart';
 import 'elements/render_panel.dart';
@@ -23,11 +22,18 @@ import 'elements/rialto_element.dart';
 
 
 part 'annotator.dart';
-part 'axes_object.dart';
-part 'bbox_object.dart';
+part 'axes_shape.dart';
+part 'box_shape.dart';
+part 'camera.dart';
+part 'camera_interactor.dart';
+part 'cloud_shape.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'event_registry.dart';
+part 'fragment_shader.dart';
+part 'gl_program.dart';
+part 'line_shape.dart';
+part 'picker.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
 part 'proxy.dart';
@@ -36,9 +42,13 @@ part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
 part 'render_utils.dart';
 part 'rialto_exceptions.dart';
+part 'shape.dart';
 part 'signal.dart';
 part 'utils.dart';
+part 'vertex_shader.dart';
 
+int c_width = 500;
+int c_height = 500;
 
 class Hub {
     RenderPanel mainRenderPanel;
@@ -84,10 +94,31 @@ class Hub {
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
-        _createRenderer();
+        CanvasElement canvas = querySelector("#mycanvas");
+
+        RenderingContext gl = canvas.getContext3d();
+        if (gl == null) {
+            return;
+        }
+
+        renderablePointCloudSet = new RenderablePointCloudSet();
+
+        mainRenderer = new Renderer(canvas, gl);
+
+        /***
+        var domElement = mainRenderer.canvas;
+        domElement.onMouseMove.listen(
+                (e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y, e.target)));
+        domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire0());
+        domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire0());
+        window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
+        ***/
+
+        mainRenderer.tick(0);
     }
 
     void _createRenderer() {
+        /***
         assert(mainRenderer == null);
         assert(navRenderer == null);
 
@@ -106,7 +137,7 @@ class Hub {
             domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire0());
             domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire0());
             window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
-        }
+        }***/
         /*{
             navRenderer = new Renderer(navRenderPanel, renderablePointCloudSet, "nav");
             navRenderer.update();

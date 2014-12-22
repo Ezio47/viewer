@@ -109,13 +109,6 @@ packages:
     description: template_binding
     source: hosted
     version: "0.13.1"
-  three:
-    description:
-      ref: null
-      resolved-ref: "8418af7ed1879ac5043d976dffa0e3cec444d66e"
-      url: "https://github.com/threeDart/three.dart.git"
-    source: git
-    version: "0.2.5+1"
   utf:
     description: utf
     source: hosted

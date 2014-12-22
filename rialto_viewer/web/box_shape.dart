@@ -5,6 +5,73 @@
 part of rialto.viewer;
 
 
+class BoxShape extends Shape {
+
+    BoxShape(RenderingContext gl) : super(gl);
+
+    @override
+    void setArrays() {
+        const double x = 10.0;
+        const double y = 10.0;
+        const double z = 10.0;
+        const double xx = 11.0;
+        const double yy = 11.0;
+        const double zz = 11.0;
+        var vertices = [];
+        var a = [x, y, z];
+        var b = [xx, y, z];
+        var c = [x, yy, z];
+        var d = [xx, yy, z];
+        var aa = [x, y, zz];
+        var bb = [xx, y, zz];
+        var cc = [x, yy, zz];
+        var dd = [xx, yy, zz];
+
+        vertices.addAll(a);
+        vertices.addAll(b);
+        vertices.addAll(b);
+        vertices.addAll(d);
+        vertices.addAll(d);
+        vertices.addAll(c);
+        vertices.addAll(c);
+        vertices.addAll(a);
+
+        vertices.addAll(aa);
+        vertices.addAll(bb);
+        vertices.addAll(bb);
+        vertices.addAll(dd);
+        vertices.addAll(dd);
+        vertices.addAll(cc);
+        vertices.addAll(cc);
+        vertices.addAll(aa);
+
+        vertices.addAll(a);
+        vertices.addAll(aa);
+        vertices.addAll(b);
+        vertices.addAll(bb);
+        vertices.addAll(c);
+        vertices.addAll(cc);
+        vertices.addAll(d);
+        vertices.addAll(dd);
+
+        var colors = [];
+        for (int i = 0; i < 8 + 8 + 8; i++) {
+            colors.addAll([1.0, 1.0, 1.0, 1.0]);
+        }
+
+        _vertexArray = new Float32List.fromList(vertices);
+        _colorArray = new Float32List.fromList(colors);
+        setDefaultIdArray();
+    }
+
+    @override
+    void drawImpl() {
+        gl.drawArrays(LINES, 0/*first elem*/, 8 + 8 + 8/*total num vertices*/);
+    }
+}
+
+
+/***
 class BboxObject extends Object3D {
     BboxObject() : super() {
         var x1Geometry = new Geometry()
@@ -70,3 +137,4 @@ class BboxObject extends Object3D {
 
     }
 }
+***/

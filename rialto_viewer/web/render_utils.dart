@@ -6,6 +6,7 @@ part of rialto.viewer;
 
 
 class RenderUtils {
+    /***
     static Line createLine(Vector3 p1, Vector3 p2, int xcolor) {
         var material = new LineBasicMaterial(color: xcolor);
 
@@ -62,4 +63,5 @@ class RenderUtils {
 
         return v;
     }
+     ***/
 }

@@ -6,8 +6,7 @@ dependencies:
   http: any
   paper_elements: any
   polymer: any
-  three:
-    git: https://github.com/threeDart/three.dart.git
+  vector_math: any
 transformers:
 - rialto_viewer
 - polymer

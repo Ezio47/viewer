@@ -8,7 +8,7 @@ class Annotator {
     Hub _hub;
     SignalSubscription _mouseMoveSubscription;
     bool running = false;
-    Object3D _graphic;
+    Shape _graphic;
 
     Annotator() {
         _hub = Hub.root;
@@ -37,7 +37,8 @@ class Annotator {
     }
 
     Vector3 point;
-    Object3D get graphic {
+    Shape get graphic {
+        /**
         if (point == null) return null;
         var gline = new Geometry();
         gline.vertices.add(point);
@@ -45,14 +46,19 @@ class Annotator {
         var line = new Line(gline, new LineBasicMaterial(color: 0x0000ff));
         point = null;
         return line;
+        ***/
+        assert(false);
+        return null;
     }
 
     void _handleMouseMove(MouseMoveData data) {
+        /***
         //print("${new DateTime.now().millisecond}");
         assert(running);
 
         Vector3 ndc = _hub.mainRenderer.fromMouseToNdc(data.newX, data.newY);
         Vector3 world = _hub.mainRenderer.fromNdcToModel(ndc.x, ndc.y);
         point = world;
-    }
+     ***/
+        }
 }

@@ -4,7 +4,40 @@
 
 part of rialto.viewer;
 
+class AxesShape extends Shape {
+    AxesShape(RenderingContext gl) : super(gl);
 
+    @override
+    void setArrays() {
+        const double x = 1.0;
+        const double y = 1.0;
+        const double z = 1.0;
+        var vertices = [];
+        vertices.addAll([0.0, 0.0, 0.0, x, 0.0, 0.0]);
+        vertices.addAll([0.0, 0.0, 0.0, 0.0, y, 0.0]);
+        vertices.addAll([0.0, 0.0, 0.0, 0.0, 0.0, z]);
+
+        var colors = [];
+        colors.addAll([1.0, 0.0, 0.0, 1.0]);
+        colors.addAll([1.0, 0.0, 0.0, 1.0]);
+        colors.addAll([0.0, 1.0, 0.0, 1.0]);
+        colors.addAll([0.0, 1.0, 0.0, 1.0]);
+        colors.addAll([0.0, 0.0, 1.0, 1.0]);
+        colors.addAll([0.0, 0.0, 1.0, 1.0]);
+
+        _vertexArray = new Float32List.fromList(vertices);
+        _colorArray = new Float32List.fromList(colors);
+
+        setDefaultIdArray();
+    }
+
+    @override
+    void drawImpl() {
+        gl.drawArrays(LINES, 0/*first elem*/, 6/*total num vertices*/);
+    }
+}
+
+/***
 // taken from three/extra/helpers/axis_helper.dart
 class AxesObject extends Object3D {
     AxesObject() : super() {
@@ -50,3 +83,4 @@ class AxesObject extends Object3D {
         this.add(cone);
     }
 }
+ ***/

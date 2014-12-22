@@ -8,10 +8,10 @@ part of rialto.viewer;
 // given a point cloud, this will give us an Object3D for WebGL
 class RenderablePointCloud {
     PointCloud pointCloud;
-    var dims = new Map<String, GeometryAttribute>();
+    var dims = new Map<String, Float32List>();
     int numPoints;
     Vector3 min, max, len;
-    ParticleSystem _particleSystem;
+    CloudShape _particleSystem;
     bool visible;
 
     RenderablePointCloud(PointCloud pc) {
@@ -24,12 +24,12 @@ class RenderablePointCloud {
     }
 
     void _computeBounds() {
-        double xmin = pointCloud.min["positions.x"];
-        double ymin = pointCloud.min["positions.y"];
-        double zmin = pointCloud.min["positions.z"];
-        double xmax = pointCloud.max["positions.x"];
-        double ymax = pointCloud.max["positions.y"];
-        double zmax = pointCloud.max["positions.z"];
+        double xmin = pointCloud.minimum["positions.x"];
+        double ymin = pointCloud.minimum["positions.y"];
+        double zmin = pointCloud.minimum["positions.z"];
+        double xmax = pointCloud.maximum["positions.x"];
+        double ymax = pointCloud.maximum["positions.y"];
+        double zmax = pointCloud.maximum["positions.z"];
 
         min = new Vector3(xmin, ymin, zmin);
         max = new Vector3(xmax, ymax, zmax);
@@ -41,7 +41,7 @@ class RenderablePointCloud {
 
         numPoints = pointCloud.numPoints;
 
-        var xyz = new GeometryAttribute.float32(numPoints * 3, 3);
+        var xyz = new Float32List(numPoints * 3 * 3);
         dims["positions"] = xyz;
 
         int idx = 0;
@@ -49,12 +49,12 @@ class RenderablePointCloud {
         Float32List ysrc = pointCloud.dimensions["positions.y"];
         Float32List zsrc = pointCloud.dimensions["positions.z"];
         for (int i = 0; i < pointCloud.numPoints; i++) {
-            xyz.array[idx++] = xsrc[i];
-            xyz.array[idx++] = ysrc[i];
-            xyz.array[idx++] = zsrc[i];
+            xyz[idx++] = xsrc[i];
+            xyz[idx++] = ysrc[i];
+            xyz[idx++] = zsrc[i];
         }
 
-        var color = new GeometryAttribute.float32(numPoints * 3, 3);
+        var color = new Float32List(numPoints * 3);
         dims["colors"] = color;
         idx = 0;
 
@@ -63,27 +63,27 @@ class RenderablePointCloud {
             Float32List ysrc = pointCloud.dimensions["colors.y"];
             Float32List zsrc = pointCloud.dimensions["colors.z"];
             for (int i = 0; i < pointCloud.numPoints; i++) {
-                color.array[idx++] = xsrc[i];
-                color.array[idx++] = ysrc[i];
-                color.array[idx++] = zsrc[i];
+                color[idx++] = xsrc[i];
+                color[idx++] = ysrc[i];
+                color[idx++] = zsrc[i];
             }
         } else {
             for (int i = 0; i < pointCloud.numPoints; i++) {
-                color.array[idx++] = 1.0;
-                color.array[idx++] = 1.0;
-                color.array[idx++] = 1.0;
+                color[idx++] = 1.0;
+                color[idx++] = 1.0;
+                color[idx++] = 1.0;
             }
         }
     }
 
-    ParticleSystem buildParticleSystem() {
+    CloudShape buildParticleSystem() {
         var positions = dims["positions"];
         var colors = dims["colors"];
         assert(positions != null);
         assert(colors != null);
 
         var xyz = positions.array;
-
+/***
         // the underlying system wants to take ownership of these arrays, so we'll
         // pass them copies
         BufferGeometry geometry = new BufferGeometry();
@@ -94,8 +94,8 @@ class RenderablePointCloud {
 
         geometry.computeBoundingSphere();
         var material = new ParticleBasicMaterial(size: 1, vertexColors: 2);
-
-        _particleSystem = new ParticleSystem(geometry, material);
+**/
+        _particleSystem = new CloudShape(xyz);
         _particleSystem.name = pointCloud.webpath;
         return _particleSystem;
     }

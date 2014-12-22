@@ -86,9 +86,9 @@ class PointCloudGenerator {
         map["colors.y"] = colorsY;
         map["colors.z"] = colorsZ;
 
-        var rnd = new Math.Random();
+        var rnd = new Random();
 
-        var color = new Color();
+        var color = new Color.zero();
 
         var n = 1000.0,
                 n2 = n / 2.0; // particles spread in the cube
@@ -239,7 +239,7 @@ class PointCloudGenerator {
         var ydim = 2000;
         var zdim = 1000;
 
-        var random = new Math.Random();
+        var random = new Random();
 
         for (var i = 0; i < numPoints; i++) {
             var x = random.nextDouble() * xdim;
@@ -305,7 +305,7 @@ class _Terrain {
     int width, height;
     var valuesX, valuesY, valuesZ;
     var _valuesW;
-    var rnd = new Math.Random(new DateTime.now().millisecondsSinceEpoch);
+    var rnd = new Random(new DateTime.now().millisecondsSinceEpoch);
 
     _Terrain(int which) {
         width = 512;
@@ -345,7 +345,7 @@ class _Terrain {
         double minz = getSample(0, 0);
         for (int w = 0; w < width; w++) {
               for (int h = 0; h < height; h++) {
-                  minz = Math.min(minz, getSample(w, h));
+                  minz = min(minz, getSample(w, h));
               }
         }
 

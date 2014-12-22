@@ -4,7 +4,120 @@
 
 part of rialto.viewer;
 
+class Renderer {
 
+    CanvasElement _canvas;
+    RenderingContext gl;
+    GlProgram _glProgram;
+
+    Matrix4 pMatrix;
+    Matrix4 mvMatrix;
+    Matrix4 nMatrix;
+
+    Camera _camera;
+    CameraInteractor _interactor;
+    Picker _picker = null;
+
+    List<Shape> renderables = [];
+
+    Renderer(CanvasElement this._canvas, this.gl) {
+        var attribs = ['aVertexPosition', 'aVertexColor'];
+        var uniforms = ['uMVMatrix', 'uPMatrix', 'uPickingColor', 'uOffscreen'];
+        _glProgram = new GlProgram(gl, fragmentShader, vertexShader, attribs, uniforms);
+        gl.useProgram(_glProgram._program);
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+        mvMatrix = new Matrix4.identity();
+
+        _camera = new Camera(CameraType.Orbiting);
+        _camera.goHome(new Vector3(0.0, 0.0, 50.0));
+        _camera.setFocus(new Vector3(0.0, 0.0, 0.0));
+        //  camera.setElevation(-22);
+        // camera.setAzimuth(37);
+
+        _picker = new Picker(gl, _canvas);
+
+        _interactor = new CameraInteractor(_camera, _canvas, _picker);
+
+        makeObjects();
+
+        _picker.renderables = renderables;
+    }
+
+    void makeObjects() {
+        var axes = new AxesShape(gl);
+        axes.modelMatrix.scale(10.0, 10.0, 10.0);
+        renderables.add(axes);
+
+        var axes2 = new AxesShape(gl);
+        axes2.modelMatrix.scale(2.5, 2.5, 2.5);
+        axes2.modelMatrix.rotate(new Vector3(-1.0, -1.0, -1.0), 90.0);
+        axes2.modelMatrix.translate(-0.5, -0.5, -0.5);
+        renderables.add(axes2);
+
+        var line = new LineShape(gl);
+        renderables.add(line);
+
+        var box = new BoxShape(gl);
+        box.modelMatrix.translate(-9.0, -9.0, -9.0);
+        renderables.add(box);
+
+        var blob = new CloudShape(gl);
+        renderables.add(blob);
+    }
+
+    void update() {
+        // ???
+    }
+
+    void draw(num viewWidth, num viewHeight, num aspect) {
+
+        Shape.offscreen = 1;
+        //off-screen rendering
+        gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
+        _drawScene(viewWidth, viewHeight, aspect);
+
+        Shape.offscreen = 0;
+        //on-screen rendering
+        gl.bindFramebuffer(FRAMEBUFFER, null);
+        _drawScene(viewWidth, viewHeight, aspect);
+    }
+
+    void _drawScene(num viewWidth, num viewHeight, num aspect) {
+        gl.viewport(0, 0, viewWidth, viewHeight);
+        gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
+        gl.enable(DEPTH_TEST);
+        gl.disable(BLEND);
+
+        pMatrix = makePerspectiveMatrix(degToRad(_camera.fovy), aspect, 0.1, 100.0);
+
+        for (var renderable in renderables) {
+            var vMatrix = _camera.getViewTransform();
+            var mMatrix = renderable.modelMatrix;
+            mvMatrix = vMatrix * mMatrix;
+            renderable.draw(
+                    _glProgram._attributes['aVertexPosition'],
+                    _glProgram._attributes['aVertexColor'],
+                    _setMatrixUniforms);
+        }
+    }
+
+    void _setMatrixUniforms(Shape r) {
+        gl.uniformMatrix4fv(_glProgram._uniforms['uPMatrix'], false, pMatrix.storage);
+        gl.uniformMatrix4fv(_glProgram._uniforms['uMVMatrix'], false, mvMatrix.storage);
+        gl.uniform1i(_glProgram._uniforms['uOffscreen'], Shape.offscreen);
+    }
+
+    void tick(time) {
+        window.animationFrame.then(tick);
+        draw(_canvas.width, _canvas.height, _canvas.width / _canvas.height);
+    }
+
+}
+
+
+/***
 class Renderer {
     // public
     double _mouseGeoX = 0.0;
@@ -345,77 +458,8 @@ class Renderer {
         return vec;
     }
 
-    /**
-    String _p(double v) => v.toStringAsFixed(4);
-    String _pp(Vector3 v) => "${_p(v.x)} ${_p(v.y)} ${_p(v.z)}";
-
-    Line _line1, _line2, _line3;
-    void _draw1(Vector3 p, Vector3 q) {
-        if (_line1 != null) _scene.remove(_line1);
-        //p.x += 5.0;
-        //q.x += 5.0;
-        var gline = new Geometry()
-                ..vertices.add(p)
-                ..vertices.add(q);
-
-        _line1 = new Line(gline, new LineBasicMaterial(color: 0xff0000));
-        _scene.add(_line1);
-    }
-    void _draw2(Vector3 p, Vector3 q) {
-        if (_line2 != null) _scene.remove(_line2);
-        //p.x += 15.0;
-        //q.x += 15.0;
-        var gline = new Geometry()
-                ..vertices.add(p)
-                ..vertices.add(q);
-
-        _line2 = new Line(gline, new LineBasicMaterial(color: 0x00ff00));
-        _scene.add(_line2);
-    }
-    void _draw3(Vector3 p, Vector3 q) {
-        if (_line3 != null) _scene.remove(_line3);
-        //p.x += 25.0;
-        //q.x += 25.0;
-        var gline = new Geometry()
-                ..vertices.add(p)
-                ..vertices.add(q);
-
-        _line3 = new Line(gline, new LineBasicMaterial(color: 0x0000ff));
-        _scene.add(_line3);
-    }
-**/
 
     void _updateMouseWorldCoords() {
-        /*{
-            double ndcX = _ndcMouseX;
-            double ndcY = _ndcMouseY;
-            var tmp = new Vector3(ndcX, ndcY, 999.999);
-
-            Ray ray = _projector.pickingRay(tmp, _camera);
-
-            Vector3 mouseWorld = VectorAtZ(ray.origin, ray.direction, 0.0);
-
-            //var originWorld = new Vector3.zero();
-            var eyeWorld = _cameraCurrentEyePoint;
-
-            var mydirWorld = mouseWorld - eyeWorld;
-            var mydirWorld_norm = mydirWorld.normalized();
-
-            var raydirWorld_norm = ray.direction;
-
-            // print("${_pp(mydirWorld_norm)} | ${_pp(raydirWorld_norm)}");
-
-            //  _draw1(mouseWorld, mouseWorld - mydirWorld_norm * 100.0, 0x0000ff);
-            //  _draw2(mouseWorld, raydirWorld_norm - raydirWorld_norm * 100.0, 0xff0000);
-
-            Vector3 r = VectorAtZ(ray.origin, ray.direction, -100.0);
-            Vector3 s = VectorAtZ(ray.origin, ray.direction, 0.0);
-            Vector3 t = VectorAtZ(ray.origin, ray.direction, 100.0);
-            _draw1(r, s);
-            _draw2(s, t);
-            _draw3(r, t);
-        }*/
-
         {
             final Vector3 vModel = fromNdcToModel(_ndcMouseX, _ndcMouseY);
             _mouseGeoX = vModel.x;
@@ -425,3 +469,4 @@ class Renderer {
         }
     }
 }
+***/

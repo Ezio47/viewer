@@ -13,9 +13,9 @@ class PointCloud {
     String displayName;
     String webpath;
     var dimensions = new Map<String, Float32List>();
-    var min = new Map<String, double>();
-    var max = new Map<String, double>();
-    var avg = new Map<String, double>();
+    var minimum = new Map<String, double>();
+    var maximum = new Map<String, double>();
+    var average = new Map<String, double>();
     int numPoints;
 
 
@@ -37,9 +37,9 @@ class PointCloud {
         }
 
         var list = _computeLimits(data);
-        min[name] = list[0];
-        max[name] = list[1];
-        avg[name] = list[2];
+        minimum[name] = list[0];
+        maximum[name] = list[1];
+        average[name] = list[2];
     }
 
     void createDimension(String name, Float32List data) {
@@ -52,9 +52,9 @@ class PointCloud {
         dimensions[name] = data;
 
         var list = _computeLimits(data);
-        min[name] = list[0];
-        max[name] = list[1];
-        avg[name] = list[2];
+        minimum[name] = list[0];
+        maximum[name] = list[1];
+        average[name] = list[2];
     }
 
     void createDimensions(Map<String, Float32List> map) {
@@ -62,20 +62,20 @@ class PointCloud {
     }
 
     static List<double> _computeLimits(Float32List list) {
-        double min = list[0];
-        double max = list[0];
+        double minimum = list[0];
+        double maximum = list[0];
         double sum = 0.0;
 
         for (int i = 0; i < list.length; i++) {
             double v = list[i];
-            min = Math.min(min, v);
-            max = Math.max(max, v);
+            minimum = min(minimum, v);
+            maximum = max(maximum, v);
             sum += v;
         }
 
-        double avg = sum / list.length;
+        double average = sum / list.length;
 
-        return [min, max, avg];
+        return [minimum, maximum, average];
     }
 
     bool get hasXYZ {
