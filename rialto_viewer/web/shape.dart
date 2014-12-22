@@ -16,7 +16,7 @@ abstract class Shape {
     Float32List _idArray;
 
     String name;
-
+    bool visible;
     int id;
 
     static Map<int, Shape> shapes = {};
@@ -26,6 +26,7 @@ abstract class Shape {
 
     Shape(RenderingContext this.gl) {
         id = Shape.getNewId();
+        visible = true;
 
         shapes[id] = this;
 
@@ -68,6 +69,8 @@ abstract class Shape {
     }
 
     void draw(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+        if (!visible) return;
+
          setBindings(vertexAttrib, colorAttrib, setUniforms);
          drawImpl();
      }

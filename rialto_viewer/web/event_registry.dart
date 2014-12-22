@@ -21,10 +21,12 @@ class EventRegistry {
         _hub = Hub.root;
     }
 
-    SignalFunctions<MouseMoveData> MouseMove = new SignalFunctions<MouseMoveData>();
+    SignalFunctions<MouseData> MouseMove = new SignalFunctions<MouseData>();
+    SignalFunctions<MouseData> MouseDown = new SignalFunctions<MouseData>();
+    SignalFunctions<MouseData> MouseUp = new SignalFunctions<MouseData>();
 
-    SignalFunctions MouseDown = new SignalFunctions();
-    SignalFunctions MouseUp = new SignalFunctions();
+    SignalFunctions<KeyboardData> KeyDown = new SignalFunctions<KeyboardData>();
+    SignalFunctions<KeyboardData> KeyUp = new SignalFunctions<KeyboardData>();
 
     SignalFunctions WindowResize = new SignalFunctions();
 
@@ -56,11 +58,39 @@ class EventRegistry {
     SignalFunctions AnnotationMode = new SignalFunctions();
 }
 
-class MouseMoveData {
-    int newX;
-    int newY;
+class MouseData {
+    int x;
+    int y;
+    bool altKey;
+    int button;
     CanvasElement canvas;
-    MouseMoveData(this.newX, this.newY, this.canvas);
+    MouseData(MouseEvent ev) {
+        altKey = ev.altKey;
+        button = ev.button;
+        x = ev.client.x;
+        y = ev.client.y;
+    }
+}
+
+class KeyboardData {
+    bool controlKey;
+    bool altKey;
+    bool shiftKey;
+    int keyCode;
+
+    static const int KEY_UP = 38;
+    static const int KEY_DOWN = 40;
+    static const int KEY_RIGHT = 39;
+    static const int KEY_LEFT = 37;
+    static const int KEY_W = 87;
+    static const int KEY_N = 78;
+
+    KeyboardData(KeyboardEvent ev) {
+       controlKey = ev.ctrlKey;
+       shiftKey = ev.shiftKey;
+       altKey = ev.altKey;
+       keyCode = ev.keyCode;
+    }
 }
 
 class DisplayLayerData {

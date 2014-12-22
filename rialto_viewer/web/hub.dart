@@ -47,9 +47,6 @@ part 'signal.dart';
 part 'utils.dart';
 part 'vertex_shader.dart';
 
-int c_width = 500;
-int c_height = 500;
-
 class Hub {
     RenderPanel mainRenderPanel;
     RenderPanel navRenderPanel;
@@ -94,65 +91,30 @@ class Hub {
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
-        CanvasElement canvas = querySelector("#mycanvas");
+        CanvasElement canvas = mainRenderPanel.$["mycanvas"];//rialtoElement.querySelector("#mycanvas");
+        assert(canvas != null);
 
         RenderingContext gl = canvas.getContext3d();
-        if (gl == null) {
-            return;
-        }
+        assert(gl != null);
 
         renderablePointCloudSet = new RenderablePointCloudSet();
 
-        mainRenderer = new Renderer(canvas, gl);
+        mainRenderer = new Renderer(canvas, gl, renderablePointCloudSet);
 
-        /***
-        var domElement = mainRenderer.canvas;
-        domElement.onMouseMove.listen(
-                (e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y, e.target)));
-        domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire0());
-        domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire0());
+        var domElement = canvas;
+        domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
+        domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
+        domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));
+        domElement.onKeyUp.listen((e) => eventRegistry.KeyUp.fire(new KeyboardData(e)));
+        domElement.onKeyDown.listen((e) => eventRegistry.KeyDown.fire(new KeyboardData(e)));
         window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
-        ***/
 
         mainRenderer.tick(0);
     }
 
-    void _createRenderer() {
-        /***
-        assert(mainRenderer == null);
-        assert(navRenderer == null);
+    int get width => window.innerWidth;
+    int get height => window.innerHeight;
 
-        renderablePointCloudSet = new RenderablePointCloudSet();
-
-        {
-            mainRenderer = new Renderer(mainRenderPanel, renderablePointCloudSet, "main");
-            mainRenderer.update();
-            mainRenderer.animate(0);
-
-            var domElement = mainRenderer.canvas;
-            //domElement.text = "main";
-
-            domElement.onMouseMove.listen(
-                    (e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y, e.target)));
-            domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire0());
-            domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire0());
-            window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
-        }***/
-        /*{
-            navRenderer = new Renderer(navRenderPanel, renderablePointCloudSet, "nav");
-            navRenderer.update();
-            navRenderer.animate(0);
-
-            var domElement = navRenderer.canvas;
-            //domElement.text = "nav";
-
-            domElement.onMouseMove.listen(
-                    (e) => eventRegistry.MouseMove.fire(new MouseMoveData(e.client.x, e.client.y, e.target)));
-            domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire());
-            domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire());
-            window.onResize.listen((e) => eventRegistry.WindowResize.fire());
-        }*/
-    }
 
     void _handleOpenServer(String server) {
         proxy = new ProxyFileSystem(server);

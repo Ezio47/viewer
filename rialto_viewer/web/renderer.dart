@@ -5,6 +5,7 @@
 part of rialto.viewer;
 
 class Renderer {
+    Hub _hub;
 
     CanvasElement _canvas;
     RenderingContext gl;
@@ -18,9 +19,26 @@ class Renderer {
     CameraInteractor _interactor;
     Picker _picker = null;
 
-    List<Shape> renderables = [];
+    List<Shape> shapes = [];
 
-    Renderer(CanvasElement this._canvas, this.gl) {
+    double _mouseGeoX = 0.0;
+    double _mouseGeoY = 0.0;
+    bool _axesVisible;
+    bool _bboxVisible;
+    double _ndcMouseX = 0.0; // [-1..+1]
+    double _ndcMouseY = 0.0;
+
+    RenderablePointCloudSet _renderSource;
+
+    AxesShape _axesShape;
+    BoxShape _bboxShape;
+
+    Renderer(CanvasElement this._canvas, this.gl, RenderablePointCloudSet rpcSet) {
+        _hub = Hub.root;
+
+        _canvas.width = _hub.width;
+        _canvas.height = _hub.height;
+
         var attribs = ['aVertexPosition', 'aVertexColor'];
         var uniforms = ['uMVMatrix', 'uPMatrix', 'uPickingColor', 'uOffscreen'];
         _glProgram = new GlProgram(gl, fragmentShader, vertexShader, attribs, uniforms);
@@ -42,29 +60,44 @@ class Renderer {
 
         makeObjects();
 
-        _picker.renderables = renderables;
+        _picker.shapes = shapes;
+
+        _axesVisible = false;
+        _bboxVisible = false;
+
+        _renderSource = rpcSet;
+
+        //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
+        _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
+        _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
+        //_hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
+        //_hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
+
+        _hub.eventRegistry.WindowResize.subscribe0(_handleWindowResize);
     }
 
     void makeObjects() {
         var axes = new AxesShape(gl);
         axes.modelMatrix.scale(10.0, 10.0, 10.0);
-        renderables.add(axes);
+        shapes.add(axes);
+        _axesShape = axes;
 
         var axes2 = new AxesShape(gl);
         axes2.modelMatrix.scale(2.5, 2.5, 2.5);
         axes2.modelMatrix.rotate(new Vector3(-1.0, -1.0, -1.0), 90.0);
         axes2.modelMatrix.translate(-0.5, -0.5, -0.5);
-        renderables.add(axes2);
+        shapes.add(axes2);
 
         var line = new LineShape(gl);
-        renderables.add(line);
+        shapes.add(line);
 
         var box = new BoxShape(gl);
         box.modelMatrix.translate(-9.0, -9.0, -9.0);
-        renderables.add(box);
+        shapes.add(box);
+        _bboxShape = box;
 
         var blob = new CloudShape(gl);
-        renderables.add(blob);
+        shapes.add(blob);
     }
 
     void update() {
@@ -92,7 +125,7 @@ class Renderer {
 
         pMatrix = makePerspectiveMatrix(degToRad(_camera.fovy), aspect, 0.1, 100.0);
 
-        for (var renderable in renderables) {
+        for (var renderable in shapes) {
             var vMatrix = _camera.getViewTransform();
             var mMatrix = renderable.modelMatrix;
             mvMatrix = vMatrix * mMatrix;
@@ -114,86 +147,32 @@ class Renderer {
         draw(_canvas.width, _canvas.height, _canvas.width / _canvas.height);
     }
 
+    void _handleWindowResize() {
+        final w = _hub.width;
+        final h = _hub.height;
+        _canvas.width = w;
+        _canvas.height = h;
+    }
+
+    void _handleDisplayAxes(bool v) {
+        _axesVisible = v;
+        _axesShape.visible = v;
+    }
+
+    void _handleDisplayBbox(bool v) {
+        _bboxVisible = v;
+        _bboxShape.visible = v;
+    }
+
 }
 
 
 /***
-class Renderer {
-    // public
-    double _mouseGeoX = 0.0;
-    double _mouseGeoY = 0.0;
-    bool _axesVisible;
-    bool _bboxVisible;
-
-    Hub _hub;
-
-    // private
-    PerspectiveCamera _camera;
-    Scene _scene;
-    WebGLRenderer _webglRenderer;
-    var _cameraControls;
-    Projector _projector;
-    Element _canvas;
-    ParticleSystem _particleSystem;
-    Line _myline;
-    double _ndcMouseX = 0.0,
-            _ndcMouseY = 0.0; // [-1..+1]
-
-    RenderablePointCloudSet _renderSource;
-
     Vector3 _cameraHomeEyePoint;
     Vector3 _cameraHomeTargetPoint;
     Vector3 _cameraUpVector;
     Vector3 _cameraCurrentEyePoint;
     Vector3 _cameraCurrentTargetPoint;
-
-    AxesObject _axesObject;
-    Object3D _bboxObject;
-
-    Matrix4 modelToWorld;
-
-    String _name;
-
-    Renderer(RenderPanel renderPanel, RenderablePointCloudSet rpcSet, String name) {
-        _hub = Hub.root;
-        _name = name;
-
-        _scene = null;
-        _projector = new Projector();
-
-        _webglRenderer = new WebGLRenderer();
-
-        var containerElement = renderPanel.shadowRoot.querySelector("#container");
-        assert(containerElement != null);
-        containerElement.children.add(_webglRenderer.domElement);
-
-        if (name == "nav") {
-            _webglRenderer.setSize(renderPanel.parent.parent.clientWidth, renderPanel.parent.parent.clientHeight);
-        } else if (name == "main") {
-            _webglRenderer.setSize(window.innerWidth, window.innerHeight);
-        } else {
-            assert(false);
-        }
-
-        _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
-        _hub.eventRegistry.WindowResize.subscribe0(_handleWindowResize);
-        _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
-        _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
-        _hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
-        _hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
-
-        _renderSource = rpcSet;
-
-        modelToWorld = new Matrix4.identity();
-
-        _canvas = _webglRenderer.domElement;
-
-        _axesVisible = false;
-        _bboxVisible = false;
-    }
-
-    Element get canvas => _canvas;
-
 
     void _handleUpdateCameraTargetPosition(Vector3 data) {
         if (data == null) data = _cameraHomeTargetPoint;
@@ -213,44 +192,8 @@ class Renderer {
         _camera.lookAt(_cameraCurrentTargetPoint);
     }
 
-    int get _canvasWidth {
-        return _canvas.clientWidth;
-    }
-    int get _canvasHeight {
-        return _canvas.clientHeight;
-    }
-    int get _canvasOffsetX {
-        return _canvas.documentOffset.x;
-    }
-    int get _canvasOffsetY {
-        return _canvas.documentOffset.y;
-    }
-
-    void _addCamera() {
-        var w = _canvasWidth;
-        var h = _canvasHeight;
-        final double aspect = w.toDouble() / h.toDouble();
-        _camera = new PerspectiveCamera(50.0, aspect, 0.01, 200000.0);
-
-        _scene.add(_camera);
-    }
-
-    void _addCameraControls() {
-        _cameraControls = new TrackballControls(_camera, _webglRenderer.domElement);
-        _cameraControls.zoomSpeed = 0.25;
-
-        //_cameraControls.rotateSpeed = 1.0;
-        //_cameraControls.panSpeed = 0.8;
-        //_cameraControls.noZoom = false;
-        //_cameraControls.noPan = false;
-        //_cameraControls.staticMoving = true;
-        //_cameraControls.dynamicDampingFactor = 0.3;
-    }
 
     void update() {
-
-        _scene = new Scene();
-
         // model space ...(xmin,ymin,zmin)..(xmax,ymax,zmax)...
         // world space ...(0,0)..(xlen,ylen)...
         //
@@ -325,24 +268,6 @@ class Renderer {
     }
 
 
-    void _handleDisplayAxes(bool v) {
-        _axesVisible = v;
-        if (_axesVisible) {
-            _scene.add(_axesObject);
-        } else {
-            _scene.remove(_axesObject);
-        }
-    }
-
-    void _handleDisplayBbox(bool v) {
-        _bboxVisible = v;
-        if (_bboxVisible) {
-            _scene.add(_bboxObject);
-        } else {
-            _scene.remove(_bboxObject);
-        }
-    }
-
     Vector3 fromMouseToNdc(int newX, int newY) {
 
         // event.client.x,y is from upper left (0,0) of entire browser window
@@ -391,43 +316,6 @@ class Renderer {
         _ndcMouseY = ndcVec.y;
 
         //print("ncd: $_ndcMouseX $_ndcMouseY");
-    }
-
-
-    void _handleWindowResize() {
-        final w = window.innerWidth;
-        final h = window.innerHeight;
-        _webglRenderer.setSize(w, h);
-
-        final double aspect = w.toDouble() / h.toDouble();
-        _camera.aspect = aspect;
-
-        _camera.lookAt(_scene.position);
-    }
-
-
-    void animate(num time) {
-        window.requestAnimationFrame(animate);
-        _render();
-    }
-
-    var aline;
-    void _render() {
-        if (_camera == null) return;
-
-        if (_hub.annotator.running) {
-            //if (aline != null) _scene.remove(aline);
-            aline = _hub.annotator.graphic;
-            if (aline != null) _scene.add(aline);
-        } else {
-            if (_cameraControls != null) {
-                _cameraControls.update();
-            }
-        }
-
-        _updateMouseWorldCoords();
-
-        _webglRenderer.render(_scene, _camera);
     }
 
     Vector3 VectorAtZ(Vector3 origin, Vector3 direction, double z) {

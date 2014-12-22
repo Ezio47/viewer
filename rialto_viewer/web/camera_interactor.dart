@@ -1,23 +1,8 @@
 part of rialto.viewer;
 
 
-enum KeyCode {
-    UP,
-    DOWN,
-    RIGHT,
-    LEFT,
-    W,
-    N
-}
-const int KEY_UP = 38;
-const int KEY_DOWN = 40;
-const int KEY_RIGHT = 39;
-const int KEY_LEFT = 37;
-const int KEY_W = 87;
-const int KEY_N = 78;
-
 class CameraInteractor {
-
+    Hub _hub;
     Camera _camera;
     Element _canvas;
     Picker _picker = null;
@@ -30,19 +15,22 @@ class CameraInteractor {
     int _button = 0;
     bool _isMoving = false;
     bool isPickingEnabled = true;
+    bool _altKeyDown;
 
     static const double MOTION_FACTOR = 10.0;
 
 
     CameraInteractor(Camera this._camera, CanvasElement this._canvas, Picker this._picker) {
-        _canvas.onMouseDown.listen(_onMouseDown);
-        _canvas.onMouseUp.listen(_onMouseUp);
-        _canvas.onMouseMove.listen(_onMouseMove);
-        window.onKeyDown.listen(_onKeyDown);
-        window.onKeyUp.listen(_onKeyUp);
+        _hub = Hub.root;
+
+        _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
+        _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
+        _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
+        _hub.eventRegistry.KeyDown.subscribe(_handleKeyDown);
+        _hub.eventRegistry.KeyUp.subscribe(_handleKeyUp);
     }
 
-    Vector2i _get2DCoords(ev) {
+    Point _get2DCoords(MouseData ev) {
         int top = 0;
         int left = 0;
         Element obj = _canvas;
@@ -57,33 +45,33 @@ class CameraInteractor {
         top -= window.pageYOffset;
 
         // return relative mouse position
-        final int x = ev.clientX - left;
-        final int y = c_height - (ev.clientY - top);
-        return new Vector2i(x, y);
+        final int x = ev.x - left;
+        final int y = _hub.height - (ev.y - top);
+        return new Point(x, y);
     }
 
-    void _onMouseUp(ev) {
+    void _handleMouseUp(ev) {
         _isMoving = false;
     }
 
-    void _onMouseDown(ev) {
+    void _handleMouseDown(MouseData ev) {
         _isMoving = true;
-        _currentX = ev.clientX;
-        _currentY = ev.clientY;
+        _currentX = ev.x;
+        _currentY = ev.y;
         _button = ev.button;
         _dollyStep = max3(_camera.position.x, _camera.position.y, _camera.position.z) / 100.0;
 
         if (_picker != null && isPickingEnabled) {
-            Vector2i coords = _get2DCoords(ev);
+            Point coords = _get2DCoords(ev);
             _picker.find(coords);
         }
     }
 
-    void _onMouseMove(ev) {
+    void _handleMouseMove(MouseData ev) {
         _lastX = _currentX;
         _lastY = _currentY;
-        _currentX = ev.clientX;
-        _currentY = ev.clientY;
+        _currentX = ev.x;
+        _currentY = ev.y;
 
         if (!_isMoving) return;
 
@@ -100,32 +88,36 @@ class CameraInteractor {
         }
     }
 
-    void _onKeyDown(ev) {
+    void _handleKeyDown(KeyboardData ev) {
         var c = _camera;
 
+        _altKeyDown = ev.altKey;
+
         switch (ev.keyCode) {
-            case KEY_UP:
+            case KeyboardData.KEY_UP:
                 c.changeElevation(10.0);
                 break;
-            case KEY_DOWN:
+            case KeyboardData.KEY_DOWN:
                 c.changeElevation(-10.0);
                 break;
-            case KEY_LEFT:
+            case KeyboardData.KEY_LEFT:
                 c.changeAzimuth(-10.0);
                 break;
-            case KEY_RIGHT:
+            case KeyboardData.KEY_RIGHT:
                 c.changeAzimuth(10.0);
                 break;
-            case KEY_W:
+            case KeyboardData.KEY_W:
                 c.changeFovy(10.0);
                 break;
-            case KEY_N:
+            case KeyboardData.KEY_N:
                 c.changeFovy(-10.0);
                 break;
         }
     }
 
-    void _onKeyUp(ev) {}
+    void _handleKeyUp(KeyboardData ev) {
+        _altKeyDown = !ev.altKey;
+    }
 
     void dolly(double value) {
         if (value > 0) {
@@ -137,8 +129,8 @@ class CameraInteractor {
     }
 
     void rotate(double dx, double dy) {
-        final double delta_elevation = -20.0 / c_height;
-        final double delta_azimuth = -20.0 / c_width;
+        final double delta_elevation = -20.0 / _hub.height;
+        final double delta_azimuth = -20.0 / _hub.width;
 
         final double nAzimuth = dx * delta_azimuth * MOTION_FACTOR;
         final double nElevation = dy * delta_elevation * MOTION_FACTOR;

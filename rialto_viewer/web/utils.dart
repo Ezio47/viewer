@@ -11,6 +11,7 @@ num radToDeg(num rad) => rad * (180.0 / PI);
 num clamp(num v, num low, num high) => (v < low) ? low : ((v > high) ? high : v);
 num clamp360(num degrees) => (degrees > 360 || degrees < -360) ? degrees % 360 : degrees;
 
+
 class Color {
     double r,g,b,a;
     Color.zero();
@@ -23,11 +24,6 @@ class Color {
     }
 }
 
-class Vector2i {
-    int x;
-    int y;
-    Vector2i(int this.x, int this.y);
-}
 
 class Utils {
     static bool _checkInts(int r, int g, int b) => (r >= 0 && r <= 255) && (g >= 0 && g <= 255) && (b >= 0 && b <= 255);

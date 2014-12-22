@@ -2,15 +2,19 @@ part of rialto.viewer;
 
 
 class Picker {
+    Hub _hub;
+
     RenderingContext gl;
     CanvasElement _canvas;
     var _texture;
     var _frameBNuffer;
     var _renderBuffer;
 
-    List<Shape> renderables;
+    List<Shape> shapes;
 
     Picker(RenderingContext this.gl, CanvasElement this._canvas) {
+        _hub = Hub.root;
+
         _configure();
     }
 
@@ -52,7 +56,7 @@ class Picker {
         gl.bindFramebuffer(FRAMEBUFFER, null);
     }
 
-    bool find(Vector2i coords) {
+    bool find(Point coords) {
         // BUG: is 2*2=4 the right window size?
         // BUG: should we look for more than one hit in the window?
         // BUG: should we hit test at the center of the window first?
@@ -66,11 +70,11 @@ class Picker {
 
         int xmin = coords.x - xsize ~/ 2;
         if (xmin < 0) { xsize -= (0-xmin); xmin = 0; }
-        if (xmin + xsize >= c_width) xsize -= c_width - (xmin + xsize);
+        if (xmin + xsize >= _hub.width) xsize -= _hub.width - (xmin + xsize);
 
         int ymin = coords.y - ysize ~/ 2;
         if (ymin < 0) { ysize -= (0-ymin); ymin = 0; }
-        if (ymin + ysize >= c_height) ysize -= c_height - (ymin + ysize);
+        if (ymin + ysize >= _hub.height) ysize -= _hub.height - (ymin + ysize);
 
         gl.readPixels(xmin, ymin, xsize, ysize, RGBA, UNSIGNED_BYTE, readout);
         gl.bindFramebuffer(FRAMEBUFFER, null);

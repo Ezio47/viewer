@@ -51,7 +51,7 @@ class Annotator {
         return null;
     }
 
-    void _handleMouseMove(MouseMoveData data) {
+    void _handleMouseMove(MouseData data) {
         /***
         //print("${new DateTime.now().millisecond}");
         assert(running);
