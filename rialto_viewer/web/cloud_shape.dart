@@ -14,26 +14,20 @@ class CloudShape extends Shape {
 
     CloudShape(RenderingContext gl, Float32List this.points, Float32List this.colors) : super(gl) {
         numPoints = points.length ~/ 3;
+        assert(numPoints * 3 == points.length);
+        assert(numPoints * 4 == colors.length);
     }
 
     @override
     void setArrays() {
-        _vertexArray = new Float32List.fromList(points.toList());
+        _vertexArray = points/*new Float32List.fromList(points.toList())*/;
+        _colorArray = colors /*new Float32List.fromList(colors) */;
 
-        if (colors == null) {
-            var white = new Color.white().toList();
-            _colorArray = new Float32List(numPoints * 4);
-            for (int i = 0; i < numPoints; i++) {
-                colors.addAll(white);
-            }
-        }
+        print("${_colorArray.length} ${_vertexArray.length}");
+        assert(numPoints * 3 == _vertexArray.length);
+        assert(numPoints * 4 == _colorArray.length);
 
-        assert(colors.length == _vertexArray.length);
-
-        _colorArray = new Float32List.fromList(colors);
-
-        print(_colorArray.length ~/ 4);
-        _idArray = new Float32List(_colorArray.length);
+        _idArray = new Float32List(numPoints * 4);
         for (int i = 0; i < _idArray.length; i += 4) {
             final int pointId = Shape.getNewId();
             var pointCode = Utils.convertIdToFvec(pointId);

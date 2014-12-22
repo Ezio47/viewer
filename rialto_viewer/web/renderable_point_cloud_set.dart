@@ -90,7 +90,7 @@ class RenderablePointCloudSet {
         var colorizer = new RampColorizer(_colorRamp);
 
         for (var cloud in renderablePointClouds) {
-            colorizer.run(cloud);
+            cloud.colorize(colorizer);
         }
         _hub.mainRenderer.update();
     }

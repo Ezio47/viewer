@@ -7,16 +7,14 @@ part of rialto.viewer;
 abstract class Colorizer {
     Colorizer();
 
-    void run(RenderablePointCloud cloud) {
+    Float32List run(RenderablePointCloud cloud) {
         var newColors = _algorithm(
                 cloud.min.z,
                 cloud.max.z,
                 cloud.dims["positions"],
                 cloud.dims["colors"],
                 cloud.numPoints);
-
-        cloud.dims["oldcolors"] = cloud.dims["colors"];
-        cloud.dims["colors"] = newColors;
+        return newColors;
     }
 
     Float32List _algorithm(double zmin, double zmax, Float32List positions, Float32List oldColors, int numPoints);

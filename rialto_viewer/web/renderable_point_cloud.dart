@@ -44,7 +44,7 @@ class RenderablePointCloud {
 
         numPoints = pointCloud.numPoints;
 
-        var xyz = new Float32List(numPoints * 3 * 3);
+        var xyz = new Float32List(numPoints * 3);
         dims["positions"] = xyz;
 
         int idx = 0;
@@ -57,7 +57,7 @@ class RenderablePointCloud {
             xyz[idx++] = zsrc[i];
         }
 
-        var color = new Float32List(numPoints * 3);
+        var color = new Float32List(numPoints * 4);
         dims["colors"] = color;
         idx = 0;
 
@@ -69,9 +69,11 @@ class RenderablePointCloud {
                 color[idx++] = xsrc[i];
                 color[idx++] = ysrc[i];
                 color[idx++] = zsrc[i];
+                color[idx++] = 1.0;
             }
         } else {
             for (int i = 0; i < pointCloud.numPoints; i++) {
+                color[idx++] = 1.0;
                 color[idx++] = 1.0;
                 color[idx++] = 1.0;
                 color[idx++] = 1.0;
@@ -85,23 +87,17 @@ class RenderablePointCloud {
         assert(positions != null);
         assert(colors != null);
 
-        var xyz = positions;
-/***
-        // the underlying system wants to take ownership of these arrays, so we'll
-        // pass them copies
-        BufferGeometry geometry = new BufferGeometry();
-        geometry.attributes = {
-            "position": Utils.clone(positions),
-            "color": Utils.clone(colors)
-        };
-
-        geometry.computeBoundingSphere();
-        var material = new ParticleBasicMaterial(size: 1, vertexColors: 2);
-**/
         assert(gl != null);
-        _particleSystem = new CloudShape(gl, xyz, colors);
+        _particleSystem = new CloudShape(gl, positions, colors);
         _particleSystem.init();
         _particleSystem.name = pointCloud.webpath;
         return _particleSystem;
+    }
+
+    void colorize(Colorizer colorizer) {
+        var oldColors = dims["colors"];
+        var newColors = colorizer.run(this);
+        dims["oldcolors"] = oldColors;
+        dims["colors"] = newColors;
     }
 }
