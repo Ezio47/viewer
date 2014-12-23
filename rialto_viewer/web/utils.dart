@@ -14,10 +14,20 @@ num clamp360(num degrees) => (degrees > 360 || degrees < -360) ? degrees % 360 :
 
 
 class Utils {
+    static String printv(Vector3 v, [int prec=1]) {
+        var s = Utils.printv3(v.x, v.y, v.z, prec);
+        return s;
+    }
+
+    static String printv3(double x, double y, double z, [int prec=1]) {
+        var s = "${x.toStringAsFixed(prec)},${y.toStringAsFixed(prec)},${z.toStringAsFixed(prec)}";
+        return s;
+    }
+
     static bool _checkInts(int r, int g, int b) => (r >= 0 && r <= 255) && (g >= 0 && g <= 255) && (b >= 0 && b <= 255);
     static bool _checkFloats(double r, double g, double b) =>
             (r >= 0.0 && r <= 1.0) && (g >= 0.0 && g <= 1.0) && (b >= 0.0 && b <= 1.0);
-    static bool _checkId(int id) => (id > 0 && id < 256 * 256 * 256);
+    static bool _checkId(int id) => (id >= 0 && id < 256 * 256 * 256);
 
     static int convertFvecToId(Float32List list) {
         final double rf = list[0];
@@ -25,9 +35,9 @@ class Utils {
         final double bf = list[2];
         assert(_checkFloats(rf, gf, bf));
 
-        final int ri = (rf * 256.0).floor();
-        final int gi = (gf * 256.0).floor();
-        final int bi = (bf * 256.0).floor();
+        final int ri = (rf * 256.0).toInt();
+        final int gi = (gf * 256.0).toInt();
+        final int bi = (bf * 256.0).toInt();
         assert(_checkInts(ri, gi, bi));
 
         final int id = (bi << 16) | (gi << 8) | ri;
@@ -46,20 +56,21 @@ class Utils {
     }
 
     static Float32List convertIdToFvec(int id) {
-        //assert(_checkId(id));
+        assert(_checkId(id));
 
         final int ri = id & 0x0000ff;
         final int gi = (id & 0x00ff00) >> 8;
         final int bi = (id & 0xff0000) >> 16;
-        //assert(_checkInts(ri, gi, bi));
+        assert(_checkInts(ri, gi, bi));
 
         final double rf = ri / 256.0;
         final double gf = gi / 256.0;
         final double bf = bi / 256.0;
-        //assert(_checkFloats(rf, gf, bf));
+        assert(_checkFloats(rf, gf, bf));
 
         var list = new Float32List.fromList([rf, gf, bf, 1.0]);
-        //assert(convertFvecToId(list) == id);
+        assert(convertFvecToId(list) == id);
+        print("MAP $id => $rf $gf $bf == ${(rf*256.0).toInt()} ${(gf*256.0).toInt()} ${(bf*256.0).toInt()}");
         return list;
     }
 

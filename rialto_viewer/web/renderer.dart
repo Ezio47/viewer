@@ -111,7 +111,7 @@ class Renderer {
             // bbox model space is (0,0,0)..(theLen)
             _bboxShape = new BoxShape(gl);
             _bboxShape.init();
-            _bboxShape.modelMatrix.translate(-theLen/2.0);
+            _bboxShape.modelMatrix.translate(-theLen / 2.0);
             _bboxShape.modelMatrix.scale(theLen);
             shapes.add(_bboxShape);
         }
@@ -130,13 +130,15 @@ class Renderer {
 
     void draw(num viewWidth, num viewHeight, num aspect) {
 
-        Shape.offscreen = 1;
         //off-screen rendering
-        //   gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
-        //   _drawScene(viewWidth, viewHeight, aspect);
+        if (_hub.isPickingEnabled) {
+            Shape.offscreen = 1;
+            gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
+            _drawScene(viewWidth, viewHeight, aspect);
+        }
 
-        Shape.offscreen = 0;
         //on-screen rendering
+        Shape.offscreen = 0;
         gl.bindFramebuffer(FRAMEBUFFER, null);
         _drawScene(viewWidth, viewHeight, aspect);
     }
@@ -155,7 +157,10 @@ class Renderer {
         for (var shape in shapes) {
             var mMatrix = shape.modelMatrix;
             mvMatrix = vMatrix * mMatrix;
-            shape.draw(_glProgram._attributes['aVertexPosition'], _glProgram._attributes['aVertexColor'], _setMatrixUniforms);
+            shape.draw(
+                    _glProgram._attributes['aVertexPosition'],
+                    _glProgram._attributes['aVertexColor'],
+                    _setMatrixUniforms);
         }
     }
 

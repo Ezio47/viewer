@@ -14,7 +14,6 @@ class CameraInteractor {
     int _lastY = 0;
     int _button = 0;
     bool _isMouseDown = false;
-    bool isPickingEnabled = false;
 
     static const double MOTION_FACTOR = 10.0;
 
@@ -63,7 +62,7 @@ class CameraInteractor {
         _button = ev.button;
         _dollyStep = max3(_camera.eye.x, _camera.eye.y, _camera.eye.z) / 100.0;
 
-        if (_picker != null && isPickingEnabled) {
+        if (_picker != null && _hub.isPickingEnabled) {
             Point coords = _get2DCoords(ev);
             _picker.find(coords);
         }

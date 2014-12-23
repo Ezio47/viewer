@@ -65,15 +65,21 @@ class Picker {
         int ysize = 3;
 
         //read a block of (xsize x ysize) pixels
-        var readout = new Uint8List(1 * 1 * 4 * (xsize*ysize));
+        var readout = new Uint8List(1 * 1 * 4 * (xsize * ysize));
         gl.bindFramebuffer(FRAMEBUFFER, _frameBNuffer);
 
         int xmin = coords.x - xsize ~/ 2;
-        if (xmin < 0) { xsize -= (0-xmin); xmin = 0; }
+        if (xmin < 0) {
+            xsize -= (0 - xmin);
+            xmin = 0;
+        }
         if (xmin + xsize >= _hub.width) xsize -= _hub.width - (xmin + xsize);
 
         int ymin = coords.y - ysize ~/ 2;
-        if (ymin < 0) { ysize -= (0-ymin); ymin = 0; }
+        if (ymin < 0) {
+            ysize -= (0 - ymin);
+            ymin = 0;
+        }
         if (ymin + ysize >= _hub.height) ysize -= _hub.height - (ymin + ysize);
 
         gl.readPixels(xmin, ymin, xsize, ysize, RGBA, UNSIGNED_BYTE, readout);
@@ -81,7 +87,7 @@ class Picker {
 
         Shape hit = null;
 
-        for (int i = 0; i < xsize*ysize; i++) {
+        for (int i = 0; i < xsize * ysize; i++) {
             final int ri = readout[i * 4];
             final int gi = readout[i * 4 + 1];
             final int bi = readout[i * 4 + 2];
@@ -97,30 +103,22 @@ class Picker {
 
     Shape _hitTest(int ri, int gi, int bi) {
 
-      //print("readout: $ri $gi $bi");
+        //print("readout: $ri $gi $bi");
 
-      if (ri == 0 && gi == 0 && bi == 0) {
-          // not an object at all
-          return null;
-      }
+        if (ri == 0 && gi == 0 && bi == 0) {
+            // not an object at all
+            return null;
+        }
 
-      final int id = Utils.convertIvecToId(ri, gi, bi);
-      if (!Shape.shapes.containsKey(id)) {
-          // error: we have an object that we don't have a key for!
-          assert(false);
-      }
+        final int id = Utils.convertIvecToId(ri, gi, bi);
+        if (!Shape.shapes.containsKey(id)) {
+            // error: we have an object that we don't have a key for!
+            assert(false);
+        }
 
-      var hit = Shape.shapes[id];
-      print("BOOM: $id is ${hit.runtimeType.toString()}");
-      if (hit is CloudShape) {
-          int objId = hit.id;
-          int pointId = id;
-          int pointNum = pointId - (objId + 1);
-          assert(pointNum >= 0 && pointNum < (hit as CloudShape).numPoints);
-          print("   point $pointNum");
+        var hit = Shape.shapes[id];
+        hit.pickFunc(id);
 
-      }
-
-      return hit;
+        return hit;
     }
 }

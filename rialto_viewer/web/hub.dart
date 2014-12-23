@@ -70,6 +70,8 @@ class Hub {
     String defaultServer = "http://www.example.com";
     String currentServer;
 
+    bool isPickingEnabled = true;
+
     // singleton
     static Hub _root;
 

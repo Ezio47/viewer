@@ -37,6 +37,8 @@ class RenderablePointCloud {
         min = new Vector3(xmin, ymin, zmin);
         max = new Vector3(xmax, ymax, zmax);
         len = new Vector3(xmax - xmin, ymax - ymin, zmax - zmin);
+
+        print("Bounds: min=${Utils.printv(min)} max=${Utils.printv(max)} len=${Utils.printv(len)}");
     }
 
     void _createRenderArrays() {

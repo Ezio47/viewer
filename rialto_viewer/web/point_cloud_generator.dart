@@ -12,8 +12,7 @@ part of rialto.viewer;
 
 class PointCloudGenerator {
 
-    static PointCloud fromRaw(Float32List floats, String webpath, String displayName)
-    {
+    static PointCloud fromRaw(Float32List floats, String webpath, String displayName) {
         final int numFloats = floats.length;
         final int numPoints = numFloats ~/ 3;
 
@@ -26,11 +25,11 @@ class PointCloudGenerator {
         map["positions.y"] = positionsY;
         map["positions.z"] = positionsZ;
 
-        int i=0;
-        for (int di=0; di<numFloats; di+=3) {
+        int i = 0;
+        for (int di = 0; di < numFloats; di += 3) {
             var x = floats[di];
-            var y = floats[di+1];
-            var z = floats[di+2];
+            var y = floats[di + 1];
+            var z = floats[di + 2];
             positionsX[i] = x;
             positionsY[i] = y;
             positionsZ[i] = z;
@@ -168,12 +167,12 @@ class PointCloudGenerator {
         List points = [];
 
         points.addAll([x0, ymin, zmin]);
-        points.addAll([x0*1.05, ymin*1.05, zmin]);
-        points.addAll([x0*1.10, ymin*1.10, zmin]);
-        points.addAll([x0, ymin*1.05, zmin*1.05]);
-        points.addAll([x0, ymin*1.10, zmin*1.10]);
-        points.addAll([x0*1.05, ymin, zmin*1.05]);
-        points.addAll([x0*1.10, ymin, zmin*1.10]);
+        points.addAll([x0 * 1.05, ymin * 1.05, zmin]);
+        points.addAll([x0 * 1.10, ymin * 1.10, zmin]);
+        points.addAll([x0, ymin * 1.05, zmin * 1.05]);
+        points.addAll([x0, ymin * 1.10, zmin * 1.10]);
+        points.addAll([x0 * 1.05, ymin, zmin * 1.05]);
+        points.addAll([x0 * 1.10, ymin, zmin * 1.10]);
         points.addAll([x1, ymin, zmin]);
         points.addAll([x2, ymin, zmin]);
         points.addAll([x3, ymin, zmin]);
@@ -226,7 +225,7 @@ class PointCloudGenerator {
     static PointCloud _makeRandom(String webpath, String displayName) {
         Map<String, Float32List> map = new Map();
 
-        var numPoints = 50000;
+        var numPoints = 150;
 
         var positionsX = new Float32List(numPoints);
         var positionsY = new Float32List(numPoints);
@@ -235,16 +234,31 @@ class PointCloudGenerator {
         map["positions.y"] = positionsY;
         map["positions.z"] = positionsZ;
 
-        var xdim = 500;
-        var ydim = 2000;
-        var zdim = 1000;
+        var xdim = 5000;
+        var ydim = 5000;
+        var zdim = 100;
 
-        var random = new Random();
+        var xmin = -1000.0;
+        var xmax = 1000.0;
+        var ymin = -1000.0;
+        var ymax = 1000.0;
+        var zmin = 0.0;
+        var zmax = 1.0;
 
-        for (var i = 0; i < numPoints; i++) {
-            var x = random.nextDouble() * xdim;
-            var y = random.nextDouble() * ydim;
-            var z = random.nextDouble() * zdim;
+        var random = new Random(17);
+
+        for (int i = 0; i < numPoints; i++) {
+            double d = i.toDouble() / numPoints.toDouble();
+            double x = random.nextDouble();
+            double y = random.nextDouble();
+            double z = random.nextDouble();
+
+            //x = y = z = d;
+
+            x = xmin + (xmax - xmin) * x;
+            y = ymin + (ymax - ymin) * y;
+            z = zmin + (zmax - zmin) * z;
+
             positionsX[i] = x;
             positionsY[i] = y;
             positionsZ[i] = z;
@@ -344,9 +358,9 @@ class _Terrain {
 
         double minz = getSample(0, 0);
         for (int w = 0; w < width; w++) {
-              for (int h = 0; h < height; h++) {
-                  minz = min(minz, getSample(w, h));
-              }
+            for (int h = 0; h < height; h++) {
+                minz = min(minz, getSample(w, h));
+            }
         }
 
         double scale = 5.0;
@@ -366,7 +380,7 @@ class _Terrain {
                 x = (x - width / 2) * scale;
                 y = (y - height / 2) * scale;
 
-                if (w<width*0.1 && h<height*0.1) z = minz;
+                if (w < width * 0.1 && h < height * 0.1) z = minz;
 
                 // for better viewing, exaggerate Z
                 z = z * 200.0;

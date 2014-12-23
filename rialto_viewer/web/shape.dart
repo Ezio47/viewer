@@ -1,6 +1,7 @@
 part of rialto.viewer;
 
 typedef void SetUniformsFunc(Renderable);
+typedef void PickFunc(int pickedId);
 
 abstract class Shape {
     static int offscreen = 0;
@@ -14,6 +15,7 @@ abstract class Shape {
     Float32List _colorArray;
     Buffer _idBuffer;
     Float32List _idArray;
+    PickFunc pickFunc;
 
     String name;
     bool visible;
@@ -29,6 +31,8 @@ abstract class Shape {
         visible = true;
 
         shapes[id] = this;
+
+        pickFunc = defaultPickFunc;
     }
 
     void init() {
@@ -87,5 +91,10 @@ abstract class Shape {
         gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
 
         if (setUniforms != null) setUniforms(this);
+    }
+
+    void defaultPickFunc(int pickedId) {
+        assert(id == pickedId);
+        print("BOOM: $id is ${runtimeType.toString()}");
     }
 }
