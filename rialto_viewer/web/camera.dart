@@ -27,8 +27,10 @@ class Camera {
     Vector3 _up = new Vector3.zero();
     Vector3 _right = new Vector3.zero();
     Vector3 _normal = new Vector3.zero();
-    Vector3 _position = new Vector3.zero();
+    Vector3 _eye = new Vector3.zero();
+    Vector3 _defaultEye = new Vector3.zero();
     Vector3 _target = new Vector3.zero();
+    Vector3 _defaultTarget = new Vector3.zero();
     double _azimuth = 0.0;
     double _elevation = 0.0;
     int _cameraType = ORBITING;
@@ -41,24 +43,44 @@ class Camera {
         return makePerspectiveMatrix(degToRad(fovy), aspect, 0.001, 10000.0);
     }
 
-    void setEye(double x, double y, double z) {
-        position.x = x;
-        position.y = y;
-        position.z = z;
+    void goHome() {
+        eye = defaultEye;
+        target = defaultTarget;
+        _right = _xAxis;
+        _up = _yAxis;
+        _normal = _zAxis;
+        _azimuth = 0.0;
+        _elevation = 0.0;
+    }
 
-        azimuth = 0.0;
-        elevation = 0.0;
-        _zoom = 0.0;
+    Vector3 get eye => _eye;
+    void set eye(Vector3 v) {
+        v.copyInto(_eye);
+    }
+
+    Vector3 get defaultEye => _defaultEye;
+    void set defaultEye(Vector3 v) {
+        v.copyInto(_defaultEye);
+    }
+
+    Vector3 get target => _target;
+    void set target(Vector3 v) {
+        v.copyInto(_target);
+    }
+
+    Vector3 get defaultTarget => _defaultTarget;
+    void set defaultTarget(Vector3 v) {
+        v.copyInto(_defaultTarget);
     }
 
     double get zoom => _zoom;
-    void set zoom(double target) {
-        _zoom = target;
+    void set zoom(double amt) {
+        _zoom = amt;
         _dolly();
     }
 
     void _dolly() {
-        var p = new Vector3.copy(position);
+        var p = new Vector3.copy(eye);
 
         var n = new Vector3.zero();
         _normal.normalizeInto(n);
@@ -80,19 +102,7 @@ class Camera {
                 assert(false); // BUG
         }
 
-        position = newPosition;
-        //update();
-    }
-
-    Vector3 get position => _position;
-    void set position(Vector3 p) {
-        p.copyInto(position);
-        //update();
-    }
-
-    Vector3 get target => _target;
-    void set target(Vector3 p) {
-        p.copyInto(target);
+        eye = newPosition;
         //update();
     }
 
@@ -130,14 +140,14 @@ class Camera {
 
         switch (_cameraType) {
             case TRACKING:
-                _viewMatrix.translate(position);
+                _viewMatrix.translate(eye);
                 _viewMatrix.rotateY(degToRad(azimuth));
                 _viewMatrix.rotateX(degToRad(elevation));
                 break;
             case ORBITING:
                 _viewMatrix.rotateY(degToRad(azimuth));
                 _viewMatrix.rotateX(degToRad(elevation));
-                _viewMatrix.translate(position);
+                _viewMatrix.translate(eye);
                 //var trxLook = new Matrix4.zero();
                 //mat4.lookAt(position, focus, up, trxLook);
                 //mat4.inverse(trxLook);
@@ -150,11 +160,10 @@ class Camera {
         _calculateOrientation();
 
         if (_cameraType == TRACKING) {
-            position = _viewMatrix * _zero;
+            eye = _viewMatrix * _zero;
         }
 
         var cameraPosition = new Vector3(_viewMatrix[12], _viewMatrix[13], _viewMatrix[14]);
-        Vector3 target = new Vector3(0.0, 0.0, 0.0);
         var cameraMatrix = makeViewMatrix(cameraPosition, target, _yAxis);
         cameraMatrix.copyInto(_viewMatrix);
         //_viewMatrix.invert();

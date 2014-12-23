@@ -71,8 +71,7 @@ class RialtoElement extends PolymerElement {
     }
 
     void goHome(Event e, var detail, Node target) {
-        _hub.eventRegistry.UpdateCameraEyePosition.fire(null);
-        _hub.eventRegistry.UpdateCameraTargetPosition.fire(null);
+        _hub.eventRegistry.MoveCameraHome.fire0();
     }
 
     void goColorize(Event e, var detail, Node target) {

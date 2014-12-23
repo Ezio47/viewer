@@ -41,8 +41,7 @@ class EventRegistry {
 
     SignalFunctions ColorizeLayers = new SignalFunctions();
 
-    SignalFunctions<Vector3> UpdateCameraEyePosition = new SignalFunctions<Vector3>();
-    SignalFunctions<Vector3> UpdateCameraTargetPosition = new SignalFunctions<Vector3>();
+    SignalFunctions MoveCameraHome = new SignalFunctions();
 
     SignalFunctions<String> UpdateColorizationSettings = new SignalFunctions<String>();
 

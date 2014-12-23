@@ -71,12 +71,6 @@ class DisplayPanel extends PolymerElement {
 
     void doCamera(Event e, var detail, Node target) {
         var eyeVec = parseTriplet(eyePositionString);
-        if (eyeVec != null) {
-            _hub.eventRegistry.UpdateCameraEyePosition.fire(eyeVec);
-        }
-        var cameraVec = parseTriplet(targetPositionString);
-        if (cameraVec != null) {
-            _hub.eventRegistry.UpdateCameraTargetPosition.fire(cameraVec);
-        }
+        assert(false); // BUG: not supported again
     }
 }

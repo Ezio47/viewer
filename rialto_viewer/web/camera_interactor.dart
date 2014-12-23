@@ -29,9 +29,8 @@ class CameraInteractor {
         _hub.eventRegistry.KeyDown.subscribe(_handleKeyDown);
         _hub.eventRegistry.KeyUp.subscribe(_handleKeyUp);
 
-        _hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateEye);
-        _hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateTarget);
-    }
+        _hub.eventRegistry.MoveCameraHome.subscribe0(_handleMoveCameraHome);
+   }
 
     Point _get2DCoords(MouseData ev) {
         int top = 0;
@@ -62,7 +61,7 @@ class CameraInteractor {
         _currentX = ev.x;
         _currentY = ev.y;
         _button = ev.button;
-        _dollyStep = max3(_camera.position.x, _camera.position.y, _camera.position.z) / 100.0;
+        _dollyStep = max3(_camera.eye.x, _camera.eye.y, _camera.eye.z) / 100.0;
 
         if (_picker != null && isPickingEnabled) {
             Point coords = _get2DCoords(ev);
@@ -121,18 +120,8 @@ class CameraInteractor {
     void _handleKeyUp(KeyboardData ev) {
     }
 
-    void _handleUpdateEye(Vector3 eye) {
-        if (eye == null) {
-            eye = new Vector3(0.0, 0.0, 1000.0);
-        }
-        _camera.position = eye;
-    }
-
-    void _handleUpdateTarget(Vector3 target) {
-        if (target == null) {
-            target = new Vector3(0.0, 0.0, 0.0);
-        }
-        _camera.target = target;
+    void _handleMoveCameraHome() {
+        _camera.goHome();
     }
 
     void rotate(double dx, double dy) {

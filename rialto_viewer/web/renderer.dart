@@ -51,7 +51,7 @@ class Renderer {
         mvMatrix = new Matrix4.identity();
 
         _camera = new Camera(Camera.ORBITING);
-        _camera.setEye(0.0, 0.0, 50.0);
+        _camera.eye = new Vector3(0.0, 0.0, 50.0);
         //  camera.setElevation(-22);
         // camera.setAzimuth(37);
 
@@ -93,7 +93,10 @@ class Renderer {
             theLen = new Vector3(1.0, 1.0, 1.0);
         }
 
-        _camera.setEye(0.0, 0.0, 3000.0);
+        _camera.eye = new Vector3(0.0, 0.0, 3000.0);
+        _camera.defaultEye = new Vector3(0.0, 0.0, 3000.0);
+        _camera.target = new Vector3(0.0, 0.0, 0.0);
+        _camera.defaultTarget = new Vector3(0.0, 0.0, 0.0);
 
         {
             // axes model space is (0,0,0)..(0.25 * theLen)
@@ -121,6 +124,8 @@ class Renderer {
                 shapes.add(obj);
             }
         }
+
+        _camera.goHome();
     }
 
     void draw(num viewWidth, num viewHeight, num aspect) {
@@ -182,34 +187,14 @@ class Renderer {
         _bboxShape.visible = v;
     }
 
-}
-
-
-/***
-    Vector3 _cameraHomeEyePoint;
-    Vector3 _cameraHomeTargetPoint;
-    Vector3 _cameraUpVector;
-    Vector3 _cameraCurrentEyePoint;
-    Vector3 _cameraCurrentTargetPoint;
-
     void _handleUpdateCameraTargetPosition(Vector3 data) {
-        if (data == null) data = _cameraHomeTargetPoint;
-        data.copyInto(_cameraCurrentTargetPoint);
-        _updateCameraModel();
+        _camera.target = _camera.defaultTarget;
     }
 
     void _handleUpdateCameraEyePosition(Vector3 data) {
-        if (data == null) data = _cameraHomeEyePoint;
-        data.copyInto(_cameraCurrentEyePoint);
-        _updateCameraModel();
+        _camera.eye = _camera.defaultEye;
     }
-
-    void _updateCameraModel() {
-        _camera.position.setFrom(_cameraCurrentEyePoint);
-        _camera.up.setFrom(_cameraUpVector);
-        _camera.lookAt(_cameraCurrentTargetPoint);
-    }
-***/
+}
 
 
 
