@@ -36,6 +36,7 @@ part 'event_registry.dart';
 part 'fragment_shader.dart';
 part 'gl_program.dart';
 part 'line_shape.dart';
+part 'measurement.dart';
 part 'picker.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
@@ -66,6 +67,7 @@ class Hub {
     Annotator annotator;
     Picker picker;
     RenderingContext gl;
+    Measurement measurement;
 
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -78,6 +80,9 @@ class Hub {
 
     bool isPickingEnabled = true;
 
+    Map<int, BasicShape> shapesMap = {};
+    List<BasicShape> shapesList = [];
+
     // singleton
     static Hub _root;
 
@@ -86,6 +91,7 @@ class Hub {
         _root = this;
         eventRegistry = new EventRegistry();
         annotator = new Annotator();
+        measurement = new Measurement();
     }
 
     static Hub get root {

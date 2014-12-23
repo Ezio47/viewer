@@ -243,7 +243,7 @@ class PointCloudGenerator {
         var ymin = -1000.0;
         var ymax = 1000.0;
         var zmin = 0.0;
-        var zmax = 1.0;
+        var zmax = 100.0;
 
         var random = new Random(17);
 

@@ -4,11 +4,50 @@
 
 part of rialto.viewer;
 
-class AxesShape extends Shape {
-    AxesShape(RenderingContext gl) : super(gl);
+class AxesShape extends BasicShape {
+    Float32List _vertexArray;
+    Buffer _vertexBuffer;
 
-    @override
-    void setArrays() {
+    Float32List _colorArray;
+    Buffer _colorBuffer;
+    Float32List _highlightColorArray;
+    Buffer _highlightColorBuffer;
+
+    Buffer _idBuffer;
+    Float32List _idArray;
+
+    AxesShape(RenderingContext gl) : super(gl) {
+        _initArrays();
+
+        assert(_vertexArray != null);
+        assert(_colorArray != null);
+        assert(_idArray != null);
+
+        _initBuffers();
+
+        var pcode = Utils.convertIdToFvec(id);
+        //print("created ${this.runtimeType}: $id ($pcode)");
+    }
+
+    void _initBuffers() {
+        _vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _vertexArray, STATIC_DRAW);
+
+        _colorBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
+
+        _highlightColorBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _highlightColorBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _highlightColorArray, STATIC_DRAW);
+
+        _idBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _idArray, STATIC_DRAW);
+    }
+
+    void _initArrays() {
         const double x = 1.0;
         const double y = 1.0;
         const double z = 1.0;
@@ -28,59 +67,34 @@ class AxesShape extends Shape {
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
 
-        setDefaultIdArray();
+        _idArray = _createIdArray(_colorArray.length);
     }
 
     @override
-    void drawImpl() {
+    void _drawImpl() {
         gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
+
+    }
+
+    @override
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+        gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
+
+        if (BasicShape.offscreen == 1) {
+            gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
+            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+        } else {
+            gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+        }
+
+        assert(setUniforms != null);
+        setUniforms(this);
+    }
+
+    void pick(int pickedId) {
+        assert(id == pickedId);
+        print("BOOM: $id is ${runtimeType.toString()}");
     }
 }
-
-/***
-// taken from three/extra/helpers/axis_helper.dart
-class AxesObject extends Object3D {
-    AxesObject() : super() {
-
-        var lineGeometry = new Geometry();
-        lineGeometry.vertices.add(new Vector3.zero());
-        lineGeometry.vertices.add(new Vector3(0.0, 100.0, 0.0));
-
-        // radius top, radius bottom, height, segments-radius, segments-height
-        var coneGeometry = new CylinderGeometry(0.0, 10.0, 20.0, 8, 1);
-
-        var line, cone;
-
-        // x
-
-        line = new Line(lineGeometry, new LineBasicMaterial(color: 0xff0000));
-        line.rotation.z = -Math.PI / 2.0;
-        this.add(line);
-
-        cone = new Mesh(coneGeometry, new MeshBasicMaterial(color: 0xff0000));
-        cone.position.x = 100.0;
-        cone.rotation.z = -Math.PI / 2.0;
-        this.add(cone);
-
-        // y
-
-        line = new Line(lineGeometry, new LineBasicMaterial(color: 0x00ff00));
-        this.add(line);
-
-        cone = new Mesh(coneGeometry, new MeshBasicMaterial(color: 0x00ff00));
-        cone.position.y = 100.0;
-        this.add(cone);
-
-        // z
-
-        line = new Line(lineGeometry, new LineBasicMaterial(color: 0x0000ff));
-        line.rotation.x = Math.PI / 2.0;
-        this.add(line);
-
-        cone = new Mesh(coneGeometry, new MeshBasicMaterial(color: 0x0000ff));
-        cone.position.z = 100.0;
-        cone.rotation.x = Math.PI / 2.0;
-        this.add(cone);
-    }
-}
- ***/

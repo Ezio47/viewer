@@ -85,4 +85,8 @@ class RialtoElement extends PolymerElement {
     void goSelect(Event e, var detail, Node target) {
         _hub.eventRegistry.SelectionMode.fire0();
     }
+
+    void goMeasure(Event e, var detail, Node target) {
+        _hub.eventRegistry.MeasurementMode.fire0();
+    }
 }

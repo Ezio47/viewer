@@ -97,7 +97,7 @@ class Picker {
 
             var l = _hitTest(ri, gi, bi);
             if (l != null) {
-                print("HTI");
+                print("HIT");
                 return l;
             }
         }
@@ -116,13 +116,13 @@ class Picker {
         }
 
         final int id = Utils.convertIvecToId(ri, gi, bi);
-        if (!Shape.shapes.containsKey(id)) {
+        if (!Hub.root.shapesMap.containsKey(id)) {
             // error: we have an object that we don't have a key for!
             assert(false);
         }
 
-        var hit = Shape.shapes[id];
-        hit.pickFunc(id);
+        var hit = Hub.root.shapesMap[id];
+        hit.pick(id);
 
         return [hit, id];
     }

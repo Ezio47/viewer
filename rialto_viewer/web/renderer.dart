@@ -19,8 +19,6 @@ class Renderer {
     CameraInteractor _interactor;
     Picker _picker = null;
 
-    List<Shape> shapes = [];
-
     double _mouseGeoX = 0.0;
     double _mouseGeoY = 0.0;
     bool _axesVisible;
@@ -63,7 +61,7 @@ class Renderer {
 
         update();
 
-        _picker.shapes = shapes;
+        _picker.shapes = _hub.shapesList;
 
         _axesVisible = false;
         _bboxVisible = false;
@@ -84,7 +82,7 @@ class Renderer {
         //
         // note mid-point of the cloud model gets tranlated to the origin of world space
 
-        shapes.clear();
+        _hub.shapesList.clear();
 
         var theMin = _renderSource.min;
         var theLen = _renderSource.len;
@@ -103,9 +101,8 @@ class Renderer {
         {
             // axes model space is (0,0,0)..(0.25 * theLen)
             _axesShape = new AxesShape(gl);
-            _axesShape.init();
             _axesShape.modelMatrix.scale(theLen * 0.25);
-            shapes.add(_axesShape);
+            _hub.shapesList.add(_axesShape);
         }
 
 
@@ -115,7 +112,7 @@ class Renderer {
             _bboxShape.init();
             _bboxShape.modelMatrix.translate(-theLen / 2.0);
             _bboxShape.modelMatrix.scale(theLen);
-            shapes.add(_bboxShape);
+            _hub.shapesList.add(_bboxShape);
         }
 
         {
@@ -123,14 +120,14 @@ class Renderer {
                 var obj = rpc.buildParticleSystem();
                 obj.visible = rpc.visible;
                 obj.modelMatrix.translate(-theMin - theLen / 2.0);
-                shapes.add(obj);
+                _hub.shapesList.add(obj);
             }
         }
 
         for (var annotation in annotations) {
             AnnotationShape shape = annotation.shape;
             shape.modelMatrix.translate(-theMin - theLen / 2.0);
-            shapes.add(shape);
+            _hub.shapesList.add(shape);
         }
 
         _camera.goHome();
@@ -140,13 +137,13 @@ class Renderer {
 
         //off-screen rendering
         if (_hub.isPickingEnabled) {
-            Shape.offscreen = 1;
+            BasicShape.offscreen = 1;
             gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
             _drawScene(viewWidth, viewHeight, aspect);
         }
 
         //on-screen rendering
-        Shape.offscreen = 0;
+        BasicShape.offscreen = 0;
         gl.bindFramebuffer(FRAMEBUFFER, null);
         _drawScene(viewWidth, viewHeight, aspect);
     }
@@ -162,7 +159,7 @@ class Renderer {
         pMatrix = _camera.getPerspectiveMatrix(aspect);
 
         var vMatrix = _camera.getViewMatrix();
-        for (var shape in shapes) {
+        for (var shape in _hub.shapesList) {
             var mMatrix = shape.modelMatrix;
             mvMatrix = vMatrix * mMatrix;
             shape.draw(
@@ -172,10 +169,10 @@ class Renderer {
         }
     }
 
-    void _setMatrixUniforms(Shape r) {
+    void _setMatrixUniforms(BasicShape r) {
         gl.uniformMatrix4fv(_glProgram._uniforms['uPMatrix'], false, pMatrix.storage);
         gl.uniformMatrix4fv(_glProgram._uniforms['uMVMatrix'], false, mvMatrix.storage);
-        gl.uniform1i(_glProgram._uniforms['uOffscreen'], Shape.offscreen);
+        gl.uniform1i(_glProgram._uniforms['uOffscreen'], BasicShape.offscreen);
     }
 
     void tick(time) {

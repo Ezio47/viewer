@@ -3,11 +3,61 @@ part of rialto.viewer;
 typedef void SetUniformsFunc(Renderable);
 typedef void PickFunc(int pickedId);
 
-abstract class Shape {
+abstract class BasicShape {
     static int offscreen = 0;
     static int _ids = 257;
-
     RenderingContext gl;
+
+    String name;
+    bool visible;
+    bool _highlight;
+    int id;
+
+
+    // to change from model to world coords
+    Matrix4 modelMatrix = new Matrix4.identity();
+
+    BasicShape(RenderingContext this.gl) {
+        id = BasicShape.getNewId();
+        visible = true;
+        _highlight = false;
+
+        Hub.root.shapesMap[id] = this;
+    }
+
+    static int getNewId() => _ids++;
+
+    void draw(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+         if (!visible) return;
+
+         _setBindings(vertexAttrib, colorAttrib, setUniforms);
+         _drawImpl();
+     }
+
+    void pick(int id){}
+    void setHighlight(){}
+    void unsetHighlight(){}
+
+    void _drawImpl();
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms);
+
+    // more renderable objects will use this: it sets the entire object to a single ID
+    Float32List _createIdArray(int length) {
+        var pcode = Utils.convertIdToFvec(id);
+        Float32List array = new Float32List(length);
+        for (int i = 0; i < length; i += 4) {
+            array[i] = pcode[0];
+            array[i + 1] = pcode[1];
+            array[i + 2] = pcode[2];
+            array[i + 3] = pcode[3];
+        }
+        return array;
+    }
+
+
+}
+
+abstract class Shape extends BasicShape {
 
     Float32List _vertexArray;
     Buffer _vertexBuffer;
@@ -19,28 +69,8 @@ abstract class Shape {
 
     Buffer _idBuffer;
     Float32List _idArray;
-    PickFunc pickFunc;
 
-    String name;
-    bool visible;
-    bool _highlight;
-    int id;
-
-    static Map<int, Shape> shapes = {};
-
-    // to change from model to world coords
-    Matrix4 modelMatrix = new Matrix4.identity();
-
-    Shape(RenderingContext this.gl) {
-        id = Shape.getNewId();
-        visible = true;
-        _highlight = false;
-
-        shapes[id] = this;
-
-        pickFunc = defaultPickFunc;
-    }
-
+    Shape(RenderingContext mygl) : super(mygl);
     void init() {
         setArrays();
         assert(_vertexArray != null);
@@ -67,8 +97,6 @@ abstract class Shape {
         //print("created ${this.runtimeType}: $id ($pcode)");
     }
 
-    static int getNewId() => _ids++;
-
     void setArrays();
 
     // more renderable objects will use this: it sets the entire object to a single ID
@@ -92,28 +120,22 @@ abstract class Shape {
 
     }
 
-    void draw(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
-        if (!visible) return;
+    @override
+    void _drawImpl();
 
-        setBindings(vertexAttrib, colorAttrib, setUniforms);
-        drawImpl();
-    }
-
-    void drawImpl();
-
-    void setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+    @override
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
         gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
 
-        if (Shape.offscreen == 1) {
+        if (BasicShape.offscreen == 1) {
             gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
-        } else  {
+        } else {
             if (_highlight) {
                 gl.bindBuffer(ARRAY_BUFFER, _highlightColorBuffer);
                 gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
-            }
-            else {
+            } else {
                 gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
                 gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
             }

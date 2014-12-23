@@ -33,7 +33,7 @@ class LineShape extends Shape {
     }
 
     @override
-    void drawImpl() {
+    void _drawImpl() {
         gl.drawArrays(LINES, 0/*first elem*/, _vertexArray.length ~/ 3);
     }
 }

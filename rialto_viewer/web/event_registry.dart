@@ -57,6 +57,7 @@ class EventRegistry {
 
     SignalFunctions AnnotationMode = new SignalFunctions();
     SignalFunctions SelectionMode = new SignalFunctions();
+    SignalFunctions MeasurementMode = new SignalFunctions();
 }
 
 class MouseData {

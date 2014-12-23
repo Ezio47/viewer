@@ -23,13 +23,13 @@ class CloudShape extends Shape {
         _idArray = new Float32List(numPoints * 4);
         for (int i = 0,
                 j = 0; i < numPoints * 4; i += 4, j += 3) {
-            final int pointId = Shape.getNewId();
+            final int pointId = BasicShape.getNewId();
             var pointCode = Utils.convertIdToFvec(pointId);
             _idArray[i] = pointCode[0];
             _idArray[i + 1] = pointCode[1];
             _idArray[i + 2] = pointCode[2];
             _idArray[i + 3] = pointCode[3];
-            Shape.shapes[pointId] = this;
+            Hub.root.shapesMap[pointId] = this;
 
             double x = _vertexArray[j];
             double y = _vertexArray[j + 1];
@@ -39,7 +39,7 @@ class CloudShape extends Shape {
     }
 
     @override
-    void drawImpl() {
+    void _drawImpl() {
         gl.drawArrays(POINTS, 0/*first elem*/, numPoints/*total num vertices*/);
     }
 

@@ -68,7 +68,7 @@ class AnnotationShape extends Shape {
     }
 
     @override
-    void drawImpl() {
+    void _drawImpl() {
         gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
     }
 }
