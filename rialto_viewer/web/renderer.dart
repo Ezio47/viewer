@@ -80,7 +80,7 @@ class Renderer {
         // model space: cloud's (xmin,ymin,zmin)..cloud's (xmax,ymax,zmax)
         // world space: (0,0,0).. cloud's (xlen,ylen,zlen)
         //
-        // note min point of the cloud model gets tranlated to the origin of world space
+        // note mid-point of the cloud model gets tranlated to the origin of world space
 
         shapes.clear();
 
@@ -90,7 +90,7 @@ class Renderer {
         if (_renderSource.length == 0) {
             // a reasonable default
             theMin = new Vector3.zero();
-            theLen = new Vector3(100.0, 100.0, 100.0);
+            theLen = new Vector3(1.0, 1.0, 1.0);
         }
 
         _camera.setEye(0.0, 0.0, 3000.0);
@@ -99,7 +99,7 @@ class Renderer {
             // axes model space is (0,0,0)..(0.25 * theLen)
             _axesShape = new AxesShape(gl);
             _axesShape.init();
-            _axesShape.modelMatrix.scale(theLen * 0.5);
+            _axesShape.modelMatrix.scale(theLen * 0.25);
             shapes.add(_axesShape);
         }
 
@@ -108,7 +108,7 @@ class Renderer {
             // bbox model space is (0,0,0)..(theLen)
             _bboxShape = new BoxShape(gl);
             _bboxShape.init();
-            //_bboxShape.modelMatrix.translate(-theMin);
+            _bboxShape.modelMatrix.translate(-theLen/2.0);
             _bboxShape.modelMatrix.scale(theLen);
             shapes.add(_bboxShape);
         }
@@ -117,7 +117,7 @@ class Renderer {
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.visible = rpc.visible;
-                obj.modelMatrix.translate(-theMin);
+                obj.modelMatrix.translate(-theMin - theLen / 2.0);
                 shapes.add(obj);
             }
         }
@@ -127,8 +127,8 @@ class Renderer {
 
         Shape.offscreen = 1;
         //off-screen rendering
-     //   gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
-     //   _drawScene(viewWidth, viewHeight, aspect);
+        //   gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
+        //   _drawScene(viewWidth, viewHeight, aspect);
 
         Shape.offscreen = 0;
         //on-screen rendering
@@ -146,14 +146,11 @@ class Renderer {
 
         pMatrix = _camera.getPerspectiveMatrix(aspect);
 
-        for (var renderable in shapes) {
-            var vMatrix = _camera.getViewMatrix();
-            var mMatrix = renderable.modelMatrix;
+        var vMatrix = _camera.getViewMatrix();
+        for (var shape in shapes) {
+            var mMatrix = shape.modelMatrix;
             mvMatrix = vMatrix * mMatrix;
-            renderable.draw(
-                    _glProgram._attributes['aVertexPosition'],
-                    _glProgram._attributes['aVertexColor'],
-                    _setMatrixUniforms);
+            shape.draw(_glProgram._attributes['aVertexPosition'], _glProgram._attributes['aVertexColor'], _setMatrixUniforms);
         }
     }
 

@@ -23,7 +23,7 @@ class CloudShape extends Shape {
         _vertexArray = points/*new Float32List.fromList(points.toList())*/;
         _colorArray = colors /*new Float32List.fromList(colors) */;
 
-        print("${_colorArray.length} ${_vertexArray.length}");
+        //print("${_colorArray.length} ${_vertexArray.length}");
         assert(numPoints * 3 == _vertexArray.length);
         assert(numPoints * 4 == _colorArray.length);
 
