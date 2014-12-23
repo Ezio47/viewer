@@ -4,14 +4,12 @@
 
 part of rialto.viewer;
 
-class AxesShape extends BasicShape {
+class AxesShape extends Shape {
     Float32List _vertexArray;
     Buffer _vertexBuffer;
 
     Float32List _colorArray;
     Buffer _colorBuffer;
-    Float32List _highlightColorArray;
-    Buffer _highlightColorBuffer;
 
     Buffer _idBuffer;
     Float32List _idArray;
@@ -19,14 +17,9 @@ class AxesShape extends BasicShape {
     AxesShape(RenderingContext gl) : super(gl) {
         _initArrays();
 
-        assert(_vertexArray != null);
-        assert(_colorArray != null);
-        assert(_idArray != null);
+        _idArray = Shape._createIdArray(id, _colorArray.length);
 
         _initBuffers();
-
-        var pcode = Utils.convertIdToFvec(id);
-        //print("created ${this.runtimeType}: $id ($pcode)");
     }
 
     void _initBuffers() {
@@ -37,10 +30,6 @@ class AxesShape extends BasicShape {
         _colorBuffer = gl.createBuffer();
         gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
         gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
-
-        _highlightColorBuffer = gl.createBuffer();
-        gl.bindBuffer(ARRAY_BUFFER, _highlightColorBuffer);
-        gl.bufferDataTyped(ARRAY_BUFFER, _highlightColorArray, STATIC_DRAW);
 
         _idBuffer = gl.createBuffer();
         gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
@@ -66,12 +55,10 @@ class AxesShape extends BasicShape {
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
-
-        _idArray = _createIdArray(_colorArray.length);
     }
 
     @override
-    void _drawImpl() {
+    void _draw() {
         gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
 
     }
@@ -81,7 +68,7 @@ class AxesShape extends BasicShape {
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
         gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
 
-        if (BasicShape.offscreen == 1) {
+        if (Hub.root.offscreenMode == 1) {
             gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
         } else {

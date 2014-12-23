@@ -7,10 +7,42 @@ part of rialto.viewer;
 
 class BoxShape extends Shape {
 
-    BoxShape(RenderingContext gl) : super(gl);
+    Float32List _vertexArray;
+    Buffer _vertexBuffer;
 
-    @override
-    void setArrays() {
+    Float32List _colorArray;
+    Buffer _colorBuffer;
+
+    Buffer _idBuffer;
+    Float32List _idArray;
+
+    BoxShape(RenderingContext gl) : super(gl) {
+        _initArrays();
+
+        _idArray = Shape._createIdArray(id, _colorArray.length);
+
+        _initBuffers();
+    }
+
+    void _initBuffers() {
+        assert(_vertexArray != null);
+        assert(_colorArray != null);
+        assert(_idArray != null);
+
+        _vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _vertexArray, STATIC_DRAW);
+
+        _colorBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
+
+        _idBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _idArray, STATIC_DRAW);
+    }
+
+    void _initArrays() {
         const double x = 0.0;
         const double y = 0.0;
         const double z = 0.0;
@@ -99,80 +131,35 @@ class BoxShape extends Shape {
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
-        setDefaultIdArray();
     }
 
     @override
-    void _drawImpl() {
+    void _draw() {
         gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
     }
-}
 
 
-/***
-class BboxObject extends Object3D {
-    BboxObject() : super() {
-        var x1Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 0.0, 0.0))
-                ..vertices.add(new Vector3(100.0, 0.0, 0.0));
-        var x2Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 100.0, 0.0))
-                ..vertices.add(new Vector3(100.0, 100.0, 0.0));
-        var x3Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 0.0, 100.0))
-                ..vertices.add(new Vector3(100.0, 0.0, 100.0));
-        var x4Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 100.0, 100.0))
-                ..vertices.add(new Vector3(100.0, 100.0, 100.0));
 
-        var y1Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 0.0, 0.0))
-                ..vertices.add(new Vector3(0.0, 100.0, 0.0));
-        var y2Geometry = new Geometry()
-                ..vertices.add(new Vector3(100.0, 0.0, 0.0))
-                ..vertices.add(new Vector3(100.0, 100.0, 0.0));
-        var y3Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 0.0, 100.0))
-                ..vertices.add(new Vector3(0.0, 100.0, 100.0));
-        var y4Geometry = new Geometry()
-                ..vertices.add(new Vector3(100.0, 0.0, 100.0))
-                ..vertices.add(new Vector3(100.0, 100.0, 100.0));
 
-        var z1Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 0.0, 0.0))
-                ..vertices.add(new Vector3(0.0, 0.0, 100.0));
-        var z2Geometry = new Geometry()
-                ..vertices.add(new Vector3(0.0, 100.0, 0.0))
-                ..vertices.add(new Vector3(0.0, 100.0, 100.0));
-        var z3Geometry = new Geometry()
-                ..vertices.add(new Vector3(100.0, 0.0, 0.0))
-                ..vertices.add(new Vector3(100.0, 0.0, 100.0));
-        var z4Geometry = new Geometry()
-                ..vertices.add(new Vector3(100.0, 100.0, 0.0))
-                ..vertices.add(new Vector3(100.0, 100.0, 100.0));
+    @override
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+        gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
 
-        this.add(new Line(x1Geometry, new LineBasicMaterial(color: 0xff0000)));
-        this.add(new Line(x2Geometry, new LineBasicMaterial(color: 0xff0000)));
-        this.add(new Line(x3Geometry, new LineBasicMaterial(color: 0xff0000)));
-        this.add(new Line(x4Geometry, new LineBasicMaterial(color: 0xff0000)));
+        if (Hub.root.offscreenMode == 1) {
+            gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
+            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+        } else {
+                gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+                gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+        }
 
-        this.add(new Line(y1Geometry, new LineBasicMaterial(color: 0x00ff00)));
-        this.add(new Line(y2Geometry, new LineBasicMaterial(color: 0x00ff00)));
-        this.add(new Line(y3Geometry, new LineBasicMaterial(color: 0x00ff00)));
-        this.add(new Line(y4Geometry, new LineBasicMaterial(color: 0x00ff00)));
-
-        this.add(new Line(z1Geometry, new LineBasicMaterial(color: 0x0000ff)));
-        this.add(new Line(z2Geometry, new LineBasicMaterial(color: 0x0000ff)));
-        this.add(new Line(z3Geometry, new LineBasicMaterial(color: 0x0000ff)));
-        this.add(new Line(z4Geometry, new LineBasicMaterial(color: 0x0000ff)));
-
-        // radius top, radius bottom, height, segments-radius, segments-height
-        var sphereGeometry = new SphereGeometry(2.0);
-
-        var sphere = new Mesh(sphereGeometry, new MeshBasicMaterial(color: 0x808080));
-        sphere.position = new Vector3(0.0, 0.0, 0.0);
-        this.add(sphere);
-
+        if (setUniforms != null) setUniforms(this);
     }
+
+    void pick(int pickedId) {
+        assert(id == pickedId);
+        print("BOOM: $id is ${runtimeType.toString()}");
+    }
+
 }
-***/

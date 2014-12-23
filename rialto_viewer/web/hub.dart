@@ -35,7 +35,6 @@ part 'comms.dart';
 part 'event_registry.dart';
 part 'fragment_shader.dart';
 part 'gl_program.dart';
-part 'line_shape.dart';
 part 'measurement.dart';
 part 'picker.dart';
 part 'point_cloud.dart';
@@ -80,11 +79,13 @@ class Hub {
 
     bool isPickingEnabled = true;
 
-    Map<int, BasicShape> shapesMap = {};
-    List<BasicShape> shapesList = [];
+    Map<int, Shape> shapesMap = {};
+    List<Shape> shapesList = [];
 
     // singleton
     static Hub _root;
+
+    int offscreenMode = 0;
 
 
     Hub() {

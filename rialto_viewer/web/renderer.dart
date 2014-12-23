@@ -61,8 +61,6 @@ class Renderer {
 
         update();
 
-        _picker.shapes = _hub.shapesList;
-
         _axesVisible = false;
         _bboxVisible = false;
 
@@ -109,7 +107,6 @@ class Renderer {
         {
             // bbox model space is (0,0,0)..(theLen)
             _bboxShape = new BoxShape(gl);
-            _bboxShape.init();
             _bboxShape.modelMatrix.translate(-theLen / 2.0);
             _bboxShape.modelMatrix.scale(theLen);
             _hub.shapesList.add(_bboxShape);
@@ -137,13 +134,13 @@ class Renderer {
 
         //off-screen rendering
         if (_hub.isPickingEnabled) {
-            BasicShape.offscreen = 1;
+            Hub.root.offscreenMode = 1;
             gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
             _drawScene(viewWidth, viewHeight, aspect);
         }
 
         //on-screen rendering
-        BasicShape.offscreen = 0;
+        Hub.root.offscreenMode = 0;
         gl.bindFramebuffer(FRAMEBUFFER, null);
         _drawScene(viewWidth, viewHeight, aspect);
     }
@@ -169,10 +166,10 @@ class Renderer {
         }
     }
 
-    void _setMatrixUniforms(BasicShape r) {
+    void _setMatrixUniforms(Shape r) {
         gl.uniformMatrix4fv(_glProgram._uniforms['uPMatrix'], false, pMatrix.storage);
         gl.uniformMatrix4fv(_glProgram._uniforms['uMVMatrix'], false, mvMatrix.storage);
-        gl.uniform1i(_glProgram._uniforms['uOffscreen'], BasicShape.offscreen);
+        gl.uniform1i(_glProgram._uniforms['uOffscreen'], Hub.root.offscreenMode);
     }
 
     void tick(time) {

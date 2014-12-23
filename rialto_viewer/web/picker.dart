@@ -10,8 +10,6 @@ class Picker {
     var _frameBNuffer;
     var _renderBuffer;
 
-    List<Shape> shapes;
-
     Picker(RenderingContext this.gl, CanvasElement this._canvas) {
         _hub = Hub.root;
         _hub.picker = this;

@@ -11,12 +11,11 @@ class Annotation {
 
         _fixCorners();
 
-        makeShape();
+        _makeShape();
     }
 
-    void makeShape() {
+    void _makeShape() {
         shape = new AnnotationShape(Hub.root.gl, _point1, _point2);
-        shape.init();
     }
 
     void _fixCorners() {

@@ -1,6 +1,15 @@
 part of rialto.viewer;
 
 class AnnotationShape extends Shape {
+    Float32List _vertexArray;
+    Buffer _vertexBuffer;
+
+    Float32List _colorArray;
+    Buffer _colorBuffer;
+
+    Buffer _idBuffer;
+    Float32List _idArray;
+
     Vector3 _point1;
     Vector3 _point2;
 
@@ -11,10 +20,29 @@ class AnnotationShape extends Shape {
         assert(_point1.x <= _point2.x);
         assert(_point1.y <= _point2.y);
         assert(_point1.z == _point2.z);
+
+        _initArrays();
+
+        _idArray = Shape._createIdArray(id, _colorArray.length);
+
+        _initBuffers();
     }
 
-    @override
-    void setArrays() {
+    void _initBuffers() {
+        _vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _vertexArray, STATIC_DRAW);
+
+        _colorBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
+
+        _idBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _idArray, STATIC_DRAW);
+    }
+
+    void _initArrays() {
         double x1 = _point1.x;
         double y1 = _point1.y;
         double z1 = _point1.z;
@@ -64,11 +92,34 @@ class AnnotationShape extends Shape {
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
-        setDefaultIdArray();
     }
 
     @override
-    void _drawImpl() {
+    void _draw() {
         gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
     }
+
+    @override
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+        gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
+
+        if (Hub.root.offscreenMode == 1) {
+            gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
+            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+        } else {
+
+                gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+                gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+
+        }
+
+        if (setUniforms != null) setUniforms(this);
+    }
+
+    void pick(int pickedId) {
+        assert(id == pickedId);
+        print("BOOM: $id is ${runtimeType.toString()}");
+    }
+
 }
