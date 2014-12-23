@@ -105,7 +105,7 @@ class CloudShape extends Shape {
 
     @override
     void pick(int pickedId) {
-        print("BOOM: $pickedId is ${runtimeType.toString()}");
+        print("PICK: $pickedId is ${runtimeType.toString()}");
         final int objId = id;
         final int pointId = pickedId;
         final int pointNum = pointId - (objId + 1);

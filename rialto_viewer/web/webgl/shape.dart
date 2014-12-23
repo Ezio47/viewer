@@ -35,7 +35,10 @@ abstract class Shape {
          _draw();
      }
 
-    void pick(int id){}
+    void pick(int pickedId) {
+        assert(id == pickedId);
+        print("PICK: $id is ${runtimeType.toString()}");
+    }
 
     void _draw();
     void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms);

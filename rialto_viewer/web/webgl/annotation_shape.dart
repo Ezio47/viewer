@@ -120,10 +120,4 @@ class AnnotationShape extends Shape {
 
         if (setUniforms != null) setUniforms(this);
     }
-
-    void pick(int pickedId) {
-        assert(id == pickedId);
-        print("BOOM: $id is ${runtimeType.toString()}");
-    }
-
 }
