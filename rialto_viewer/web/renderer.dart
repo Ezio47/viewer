@@ -173,8 +173,15 @@ class Renderer {
     }
 
     void tick(time) {
-        window.animationFrame.then(tick);
-        draw(_canvas.width, _canvas.height, _canvas.width / _canvas.height);
+        //window.animationFrame.then(tick);
+        //draw(_canvas.width, _canvas.height, _canvas.width / _canvas.height);
+
+        // BUG???
+
+        window.animationFrame.then((_) {
+            draw(_canvas.width, _canvas.height, _canvas.width / _canvas.height);
+            tick(0);
+        });
     }
 
     void _handleWindowResize() {
