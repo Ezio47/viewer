@@ -28,7 +28,7 @@ class FauxColorizer extends Colorizer {
 
         double zLen = zmax - zmin;
 
-        for (int i = 0; i < numPoints * 3; i += 3) {
+        for (int i = 0; i < numPoints * 4; i += 4) {
             double z = positions[i + 2];
             double c = (z - zmin) / zLen;
 
@@ -51,6 +51,7 @@ class FauxColorizer extends Colorizer {
                 newColors[i + 1] = 0.0;
                 newColors[i + 2] = (c - 0.6666) * 3.0;
             }
+            newColors[i + 3] = 1.0;
         }
 
         return newColors;
@@ -75,7 +76,7 @@ class RampColorizer extends Colorizer {
 
         final double zLen = zmax - zmin;
 
-        for (int i = 0; i < numPoints * 3; i += 3) {
+        for (int i = 0, j = 0; i < numPoints * 3; i += 3, j += 4) {
             double z = positions[i + 2];
             double scaledZ = (z - zmin) / zLen;
 
@@ -104,9 +105,10 @@ class RampColorizer extends Colorizer {
             }
             assert(result != null);
 
-            newColors[i + 0] = result.r / 255.0;
-            newColors[i + 1] = result.g / 255.0;
-            newColors[i + 2] = result.b / 255.0;
+            newColors[j + 0] = result.r / 255.0;
+            newColors[j + 1] = result.g / 255.0;
+            newColors[j + 2] = result.b / 255.0;
+            newColors[j + 3] = 1.0;
         }
 
         return newColors;
