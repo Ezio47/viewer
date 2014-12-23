@@ -81,4 +81,8 @@ class RialtoElement extends PolymerElement {
     void goAnnotate(Event e, var detail, Node target) {
         _hub.eventRegistry.AnnotationMode.fire0();
     }
+
+    void goSelect(Event e, var detail, Node target) {
+        _hub.eventRegistry.SelectionMode.fire0();
+    }
 }

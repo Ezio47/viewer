@@ -9,6 +9,7 @@ class GlProgram {
 
     GlProgram(RenderingContext this.gl, String fragmentCode, String vertexCode, List<String> attributeNames,
             List<String> uniformNames) {
+
         _fragmentShader = gl.createShader(FRAGMENT_SHADER);
         gl.shaderSource(_fragmentShader, fragmentCode);
         gl.compileShader(_fragmentShader);
@@ -36,6 +37,8 @@ class GlProgram {
             var uniformLocation = gl.getUniformLocation(_program, uniform);
             _uniforms[uniform] = uniformLocation;
         }
+
+        Hub.root.gl = gl;
     }
 }
 

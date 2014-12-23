@@ -9,6 +9,7 @@ class Color {
     Color.red() : this(1.0, 0.0, 0.0);
     Color.green() : this(0.0, 1.0, 0.0);
     Color.blue() : this(0.0, 0.0, 1.0);
+    Color.yellow() : this(1.0, 1.0, 0.0);
     Color.black() : this(0.0, 0.0, 0.0);
     Color.white() : this(1.0, 1.0, 1.0);
 

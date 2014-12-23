@@ -21,7 +21,9 @@ import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
 
+part 'annotation.dart';
 part 'annotator.dart';
+part 'annotation_shape.dart';
 part 'axes_shape.dart';
 part 'box_shape.dart';
 part 'camera.dart';
@@ -42,6 +44,7 @@ part 'renderable_point_cloud.dart';
 part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
 part 'rialto_exceptions.dart';
+part 'selector.dart';
 part 'shape.dart';
 part 'signal.dart';
 part 'utils.dart';
@@ -59,7 +62,10 @@ class Hub {
 
     EventRegistry eventRegistry;
 
+    CameraInteractor cameraInteractor;
     Annotator annotator;
+    Picker picker;
+    RenderingContext gl;
 
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;

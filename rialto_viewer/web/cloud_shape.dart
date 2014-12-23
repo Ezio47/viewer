@@ -34,13 +34,27 @@ class CloudShape extends Shape {
             double x = _vertexArray[j];
             double y = _vertexArray[j + 1];
             double z = _vertexArray[j + 2];
-            print("created point ($id) $pointId == ${pointId - (id+1)} @ ${Utils.printv3(x,y,z,0)}");
+            //print("created point ($id) $pointId == ${pointId - (id+1)} @ ${Utils.printv3(x,y,z,0)}");
         }
     }
 
     @override
     void drawImpl() {
         gl.drawArrays(POINTS, 0/*first elem*/, numPoints/*total num vertices*/);
+    }
+
+    Vector3 getPoint(int pickedId) {
+        assert(pickedId > id);
+
+        final int objId = id;
+        final int pointId = pickedId;
+        final int pointNum = pointId - (objId + 1);
+        assert(pointNum >= 0 && pointNum < numPoints);
+
+        final double x = _vertexArray[pointNum * 3];
+        final double y = _vertexArray[pointNum * 3 + 1];
+        final double z = _vertexArray[pointNum * 3 + 2];
+        return new Vector3(x,y,z);
     }
 
     @override

@@ -33,6 +33,8 @@ class Renderer {
     AxesShape _axesShape;
     BoxShape _bboxShape;
 
+    List<Annotation> annotations = new List<Annotation>();
+
     Renderer(CanvasElement this._canvas, this.gl, RenderablePointCloudSet rpcSet) {
         _hub = Hub.root;
 
@@ -123,6 +125,12 @@ class Renderer {
                 obj.modelMatrix.translate(-theMin - theLen / 2.0);
                 shapes.add(obj);
             }
+        }
+
+        for (var annotation in annotations) {
+            AnnotationShape shape = annotation.shape;
+            shape.modelMatrix.translate(-theMin - theLen / 2.0);
+            shapes.add(shape);
         }
 
         _camera.goHome();

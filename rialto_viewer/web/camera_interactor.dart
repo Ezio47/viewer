@@ -20,6 +20,7 @@ class CameraInteractor {
 
     CameraInteractor(Camera this._camera, CanvasElement this._canvas, Picker this._picker) {
         _hub = Hub.root;
+        _hub.cameraInteractor = this;
 
         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
@@ -31,7 +32,7 @@ class CameraInteractor {
         _hub.eventRegistry.MoveCameraHome.subscribe0(_handleMoveCameraHome);
    }
 
-    Point _get2DCoords(MouseData ev) {
+    Point get2DCoords(MouseData ev) {
         int top = 0;
         int left = 0;
         Element obj = _canvas;
@@ -63,7 +64,7 @@ class CameraInteractor {
         _dollyStep = max3(_camera.eye.x, _camera.eye.y, _camera.eye.z) / 100.0;
 
         if (_picker != null && _hub.isPickingEnabled) {
-            Point coords = _get2DCoords(ev);
+            Point coords = get2DCoords(ev);
             _picker.find(coords);
         }
     }

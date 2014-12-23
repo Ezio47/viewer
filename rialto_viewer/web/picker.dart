@@ -14,6 +14,7 @@ class Picker {
 
     Picker(RenderingContext this.gl, CanvasElement this._canvas) {
         _hub = Hub.root;
+        _hub.picker = this;
 
         _configure();
     }
@@ -56,7 +57,7 @@ class Picker {
         gl.bindFramebuffer(FRAMEBUFFER, null);
     }
 
-    bool find(Point coords) {
+    List find(Point coords) {
         // BUG: is 2*2=4 the right window size?
         // BUG: should we look for more than one hit in the window?
         // BUG: should we hit test at the center of the window first?
@@ -94,14 +95,18 @@ class Picker {
 
             //print("readout: $ri $gi $bi");
 
-            hit = _hitTest(ri, gi, bi);
-            if (hit != null) break;
+            var l = _hitTest(ri, gi, bi);
+            if (l != null) {
+                print("HTI");
+                return l;
+            }
         }
 
-        return (hit != null);
+        print("pick miss");
+        return null;
     }
 
-    Shape _hitTest(int ri, int gi, int bi) {
+    List _hitTest(int ri, int gi, int bi) {
 
         //print("readout: $ri $gi $bi");
 
@@ -119,6 +124,6 @@ class Picker {
         var hit = Shape.shapes[id];
         hit.pickFunc(id);
 
-        return hit;
+        return [hit, id];
     }
 }

@@ -70,7 +70,7 @@ class Utils {
 
         var list = new Float32List.fromList([rf, gf, bf, 1.0]);
         assert(convertFvecToId(list) == id);
-        print("MAP $id => $rf $gf $bf == ${(rf*256.0).toInt()} ${(gf*256.0).toInt()} ${(bf*256.0).toInt()}");
+        //print("MAP $id => $rf $gf $bf == ${(rf*256.0).toInt()} ${(gf*256.0).toInt()} ${(bf*256.0).toInt()}");
         return list;
     }
 
