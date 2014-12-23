@@ -50,9 +50,9 @@ class PointCloudGenerator {
             case "/dir2/line.dat":
                 return _makeLine(webpath, displayName);
             case "/newcube.dat":
-                return _makeNewCube(webpath, displayName);
+                return _makeRandom(webpath, displayName);
             case "/oldcube.dat":
-                return _makeOldCube(webpath, displayName);
+                return _makeRandom(webpath, displayName);
             case "/dir1/random.dat":
                 return _makeRandom(webpath, displayName);
             case "/terrain1.dat":
@@ -65,167 +65,10 @@ class PointCloudGenerator {
         throw new RialtoArgumentError("invalid file name");
     }
 
-
-    static PointCloud _makeNewCube(String webpath, String displayName) {
-        num particles = 50000;
-
-        Map<String, Float32List> map = new Map();
-
-        var positionsX = new Float32List(particles);
-        var positionsY = new Float32List(particles);
-        var positionsZ = new Float32List(particles);
-        var colorsX = new Float32List(particles);
-        var colorsY = new Float32List(particles);
-        var colorsZ = new Float32List(particles);
-
-        map["positions.x"] = positionsX;
-        map["positions.y"] = positionsY;
-        map["positions.z"] = positionsZ;
-        map["colors.x"] = colorsX;
-        map["colors.y"] = colorsY;
-        map["colors.z"] = colorsZ;
-
-        var rnd = new Random();
-
-        var color = new Color.black();
-
-        var n = 1000.0,
-                n2 = n / 2.0; // particles spread in the cube
-
-        for (var i = 0; i < particles; i++) {
-
-            // positions
-            var x = rnd.nextDouble() * n - n2; // -500..+500
-            var y = rnd.nextDouble() * n - n2;
-            var z = rnd.nextDouble() * n - n2;
-            assert(x >= -500.0 && y >= -500.0 && z >= -500.0);
-            assert(x <= 500.0 && y <= 500.0 && z <= 500.0);
-            //print("$x $y $z");
-
-            positionsX[i] = x;
-            positionsY[i] = y;
-            positionsZ[i] = z;
-
-            // colors
-            var vx = (x / n) + 0.5;
-            var vy = (y / n) + 0.5;
-            var vz = (z / n) + 0.5;
-
-            color.setRGB(vx, vy, vz);
-
-            //colors.array[ i ]     = color.r;
-            //colors.array[ i ] = color.g;
-            //colors.array[ i ] = color.b;
-
-            if (x < 0.0 && y < 0.0 && z < 0.0) {
-                // red at -5,-5,-5
-                colorsX[i] = 1.0;
-                colorsY[i] = 0.0;
-                colorsZ[i] = 0.0;
-                //print("$x $y $z");
-            } else if (x > 0.0 && y > 0.0 && z > 0.0) {
-                // blue at +5,+5,+5
-                colorsX[i] = 0.0;
-                colorsY[i] = 0.0;
-                colorsZ[i] = 1.0;
-            } else {
-                colorsX[i] = 0.0;
-                colorsY[i] = 0.0;
-                colorsZ[i] = 0.0;
-            }
-        }
-
-        var cloud = new PointCloud(webpath, displayName);
-        cloud.createDimensions(map);
-
-        return cloud;
-    }
-
-
-    static PointCloud _makeOldCube(String webpath, String displayName) {
-
-        const double xmin = 200.0;
-        const double xmax = 400.0;
-        const double ymin = 200.0;
-        const double ymax = 400.0;
-        const double zmin = 200.0;
-        const double zmax = 400.0;
-
-        const double x0 = xmin;
-        const double x1 = xmin + (xmax - xmin) * 0.25;
-        const double x2 = xmin + (xmax - xmin) * 0.5;
-        const double x3 = xmin + (xmax - xmin) * 0.75;
-        const double x4 = xmin + (xmax - xmin);
-
-        const double y2 = ymin + (ymax - ymin) * 0.5;
-        const double z2 = zmin + (zmax - zmin) * 0.5;
-
-        // x = red
-        // y = green
-        // z = blue
-
-        List points = [];
-
-        points.addAll([x0, ymin, zmin]);
-        points.addAll([x0 * 1.05, ymin * 1.05, zmin]);
-        points.addAll([x0 * 1.10, ymin * 1.10, zmin]);
-        points.addAll([x0, ymin * 1.05, zmin * 1.05]);
-        points.addAll([x0, ymin * 1.10, zmin * 1.10]);
-        points.addAll([x0 * 1.05, ymin, zmin * 1.05]);
-        points.addAll([x0 * 1.10, ymin, zmin * 1.10]);
-        points.addAll([x1, ymin, zmin]);
-        points.addAll([x2, ymin, zmin]);
-        points.addAll([x3, ymin, zmin]);
-        points.addAll([x4, ymin, zmin]);
-
-        points.addAll([x0, ymax, zmin]);
-        points.addAll([x1, ymax, zmin]);
-        points.addAll([x2, ymax, zmin]);
-        points.addAll([x3, ymax, zmin]);
-        points.addAll([x4, ymax, zmin]);
-
-        points.addAll([x0, ymin, zmax]);
-        points.addAll([x1, ymin, zmax]);
-        points.addAll([x2, ymin, zmax]);
-        points.addAll([x3, ymin, zmax]);
-        points.addAll([x4, ymin, zmax]);
-
-        points.addAll([x0, ymax, zmax]);
-        points.addAll([x1, ymax, zmax]);
-        points.addAll([x2, ymax, zmax]);
-        points.addAll([x3, ymax, zmax]);
-        //points.addAll([x4, ymax, zmax]);
-
-        points.addAll([x2, y2, y2]);
-
-        final int numPoints = points.length ~/ 3;
-
-        var x = new Float32List(numPoints);
-        var y = new Float32List(numPoints);
-        var z = new Float32List(numPoints);
-
-        for (int i = 0; i < numPoints; i++) {
-            x[i] = points[i * 3];
-            y[i] = points[i * 3 + 1];
-            z[i] = points[i * 3 + 2];
-        }
-
-        Map<String, Float32List> map = new Map();
-        map["positions.x"] = x;
-        map["positions.y"] = y;
-        map["positions.z"] = z;
-
-        var cloud = new PointCloud(webpath, displayName);
-        cloud.createDimensions(map);
-
-        return cloud;
-    }
-
-
     static PointCloud _makeRandom(String webpath, String displayName) {
         Map<String, Float32List> map = new Map();
 
-        var numPoints = 150;
+        var numPoints = 3;
 
         var positionsX = new Float32List(numPoints);
         var positionsY = new Float32List(numPoints);
@@ -234,42 +77,24 @@ class PointCloudGenerator {
         map["positions.y"] = positionsY;
         map["positions.z"] = positionsZ;
 
-        var xdim = 5000;
-        var ydim = 5000;
-        var zdim = 100;
+        positionsX[0] = 94.0;
+        positionsY[0] = 983.0;
+        positionsZ[0] = 9.0;
 
-        var xmin = -1000.0;
-        var xmax = 1000.0;
-        var ymin = -1000.0;
-        var ymax = 1000.0;
-        var zmin = 0.0;
-        var zmax = 100.0;
+        positionsX[1] = 325.0;
+        positionsY[1] = 603.0;
+        positionsZ[1] = 35.0;
 
-        var random = new Random(17);
+        positionsX[2] = 38.0;
+        positionsY[2] = 615.0;
+        positionsZ[2] = 29.0;
 
-        for (int i = 0; i < numPoints; i++) {
-            double d = i.toDouble() / numPoints.toDouble();
-            double x = random.nextDouble();
-            double y = random.nextDouble();
-            double z = random.nextDouble();
-
-            //x = y = z = d;
-
-            x = xmin + (xmax - xmin) * x;
-            y = ymin + (ymax - ymin) * y;
-            z = zmin + (zmax - zmin) * z;
-
-            positionsX[i] = x;
-            positionsY[i] = y;
-            positionsZ[i] = z;
-        }
 
         var cloud = new PointCloud(webpath, displayName);
         cloud.createDimensions(map);
 
         return cloud;
     }
-
 
     static PointCloud _makeLine(String webpath, String displayName) {
         Map<String, Float32List> map = new Map();
@@ -296,7 +121,6 @@ class PointCloudGenerator {
 
         return cloud;
     }
-
 
     static PointCloud _makeTerrain(int which, String webpath, String displayName) {
         _Terrain terrain = new _Terrain(which);
