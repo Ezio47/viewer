@@ -16,7 +16,7 @@ class Renderer {
     Matrix4 nMatrix;
 
     Camera _camera;
-    CameraInteractor _interactor;
+    CameraControl _interactor;
     Picker _picker = null;
 
     double _mouseGeoX = 0.0;
@@ -57,7 +57,7 @@ class Renderer {
 
         _picker = new Picker(gl, _canvas);
 
-        _interactor = new CameraInteractor(_camera, _canvas, _picker);
+        _interactor = new CameraControl(_camera, _canvas, _picker);
 
         update();
 

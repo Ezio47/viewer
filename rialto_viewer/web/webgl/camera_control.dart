@@ -1,7 +1,11 @@
+// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
 part of rialto.viewer;
 
 
-class CameraInteractor {
+class CameraControl {
     Hub _hub;
     Camera _camera;
     Element _canvas;
@@ -18,7 +22,7 @@ class CameraInteractor {
     static const double MOTION_FACTOR = 10.0;
 
 
-    CameraInteractor(Camera this._camera, CanvasElement this._canvas, Picker this._picker) {
+    CameraControl(Camera this._camera, CanvasElement this._canvas, Picker this._picker) {
         _hub = Hub.root;
         _hub.cameraInteractor = this;
 

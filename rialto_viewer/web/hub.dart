@@ -20,35 +20,36 @@ import 'elements/render_panel.dart';
 import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
-
 part 'annotation.dart';
 part 'annotator.dart';
-part 'annotation_shape.dart';
-part 'axes_shape.dart';
-part 'box_shape.dart';
-part 'camera.dart';
-part 'camera_interactor.dart';
-part 'cloud_shape.dart';
-part 'color.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'event_registry.dart';
-part 'fragment_shader.dart';
-part 'gl_program.dart';
 part 'measurement.dart';
-part 'picker.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
 part 'proxy.dart';
 part 'renderable_point_cloud.dart';
 part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
-part 'rialto_exceptions.dart';
 part 'selector.dart';
-part 'shape.dart';
-part 'signal.dart';
-part 'utils.dart';
-part 'vertex_shader.dart';
+
+part 'utils/color.dart';
+part 'utils/rialto_exceptions.dart';
+part 'utils/signal.dart';
+part 'utils/utils.dart';
+
+part 'webgl/annotation_shape.dart';
+part 'webgl/axes_shape.dart';
+part 'webgl/box_shape.dart';
+part 'webgl/camera.dart';
+part 'webgl/camera_control.dart';
+part 'webgl/cloud_shape.dart';
+part 'webgl/fragment_shader.dart';
+part 'webgl/gl_program.dart';
+part 'webgl/picker.dart';
+part 'webgl/shape.dart';
+part 'webgl/vertex_shader.dart';
 
 class Hub {
     RenderPanel mainRenderPanel;
@@ -62,7 +63,7 @@ class Hub {
 
     EventRegistry eventRegistry;
 
-    CameraInteractor cameraInteractor;
+    CameraControl cameraInteractor;
     Annotator annotator;
     Picker picker;
     RenderingContext gl;
