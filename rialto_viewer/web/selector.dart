@@ -6,11 +6,10 @@ part of rialto.viewer;
 
 class Selector implements IMode {
     Hub _hub;
-
-    Shape _selectedShape;
-    Shape _possibleShape;
-    int _pickedId;
     bool isRunning;
+
+    Shape _possibleShape;
+    int _possibleId;
 
     Selector() {
         _hub = Hub.root;
@@ -18,21 +17,22 @@ class Selector implements IMode {
 
         _hub.modeController.register(this, ModeData.SELECTION);
 
-         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
-         _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
-         _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
+        _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
+        _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
+        _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
 
-        _selectedShape = _possibleShape = null;
+        _possibleShape = null;
+        _possibleId = -1;
     }
 
     void startMode() {
+        _possibleShape = null;
+        _possibleId = -1;
     }
 
     void endMode() {
-        if (_selectedShape != null) {
-            _selectedShape.isSelected = false;
-            _selectedShape = null;
-        }
+        _possibleShape = null;
+        _possibleId = -1;
     }
 
     void _handleMouseMove(MouseData data) {
@@ -46,9 +46,9 @@ class Selector implements IMode {
 
         List l = _hub.picker.find(p);
         if (l == null) return;
-        _possibleShape = l[0];
-        _pickedId = l[1];
 
+        _possibleShape = l[0];
+        _possibleId = l[1];
     }
 
     void _handleMouseUp(MouseData data) {
@@ -58,10 +58,32 @@ class Selector implements IMode {
             return;
         }
 
-        _selectedShape.isSelected = false;
+        if (!_possibleShape.isSelectable) {
+            _possibleShape = null;
+            _possibleId = -1;
+            return;
+        }
 
-        _selectedShape = _possibleShape;
-        _selectedShape.isSelected = true;
+        if (_possibleShape.isSelected) {
+            if (_possibleShape is CloudShape) {
+                CloudShape cs = _possibleShape;
+                cs.selectedPoints.remove(_possibleId);
+                if (cs.selectedPoints.length == 0) {
+                    _possibleShape.isSelected = false;
+                }
+            } else {
+                _possibleShape.isSelected = false;
+            }
+            _possibleShape = null;
+            _possibleId = -1;
+            return;
+        }
+
+        _possibleShape.isSelected = true;
+        if (_possibleShape is CloudShape) {
+            CloudShape cs = _possibleShape;
+            cs.selectedPoints.add(_possibleId);
+        }
         _possibleShape = null;
     }
 }
