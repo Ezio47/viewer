@@ -6,6 +6,7 @@ part of rialto.viewer;
 
 
 class BoxShape extends Shape {
+    int numVertices;
 
     Float32List _vertexArray;
     Buffer _vertexBuffer;
@@ -43,6 +44,12 @@ class BoxShape extends Shape {
         final red = new Color.red().toList();
         final blue = new Color.blue().toList();
         final green = new Color.green().toList();
+        final white = new Color.white().toList();
+
+        final o = [0.0, 0.0, 0.0];
+        final xo = [0.1, 0.0, 0.0];
+        final yo = [0.0, 0.1, 0.0];
+        final zo = [0.0, 0.0, 0.1];
 
         final a = [x, y, z];
         final b = [xx, y, z];
@@ -56,8 +63,22 @@ class BoxShape extends Shape {
         var vertices = [];
         var colors = [];
 
+        // origin axes
+        vertices.addAll(o);
+        vertices.addAll(xo);
+        vertices.addAll(o);
+        vertices.addAll(yo);
+        vertices.addAll(o);
+        vertices.addAll(zo);
+        colors.addAll(white);
+        colors.addAll(white);
+        colors.addAll(white);
+        colors.addAll(white);
+        colors.addAll(white);
+        colors.addAll(white);
+
         // bottom square
-        vertices.addAll(a); // 0
+        vertices.addAll(xo); // 0
         vertices.addAll(b); // 1
         colors.addAll(red);
         colors.addAll(red);
@@ -73,7 +94,7 @@ class BoxShape extends Shape {
         colors.addAll(red);
 
         vertices.addAll(c); // 6
-        vertices.addAll(a); // 7
+        vertices.addAll(yo); // 7
         colors.addAll(green);
         colors.addAll(green);
 
@@ -99,7 +120,7 @@ class BoxShape extends Shape {
         colors.addAll(green);
 
         // vertical lines
-        vertices.addAll(a);
+        vertices.addAll(zo);
         vertices.addAll(aa);
         colors.addAll(blue);
         colors.addAll(blue);
@@ -121,13 +142,15 @@ class BoxShape extends Shape {
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
+
+        numVertices = _vertexArray.length ~/ 3;
     }
 
     @override
     void _draw(bool offscreen) {
         if (offscreen) return;
 
-        gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
+        gl.drawArrays(LINES, 0, numVertices);
     }
 
     @override

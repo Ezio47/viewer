@@ -17,8 +17,6 @@ class CameraController implements IController {
     static const ROTATE = 0;
     static const ZOOM = 1;
     static const PAN = 2;
-    static const TOUCH_ROTATE = 3;
-    static const TOUCH_ZOOM_PAN = 4;
 
     int _state, _prevState;
     bool enabled;
@@ -26,25 +24,28 @@ class CameraController implements IController {
     num rotateSpeed, zoomSpeed, panSpeed;
     bool noRotate, noZoom, noPan, noRoll;
     bool staticMoving;
-    bool autoUpdate;
 
     num dynamicDampingFactor;
-    num minDistance, maxDistance;
-    List keys;
-    Vector3 target;
+    num _minDistance, _maxDistance;
+
+    Map<int, int> _keys = {
+        ROTATE: Key.A,
+        ZOOM: Key.S,
+        PAN: Key.D
+    };
+
+    Vector3 _target;
 
     Vector3 _eye;
 
     Vector3 _rotateStart, _rotateEnd;
     Vector2 _zoomStart, _zoomEnd;
-    double _touchZoomDistanceStart, _touchZoomDistanceEnd;
     Vector2 _panStart, _panEnd;
-    Vector3 lastPosition;
+    Vector3 _lastPosition;
 
-    CameraController(Camera this._camera, CanvasElement this._canvas) {
-        _hub = Hub.root;
-        isRunning = false;
-
+    CameraController(Camera this._camera, CanvasElement this._canvas)
+            : _hub = Hub.root,
+              isRunning = false {
         _hub.modeController.register(this, ModeData.MOVEMENT);
 
         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
@@ -70,19 +71,17 @@ class CameraController implements IController {
         noRoll = false;
 
         staticMoving = false;
-        autoUpdate = false;
+
         dynamicDampingFactor = 0.2;
 
-        minDistance = 0;
-        maxDistance = double.INFINITY;
-
-        keys = [65 /*A*/, 83 /*S*/, 68 /*D*/ ];
+        _minDistance = 0;
+        _maxDistance = double.INFINITY;
 
         // internals
 
-        target = new Vector3.zero();
+        _target = new Vector3.zero();
 
-        lastPosition = new Vector3.zero();
+        _lastPosition = new Vector3.zero();
 
         _state = NONE;
         _prevState = NONE;
@@ -94,9 +93,6 @@ class CameraController implements IController {
 
         _zoomStart = new Vector2.zero();
         _zoomEnd = new Vector2.zero();
-
-        _touchZoomDistanceStart = 0.0;
-        _touchZoomDistanceEnd = 0.0;
 
         _panStart = new Vector2.zero();
         _panEnd = new Vector2.zero();
@@ -121,9 +117,7 @@ class CameraController implements IController {
     void _handleMouseDown(MouseData event) {
         if (!isRunning) return;
 
-        if (!enabled) {
-            return;
-        }
+        if (!enabled) return;
 
         if (_state == NONE) {
             _state = event.button;
@@ -156,9 +150,7 @@ class CameraController implements IController {
     void _handleMouseMove(MouseData event) {
         if (!isRunning) return;
 
-        if (!enabled) {
-            return;
-        }
+        if (!enabled) return;
 
         if (_state == ROTATE && !noRotate) {
             _rotateEnd = getMouseProjectionOnBall(event.x, event.y);
@@ -168,7 +160,9 @@ class CameraController implements IController {
             _panEnd = getMouseOnScreen(event.x, event.y);
         }
 
-        update();
+        if (_state != NONE) {
+            update();
+        }
     }
 
     void _handleKeyDown(KeyboardData event) {
@@ -176,23 +170,75 @@ class CameraController implements IController {
 
         if (!enabled) return;
 
+        bool handled = true;
+        switch (event.keyCode) {
+            case Key.MINUS:
+                _zoomStart.x = 0.0;
+                _zoomStart.y = 0.0;
+                _zoomEnd.x = 0.0;
+                _zoomEnd.y = 0.1;
+                break;
+            case Key.PLUS:
+                _zoomStart.x = 0.0;
+                _zoomStart.y = 0.1;
+                _zoomEnd.x = 0.0;
+                _zoomEnd.y = 0.0;
+                break;
+            case Key.RIGHT:
+                _panStart.x = 0.1;
+                _panStart.y = 0.0;
+                _panEnd.x = 0.0;
+                _panEnd.y = 0.0;
+                break;
+            case Key.LEFT:
+                _panStart.x = 0.0;
+                _panStart.y = 0.0;
+                _panEnd.x = 0.1;
+                _panEnd.y = 0.0;
+                break;
+            case Key.UP:
+                _panStart.x = 0.0;
+                _panStart.y = 0.1;
+                _panEnd.x = 0.0;
+                _panEnd.y = 0.0;
+                break;
+            case Key.DOWN:
+                _panStart.x = 0.0;
+                _panStart.y = 0.0;
+                _panEnd.x = 0.0;
+                _panEnd.y = 0.1;
+                break;
+            default:
+                handled = false;
+        }
+
+        if (handled) {
+            update();
+            return;
+        }
+
         _prevState = _state;
 
         if (_state != NONE) {
             return;
-        } else if (event.keyCode == keys[ROTATE] && !noRotate) {
+        } else if (event.keyCode == _keys[ROTATE] && !noRotate) {
             _state = ROTATE;
-        } else if (event.keyCode == keys[ZOOM] && !noZoom) {
+        } else if (event.keyCode == _keys[ZOOM] && !noZoom) {
             _state = ZOOM;
-        } else if (event.keyCode == keys[PAN] && !noPan) {
+        } else if (event.keyCode == _keys[PAN] && !noPan) {
             _state = PAN;
         }
     }
 
-    void _handleKeyUp(KeyboardData ev) {
+    void _handleKeyUp(KeyboardData event) {
         if (!isRunning) return;
 
-        if (!enabled) {
+        if (!enabled) return;
+
+        if (event.keyCode == Key.MINUS) {
+            return;
+        }
+        if (event.keyCode == Key.PLUS) {
             return;
         }
 
@@ -223,12 +269,12 @@ class CameraController implements IController {
         return new Point(x, y);
     }
 
-    getMouseOnScreen(clientX, clientY) {
+    Vector2 getMouseOnScreen(int clientX, int clientY) {
         Point p = get2DCoords(clientX, clientY);
         return new Vector2(p.x / _hub.width, p.y / _hub.height);
     }
 
-    getMouseProjectionOnBall(clientX, clientY) {
+    Vector3 getMouseProjectionOnBall(int clientX, int clientY) {
 
         // [-1..+1]
         Vector2 p = getMouseOnScreen(clientX, clientY); // [0..1]
@@ -239,38 +285,29 @@ class CameraController implements IController {
         var length = mouseOnBall.length;
 
         if (noRoll) {
-
             if (length < SQRT1_2) {
-
                 mouseOnBall.z = sqrt(1.0 - length * length);
-
             } else {
-
                 mouseOnBall.z = 0.5 / length;
-
             }
 
         } else if (length > 1.0) {
-
             mouseOnBall.normalize();
 
         } else {
-
             mouseOnBall.z = sqrt(1.0 - length * length);
-
         }
 
-        _eye.setFrom(_camera.eye).sub(target);
+        _eye.setFrom(_camera.eye).sub(_target);
 
         Vector3 projection = _camera.up.clone().normalize().scale(mouseOnBall.y);
         projection.add(_camera.up.cross(_eye).normalize().scale(mouseOnBall.x));
         projection.add(_eye.normalize().scale(mouseOnBall.z));
 
         return projection;
-
     }
 
-    rotateCamera() {
+    void rotateCamera() {
 
         var angle = acos(_rotateStart.dot(_rotateEnd) / _rotateStart.length / _rotateEnd.length);
 
@@ -285,110 +322,68 @@ class CameraController implements IController {
 
             quaternion.rotate(_eye);
             quaternion.rotate(_camera.up);
-
             quaternion.rotate(_rotateEnd);
 
             if (staticMoving) {
-
                 _rotateStart.setFrom(_rotateEnd);
-
             } else {
-
                 quaternion.setAxisAngle(axis, -angle * (dynamicDampingFactor - 1.0));
                 quaternion.rotate(_rotateStart);
-
             }
-
         }
-
     }
 
-    zoomCamera() {
+    void zoomCamera() {
+        var factor = 1.0 + (_zoomEnd.y - _zoomStart.y) * zoomSpeed;
 
-        if (_state == TOUCH_ZOOM_PAN) {
-
-            var factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
-
-            _touchZoomDistanceStart = _touchZoomDistanceEnd;
-
+        if (factor != 1.0 && factor > 0.0) {
             _eye.scale(factor);
 
-        } else {
-
-            var factor = 1.0 + (_zoomEnd.y - _zoomStart.y) * zoomSpeed;
-
-            if (factor != 1.0 && factor > 0.0) {
-
-                _eye.scale(factor);
-
-                if (staticMoving) {
-
-                    _zoomStart.setFrom(_zoomEnd);
-
-                } else {
-
-                    _zoomStart.y += (_zoomEnd.y - _zoomStart.y) * this.dynamicDampingFactor;
-
-                }
-
+            if (staticMoving) {
+                _zoomStart.setFrom(_zoomEnd);
+            } else {
+                _zoomStart.y += (_zoomEnd.y - _zoomStart.y) * this.dynamicDampingFactor;
             }
-
         }
-
     }
 
-    panCamera() {
-
+    void panCamera() {
         Vector2 mouseChange = _panEnd - _panStart;
 
         if (mouseChange.length != 0.0) {
-
             mouseChange.scale(_eye.length * panSpeed);
 
             Vector3 pan = _eye.cross(_camera.up).normalize().scale(mouseChange.x);
             pan += _camera.up.clone().normalize().scale(mouseChange.y);
 
             _camera.eye.add(pan);
-            target.add(pan);
+            _target.add(pan);
 
             if (staticMoving) {
-
                 _panStart.setFrom(_panEnd);
-
             } else {
-
                 _panStart += (_panEnd - _panStart).scale(dynamicDampingFactor);
-
             }
-
         }
-
     }
 
-    checkDistances() {
+    void checkDistances() {
 
         if (!noZoom || !noPan) {
 
-            if (_camera.eye.length2 > maxDistance * maxDistance) {
-
-                _camera.eye.normalize().scale(maxDistance);
-
+            if (_camera.eye.length2 > _maxDistance * _maxDistance) {
+                _camera.eye.normalize().scale(_maxDistance);
             }
 
-            if (_eye.length2 < minDistance * minDistance) {
-
-                _camera.eye = target + _eye.normalize().scale(minDistance);
-
+            if (_eye.length2 < _minDistance * _minDistance) {
+                _camera.eye = _target + _eye.normalize().scale(_minDistance);
             }
-
         }
-
     }
 
 
-    update() {
-
-        _eye.setFrom(_camera.eye).sub(target);
+    void update() {
+        _eye.setFrom(_camera.eye).sub(_target);
 
         if (!noRotate) {
             rotateCamera();
@@ -402,16 +397,15 @@ class CameraController implements IController {
             panCamera();
         }
 
-        _camera.eye = target + _eye;
+        _camera.eye = _target + _eye;
 
         checkDistances();
 
-        _camera.target = target;
+        _camera.target = _target;
 
         // distanceToSquared
-        if ((lastPosition - _camera.eye).length2 > 0.0) {
-            lastPosition.setFrom(_camera.eye);
+        if ((_lastPosition - _camera.eye).length2 > 0.0) {
+            _lastPosition.setFrom(_camera.eye);
         }
-
     }
 }

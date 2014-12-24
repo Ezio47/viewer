@@ -1,7 +1,7 @@
 part of rialto.viewer;
 
 class GlMath {
-    static Matrix4 makePerspective(double fieldOfViewInRadians, double aspect, double near, double far) {
+    static Matrix4 makePerspectiveMatrix(double fieldOfViewInRadians, double aspect, double near, double far) {
         var f = tan(PI * 0.5 - 0.5 * fieldOfViewInRadians);
         var rangeInv = 1.0 / (near - far);
         var m = new Matrix4.zero();
@@ -13,8 +13,12 @@ class GlMath {
         return m;
     }
 
+    static Vector3 getTranslationVector(Matrix4 m) {
+        var v = m.getTranslation();
+        return v;
+    }
 
-    static Matrix4 makeTranslation(double tx, double ty, double tz) {
+    static Matrix4 makeTranslationMatrix(double tx, double ty, double tz) {
         var m = new Matrix4.identity();
         m[12] = tx;
         m[13] = ty;
@@ -22,7 +26,7 @@ class GlMath {
         return m;
     }
 
-    static Matrix4 makeScale(double sx, double sy, double sz) {
+    static Matrix4 makeScaleMatrix(double sx, double sy, double sz) {
         var m = new Matrix4.zero();
         m[0] = sx;
         m[5] = sy;
@@ -31,7 +35,7 @@ class GlMath {
         return m;
     }
 
-    static Matrix4 makeXRotation(angleInRadians) {
+    static Matrix4 makeXRotationMatrix(angleInRadians) {
         var c = cos(angleInRadians);
         var s = sin(angleInRadians);
         var m = new Matrix4.identity();
@@ -42,7 +46,7 @@ class GlMath {
         return m;
     }
 
-    static Matrix4 makeYRotation(angleInRadians) {
+    static Matrix4 makeYRotationMatrix(angleInRadians) {
         var c = cos(angleInRadians);
         var s = sin(angleInRadians);
         var m = new Matrix4.identity();
@@ -53,7 +57,7 @@ class GlMath {
         return m;
     }
 
-    static Matrix4 makeZRotation(angleInRadians) {
+    static Matrix4 makeZRotationMatrix(angleInRadians) {
         var c = cos(angleInRadians);
         var s = sin(angleInRadians);
         var m = new Matrix4.identity();
@@ -64,15 +68,15 @@ class GlMath {
         return m;
     }
 
-    static Matrix4 makeLookAt(Vector3 cameraPosition, Vector3 cameraFocusPosition, Vector3 upDirection) {
-        Matrix4 viewMatrix = new Matrix4.zero();
+    static Matrix4 makeLookAtMatrix(Vector3 cameraPosition, Vector3 cameraFocusPosition, Vector3 upDirection) {
         Vector3 z = cameraPosition - cameraFocusPosition;
         z.normalize();
         Vector3 x = upDirection.cross(z);
         x.normalize();
         Vector3 y = z.cross(x);
         y.normalize();
-        //viewMatrix.setZero();
+
+        Matrix4 viewMatrix = new Matrix4.zero();
         viewMatrix.setEntry(0, 0, x.x);
         viewMatrix.setEntry(1, 0, x.y);
         viewMatrix.setEntry(2, 0, x.z);
@@ -82,8 +86,6 @@ class GlMath {
         viewMatrix.setEntry(0, 2, z.x);
         viewMatrix.setEntry(1, 2, z.y);
         viewMatrix.setEntry(2, 2, z.z);
-//      viewMatrix.transpose();
-        //    Vector3 rotatedEye = viewMatrix * -cameraPosition;
         viewMatrix.setEntry(0, 3, cameraPosition.x);
         viewMatrix.setEntry(1, 3, cameraPosition.y);
         viewMatrix.setEntry(2, 3, cameraPosition.z);

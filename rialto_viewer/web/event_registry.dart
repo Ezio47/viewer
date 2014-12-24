@@ -87,13 +87,6 @@ class KeyboardData {
     bool shiftKey;
     int keyCode;
 
-    static const int KEY_UP = 38;
-    static const int KEY_DOWN = 40;
-    static const int KEY_RIGHT = 39;
-    static const int KEY_LEFT = 37;
-    static const int KEY_W = 87;
-    static const int KEY_N = 78;
-
     KeyboardData(KeyboardEvent ev) {
         controlKey = ev.ctrlKey;
         shiftKey = ev.shiftKey;

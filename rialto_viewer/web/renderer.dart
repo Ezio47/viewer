@@ -13,7 +13,6 @@ class Renderer {
 
     Matrix4 pMatrix;
     Matrix4 mvMatrix;
-    Matrix4 nMatrix;
 
     double _mouseGeoX = 0.0;
     double _mouseGeoY = 0.0;
@@ -29,9 +28,11 @@ class Renderer {
 
     List<Annotation> annotations = new List<Annotation>();
 
-    Renderer(CanvasElement this._canvas, this.gl, RenderablePointCloudSet rpcSet) {
-        _hub = Hub.root;
-
+    Renderer(CanvasElement this._canvas, this.gl, RenderablePointCloudSet rpcSet)
+            : mvMatrix = new Matrix4.identity(),
+              _hub = Hub.root,
+              _axesVisible = false,
+              _bboxVisible = false {
         _canvas.width = _hub.width;
         _canvas.height = _hub.height;
 
@@ -41,21 +42,10 @@ class Renderer {
         var uniforms = ['uMVMatrix', 'uPMatrix', 'uPickingColor', 'uOffscreen'];
         _glProgram = new GlProgram(gl, fragmentShader, vertexShader, attribs, uniforms);
         gl.useProgram(_glProgram._program);
-
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
-
-        mvMatrix = new Matrix4.identity();
-
-        _hub.camera.eye = new Vector3(0.0, 0.0, 200.0);
-        //  camera.setElevation(-22);
-        // camera.setAzimuth(37);
 
         update();
 
-        _axesVisible = false;
-        _bboxVisible = false;
-
-        //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
         //_hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
@@ -73,22 +63,25 @@ class Renderer {
 
         _hub.shapesList.clear();
 
-        var theMin = _renderSource.min;
-        var theLen = _renderSource.len;
+        var cloudMin = _renderSource.min;
+        var cloudLen = _renderSource.len;
 
         if (_renderSource.length == 0) {
             // a reasonable default
-            theMin = new Vector3.zero();
-            theLen = new Vector3(1.0, 1.0, 1.0);
+            cloudMin = new Vector3.zero();
+            cloudLen = new Vector3(1.0, 1.0, 1.0);
         }
 
-        _hub.camera.defaultEye = new Vector3(0.0, 0.0, 1800.0);
+        final cloudLen12 = cloudLen / 2.0;
+        final cloudLen14 = cloudLen / 4.0;
+
+        final ideal = new Vector3(-1.0, -2.0, 2.0);
+        _hub.camera.defaultEye = new Vector3(ideal.x * cloudLen.x, ideal.y * cloudLen.y, ideal.z * cloudLen.z);
         _hub.camera.defaultTarget = new Vector3(0.0, 0.0, 0.0);
         _hub.camera.eye = _hub.camera.defaultEye;
         _hub.camera.target = _hub.camera.defaultTarget;
-        _hub.camera.azimuth = 0.0;
-        _hub.camera.elevation = 0.0;
         _hub.camera.fovy = 65.0;
+        _hub.camera.up = new Vector3(0.0, 0.0, 1.0);
 
         // "rotate then translate" (spinning) vs "translate then rotate" (orbiting)
         //
@@ -101,13 +94,13 @@ class Renderer {
         // modelMatrix = t * r * s;
 
         {
-            // axes model space is (0,0,0)..(0.25 * theLen)
+            // axes model space is (0 .. 0.25 * cloudLen)
             _axesShape = new AxesShape(gl);
-            Matrix4 s = GlMath.makeScale(theLen.x / 4.0, theLen.y / 4.0, theLen.z / 4.0);
-            Matrix4 t = GlMath.makeTranslation(0.0, 0.0, 0.0);
-            Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
-            Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
-            Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+            Matrix4 s = GlMath.makeScaleMatrix(cloudLen14.x, cloudLen14.y, cloudLen14.z);
+            Matrix4 t = GlMath.makeTranslationMatrix(0.0, 0.0, 0.0);
+            Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
+            Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
+            Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
             var m = s * rz;
             m = m * ry;
             m = m * rx;
@@ -117,14 +110,13 @@ class Renderer {
         }
 
         {
-            // bbox model space is (-len/2)..(+len/2)
+            // bbox model space is (-cloudlen/2..+cloudlen/2)
             _bboxShape = new BoxShape(gl);
-            Matrix4 s = GlMath.makeScale(theLen.x, theLen.y, theLen.z);
-            var p = theLen / 2.0;
-            Matrix4 t = GlMath.makeTranslation(-p.x / theLen.x, -p.y / theLen.y, -p.z / theLen.z);
-            Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
-            Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
-            Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+            Matrix4 s = GlMath.makeScaleMatrix(cloudLen.x, cloudLen.y, cloudLen.z);
+            Matrix4 t = GlMath.makeTranslationMatrix(-0.5, -0.5, -0.5);
+            Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
+            Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
+            Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
             var m = s * rz;
             m = m * ry;
             m = m * rx;
@@ -137,12 +129,12 @@ class Renderer {
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.isVisible = rpc.visible;
-                Matrix4 s = GlMath.makeScale(1.0, 1.0, 1.0);
-                var p = theLen / 2.0;
-                Matrix4 t = GlMath.makeTranslation(-theMin.x - p.x, -theMin.y - p.x, -theMin.z - p.z);
-                Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
-                Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
-                Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+                Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
+                final d = -cloudMin - cloudLen12;
+                Matrix4 t = GlMath.makeTranslationMatrix(d.x, d.y, d.z);
+                Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
+                Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
+                Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
                 var m = s * rz;
                 m = m * ry;
                 m = m * rx;
@@ -154,11 +146,11 @@ class Renderer {
 
         for (var annotation in annotations) {
             AnnotationShape shape = annotation.shape;
-            Matrix4 s = GlMath.makeScale(1.0, 1.0, 1.0);
-            Matrix4 t = GlMath.makeTranslation(-theLen.x, -theLen.y, -theLen.z);
-            Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
-            Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
-            Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+            Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
+            Matrix4 t = GlMath.makeTranslationMatrix(-cloudLen.x, -cloudLen.y, -cloudLen.z);
+            Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
+            Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
+            Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
             var m = s * rz;
             m = m * ry;
             m = m * rx;
@@ -190,7 +182,7 @@ class Renderer {
         gl.enable(DEPTH_TEST);
         gl.disable(BLEND);
 
-        pMatrix = GlMath.makePerspective(degToRad(60.0), aspect, 1.0, 2000.0);
+        pMatrix = GlMath.makePerspectiveMatrix(degToRad(60.0), aspect, 1.0, 2000.0);
         var viewMatrix = _hub.camera.getViewMatrix();
 
         for (var shape in _hub.shapesList) {

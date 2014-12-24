@@ -78,7 +78,7 @@ class PointCloudGenerator {
         map["positions.z"] = positionsZ;;
 
         var xmin = 100.0;
-        var xmax = 300.0;
+        var xmax = 700.0;
         var ymin = 100.0;
         var ymax = 300.0;
         var zmin = 0.0;

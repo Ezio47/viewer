@@ -13,13 +13,28 @@ num clamp(num v, num low, num high) => (v < low) ? low : ((v > high) ? high : v)
 num clamp360(num degrees) => (degrees > 360 || degrees < -360) ? degrees % 360 : degrees;
 
 
+class Key {
+    static const int UP = 38;
+    static const int DOWN = 40;
+    static const int RIGHT = 39;
+    static const int LEFT = 37;
+    static const int A = 65;
+    static const int D = 68;
+    static const int N = 78;
+    static const int S = 83;
+    static const int W = 87;
+    static const int PLUS = 187;
+    static const int MINUS = 189;
+}
+
+
 class Utils {
-    static String printv(Vector3 v, [int prec=1]) {
+    static String printv(Vector3 v, [int prec = 1]) {
         var s = Utils.printv3(v.x, v.y, v.z, prec);
         return s;
     }
 
-    static String printv3(double x, double y, double z, [int prec=1]) {
+    static String printv3(double x, double y, double z, [int prec = 1]) {
         var s = "${x.toStringAsFixed(prec)},${y.toStringAsFixed(prec)},${z.toStringAsFixed(prec)}";
         return s;
     }
@@ -106,7 +121,7 @@ class Utils {
         return d;
     }
 
-    static String toSI(num vv, {sigfigs:0}) {
+    static String toSI(num vv, {sigfigs: 0}) {
         double v = vv.toDouble();
         const double K = 1000.0;
         const double M = K * K;
@@ -143,46 +158,46 @@ class Utils {
 
     static Vector3 getCameraPointTarget(RenderablePointCloudSet set) {
 
-         double minx = 0.0;
-         double miny = 0.0;
-         double minz = 0.0;
-         double lenx = 100.0;
-         double leny = 100.0;
+        double minx = 0.0;
+        double miny = 0.0;
+        double minz = 0.0;
+        double lenx = 100.0;
+        double leny = 100.0;
 
-         if (set.length > 0) {
-             minx = set.min.x;
-             miny = set.min.y;
-             minz = set.min.z;
-             lenx = set.len.x;
-             leny = set.len.y;
-         }
+        if (set.length > 0) {
+            minx = set.min.x;
+            miny = set.min.y;
+            minz = set.min.z;
+            lenx = set.len.x;
+            leny = set.len.y;
+        }
 
-         final double x = minx + lenx / 2.0;
-         final double y = miny + leny / 2.0;
-         final double z = minz;
+        final double x = minx + lenx / 2.0;
+        final double y = miny + leny / 2.0;
+        final double z = minz;
 
-         return new Vector3(x, y, z);
-     }
+        return new Vector3(x, y, z);
+    }
 
-     static Vector3 getCameraPointEye(RenderablePointCloudSet set) {
+    static Vector3 getCameraPointEye(RenderablePointCloudSet set) {
 
-         double lenx = 100.0;
-         double leny = 100.0;
-         double maxz = 25.0;
+        double lenx = 100.0;
+        double leny = 100.0;
+        double maxz = 25.0;
 
-         if (set.length > 0) {
-             lenx = set.len.x;
-             leny = set.len.y;
-             maxz = set.max.z;
+        if (set.length > 0) {
+            lenx = set.len.x;
+            leny = set.len.y;
+            maxz = set.max.z;
 
-         }
+        }
 
-         var v = getCameraPointTarget(set);
+        var v = getCameraPointTarget(set);
 
-         v.x = v.x - 0.5 * lenx;
-         v.y = v.y - 1.25 * leny;
-         v.z = maxz * 5.0;
+        v.x = v.x - 0.5 * lenx;
+        v.y = v.y - 1.25 * leny;
+        v.z = maxz * 5.0;
 
-         return v;
-     }
+        return v;
+    }
 }
