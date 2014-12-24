@@ -47,6 +47,7 @@ part 'webgl/camera_control.dart';
 part 'webgl/cloud_shape.dart';
 part 'webgl/fragment_shader.dart';
 part 'webgl/gl_program.dart';
+part 'webgl/gl_math.dart';
 part 'webgl/picker.dart';
 part 'webgl/shape.dart';
 part 'webgl/vertex_shader.dart';

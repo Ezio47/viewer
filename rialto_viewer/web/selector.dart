@@ -69,7 +69,7 @@ class Selector {
     void _handleMouseDown(MouseData data) {
         assert(running);
 
-        Point p = _hub.cameraInteractor.get2DCoords(data);
+        Point p = _hub.cameraInteractor.get2DCoords(data.x, data.y);
 
         List l = _hub.picker.find(p);
         if (l == null) return;

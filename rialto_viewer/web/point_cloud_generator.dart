@@ -68,27 +68,40 @@ class PointCloudGenerator {
     static PointCloud _makeRandom(String webpath, String displayName) {
         Map<String, Float32List> map = new Map();
 
-        var numPoints = 3;
+        var numPoints = 1500;
 
         var positionsX = new Float32List(numPoints);
         var positionsY = new Float32List(numPoints);
         var positionsZ = new Float32List(numPoints);
         map["positions.x"] = positionsX;
         map["positions.y"] = positionsY;
-        map["positions.z"] = positionsZ;
+        map["positions.z"] = positionsZ;;
 
-        positionsX[0] = 94.0;
-        positionsY[0] = 983.0;
-        positionsZ[0] = 9.0;
+        var xmin = 100.0;
+        var xmax = 300.0;
+        var ymin = 100.0;
+        var ymax = 300.0;
+        var zmin = 0.0;
+        var zmax = 100.0;
 
-        positionsX[1] = 325.0;
-        positionsY[1] = 603.0;
-        positionsZ[1] = 35.0;
+        var random = new Random(17);
 
-        positionsX[2] = 38.0;
-        positionsY[2] = 615.0;
-        positionsZ[2] = 29.0;
+        for (int i = 0; i < numPoints; i++) {
+            double d = i.toDouble() / numPoints.toDouble();
+            double x = random.nextDouble();
+            double y = random.nextDouble();
+            double z = random.nextDouble();
 
+            //x = y = z = d;
+
+            x = xmin + (xmax - xmin) * x;
+            y = ymin + (ymax - ymin) * y;
+            z = zmin + (zmax - zmin) * z;
+
+            positionsX[i] = x;
+            positionsY[i] = y;
+            positionsZ[i] = z;
+        }
 
         var cloud = new PointCloud(webpath, displayName);
         cloud.createDimensions(map);

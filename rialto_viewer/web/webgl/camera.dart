@@ -18,9 +18,6 @@ part of rialto.viewer;
 
 
 class Camera {
-    static const ORBITING = 0;
-    static const TRACKING = 1;
-
     final Vector3 _zero = new Vector3.zero();
     final Vector3 _xAxis = new Vector3(1.0, 0.0, 0.0);
     final Vector3 _yAxis = new Vector3(0.0, 1.0, 0.0);
@@ -28,20 +25,29 @@ class Camera {
 
     Matrix4 _viewMatrix = new Matrix4.zero();
     Matrix4 _perspective = new Matrix4.zero();
-    Vector3 _up = new Vector3.zero();
-    Vector3 _right = new Vector3.zero();
-    Vector3 _normal = new Vector3.zero();
+    Vector3 up = new Vector3(0.0, 1.0, 0.0);
     Vector3 _eye = new Vector3.zero();
     Vector3 _defaultEye = new Vector3.zero();
     Vector3 _target = new Vector3.zero();
     Vector3 _defaultTarget = new Vector3.zero();
     double _azimuth = 0.0;
     double _elevation = 0.0;
-    int _cameraType = ORBITING;
     double _fovy = 65.0;
-    double _zoom = 0.0;
 
-    Camera(int cameraType) : _cameraType = cameraType;
+    Camera();
+
+    // https://github.com/greggman/webgl-fundamentals/
+    // http://mikeheavers.com/main/code-item/webgl_circular_camera_rotation_around_a_single_axis_in_threejs
+
+    Matrix4 getViewMatrix() {
+
+        var m = new Matrix4.translationValues(_eye.x, _eye.y, _eye.z);
+        Vector3 myeye = m.getTranslation();
+        var cameraMatrix = GlMath.makeLookAt(myeye, _target, up);
+        var viewMatrix = cameraMatrix.clone();
+        viewMatrix.invert();
+        return viewMatrix;
+    }
 
     Matrix4 getPerspectiveMatrix(double aspect) {
         return makePerspectiveMatrix(degToRad(fovy), aspect, 0.001, 10000.0);
@@ -50,11 +56,9 @@ class Camera {
     void goHome() {
         eye = defaultEye;
         target = defaultTarget;
-        _right = _xAxis;
-        _up = _yAxis;
-        _normal = _zAxis;
         _azimuth = 0.0;
         _elevation = 0.0;
+        _fovy = 65.0;
     }
 
     Vector3 get eye => _eye;
@@ -75,39 +79,6 @@ class Camera {
     Vector3 get defaultTarget => _defaultTarget;
     void set defaultTarget(Vector3 v) {
         v.copyInto(_defaultTarget);
-    }
-
-    double get zoom => _zoom;
-    void set zoom(double amt) {
-        _zoom = amt;
-        _dolly();
-    }
-
-    void _dolly() {
-        var p = new Vector3.copy(eye);
-
-        var n = new Vector3.zero();
-        _normal.normalizeInto(n);
-
-        var newPosition = new Vector3.zero();
-
-        switch (_cameraType) {
-            case TRACKING:
-                newPosition.x = p.x - _zoom * n.x;
-                newPosition.y = p.y - _zoom * n.y;
-                newPosition.z = p.z - _zoom * n.z;
-                break;
-            case ORBITING:
-                newPosition.x = p.x;
-                newPosition.y = p.y;
-                newPosition.z = p.z - _zoom;
-                break;
-            default:
-                assert(false); // BUG
-        }
-
-        eye = newPosition;
-        //update();
     }
 
     double get fovy => _fovy;
@@ -131,51 +102,20 @@ class Camera {
         //update();
     }
 
-    void _calculateOrientation() {
-        _right = _viewMatrix * _xAxis;
-        _up = _viewMatrix * _yAxis;
-        _normal = _viewMatrix * _zAxis;
-    }
-
-    void update() {
+   /* void update() {
         _viewMatrix.setIdentity();
 
         _calculateOrientation();
-
-        switch (_cameraType) {
-            case TRACKING:
-                _viewMatrix.translate(eye);
-                _viewMatrix.rotateY(degToRad(azimuth));
-                _viewMatrix.rotateX(degToRad(elevation));
-                break;
-            case ORBITING:
-                _viewMatrix.rotateY(degToRad(azimuth));
-                _viewMatrix.rotateX(degToRad(elevation));
-                _viewMatrix.translate(eye);
-                //var trxLook = new Matrix4.zero();
-                //mat4.lookAt(position, focus, up, trxLook);
-                //mat4.inverse(trxLook);
-                //mat4.multiply(matrix,trxLook);
-                break;
-            default:
-                assert(false);
-        }
+        _viewMatrix.rotateY(degToRad(azimuth));
+        _viewMatrix.rotateX(degToRad(elevation));
+        _viewMatrix.translate(eye);
 
         _calculateOrientation();
 
-        if (_cameraType == TRACKING) {
-            eye = _viewMatrix * _zero;
-        }
 
         var cameraPosition = new Vector3(_viewMatrix[12], _viewMatrix[13], _viewMatrix[14]);
         var cameraMatrix = makeViewMatrix(cameraPosition, target, _yAxis);
         cameraMatrix.copyInto(_viewMatrix);
         //_viewMatrix.invert();
-    }
-
-    Matrix4 getViewMatrix() {
-        var m = new Matrix4.copy(_viewMatrix);
-        //m.invert();
-        return m;
-    }
+    }*/
 }

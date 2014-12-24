@@ -50,14 +50,14 @@ class Renderer {
 
         mvMatrix = new Matrix4.identity();
 
-        _camera = new Camera(Camera.ORBITING);
-        _camera.eye = new Vector3(0.0, 0.0, 50.0);
+        _camera = new Camera();
+        _camera.eye = new Vector3(0.0, 0.0, 200.0);
         //  camera.setElevation(-22);
         // camera.setAzimuth(37);
 
         _picker = new Picker(gl, _canvas);
 
-        _interactor = new CameraControl(_camera, _canvas, _picker);
+        _interactor = new CameraControl(_camera, _canvas);
 
         update();
 
@@ -91,24 +91,54 @@ class Renderer {
             theLen = new Vector3(1.0, 1.0, 1.0);
         }
 
-        _camera.eye = new Vector3(0.0, 0.0, 3000.0);
-        _camera.defaultEye = new Vector3(0.0, 0.0, 3000.0);
-        _camera.target = new Vector3(0.0, 0.0, 0.0);
+        _camera.defaultEye = new Vector3(0.0, 0.0, 1800.0);
         _camera.defaultTarget = new Vector3(0.0, 0.0, 0.0);
+        _camera.eye = _camera.defaultEye;
+        _camera.target = _camera.defaultTarget;
+        _camera.azimuth = 0.0;
+        _camera.elevation = 0.0;
+        _camera.fovy = 65.0;
+
+        // "rotate then translate" (spinning) vs "translate then rotate" (orbiting)
+        //
+        // s = new Matrix4.diagonal3Values(1.0, 2.0, 1.0);
+        // t = new Matrix4.translationValues(0.0, 3.0, 0.0);
+        // rx = new Matrix4.rotationX(degToRad(0.0));
+        // ry = new Matrix4.rotationY(degToRad(0.0));
+        // rz = new Matrix4.rotationZ(degToRad(20.0));
+        // r = (rx * ry * rz);
+        // modelMatrix = t * r * s;
 
         {
             // axes model space is (0,0,0)..(0.25 * theLen)
             _axesShape = new AxesShape(gl);
-            _axesShape.modelMatrix.scale(theLen * 0.25);
+            Matrix4 s = GlMath.makeScale(theLen.x / 4.0, theLen.y / 4.0, theLen.z / 4.0);
+            Matrix4 t = GlMath.makeTranslation(0.0, 0.0, 0.0);
+            Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
+            Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
+            Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+            var m = s * rz;
+            m = m * ry;
+            m = m * rx;
+            m = m * t;
+            _axesShape.modelMatrix = m;
             _hub.shapesList.add(_axesShape);
         }
 
-
         {
-            // bbox model space is (0,0,0)..(theLen)
+            // bbox model space is (-len/2)..(+len/2)
             _bboxShape = new BoxShape(gl);
-            _bboxShape.modelMatrix.translate(-theLen / 2.0);
-            _bboxShape.modelMatrix.scale(theLen);
+            Matrix4 s = GlMath.makeScale(theLen.x, theLen.y, theLen.z);
+            var p = theLen / 2.0;
+            Matrix4 t = GlMath.makeTranslation(-p.x / theLen.x, -p.y / theLen.y, -p.z / theLen.z);
+            Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
+            Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
+            Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+            var m = s * rz;
+            m = m * ry;
+            m = m * rx;
+            m = m * t;
+            _bboxShape.modelMatrix = m;
             _hub.shapesList.add(_bboxShape);
         }
 
@@ -116,14 +146,33 @@ class Renderer {
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.visible = rpc.visible;
-                obj.modelMatrix.translate(-theMin - theLen / 2.0);
+                Matrix4 s = GlMath.makeScale(1.0, 1.0, 1.0);
+                var p = theLen / 2.0;
+                Matrix4 t = GlMath.makeTranslation(-theMin.x - p.x, -theMin.y - p.x, -theMin.z - p.z);
+                Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
+                Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
+                Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+                var m = s * rz;
+                m = m * ry;
+                m = m * rx;
+                m = m * t;
+                obj.modelMatrix = m;
                 _hub.shapesList.add(obj);
             }
         }
 
         for (var annotation in annotations) {
             AnnotationShape shape = annotation.shape;
-            shape.modelMatrix.translate(-theMin - theLen / 2.0);
+            Matrix4 s = GlMath.makeScale(1.0, 1.0, 1.0);
+            Matrix4 t = GlMath.makeTranslation(-theLen.x, -theLen.y, -theLen.z);
+            Matrix4 rx = GlMath.makeXRotation(degToRad(0.0));
+            Matrix4 ry = GlMath.makeYRotation(degToRad(0.0));
+            Matrix4 rz = GlMath.makeZRotation(degToRad(0.0));
+            var m = s * rz;
+            m = m * ry;
+            m = m * rx;
+            m = m * t;
+            shape.modelMatrix = m;
             _hub.shapesList.add(shape);
         }
 
@@ -146,19 +195,18 @@ class Renderer {
     }
 
     void _drawScene(num viewWidth, num viewHeight, num aspect) {
-        _camera.update();
 
         gl.viewport(0, 0, viewWidth, viewHeight);
         gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
         gl.enable(DEPTH_TEST);
         gl.disable(BLEND);
 
-        pMatrix = _camera.getPerspectiveMatrix(aspect);
+        pMatrix = GlMath.makePerspective(degToRad(60.0), aspect, 1.0, 2000.0);
+        var viewMatrix = _camera.getViewMatrix();
 
-        var vMatrix = _camera.getViewMatrix();
         for (var shape in _hub.shapesList) {
-            var mMatrix = shape.modelMatrix;
-            mvMatrix = vMatrix * mMatrix;
+            var modelMatrix = shape.modelMatrix;
+            mvMatrix = viewMatrix * modelMatrix;
             shape.draw(
                     _glProgram._attributes['aVertexPosition'],
                     _glProgram._attributes['aVertexColor'],

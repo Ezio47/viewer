@@ -66,7 +66,7 @@ class Annotator {
 
         if (point1 == null) {
 
-            Point p = _hub.cameraInteractor.get2DCoords(data);
+            Point p = _hub.cameraInteractor.get2DCoords(data.x, data.y);
 
             List l = _hub.picker.find(p);
             if (l == null) return;
@@ -77,7 +77,7 @@ class Annotator {
             point1 = shape.getPoint(pickedId);
 
         } else if (point2 == null) {
-            Point p = _hub.cameraInteractor.get2DCoords(data);
+            Point p = _hub.cameraInteractor.get2DCoords(data.x, data.y);
 
             List l = _hub.picker.find(p);
             if (l == null) return;
