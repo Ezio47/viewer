@@ -10,7 +10,7 @@ class Picker {
     RenderingContext gl;
     CanvasElement _canvas;
     var _texture;
-    var _frameBNuffer;
+    var _frameBuffer;
     var _renderBuffer;
 
     Picker(RenderingContext this.gl, CanvasElement this._canvas) {
@@ -47,8 +47,8 @@ class Picker {
         gl.renderbufferStorage(RENDERBUFFER, DEPTH_COMPONENT16, width, height);
 
         //3. Init Frame Buffer
-        _frameBNuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(FRAMEBUFFER, _frameBNuffer);
+        _frameBuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(FRAMEBUFFER, _frameBuffer);
         gl.framebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0, TEXTURE_2D, _texture, 0);
         gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, _renderBuffer);
 
@@ -68,7 +68,7 @@ class Picker {
 
         //read a block of (xsize x ysize) pixels
         var readout = new Uint8List(1 * 1 * 4 * (xsize * ysize));
-        gl.bindFramebuffer(FRAMEBUFFER, _frameBNuffer);
+        gl.bindFramebuffer(FRAMEBUFFER, _frameBuffer);
 
         int xmin = coords.x - xsize ~/ 2;
         if (xmin < 0) {

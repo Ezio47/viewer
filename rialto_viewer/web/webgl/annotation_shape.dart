@@ -65,7 +65,7 @@ class AnnotationShape extends Shape {
         double y4 = _point1.y;
         double z4 = _point2.z;
 
-        final yellow = new Color.yellow().toList();
+        final white = new Color.yellow().toList();
 
         final v1 = [x1, y1, z1];
         final v2 = [x2, y2, z2];
@@ -78,48 +78,71 @@ class AnnotationShape extends Shape {
         // bottom square
         vertices.addAll(v1);
         vertices.addAll(v2);
-        colors.addAll(yellow);
-        colors.addAll(yellow);
+        colors.addAll(white);
+        colors.addAll(white);
 
         vertices.addAll(v2);
         vertices.addAll(v3);
-        colors.addAll(yellow);
-        colors.addAll(yellow);
+        colors.addAll(white);
+        colors.addAll(white);
 
         vertices.addAll(v3);
         vertices.addAll(v4);
-        colors.addAll(yellow);
-        colors.addAll(yellow);
+        colors.addAll(white);
+        colors.addAll(white);
 
         vertices.addAll(v4);
         vertices.addAll(v1);
-        colors.addAll(yellow);
-        colors.addAll(yellow);
+        colors.addAll(white);
+        colors.addAll(white);
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
     }
 
     @override
-    void _draw() {
+    void _preDraw(bool offscreen) {
+        if (isSelected) {
+            for (int i = 0; i < 16; i += 4) {
+                _colorArray[i] = 1.0;
+                _colorArray[i + 1] = 1.0;
+                _colorArray[i + 2] = 0.0;
+                _colorArray[i + 3] = 1.0;
+            }
+        }
+    }
+
+    @override
+    void _postDraw(bool offscreen) {
+        if (isSelected) {
+            for (int i = 0; i < 16; i += 4) {
+                _colorArray[i] = 1.0;
+                _colorArray[i + 1] = 1.0;
+                _colorArray[i + 2] = 1.0;
+                _colorArray[i + 3] = 1.0;
+            }
+        }
+    }
+
+    @override
+    void _draw(bool offscreen) {
         gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
     }
 
     @override
-    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen) {
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
         gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
 
-        if (Hub.root.offscreenMode == 1) {
+        if (offscreen) {
             gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
         } else {
-
-                gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
-                gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+            gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
 
         }
 
-        if (setUniforms != null) setUniforms(this);
+        setUniforms(this, offscreen);
     }
 }

@@ -13,13 +13,8 @@ class BoxShape extends Shape {
     Float32List _colorArray;
     Buffer _colorBuffer;
 
-    Buffer _idBuffer;
-    Float32List _idArray;
-
     BoxShape(RenderingContext gl) : super(gl) {
         _initArrays();
-
-        _idArray = Shape._createIdArray(id, _colorArray.length);
 
         _initBuffers();
     }
@@ -27,7 +22,6 @@ class BoxShape extends Shape {
     void _initBuffers() {
         assert(_vertexArray != null);
         assert(_colorArray != null);
-        assert(_idArray != null);
 
         _vertexBuffer = gl.createBuffer();
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
@@ -36,10 +30,6 @@ class BoxShape extends Shape {
         _colorBuffer = gl.createBuffer();
         gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
         gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
-
-        _idBuffer = gl.createBuffer();
-        gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
-        gl.bufferDataTyped(ARRAY_BUFFER, _idArray, STATIC_DRAW);
     }
 
     void _initArrays() {
@@ -134,26 +124,22 @@ class BoxShape extends Shape {
     }
 
     @override
-    void _draw() {
+    void _draw(bool offscreen) {
+        if (offscreen) return;
+
         gl.drawArrays(LINES, 0, _vertexArray.length ~/ 3);
     }
 
-
-
-
     @override
-    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen) {
+        if (offscreen) return;
+
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
-        gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
+        gl.vertexAttribPointer(vertexAttrib, 3, FLOAT, false, 0, 0);
 
-        if (Hub.root.offscreenMode == 1) {
-            gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
-            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
-        } else {
-                gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
-                gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
-        }
+        gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+        gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0, 0);
 
-        if (setUniforms != null) setUniforms(this);
+        setUniforms(this, offscreen);
     }
 }

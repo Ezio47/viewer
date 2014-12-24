@@ -73,11 +73,11 @@ class CloudShape extends Shape {
     }
 
     @override
-    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen) {
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
         gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
 
-        if (Hub.root.offscreenMode == 1) {
+        if (offscreen) {
             gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
         } else {
@@ -85,11 +85,11 @@ class CloudShape extends Shape {
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
         }
 
-        if (setUniforms != null) setUniforms(this);
+        setUniforms(this, offscreen);
     }
 
     @override
-    void _draw() {
+    void _draw(bool offscreen) {
         gl.drawArrays(POINTS, 0/*first elem*/, numPoints/*total num vertices*/);
     }
 

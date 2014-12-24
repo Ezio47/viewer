@@ -4,7 +4,7 @@
 
 part of rialto.viewer;
 
-typedef void SetUniformsFunc(Renderable);
+typedef void SetUniformsFunc(Shape shape, bool offscreen);
 typedef void PickFunc(int pickedId);
 
 abstract class Shape {
@@ -32,19 +32,26 @@ abstract class Shape {
 
     static int getNewId() => _ids++;
 
-    void draw(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
+    void draw(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen) {
          if (!isVisible) return;
-         _setBindings(vertexAttrib, colorAttrib, setUniforms);
-         _draw();
+         _preDraw(offscreen);
+         _setBindings(vertexAttrib, colorAttrib, setUniforms, offscreen);
+         _draw(offscreen);
+         _postDraw(offscreen);
      }
+
+    void _preDraw(bool offscreen) {}
+
+    void _postDraw(bool offscreen) {}
 
     void pick(int pickedId) {
         assert(id == pickedId);
         print("PICK: $id is ${runtimeType.toString()}");
     }
 
-    void _draw();
-    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms);
+    void _draw(bool offscreen);
+
+    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen);
 
     // more renderable objects will use this: it sets the entire object to a single ID
     static Float32List _createIdArray(int id, int length) {
@@ -58,6 +65,4 @@ abstract class Shape {
         }
         return array;
     }
-
-
 }

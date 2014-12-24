@@ -91,8 +91,6 @@ class Hub {
     // singleton
     static Hub _root;
 
-    int offscreenMode = 0;
-
 
     Hub() {
         _root = this;

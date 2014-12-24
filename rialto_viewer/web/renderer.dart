@@ -174,18 +174,16 @@ class Renderer {
 
         //off-screen rendering
         if (_hub.isPickingEnabled) {
-            Hub.root.offscreenMode = 1;
-            gl.bindFramebuffer(FRAMEBUFFER, _hub.picker._frameBNuffer);
-            _drawScene(viewWidth, viewHeight, aspect);
+            gl.bindFramebuffer(FRAMEBUFFER, _hub.picker._frameBuffer);
+            _drawScene(viewWidth, viewHeight, aspect, offscreen: true);
         }
 
         //on-screen rendering
-        Hub.root.offscreenMode = 0;
         gl.bindFramebuffer(FRAMEBUFFER, null);
-        _drawScene(viewWidth, viewHeight, aspect);
+        _drawScene(viewWidth, viewHeight, aspect, offscreen: false);
     }
 
-    void _drawScene(num viewWidth, num viewHeight, num aspect) {
+    void _drawScene(num viewWidth, num viewHeight, num aspect, {bool offscreen}) {
 
         gl.viewport(0, 0, viewWidth, viewHeight);
         gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
@@ -201,14 +199,15 @@ class Renderer {
             shape.draw(
                     _glProgram._attributes['aVertexPosition'],
                     _glProgram._attributes['aVertexColor'],
-                    _setMatrixUniforms);
+                    _setMatrixUniforms,
+                    offscreen);
         }
     }
 
-    void _setMatrixUniforms(Shape r) {
+    void _setMatrixUniforms(Shape shape, bool offscreen) {
         gl.uniformMatrix4fv(_glProgram._uniforms['uPMatrix'], false, pMatrix.storage);
         gl.uniformMatrix4fv(_glProgram._uniforms['uMVMatrix'], false, mvMatrix.storage);
-        gl.uniform1i(_glProgram._uniforms['uOffscreen'], Hub.root.offscreenMode);
+        gl.uniform1i(_glProgram._uniforms['uOffscreen'], offscreen ? 1 : 0);
     }
 
     void tick(time) {
