@@ -65,12 +65,12 @@ class Hub {
 
     EventRegistry eventRegistry;
 
-    AnnotationController annotator;
+    AnnotationController annotationController;
     Picker picker;
     RenderingContext gl;
-    MeasurementController measurer;
+    MeasurementController measurementController;
     ModeController modeController;
-    SelectionController selector;
+    SelectionController selectionController;
     Camera camera;
     CameraController cameraController;
 
@@ -127,9 +127,9 @@ class Hub {
         camera = new Camera();
         picker = new Picker(gl, canvas);
         cameraController = new CameraController(camera, canvas);
-        annotator = new AnnotationController();
-        measurer = new MeasurementController();
-        selector = new SelectionController();
+        annotationController = new AnnotationController();
+        measurementController = new MeasurementController();
+        selectionController = new SelectionController();
 
         renderablePointCloudSet = new RenderablePointCloudSet(gl);
 

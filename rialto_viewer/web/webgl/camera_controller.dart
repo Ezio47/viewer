@@ -43,7 +43,6 @@ class CameraController implements IController {
 
     CameraController(Camera this._camera, CanvasElement this._canvas) {
         _hub = Hub.root;
-        _hub.cameraController = this;
         isRunning = false;
 
         _hub.modeController.register(this, ModeData.MOVEMENT);

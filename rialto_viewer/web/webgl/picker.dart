@@ -15,12 +15,12 @@ class Picker {
 
     Picker(RenderingContext this.gl, CanvasElement this._canvas) {
         _hub = Hub.root;
-        _hub.picker = this;
-
         _configure();
     }
 
     void update() {
+        assert(false); // BUG: need to handle resize event
+
         var width = _canvas.width;
         var height = _canvas.height;
 

@@ -12,14 +12,11 @@ part of rialto.viewer;
 //
 
 class EventRegistry {
-    Hub _hub;
 
     // BUG: note you can't unsubscribe a handler that is an anonymous lambda
     // which might be the case of 0-arity handler functions
 
-    EventRegistry() {
-        _hub = Hub.root;
-    }
+    EventRegistry();
 
     SignalFunctions<MouseData> MouseMove = new SignalFunctions<MouseData>();
     SignalFunctions<MouseData> MouseDown = new SignalFunctions<MouseData>();
