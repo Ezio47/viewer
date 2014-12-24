@@ -93,31 +93,37 @@ class CloudShape extends Shape {
         gl.drawArrays(POINTS, 0/*first elem*/, numPoints/*total num vertices*/);
     }
 
-    Vector3 getPoint(int pickedId) {
-        assert(pickedId > id);
+    int shapeIdToVertexNum(int shapeId) {
+        assert(shapeId > id);
+        var vertexNum = shapeId - (id + 1);
+        assert(vertexNum >= 0 && vertexNum < numPoints);
+        return vertexNum;
+    }
 
-        final int objId = id;
-        final int pointId = pickedId;
-        final int pointNum = pointId - (objId + 1);
-        assert(pointNum >= 0 && pointNum < numPoints);
+    int vertexNumToShapeId(int vertexNum) {
+        assert(vertexNum >= 0 && vertexNum < numPoints);
+        var shapeId = (id + 1) + vertexNum;
+        assert(shapeId > id);
+        return shapeId;
+    }
 
-        final double x = _vertexArray[pointNum * 3];
-        final double y = _vertexArray[pointNum * 3 + 1];
-        final double z = _vertexArray[pointNum * 3 + 2];
+    Vector3 getPoint(int shapeId) {
+        final int vertexNum = shapeIdToVertexNum(shapeId);
+
+        final double x = _vertexArray[vertexNum * 3];
+        final double y = _vertexArray[vertexNum * 3 + 1];
+        final double z = _vertexArray[vertexNum * 3 + 2];
         return new Vector3(x, y, z);
     }
 
     @override
-    void pick(int pickedId) {
-        print("PICK: $pickedId is ${runtimeType.toString()}");
-        final int objId = id;
-        final int pointId = pickedId;
-        final int pointNum = pointId - (objId + 1);
-        assert(pointNum >= 0 && pointNum < numPoints);
+    void pick(int shapeId) {
+        print("PICK: $shapeId is ${runtimeType.toString()}");
+        final int vertexNum = shapeIdToVertexNum(shapeId);
 
-        final double x = _vertexArray[pointNum * 3];
-        final double y = _vertexArray[pointNum * 3 + 1];
-        final double z = _vertexArray[pointNum * 3 + 2];
-        print("read point ($id) $pickedId == $pointNum @ ${Utils.printv3(x,y,z,0)}");
+        final double x = _vertexArray[vertexNum * 3];
+        final double y = _vertexArray[vertexNum * 3 + 1];
+        final double z = _vertexArray[vertexNum * 3 + 2];
+        print("read point ($id) $shapeId == $vertexNum @ ${Utils.printv3(x,y,z,0)}");
     }
 }
