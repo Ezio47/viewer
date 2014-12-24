@@ -13,7 +13,7 @@ class Camera {
     Vector3 _defaultEye = new Vector3.zero();
     Vector3 _target = new Vector3.zero();
     Vector3 _defaultTarget = new Vector3.zero();
-    double _fovy = 65.0;
+    double _fovy = 45.0;
 
     Camera();
 
@@ -30,7 +30,9 @@ class Camera {
     }
 
     Matrix4 getPerspectiveMatrix(double aspect) {
-        return GlMath.makePerspectiveMatrix(degToRad(fovy), aspect, 0.001, 10000.0);
+        _perspective = GlMath.makePerspectiveMatrix(degToRad(fovy), aspect, 0.1, 100000.0);
+        //_perspective = GlMath.makeOrthographicMatrix(-10000, 10000, -10000, 10000, -10000, 10000);
+        return _perspective;
     }
 
     void goHome() {

@@ -1,15 +1,45 @@
 part of rialto.viewer;
 
+const bool GREGGMAN = true;
+
 class GlMath {
+    static Matrix4 makeOrthographicMatrix(num left, num right, num bottom, num top, num near, num far) {
+        left = left.toDouble();
+        right = right.toDouble();
+        bottom = bottom.toDouble();
+        top = top.toDouble();
+        near = near.toDouble();
+        far = far.toDouble();
+        double rml = right - left;
+        double rpl = right + left;
+        double tmb = top - bottom;
+        double tpb = top + bottom;
+        double fmn = far - near;
+        double fpn = far + near;
+        Matrix4 r = new Matrix4.zero();
+        r.setEntry(0, 0, 2.0 / rml);
+        r.setEntry(1, 1, 2.0 / tmb);
+        r.setEntry(2, 2, -2.0 / fmn);
+        r.setEntry(0, 3, -rpl / rml);
+        r.setEntry(1, 3, -tpb / tmb);
+        r.setEntry(2, 3, -fpn / fmn);
+        r.setEntry(3, 3, 1.0);
+        return r;
+    }
+
     static Matrix4 makePerspectiveMatrix(double fieldOfViewInRadians, double aspect, double near, double far) {
-        var f = tan(PI * 0.5 - 0.5 * fieldOfViewInRadians);
-        var rangeInv = 1.0 / (near - far);
         var m = new Matrix4.zero();
-        m[0] = f / aspect;
-        m[5] = f;
-        m[10] = (near + far) * rangeInv;
-        m[11] = -1.0;
-        m[14] = near * far * rangeInv * 2.0;
+        if (GREGGMAN) {
+            var f = tan(PI * 0.5 - 0.5 * fieldOfViewInRadians);
+            var rangeInv = 1.0 / (near - far);
+            m[0] = f / aspect;
+            m[5] = f;
+            m[10] = (near + far) * rangeInv;
+            m[11] = -1.0;
+            m[14] = near * far * rangeInv * 2.0;
+        } else {
+            setPerspectiveMatrix(m, fieldOfViewInRadians, aspect, near, far);
+        }
         return m;
     }
 

@@ -182,7 +182,7 @@ class Renderer {
         gl.enable(DEPTH_TEST);
         gl.disable(BLEND);
 
-        pMatrix = GlMath.makePerspectiveMatrix(degToRad(60.0), aspect, 1.0, 2000.0);
+        pMatrix = _hub.camera.getPerspectiveMatrix(aspect);
         var viewMatrix = _hub.camera.getViewMatrix();
 
         for (var shape in _hub.shapesList) {
