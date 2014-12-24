@@ -7,7 +7,7 @@ part of rialto.viewer;
 
 // taken from https://github.com/threeDart/three.dart/blob/master/lib/extras/controls/trackball_controls.dart
 
-class CameraController implements IMode {
+class CameraController implements IController {
     Hub _hub;
     Camera _camera;
     Element _canvas;

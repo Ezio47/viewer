@@ -21,11 +21,11 @@ import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
 part 'annotation.dart';
-part 'annotator.dart';
+part 'annotation_controller.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'event_registry.dart';
-part 'measurer.dart';
+part 'measurement_controller.dart';
 part 'mode_controller.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
@@ -33,7 +33,7 @@ part 'proxy.dart';
 part 'renderable_point_cloud.dart';
 part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
-part 'selector.dart';
+part 'selection_conroller.dart';
 
 part 'utils/color.dart';
 part 'utils/rialto_exceptions.dart';
@@ -65,12 +65,12 @@ class Hub {
 
     EventRegistry eventRegistry;
 
-    Annotator annotator;
+    AnnotationController annotator;
     Picker picker;
     RenderingContext gl;
-    Measurer measurer;
+    MeasurementController measurer;
     ModeController modeController;
-    Selector selector;
+    SelectionController selector;
     Camera camera;
     CameraController cameraController;
 
@@ -129,9 +129,9 @@ class Hub {
         camera = new Camera();
         picker = new Picker(gl, canvas);
         cameraController = new CameraController(camera, canvas);
-        annotator = new Annotator();
-        measurer = new Measurer();
-        selector = new Selector();
+        annotator = new AnnotationController();
+        measurer = new MeasurementController();
+        selector = new SelectionController();
 
         renderablePointCloudSet = new RenderablePointCloudSet(gl);
 

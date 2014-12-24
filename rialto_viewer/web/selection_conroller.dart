@@ -4,14 +4,14 @@
 
 part of rialto.viewer;
 
-class Selector implements IMode {
+class SelectionController implements IController {
     Hub _hub;
     bool isRunning;
 
     Shape _possibleShape;
     int _possibleId;
 
-    Selector() {
+    SelectionController() {
         _hub = Hub.root;
         isRunning = false;
 

@@ -8,12 +8,12 @@ part of rialto.viewer;
 
 class ModeController {
     Hub _hub;
-    Map<int, IMode> _modes;
-    IMode _currentMode;
+    Map<int, IController> _modes;
+    IController _currentMode;
 
     ModeController()
             : _hub = Hub.root,
-              _modes = new Map<int, IMode>(),
+              _modes = new Map<int, IController>(),
               _currentMode = null {
         _hub.eventRegistry.ChangeMode.subscribe(_handleChangeMode);
     }
@@ -28,22 +28,22 @@ class ModeController {
             _currentMode.endMode();
         }
 
-        IMode thing = _modes[ev.type];
+        IController thing = _modes[ev.type];
         _currentMode = thing;
         print("starting mode ${ModeData.name[ev.type]}");
         _currentMode.isRunning = true;
         _currentMode.startMode();
     }
 
-    bool isEnabled(IMode thing) => (_currentMode == thing);
+    bool isEnabled(IController thing) => (_currentMode == thing);
 
-    void register(IMode thing, int type) {
+    void register(IController thing, int type) {
         if (_modes.containsValue(thing)) return;
 
         _modes[type] = thing;
     }
 
-    void unregister(IMode thing) {
+    void unregister(IController thing) {
         if (!_modes.containsValue(thing)) return;
 
         // remove the key with this value
@@ -54,9 +54,9 @@ class ModeController {
     }
 
     // inverse mapping
-    int _lookupType(IMode mode) {
+    int _lookupType(IController mode) {
         for (var k in _modes.keys) {
-            IMode m = _modes[k];
+            IController m = _modes[k];
             if (m == mode) return k;
         }
         return null;
@@ -64,7 +64,7 @@ class ModeController {
 }
 
 
-abstract class IMode {
+abstract class IController {
     bool isRunning;
     //bool get isRunning => _isRunning;
     //void set isRunning(bool v) { _isRunning = v; }
