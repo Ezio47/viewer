@@ -74,6 +74,28 @@ class MeasurementController implements IController {
 
         print("Distance from ${Utils.printv(point1)} to ${Utils.printv(point2)}");
 
+        Measurement m = new Measurement(point1, point2);
+
+        _hub.mainRenderer.addMeasurementToScene(m);
+        _hub.mainRenderer.measurements.add(m);
+
         point1 = point2 = null;
+    }
+}
+
+class Measurement {
+    MeasurementShape shape;
+    Vector3 _point1;
+    Vector3 _point2;
+
+    Measurement(Vector3 point1, Vector3 point2) {
+        _point1 = point1;
+        _point2 = point2;
+
+        _makeShape();
+    }
+
+    void _makeShape() {
+        shape = new MeasurementShape(Hub.root.gl, _point1, _point2);
     }
 }

@@ -68,21 +68,21 @@ class CloudShape extends Shape {
             double x = _vertexArray[j];
             double y = _vertexArray[j + 1];
             double z = _vertexArray[j + 2];
-            //print("created point ($id) $pointId == ${pointId - (id+1)} @ ${Utils.printv3(x,y,z,0)}");
+            //print("created point: cloud #$id, point #$pointId, vertex #${pointId - (id+1)} -- geo ${Utils.printv3(x,y,z,0)}");
         }
     }
 
     @override
     void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen) {
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
-        gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
+        gl.vertexAttribPointer(vertexAttrib, 3, FLOAT, false, 0, 0);
 
         if (offscreen) {
             gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
-            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0, 0);
         } else {
             gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
-            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+            gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0, 0);
         }
 
         setUniforms(this, offscreen);
@@ -90,7 +90,7 @@ class CloudShape extends Shape {
 
     @override
     void _draw(bool offscreen) {
-        gl.drawArrays(POINTS, 0/*first elem*/, numPoints/*total num vertices*/);
+        gl.drawArrays(POINTS, 0, numPoints);
     }
 
     int shapeIdToVertexNum(int shapeId) {

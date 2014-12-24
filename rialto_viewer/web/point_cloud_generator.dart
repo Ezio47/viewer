@@ -68,7 +68,7 @@ class PointCloudGenerator {
     static PointCloud _makeRandom(String webpath, String displayName) {
         Map<String, Float32List> map = new Map();
 
-        var numPoints = 1500;
+        var numPoints = 100;
 
         var positionsX = new Float32List(numPoints);
         var positionsY = new Float32List(numPoints);
@@ -77,12 +77,12 @@ class PointCloudGenerator {
         map["positions.y"] = positionsY;
         map["positions.z"] = positionsZ;;
 
-        var xmin = 100.0;
-        var xmax = 700.0;
-        var ymin = 100.0;
-        var ymax = 300.0;
+        var xmin = 0.0;
+        var xmax = 200.0;
+        var ymin = 0.0;
+        var ymax = 200.0;
         var zmin = 0.0;
-        var zmax = 100.0;
+        var zmax = 10.0;
 
         var random = new Random(17);
 

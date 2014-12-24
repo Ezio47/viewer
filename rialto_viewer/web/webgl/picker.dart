@@ -16,13 +16,12 @@ class Picker {
     Picker(RenderingContext this.gl, CanvasElement this._canvas) {
         _hub = Hub.root;
         _configure();
+        _hub.eventRegistry.WindowResize.subscribe0(_handleWindowResize);
     }
 
-    void update() {
-        assert(false); // BUG: need to handle resize event
-
-        var width = _canvas.width;
-        var height = _canvas.height;
+    void _handleWindowResize() {
+        var width = _hub.width;
+        var height = _hub.height;
 
         gl.bindTexture(TEXTURE_2D, _texture);
         gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
@@ -33,8 +32,8 @@ class Picker {
     }
 
     void _configure() {
-        var width = _canvas.width;
-        var height = _canvas.height;
+        var width = _hub.width;
+        var height = _hub.height;
 
         //1. Init Picking Texture
         _texture = gl.createTexture();
@@ -109,12 +108,12 @@ class Picker {
 
     List _hitTest(int ri, int gi, int bi) {
 
-        //print("readout: $ri $gi $bi");
-
         if (ri == 0 && gi == 0 && bi == 0) {
             // not an object at all
             return null;
         }
+
+        print("readout: $ri $gi $bi");
 
         final int id = Utils.convertIvecToId(ri, gi, bi);
         if (!Hub.root.shapesMap.containsKey(id)) {

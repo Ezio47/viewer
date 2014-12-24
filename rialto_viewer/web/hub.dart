@@ -20,7 +20,6 @@ import 'elements/render_panel.dart';
 import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
-part 'annotation.dart';
 part 'annotation_controller.dart';
 part 'colorizer.dart';
 part 'comms.dart';
@@ -49,6 +48,7 @@ part 'webgl/cloud_shape.dart';
 part 'webgl/fragment_shader.dart';
 part 'webgl/gl_program.dart';
 part 'webgl/gl_math.dart';
+part 'webgl/measurement_shape.dart';
 part 'webgl/picker.dart';
 part 'webgl/shape.dart';
 part 'webgl/vertex_shader.dart';
@@ -125,7 +125,6 @@ class Hub {
 
         modeController = new ModeController();
         camera = new Camera();
-        picker = new Picker(gl, canvas);
         cameraController = new CameraController(camera, canvas);
         annotationController = new AnnotationController();
         measurementController = new MeasurementController();
@@ -134,6 +133,8 @@ class Hub {
         renderablePointCloudSet = new RenderablePointCloudSet(gl);
 
         mainRenderer = new Renderer(canvas, gl, renderablePointCloudSet);
+
+        picker = new Picker(gl, canvas);
 
         eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT));
 

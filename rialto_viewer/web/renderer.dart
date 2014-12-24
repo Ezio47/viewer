@@ -28,6 +28,11 @@ class Renderer {
 
     List<Annotation> annotations = new List<Annotation>();
 
+    List<Measurement>  measurements = new List<Measurement>();
+
+    Vector3 _cloudMin;
+    Vector3 _cloudLen;
+
     Renderer(CanvasElement this._canvas, this.gl, RenderablePointCloudSet rpcSet)
             : mvMatrix = new Matrix4.identity(),
               _hub = Hub.root,
@@ -63,20 +68,20 @@ class Renderer {
 
         _hub.shapesList.clear();
 
-        var cloudMin = _renderSource.min;
-        var cloudLen = _renderSource.len;
+        _cloudMin = _renderSource.min;
+        _cloudLen = _renderSource.len;
 
         if (_renderSource.length == 0) {
             // a reasonable default
-            cloudMin = new Vector3.zero();
-            cloudLen = new Vector3(1.0, 1.0, 1.0);
+            _cloudMin = new Vector3.zero();
+            _cloudLen = new Vector3(1.0, 1.0, 1.0);
         }
 
-        final cloudLen12 = cloudLen / 2.0;
-        final cloudLen14 = cloudLen / 4.0;
+        final cloudLen12 = _cloudLen / 2.0;
+        final cloudLen14 = _cloudLen / 4.0;
 
         final ideal = new Vector3(-1.0, -2.0, 2.0);
-        _hub.camera.defaultEye = new Vector3(ideal.x * cloudLen.x, ideal.y * cloudLen.y, ideal.z * cloudLen.z);
+        _hub.camera.defaultEye = new Vector3(ideal.x * _cloudLen.x, ideal.y * _cloudLen.y, ideal.z * _cloudLen.z);
         _hub.camera.defaultTarget = new Vector3(0.0, 0.0, 0.0);
         _hub.camera.eye = _hub.camera.defaultEye;
         _hub.camera.target = _hub.camera.defaultTarget;
@@ -112,7 +117,7 @@ class Renderer {
         {
             // bbox model space is (-cloudlen/2..+cloudlen/2)
             _bboxShape = new BoxShape(gl);
-            Matrix4 s = GlMath.makeScaleMatrix(cloudLen.x, cloudLen.y, cloudLen.z);
+            Matrix4 s = GlMath.makeScaleMatrix(_cloudLen.x, _cloudLen.y, _cloudLen.z);
             Matrix4 t = GlMath.makeTranslationMatrix(-0.5, -0.5, -0.5);
             Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
             Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
@@ -130,7 +135,7 @@ class Renderer {
                 var obj = rpc.buildParticleSystem();
                 obj.isVisible = rpc.visible;
                 Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
-                final d = -cloudMin - cloudLen12;
+                final d = -_cloudMin - cloudLen12;
                 Matrix4 t = GlMath.makeTranslationMatrix(d.x, d.y, d.z);
                 Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
                 Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
@@ -145,21 +150,48 @@ class Renderer {
         }
 
         for (var annotation in annotations) {
-            AnnotationShape shape = annotation.shape;
-            Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
-            Matrix4 t = GlMath.makeTranslationMatrix(-cloudLen.x, -cloudLen.y, -cloudLen.z);
-            Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
-            Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
-            Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
-            var m = s * rz;
-            m = m * ry;
-            m = m * rx;
-            m = m * t;
-            shape.modelMatrix = m;
-            _hub.shapesList.add(shape);
+            addAnnotationToScene(annotation);
+        }
+
+        for (var measurement in measurements) {
+            addMeasurementToScene(measurement);
         }
 
         _hub.camera.goHome();
+    }
+
+    void addAnnotationToScene(Annotation annotation) {
+        final cloudLen12 = _cloudLen / 2.0;
+
+        Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
+        final d = -_cloudMin - cloudLen12;
+        Matrix4 t = GlMath.makeTranslationMatrix(d.x, d.y, d.z);
+        Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
+        Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
+        Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
+        var m = s * rz;
+        m = m * ry;
+        m = m * rx;
+        m = m * t;
+        annotation.shape.modelMatrix = m;
+        _hub.shapesList.add(annotation.shape);
+    }
+
+    void addMeasurementToScene(Measurement measurement) {
+        final cloudLen12 = _cloudLen / 2.0;
+
+        Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
+        final d = -_cloudMin - cloudLen12;
+        Matrix4 t = GlMath.makeTranslationMatrix(d.x, d.y, d.z);
+        Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
+        Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
+        Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
+        var m = s * rz;
+        m = m * ry;
+        m = m * rx;
+        m = m * t;
+        measurement.shape.modelMatrix = m;
+        _hub.shapesList.add(measurement.shape);
     }
 
     void draw(num viewWidth, num viewHeight, num aspect) {
