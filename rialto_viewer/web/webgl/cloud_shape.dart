@@ -18,6 +18,8 @@ class CloudShape extends Shape {
     Float32List points;
     Float32List colors;
 
+    List<int> selectedPoints = new List<int>();
+
     CloudShape(RenderingContext gl, Float32List this.points, Float32List this.colors) : super(gl) {
         numPoints = points.length ~/ 3;
         assert(numPoints * 3 == points.length);
@@ -26,6 +28,8 @@ class CloudShape extends Shape {
         _initArrays();
 
         _initBuffers();
+
+        isSelectable = true;
     }
 
     void _initBuffers() {

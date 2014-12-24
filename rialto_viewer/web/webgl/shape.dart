@@ -12,8 +12,9 @@ abstract class Shape {
     RenderingContext gl;
 
     String name;
-    bool visible;
-    bool highlight;
+    bool isVisible;
+    bool isSelected;
+    bool isSelectable;
     int id;
 
     // to change from model to world coords
@@ -21,8 +22,10 @@ abstract class Shape {
 
     Shape(RenderingContext this.gl) {
         id = Shape.getNewId();
-        visible = true;
-        highlight = false;
+
+        isVisible = true;
+        isSelected = false;
+        isSelectable = false;
 
         Hub.root.shapesMap[id] = this;
     }
@@ -30,7 +33,7 @@ abstract class Shape {
     static int getNewId() => _ids++;
 
     void draw(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms) {
-         if (!visible) return;
+         if (!isVisible) return;
          _setBindings(vertexAttrib, colorAttrib, setUniforms);
          _draw();
      }

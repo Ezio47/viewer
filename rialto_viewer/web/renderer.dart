@@ -15,10 +15,6 @@ class Renderer {
     Matrix4 mvMatrix;
     Matrix4 nMatrix;
 
-    Camera _camera;
-    CameraControl _interactor;
-    Picker _picker = null;
-
     double _mouseGeoX = 0.0;
     double _mouseGeoY = 0.0;
     bool _axesVisible;
@@ -50,14 +46,9 @@ class Renderer {
 
         mvMatrix = new Matrix4.identity();
 
-        _camera = new Camera();
-        _camera.eye = new Vector3(0.0, 0.0, 200.0);
+        _hub.camera.eye = new Vector3(0.0, 0.0, 200.0);
         //  camera.setElevation(-22);
         // camera.setAzimuth(37);
-
-        _picker = new Picker(gl, _canvas);
-
-        _interactor = new CameraControl(_camera, _canvas);
 
         update();
 
@@ -91,13 +82,13 @@ class Renderer {
             theLen = new Vector3(1.0, 1.0, 1.0);
         }
 
-        _camera.defaultEye = new Vector3(0.0, 0.0, 1800.0);
-        _camera.defaultTarget = new Vector3(0.0, 0.0, 0.0);
-        _camera.eye = _camera.defaultEye;
-        _camera.target = _camera.defaultTarget;
-        _camera.azimuth = 0.0;
-        _camera.elevation = 0.0;
-        _camera.fovy = 65.0;
+        _hub.camera.defaultEye = new Vector3(0.0, 0.0, 1800.0);
+        _hub.camera.defaultTarget = new Vector3(0.0, 0.0, 0.0);
+        _hub.camera.eye = _hub.camera.defaultEye;
+        _hub.camera.target = _hub.camera.defaultTarget;
+        _hub.camera.azimuth = 0.0;
+        _hub.camera.elevation = 0.0;
+        _hub.camera.fovy = 65.0;
 
         // "rotate then translate" (spinning) vs "translate then rotate" (orbiting)
         //
@@ -145,7 +136,7 @@ class Renderer {
         {
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
-                obj.visible = rpc.visible;
+                obj.isVisible = rpc.visible;
                 Matrix4 s = GlMath.makeScale(1.0, 1.0, 1.0);
                 var p = theLen / 2.0;
                 Matrix4 t = GlMath.makeTranslation(-theMin.x - p.x, -theMin.y - p.x, -theMin.z - p.z);
@@ -176,7 +167,7 @@ class Renderer {
             _hub.shapesList.add(shape);
         }
 
-        _camera.goHome();
+        _hub.camera.goHome();
     }
 
     void draw(num viewWidth, num viewHeight, num aspect) {
@@ -184,7 +175,7 @@ class Renderer {
         //off-screen rendering
         if (_hub.isPickingEnabled) {
             Hub.root.offscreenMode = 1;
-            gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
+            gl.bindFramebuffer(FRAMEBUFFER, _hub.picker._frameBNuffer);
             _drawScene(viewWidth, viewHeight, aspect);
         }
 
@@ -202,7 +193,7 @@ class Renderer {
         gl.disable(BLEND);
 
         pMatrix = GlMath.makePerspective(degToRad(60.0), aspect, 1.0, 2000.0);
-        var viewMatrix = _camera.getViewMatrix();
+        var viewMatrix = _hub.camera.getViewMatrix();
 
         for (var shape in _hub.shapesList) {
             var modelMatrix = shape.modelMatrix;
@@ -241,20 +232,20 @@ class Renderer {
 
     void _handleDisplayAxes(bool v) {
         _axesVisible = v;
-        _axesShape.visible = v;
+        _axesShape.isVisible = v;
     }
 
     void _handleDisplayBbox(bool v) {
         _bboxVisible = v;
-        _bboxShape.visible = v;
+        _bboxShape.isVisible = v;
     }
 
     void _handleUpdateCameraTargetPosition(Vector3 data) {
-        _camera.target = _camera.defaultTarget;
+        _hub.camera.target = _hub.camera.defaultTarget;
     }
 
     void _handleUpdateCameraEyePosition(Vector3 data) {
-        _camera.eye = _camera.defaultEye;
+        _hub.camera.eye = _hub.camera.defaultEye;
     }
 }
 
@@ -285,7 +276,7 @@ class Renderer {
     Vector3 fromNdcToModel(double ndcX, double ndcY) {
         var vector = new Vector3(ndcX, ndcY, 0.5);
 
-        Ray ray = _projector.pickingRay(vector.clone(), _camera);
+        Ray ray = _projector.pickingRay(vector.clone(), camera);
 
         var q = VectorAtZ(ray.origin, ray.direction, 0.0);
 

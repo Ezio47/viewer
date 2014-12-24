@@ -55,9 +55,7 @@ class EventRegistry {
     SignalFunctions<String> CloseFile = new SignalFunctions<String>();
     SignalFunctions<String> CloseFileCompleted = new SignalFunctions<String>();
 
-    SignalFunctions AnnotationMode = new SignalFunctions();
-    SignalFunctions SelectionMode = new SignalFunctions();
-    SignalFunctions MeasurementMode = new SignalFunctions();
+    SignalFunctions<ModeData> ChangeMode = new SignalFunctions();
 }
 
 class MouseData {
@@ -118,4 +116,23 @@ class CameraModelData {
     Vector3 eyePosition;
     double zExaggeartion;
     CameraModelData(this.cameraPosition, this.eyePosition, this.zExaggeartion);
+}
+
+
+
+class ModeData {
+    static const int MEASUREMENT = 0;
+    static const int MOVEMENT = 1;
+    static const int SELECTION = 2;
+    static const int ANNOTATION = 3;
+    static final name = {
+        MEASUREMENT: "measurement",
+        MOVEMENT: "movement",
+        SELECTION: "selection",
+        ANNOTATION: "annotation"
+    };
+
+    int type;
+
+    ModeData(int this.type);
 }

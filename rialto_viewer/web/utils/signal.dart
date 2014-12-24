@@ -23,22 +23,13 @@ class SignalFunctions<T> {
     }
     void fire0() => signal.fire(null);
 
-    SignalSubscription get exclusive => signal.exclusive;
-    set exclusive(SignalSubscription value) => signal.exclusive = value;
-
     SignalFunctions();
 }
 
 
-// at the time that the signal is fired, we want to be able to control which
-// listeners hear it -- this means that the check for "am I the exclusive stream"
-// has to be set up with the state of the system at the time the event is fired
-
-
 class _SignalData<T> {
     T data;
-    SignalSubscription exclusiveSignalSubscription;
-    _SignalData(this.data, this.exclusiveSignalSubscription);
+    _SignalData(this.data);
 }
 
 class SignalSubscription {
@@ -57,7 +48,6 @@ class SignalSubscription {
 class Signal<T> {
     String _name;
     StreamController<_SignalData<T>> _controller;
-    SignalSubscription exclusive;
 
     Signal({String name}) {
         _name = name;
@@ -71,24 +61,7 @@ class Signal<T> {
         var mySignalSubscription = new SignalSubscription(streamSubscription, name: name);
 
         var wrappingHandler = (_SignalData<T> data) {
-            ////var exName = (data.exclusiveSignalSubscription == null) ? "*" : data.exclusiveSignalSubscription.name;
-            ////print("in wrapping handler in stream $name for ${data.data} with exclusive for $exName");
-
-            if (data.exclusiveSignalSubscription == null) {
-                // if it's null, send the signal to everyone
-                ////print("** ${mySignalSubscription.name} getting nonexclusively");
                 userHandler(data.data);
-            } else {
-                // we are operating in exclusive mode
-                if (data.exclusiveSignalSubscription == mySignalSubscription) {
-                    // the signal is for me, run the handler
-                    ////print("** ${mySignalSubscription.name} executing exclusively");
-                    userHandler(data.data);
-                } else {
-                    // the signal is not for me, do nothing
-                    ////print("** ${mySignalSubscription.name} ignoring");
-                }
-            }
         };
 
         streamSubscription.onData(wrappingHandler);
@@ -102,55 +75,9 @@ class Signal<T> {
     }
 
     void fire(T t) {
-        var data = new _SignalData<T>(t, exclusive);
-        ////var exName = (data.exclusiveSignalSubscription==null) ? "*" : data.exclusiveSignalSubscription.name;
-        ////print("firing for ${data.data} with exclusive for $exName");
+        var data = new _SignalData<T>(t);
         _controller.add(data);
     }
 
     Future close() => _controller.close();
 }
-
-
-/*
-int counterA = 0;
-int counterB = 0;
-int counterC = 0;
-
-void testExclusive() {
-
-    var signal = new Signal<int>();
-
-    var subA, subB, subC;
-
-    var hA = (int i) {
-        counterA += i;
-    };
-
-    var hB = (int i) {
-        counterB += i;
-    };
-
-    var hC = (int i) {
-        counterC += i;
-    };
-
-    subA = signal.subscribe(hB, name: "A");
-    subB = signal.subscribe(hB, name: "B");
-    subC = signal.subscribe(hB, name: "C");
-
-    signal.exclusiveSignalSubscription = subB;
-    signal.fire(17);
-    signal.fire(3);
-    signal.fire(6);
-
-    signal.exclusiveSignalSubscription = null;
-    signal.fire(100);
-
-    signal.exclusiveSignalSubscription = subA;
-    signal.fire(112);
-
-    signal.close().then((_) {
-    });
-}
-*/

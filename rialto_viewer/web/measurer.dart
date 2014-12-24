@@ -4,18 +4,18 @@
 
 part of rialto.viewer;
 
-class Annotator implements IMode {
+class Measurer implements IMode {
     Hub _hub;
     bool isRunning;
 
     Vector3 point1;
     Vector3 point2;
 
-    Annotator() {
+    Measurer() {
         _hub = Hub.root;
         isRunning = false;
 
-        _hub.modeController.register(this, ModeData.ANNOTATION);
+        _hub.modeController.register(this, ModeData.MEASUREMENT);
 
         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
@@ -30,6 +30,7 @@ class Annotator implements IMode {
     }
 
     void _handleMouseMove(MouseData data) {
+        if (!isRunning) return;
     }
 
     void _handleMouseDown(MouseData data) {
@@ -71,13 +72,7 @@ class Annotator implements IMode {
             return;
         }
 
-        print("ONE: ${Utils.printv(point1)}");
-        print("TWO: ${Utils.printv(point2)}");
-
-        Annotation a = new Annotation(point1, point2);
-
-        _hub.mainRenderer.annotations.add(a);
-        _hub.mainRenderer.update();
+        print("Distance from ${Utils.printv(point1)} to ${Utils.printv(point2)}");
 
         point1 = point2 = null;
     }

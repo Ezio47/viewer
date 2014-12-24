@@ -30,6 +30,8 @@ class AnnotationShape extends Shape {
         _idArray = Shape._createIdArray(id, _colorArray.length);
 
         _initBuffers();
+
+        isSelectable = true;
     }
 
     void _initBuffers() {

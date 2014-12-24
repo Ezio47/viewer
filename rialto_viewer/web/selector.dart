@@ -4,72 +4,45 @@
 
 part of rialto.viewer;
 
-class Selector {
+class Selector implements IMode {
     Hub _hub;
-    SignalSubscription _mouseMoveSubscription;
-    SignalSubscription _mouseDownSubscription;
-    SignalSubscription _mouseUpSubscription;
-    bool running = false;
+
     Shape _selectedShape;
     Shape _possibleShape;
     int _pickedId;
+    bool isRunning;
 
     Selector() {
         _hub = Hub.root;
+        isRunning = false;
 
-        _hub.eventRegistry.SelectionMode.subscribe0(_handleModeChange);
-    }
+        _hub.modeController.register(this, ModeData.SELECTION);
 
-    void _handleModeChange() {
-        if (running) {
-            running = false;
-            _end();
-        } else {
-            running = true;
-            _start();
-        }
-    }
-
-    void _start() {
-        print("selection mode on");
-
-        _mouseMoveSubscription = _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
-        _hub.eventRegistry.MouseMove.signal.exclusive = _mouseMoveSubscription;
-
-        _mouseDownSubscription = _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
-        _hub.eventRegistry.MouseDown.signal.exclusive = _mouseDownSubscription;
-
-        _mouseUpSubscription = _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
-        _hub.eventRegistry.MouseUp.signal.exclusive = _mouseUpSubscription;
+         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
+         _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
+         _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
 
         _selectedShape = _possibleShape = null;
     }
 
-    void _end() {
-        _hub.eventRegistry.MouseMove.signal.exclusive = null;
-        _hub.eventRegistry.MouseMove.unsubscribe(_mouseMoveSubscription);
+    void startMode() {
+    }
 
-        _hub.eventRegistry.MouseDown.signal.exclusive = null;
-        _hub.eventRegistry.MouseDown.unsubscribe(_mouseDownSubscription);
-
-        _hub.eventRegistry.MouseUp.signal.exclusive = null;
-        _hub.eventRegistry.MouseUp.unsubscribe(_mouseUpSubscription);
-
+    void endMode() {
         if (_selectedShape != null) {
-            _selectedShape.highlight = false;
+            _selectedShape.isSelected = false;
             _selectedShape = null;
         }
-
-        print("selection mode off");
     }
 
     void _handleMouseMove(MouseData data) {
+        if (!isRunning) return;
     }
 
     void _handleMouseDown(MouseData data) {
-        assert(running);
+        if (!isRunning) return;
 
-        Point p = _hub.cameraInteractor.get2DCoords(data.x, data.y);
+        Point p = _hub.cameraController.get2DCoords(data.x, data.y);
 
         List l = _hub.picker.find(p);
         if (l == null) return;
@@ -79,14 +52,16 @@ class Selector {
     }
 
     void _handleMouseUp(MouseData data) {
+        if (!isRunning) return;
+
         if (_possibleShape == null) {
             return;
         }
 
-        _selectedShape.highlight = false;
+        _selectedShape.isSelected = false;
 
         _selectedShape = _possibleShape;
-        _selectedShape.highlight = true;
+        _selectedShape.isSelected = true;
         _possibleShape = null;
     }
 }

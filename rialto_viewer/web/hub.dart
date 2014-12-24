@@ -25,7 +25,8 @@ part 'annotator.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'event_registry.dart';
-part 'measurement.dart';
+part 'measurer.dart';
+part 'mode_controller.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
 part 'proxy.dart';
@@ -43,7 +44,7 @@ part 'webgl/annotation_shape.dart';
 part 'webgl/axes_shape.dart';
 part 'webgl/box_shape.dart';
 part 'webgl/camera.dart';
-part 'webgl/camera_control.dart';
+part 'webgl/camera_controller.dart';
 part 'webgl/cloud_shape.dart';
 part 'webgl/fragment_shader.dart';
 part 'webgl/gl_program.dart';
@@ -64,11 +65,14 @@ class Hub {
 
     EventRegistry eventRegistry;
 
-    CameraControl cameraInteractor;
     Annotator annotator;
     Picker picker;
     RenderingContext gl;
-    Measurement measurement;
+    Measurer measurer;
+    ModeController modeController;
+    Selector selector;
+    Camera camera;
+    CameraController cameraController;
 
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -93,8 +97,6 @@ class Hub {
     Hub() {
         _root = this;
         eventRegistry = new EventRegistry();
-        annotator = new Annotator();
-        measurement = new Measurement();
     }
 
     static Hub get root {
@@ -111,13 +113,6 @@ class Hub {
         CanvasElement canvas = mainRenderPanel.$["mycanvas"];//rialtoElement.querySelector("#mycanvas");
         assert(canvas != null);
 
-        RenderingContext gl = canvas.getContext3d();
-        assert(gl != null);
-
-        renderablePointCloudSet = new RenderablePointCloudSet(gl);
-
-        mainRenderer = new Renderer(canvas, gl, renderablePointCloudSet);
-
         var domElement = canvas;
         domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
         domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
@@ -126,6 +121,23 @@ class Hub {
         window.onKeyUp.listen((e) => eventRegistry.KeyUp.fire(new KeyboardData(e)));
         window.onKeyDown.listen((e) => eventRegistry.KeyDown.fire(new KeyboardData(e)));
         window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
+
+        RenderingContext gl = canvas.getContext3d();
+        assert(gl != null);
+
+        modeController = new ModeController();
+        camera = new Camera();
+        picker = new Picker(gl, canvas);
+        cameraController = new CameraController(camera, canvas);
+        annotator = new Annotator();
+        measurer = new Measurer();
+        selector = new Selector();
+
+        renderablePointCloudSet = new RenderablePointCloudSet(gl);
+
+        mainRenderer = new Renderer(canvas, gl, renderablePointCloudSet);
+
+        eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT));
 
         mainRenderer.tick(0);
     }

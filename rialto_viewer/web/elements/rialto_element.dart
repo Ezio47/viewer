@@ -71,7 +71,8 @@ class RialtoElement extends PolymerElement {
     }
 
     void goHome(Event e, var detail, Node target) {
-        _hub.eventRegistry.MoveCameraHome.fire0();
+        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT));
+        //_hub.eventRegistry.MoveCameraHome.fire0();
     }
 
     void goColorize(Event e, var detail, Node target) {
@@ -79,14 +80,14 @@ class RialtoElement extends PolymerElement {
     }
 
     void goAnnotate(Event e, var detail, Node target) {
-        _hub.eventRegistry.AnnotationMode.fire0();
+        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.ANNOTATION));
     }
 
     void goSelect(Event e, var detail, Node target) {
-        _hub.eventRegistry.SelectionMode.fire0();
+        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.SELECTION));
     }
 
     void goMeasure(Event e, var detail, Node target) {
-        _hub.eventRegistry.MeasurementMode.fire0();
+        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MEASUREMENT));
     }
 }

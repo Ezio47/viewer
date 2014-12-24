@@ -7,11 +7,11 @@ part of rialto.viewer;
 
 // taken from https://github.com/threeDart/three.dart/blob/master/lib/extras/controls/trackball_controls.dart
 
-class CameraControl {
+class CameraController implements IMode {
     Hub _hub;
     Camera _camera;
     Element _canvas;
-
+    bool isRunning;
 
     static const NONE = -1;
     static const ROTATE = 0;
@@ -41,9 +41,12 @@ class CameraControl {
     Vector2 _panStart, _panEnd;
     Vector3 lastPosition;
 
-    CameraControl(Camera this._camera, CanvasElement this._canvas) {
+    CameraController(Camera this._camera, CanvasElement this._canvas) {
         _hub = Hub.root;
-        _hub.cameraInteractor = this;
+        _hub.cameraController = this;
+        isRunning = false;
+
+        _hub.modeController.register(this, ModeData.MOVEMENT);
 
         _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
@@ -100,7 +103,15 @@ class CameraControl {
         _panEnd = new Vector2.zero();
     }
 
+    void startMode() {
+    }
+
+    void endMode() {
+    }
+
     void _handleMouseUp(ev) {
+        if (!isRunning) return;
+
         if (!enabled) {
             return;
         }
@@ -109,6 +120,8 @@ class CameraControl {
     }
 
     void _handleMouseDown(MouseData event) {
+        if (!isRunning) return;
+
         if (!enabled) {
             return;
         }
@@ -130,6 +143,8 @@ class CameraControl {
     }
 
     void _handleMouseWheel(WheelData event) {
+        if (!isRunning) return;
+
         if (!enabled) {
             return;
         }
@@ -140,6 +155,8 @@ class CameraControl {
     }
 
     void _handleMouseMove(MouseData event) {
+        if (!isRunning) return;
+
         if (!enabled) {
             return;
         }
@@ -156,6 +173,8 @@ class CameraControl {
     }
 
     void _handleKeyDown(KeyboardData event) {
+        if (!isRunning) return;
+
         if (!enabled) return;
 
         _prevState = _state;
@@ -172,6 +191,8 @@ class CameraControl {
     }
 
     void _handleKeyUp(KeyboardData ev) {
+        if (!isRunning) return;
+
         if (!enabled) {
             return;
         }
