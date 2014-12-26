@@ -43,8 +43,8 @@ class Renderer {
 
         _renderSource = rpcSet;
 
-        var attribs = ['aVertexPosition', 'aVertexColor'];
-        var uniforms = ['uMVMatrix', 'uPMatrix', 'uPickingColor', 'uOffscreen'];
+        var attribs = ['aVertexPosition', 'aVertexColor', 'aSelectionColor', 'aSelectionMask'];
+        var uniforms = ['uMVMatrix', 'uPMatrix'];
         _glProgram = new GlProgram(gl, fragmentShader, vertexShader, attribs, uniforms);
         gl.useProgram(_glProgram._program);
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -223,6 +223,8 @@ class Renderer {
             shape.draw(
                     _glProgram._attributes['aVertexPosition'],
                     _glProgram._attributes['aVertexColor'],
+                    _glProgram._attributes['aSelectionColor'],
+                    _glProgram._attributes['aSelectionMask'],
                     _setMatrixUniforms,
                     offscreen);
         }

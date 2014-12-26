@@ -32,10 +32,10 @@ abstract class Shape {
 
     static int getNewId() => _ids++;
 
-    void draw(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen) {
+    void draw(int vertexAttrib, int colorAttrib, int selectionColorAttrib, int selectionMaskAttrib, SetUniformsFunc setUniforms, bool offscreen) {
          if (!isVisible) return;
          _preDraw(offscreen);
-         _setBindings(vertexAttrib, colorAttrib, setUniforms, offscreen);
+         _setBindings(vertexAttrib, colorAttrib, selectionColorAttrib, selectionMaskAttrib, setUniforms, offscreen);
          _draw(offscreen);
          _postDraw(offscreen);
      }
@@ -51,7 +51,7 @@ abstract class Shape {
 
     void _draw(bool offscreen);
 
-    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen);
+    void _setBindings(int vertexAttrib, int colorAttrib, int selectionColorAttrib, int selectionMaskAttrib, SetUniformsFunc setUniforms, bool offscreen);
 
     // more renderable objects will use this: it sets the entire object to a single ID
     static Float32List _createIdArray(int id, int length) {

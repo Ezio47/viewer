@@ -11,6 +11,12 @@ class AnnotationShape extends Shape {
     Float32List _colorArray;
     Buffer _colorBuffer;
 
+    Float32List _selectionColorArray;
+    Buffer _selectionColorBuffer;
+
+    Float32List _selectionMaskArray;
+    Buffer _selectionMaskBuffer;
+
     Buffer _idBuffer;
     Float32List _idArray;
 
@@ -42,6 +48,14 @@ class AnnotationShape extends Shape {
         _colorBuffer = gl.createBuffer();
         gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
         gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
+
+        _selectionColorBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _selectionColorBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _selectionColorArray, STATIC_DRAW);
+
+        _selectionMaskBuffer = gl.createBuffer();
+        gl.bindBuffer(ARRAY_BUFFER, _selectionMaskBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _selectionMaskArray, STATIC_DRAW);
 
         _idBuffer = gl.createBuffer();
         gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
@@ -98,6 +112,13 @@ class AnnotationShape extends Shape {
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
+
+        _selectionColorArray = new Float32List(_colorArray.length);
+        _selectionMaskArray = new Float32List(_colorArray.length);
+        for (int i=0; i<_colorArray.length; i++) {
+             _selectionMaskArray[i] = 0.0;
+             _selectionColorArray[i] = 0.5;
+         }
     }
 
     @override
@@ -130,7 +151,7 @@ class AnnotationShape extends Shape {
     }
 
     @override
-    void _setBindings(int vertexAttrib, int colorAttrib, SetUniformsFunc setUniforms, bool offscreen) {
+    void _setBindings(int vertexAttrib, int colorAttrib, int selectionColorAttrib, int selectionMaskAttrib, SetUniformsFunc setUniforms, bool offscreen) {
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
         gl.vertexAttribPointer(vertexAttrib, 3, FLOAT, false, 0, 0);
 
@@ -141,6 +162,12 @@ class AnnotationShape extends Shape {
             gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0, 0);
         }
+
+        gl.bindBuffer(ARRAY_BUFFER, _selectionColorBuffer);
+        gl.vertexAttribPointer(selectionColorAttrib, 4, FLOAT, false, 0, 0);
+
+        gl.bindBuffer(ARRAY_BUFFER, _selectionMaskBuffer);
+        gl.vertexAttribPointer(selectionMaskAttrib, 4, FLOAT, false, 0, 0);
 
         setUniforms(this, offscreen);
     }
