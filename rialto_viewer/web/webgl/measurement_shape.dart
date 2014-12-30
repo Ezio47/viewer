@@ -67,7 +67,7 @@ class MeasurementShape extends Shape {
         double y2 = _point2.y;
         double z2 = _point2.z;
 
-        final white = new Color.yellow().toList();
+        final yellow = new Color.yellow().toList();
 
         final v1 = [x1, y1, z1];
         final v2 = [x2, y2, z2];
@@ -78,42 +78,34 @@ class MeasurementShape extends Shape {
         // bottom square
         vertices.addAll(v1);
         vertices.addAll(v2);
-        colors.addAll(white);
-        colors.addAll(white);
+        colors.addAll(yellow);
+        colors.addAll(yellow);
 
         _vertexArray = new Float32List.fromList(vertices);
         _colorArray = new Float32List.fromList(colors);
 
         _selectionColorArray = new Float32List(_colorArray.length);
-        _selectionMaskArray = new Float32List(_colorArray.length);
-        for (int i=0; i<_colorArray.length; i++) {
+        for (int i = 0; i < _colorArray.length ~/ 4; i++) {
+            _selectionColorArray[i * 4] = 0.5;
+            _selectionColorArray[i * 4 + 1] = 0.5;
+            _selectionColorArray[i * 4 + 2] = 0.5;
+            _selectionColorArray[i * 4 + 3] = 1.0;
+        }
+
+        _selectionMaskArray = new Float32List(_colorArray.length ~/ 4);
+          for (int i = 0; i < _selectionMaskArray.length; i++) {
              _selectionMaskArray[i] = 0.0;
-             _selectionColorArray[i] = 0.5;
          }
-    }
+      }
 
     @override
     void _preDraw(bool offscreen) {
-        if (isSelected) {
-            for (int i = 0; i < 16; i += 4) {
-                _colorArray[i] = 1.0;
-                _colorArray[i + 1] = 1.0;
-                _colorArray[i + 2] = 0.0;
-                _colorArray[i + 3] = 1.0;
-            }
-        }
+        return;
     }
 
     @override
     void _postDraw(bool offscreen) {
-        if (isSelected) {
-            for (int i = 0; i < 16; i += 4) {
-                _colorArray[i] = 1.0;
-                _colorArray[i + 1] = 1.0;
-                _colorArray[i + 2] = 1.0;
-                _colorArray[i + 3] = 1.0;
-            }
-        }
+        return;
     }
 
     @override
@@ -124,22 +116,33 @@ class MeasurementShape extends Shape {
     @override
     void _setBindings(int vertexAttrib, int colorAttrib, int selectionColorAttrib, int selectionMaskAttrib, SetUniformsFunc setUniforms, bool offscreen) {
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _vertexArray, STATIC_DRAW);
         gl.vertexAttribPointer(vertexAttrib, 3, FLOAT, false, 0, 0);
 
         if (offscreen) {
             gl.bindBuffer(ARRAY_BUFFER, _idBuffer);
+            gl.bufferDataTyped(ARRAY_BUFFER, _idArray, STATIC_DRAW);
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0, 0);
         } else {
             gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+            gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
             gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0, 0);
         }
 
         gl.bindBuffer(ARRAY_BUFFER, _selectionColorBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _selectionColorArray, STATIC_DRAW);
         gl.vertexAttribPointer(selectionColorAttrib, 4, FLOAT, false, 0, 0);
 
         gl.bindBuffer(ARRAY_BUFFER, _selectionMaskBuffer);
-        gl.vertexAttribPointer(selectionMaskAttrib, 4, FLOAT, false, 0, 0);
+        gl.bufferDataTyped(ARRAY_BUFFER, _selectionMaskArray, STATIC_DRAW);
+        gl.vertexAttribPointer(selectionMaskAttrib, 1, FLOAT, false, 0, 0);
 
         setUniforms(this, offscreen);
+    }
+
+    void pick(int pickedId) {
+        for (int i = 0; i < _selectionMaskArray.length; i++) {
+            _selectionMaskArray[i] = 1.0;
+        }
     }
 }

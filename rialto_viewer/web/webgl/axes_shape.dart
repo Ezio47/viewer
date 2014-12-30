@@ -67,11 +67,16 @@ class AxesShape extends Shape {
         _colorArray = new Float32List.fromList(colors);
 
         _selectionColorArray = new Float32List(_colorArray.length);
-        _selectionMaskArray = new Float32List(_colorArray.length);
-        for (int i=0; i<_colorArray.length; i++) {
-             _selectionMaskArray[i] = 0.0;
-             _selectionColorArray[i] = 0.5;
-         }
+        _selectionMaskArray = new Float32List(_colorArray.length ~/ 4);
+        for (int i = 0; i < _colorArray.length ~/ 4; i++) {
+            _selectionColorArray[i * 4] = 0.5;
+            _selectionColorArray[i * 4 + 1] = 0.5;
+            _selectionColorArray[i * 4 + 2] = 0.5;
+            _selectionColorArray[i * 4 + 3] = 1.0;
+        }
+        for (int i = 0; i < _selectionMaskArray.length; i++) {
+            _selectionMaskArray[i] = 0.0;
+        }
       }
 
     @override
@@ -86,16 +91,20 @@ class AxesShape extends Shape {
         if (offscreen) return;
 
         gl.bindBuffer(ARRAY_BUFFER, _vertexBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _vertexArray, STATIC_DRAW);
         gl.vertexAttribPointer(vertexAttrib, 3/*how many floats per point*/, FLOAT, false, 0/*3*4:bytes*/, 0);
 
         gl.bindBuffer(ARRAY_BUFFER, _colorBuffer);
+        gl.bufferDataTyped(ARRAY_BUFFER, _colorArray, STATIC_DRAW);
         gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
 
         gl.bindBuffer(ARRAY_BUFFER, _selectionColorBuffer);
-        gl.vertexAttribPointer(colorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+        gl.bufferDataTyped(ARRAY_BUFFER, _selectionColorArray, STATIC_DRAW);
+        gl.vertexAttribPointer(selectionColorAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
 
         gl.bindBuffer(ARRAY_BUFFER, _selectionMaskBuffer);
-        gl.vertexAttribPointer(selectionMaskAttrib, 4, FLOAT, false, 0/*4*4:bytes*/, 0);
+        gl.bufferDataTyped(ARRAY_BUFFER, _selectionMaskArray, STATIC_DRAW);
+        gl.vertexAttribPointer(selectionMaskAttrib, 1, FLOAT, false, 0/*4*4:bytes*/, 0);
 
         setUniforms(this, offscreen);
     }
