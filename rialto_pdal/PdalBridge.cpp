@@ -7,9 +7,10 @@ PdalBridge::PdalBridge(bool debug, boost::uint32_t verbosity) :
     m_manager(NULL),
     m_reader(NULL),
     m_numPoints(0),
-    m_buffer(NULL)
+    m_statsStage(NULL)
 {
 }
+
 
 PdalBridge::~PdalBridge()
 {
@@ -37,29 +38,27 @@ void PdalBridge::open(const std::string& fname)
         reader->setOptions(opts);
     }
 
-    // for deeply technical reasons, PDAL now requires we read the whole file to
-    // find the proper bounds (although this may be fixed again in the future)
+    pdal::Stage* stage = m_manager->addFilter("filters.stats", m_manager->getStage());
+    m_statsStage = (pdal::filters::Stats*)stage;
+    
     m_numPoints = m_manager->execute();
 
     const pdal::PointContextRef& context = m_manager->context();
     
-    m_dimensionIds = context.dims();
-    updateDimensionTypes();
-    
-    // merge all the buffers in the point buffer set into just one buffer,
-    // so that life is easier for us
-    m_buffer = new pdal::PointBuffer(context);
-    const pdal::PointBufferSet& pbSet = m_manager->buffers();
-    pdal::PointBufferSet::const_iterator iter = pbSet.begin();
-    while (iter != pbSet.end())
+    // set lists of default ids and types
     {
-        const pdal::PointBufferPtr& data = *iter;
-        const pdal::PointBuffer& t = *data;
-        pdal::PointBuffer& tt = (pdal::PointBuffer&)t;
-
-        m_buffer->append(tt);   // BUG: this should take a const PointBuffer
+        m_dimensionIds.clear();
+        m_dimensionTypes.clear();
         
-        ++iter;
+        m_dimensionIds = context.dims();
+        std::vector<DimId>::const_iterator iter = m_dimensionIds.begin();
+        while (iter != m_dimensionIds.end())
+        {
+            DimId id = *iter;
+            DimType type = context.dimType(id);
+            m_dimensionTypes.push_back(type);
+            ++iter;
+        }
     }
 
     return;
@@ -96,118 +95,22 @@ pdal::point_count_t PdalBridge::getNumPoints() const
 }
 
 
-void PdalBridge::setFields(const std::vector<DimId>& dimIds)
+void PdalBridge::getStats(pdal::Dimension::Id::Enum id, double& min, double& mean, double& max) const
 {
-    m_dimensionIds = dimIds;
-    updateDimensionTypes();
+    const pdal::filters::stats::Summary& summary = m_statsStage->getStats(id);
+    min = summary.minimum();
+    mean = summary.average();
+    max = summary.maximum();
 }
 
 
-void PdalBridge::updateDimensionTypes()
-{
-    const pdal::PointContextRef& context = m_manager->context();
-
-    m_dimensionTypes.clear();
-    std::vector<DimId>::const_iterator iter = m_dimensionIds.begin();
-    while (iter != m_dimensionIds.end())
-    {
-        DimId id = *iter;
-        DimType type = context.dimType(id);
-        m_dimensionTypes.push_back(type);
-        ++iter;
-    }
-}
-
-
-std::vector<pdal::Dimension::Id::Enum> PdalBridge::getFields() const
+std::vector<pdal::Dimension::Id::Enum> PdalBridge::getDimIds() const
 {
     return m_dimensionIds;
 }
 
 
-pdal::Dimension::Type::Enum PdalBridge::getFieldType(pdal::Dimension::Id::Enum id)
+std::vector<pdal::Dimension::Type::Enum> PdalBridge::getDimTypes() const
 {
-    const pdal::PointContextRef& context = m_manager->context();
-    return context.dimType(id);
-}
-
-
-template<typename T>
-static void doTheData(char* &p, const pdal::PointBuffer& data, pdal::point_count_t pointIndex, PdalBridge::DimId dimensionIndex)
-{
-    const T value = data.getFieldAs<T>(dimensionIndex, pointIndex);    
-    *(T*)p = value;    
-    p += sizeof(T);
-}
-
-
-void PdalBridge::processOnePoint(char* &p, pdal::point_count_t pointNum)
-{
-    const pdal::PointBuffer& data = *m_buffer;
-    
-    const int numDims = m_dimensionIds.size();
-
-    for (int dimIndex=0; dimIndex<numDims; dimIndex++)
-    {
-        const DimId id = m_dimensionIds[dimIndex];
-        const DimType type = m_dimensionTypes[dimIndex];
-        
-        switch (type)
-        {
-            case pdal::Dimension::Type::Unsigned8:
-                doTheData<boost::uint8_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Signed8:
-                doTheData<boost::int8_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Unsigned16:
-                doTheData<boost::uint16_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Signed16:
-                doTheData<boost::int16_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Unsigned32:
-                doTheData<boost::uint32_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Signed32:
-                doTheData<boost::int32_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Unsigned64:
-                doTheData<boost::uint64_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Signed64:
-                doTheData<boost::int64_t>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Float:
-                doTheData<float>(p, data, pointNum, id);
-                break;
-            case pdal::Dimension::Type::Double:
-                doTheData<double>(p, data, pointNum, id);
-                break;
-            default:
-            assert(false);
-        }
-    }
-    
-    return;
-}
-
-
-pdal::point_count_t PdalBridge::readPoints(void* buffer, pdal::point_count_t offset, pdal::point_count_t numPoints)
-{
-    char* p = (char*)buffer;
-    
-    // don't allow the user to ask for more points than we actually have
-    if (offset+numPoints > m_numPoints)
-    {
-        numPoints = m_numPoints - offset;
-    }
-    
-    pdal::point_count_t numRead;
-    for (numRead=0; numRead<numPoints; numRead++)
-    {        
-        processOnePoint(p, offset+numRead);
-    }
-
-    return numRead;
+    return m_dimensionTypes;
 }
