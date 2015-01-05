@@ -12,73 +12,90 @@
 #include <boost/algorithm/string/erase.hpp>
 #include <boost/tokenizer.hpp>
 
-const int MAXLEVEL = 20;
+const int MAXLEVEL = 14;
 const int SIZ = 64;
 
 static int tileCount = 0;
 
-Tile::Tile(int level, Tile* parent, int which, bool west) {
-    
+
+Tile::Tile(int level, int colNum, int rowNum, Tile* parent) {
     m_level = level;
-    m_which = which;
     m_parent = parent;
-    m_west = west;
     
+    m_colNum = colNum;
+    m_rowNum = rowNum;
+
+    if (colNum % 2 == 0) {
+        if (rowNum % 2 == 0)
+            m_quadrant = QuadrantSW;
+        else
+            m_quadrant = QuadrantNW;
+    } else {
+        if (rowNum % 2 == 0)
+            m_quadrant = QuadrantSE;
+        else
+            m_quadrant = QuadrantNE;
+    }
+
+    if (parent == NULL) {
+        assert(m_quadrant == QuadrantSW || m_quadrant == QuadrantSE);
+
+        m_xmin = (m_quadrant == QuadrantSW) ? -180.0 : 0.0;
+        m_xmax = m_xmin + 180.0;
+        m_ymin = -90.0;
+        m_ymax = 90;
+        
+        m_numCols = 2;
+        m_numRows = 1;        
+        
+    } else {        
+        setBounds();
+
+        m_numCols = parent->getNumCols() * 2;
+        m_numRows = parent->getNumRows() * 2;
+    }
+    
+    m_xres = (m_xmax - m_xmin) / SIZ;
+    m_yres = (m_ymax - m_ymin) / SIZ;
+    m_xmid = m_xmin + (m_xmax - m_xmin) / 2.0;
+    m_ymid = m_ymin + (m_ymax - m_ymin) / 2.0;
+
     m_data = new double[SIZ*SIZ];
     for (int i=0; i<SIZ*SIZ; i++) m_data[i] = DBL_MAX;
 
     m_children = NULL;
     
-    setBounds();
-    m_xres = (m_xmax - m_xmin) / SIZ;
-    m_yres = (m_ymax - m_ymin) / SIZ;
-    m_xmid = m_xmin + (m_xmax - m_xmin) / 2.0;
-    m_ymid = m_ymin + (m_ymax - m_ymin) / 2.0;
     
     m_id = tileCount;
     ++tileCount;
+    
+    //printf("TILE: %d.%d.%d   min=(%f,%f)  max=(%f,%f)\n",
+        //m_level, m_colNum, m_rowNum, m_xmin, m_ymin, m_xmax, m_ymax);
 }
 
+
 void Tile::setBounds() {
-    if (m_parent == NULL) {
-        if (m_which == 1) {
-            m_xmin = -180.0;
-            m_xmax = 0.0;
-            m_ymin = -90.0;
-            m_ymax = 90.0;
-        } else if (m_which == 2) {
-            m_xmin = 0.0;
-            m_xmax = 180;
-            m_ymin = -90.0;
-            m_ymax = 90;
-        } else {
-            assert(false);
-        }
-        
-        return;
-    }
-    
     assert(m_parent);
-    switch (m_which) {
-        case 0:
+    switch (m_quadrant) {
+        case QuadrantSW:
             m_xmin = m_parent->m_xmin;
             m_xmax = m_parent->m_xmid;
             m_ymin = m_parent->m_ymin;
             m_ymax = m_parent->m_ymid;
             break;
-        case 1:
+        case QuadrantSE:
             m_xmin = m_parent->m_xmid;
             m_xmax = m_parent->m_xmax;
             m_ymin = m_parent->m_ymin;
             m_ymax = m_parent->m_ymid;
             break;
-        case 2:
+        case QuadrantNE:
             m_xmin = m_parent->m_xmid;
             m_xmax = m_parent->m_xmax;
             m_ymin = m_parent->m_ymid;
             m_ymax = m_parent->m_ymax;
             break;
-        case 3:
+        case QuadrantNW:
             m_xmin = m_parent->m_xmin;
             m_xmax = m_parent->m_xmid;
             m_ymin = m_parent->m_ymid;
@@ -91,19 +108,19 @@ void Tile::setBounds() {
 
 
 // 0..3
-int Tile::whichChild(double x, double y) {
+Tile::Quadrant Tile::whichChildQuadrant(double x, double y) {
 
     if (x >= m_xmin && x < m_xmid &&
-        y >= m_ymin && y < m_ymid) return 0;
+        y >= m_ymin && y < m_ymid) return QuadrantSW;
     if (x >= m_xmid && x < m_xmax &&
-        y >= m_ymin && y < m_ymid) return 1;
+        y >= m_ymin && y < m_ymid) return QuadrantSE;
     if (x >= m_xmid && x < m_xmax &&
-        y >= m_ymid && y < m_ymax) return 2;
+        y >= m_ymid && y < m_ymax) return QuadrantNE;
     if (x >= m_xmin && x < m_xmid &&
-        y >= m_ymid && y < m_ymax) return 3;
+        y >= m_ymid && y < m_ymax) return QuadrantNW;
             
     assert(0);
-    return -999;
+    return QuadrantInvalid;
 }
 
 bool Tile::containsPoint(double x, double y) {
@@ -114,16 +131,12 @@ bool Tile::containsPoint(double x, double y) {
 }
                 
 
-bool Tile::setPoint(double x, double y, double z)
+void Tile::setPoint(double x, double y, double z)
 {
-    //printf("test at %d.%d.%d (%f..%f): %f %f\n", m_west?0:1, m_level, m_which, m_xmin, m_xmax, x, y);
+    assert(containsPoint(x,y));
+    
+    //printf("test at %d.%d.%d (%f..%f): %f %f\n", m_level, m_colNum, m_rowNum, m_xmin, m_xmax, x, y);
 
-    bool ok = containsPoint(x,y);
-    if (!ok) {
-        //printf("    nope\n");
-        return false;
-    }
-        
     // this tile, or one of its children, contains the point
     
     if (m_level == MAXLEVEL) {
@@ -140,28 +153,32 @@ bool Tile::setPoint(double x, double y, double z)
         assert(idx < SIZ*SIZ);
         m_data[idx] = z;
         
-        //printf("    SET: %d.%d.%d at %d\n", m_west?0:1, m_level, m_which, idx);
-        return true;
+        //printf("    SET: %d.%d.%d at %d\n", m_level, m_colNum, m_rowNum, idx);
+        return;
     }
 
     // we need use (or make) a child to hold the point
-    int c = whichChild(x,y);
+    Quadrant q = whichChildQuadrant(x,y);
+    int qi = (int)q;
+    
     if (m_children == NULL) {
         m_children = new Tile*[4];
         for (int i=0; i<4; i++) {
             m_children[i] = NULL;
         }
     }
-    if (m_children[c] == NULL) {
-        m_children[c] = new Tile(m_level + 1, this, c, m_west);
-        //printf("c=%d, creating\n", c);
-    } else {
-        //printf("c=%d, existing\n", c);
+    
+    if (m_children[qi] == NULL) {
+        int colNum = getColNum() * 2 + ((q==QuadrantSE || q==QuadrantNE) ? 1:0);
+        int rowNum = getRowNum() * 2 + ((q==QuadrantNE || q==QuadrantNW) ? 1:0);
+        //printf("at %d.%d.%d: qi=%d\n", m_level, m_colNum, m_rowNum, qi);
+        m_children[qi] = new Tile(m_level + 1,  colNum, rowNum, this);
+        assert(m_children[qi]->getQuadrant() == q);
     }
     
-    ok = m_children[c]->setPoint(x,y,z);
-    assert(ok);
-    return ok;
+    m_children[qi]->setPoint(x,y,z);
+
+    return;
 }
 
 
@@ -173,9 +190,9 @@ void Tile::dump() {
         }
         
         if (m_level == MAXLEVEL) {
-            printf("%d.%d.%d: X=(%f..%f)  Y=(%f..%f)  cnt=%d\n",
-                m_west?1:0, m_level, m_which,
-                m_xmin, m_xmax, m_ymin, m_ymax,
+            printf("%d.%d.%d: min=(%f,%f)  max=(%f,%f)  cnt=%d\n",
+                m_level, m_colNum, m_rowNum,
+                m_xmin, m_ymin, m_xmax, m_ymax,
                 cnt);
         }
     }
@@ -251,13 +268,63 @@ void Tile::fillInCells() {
 }
 
 
+boost::uint16_t Tile::convert(double z) const {
+    boost::uint16_t h = 12345;
+    return h;
+}
+
+
+void Tile::write(FILE* fp) const {
+    for (int y=0; y<SIZ + 1; y++) {
+        for (int x=0; x<SIZ + 1; x++) {
+
+            boost::uint16_t height;
+            double z;
+            
+            if (x == SIZ) {
+                int idx = y*SIZ + (x-1); // BUG
+                z = m_data[idx];
+            } else if (y == SIZ) {
+                int idx = (y-1)*SIZ + x; // BUG
+                z = m_data[idx];
+            } else {            
+                int idx = y*SIZ + x;
+                z = m_data[idx];
+            }
+            height = convert(z);
+            fwrite(&height, 2, 1, fp);
+        }
+    }
+}
+
+    
+void Tile::write(const std::string& prefix) const {
+    char buf[1024];
+    sprintf(buf, "%s/%d.%d.%d.terrain", prefix.c_str(), m_level, m_colNum, m_rowNum);
+    assert(strlen(buf) < 1024);
+    printf("--> %s\n", buf);
+    
+    FILE* fp = fopen(buf, "wb");
+    write(fp);
+    fclose(fp);
+    
+    if (m_children) {
+        for (int i=0; i<4; i++) {
+            if (m_children[i]) {
+                m_children[i]->write(prefix);
+            }
+        }
+    }
+}
+
+
 //////////////////////////////////////////////
 
 
 TileWriter::TileWriter()
 {
-    m_root1 = new Tile(0, NULL, 1, true);
-    m_root2 = new Tile(0, NULL, 2, false);
+    m_root0 = new Tile(0, 0, 0, NULL);
+    m_root1 = new Tile(0, 1, 0, NULL);
 }
 
 
@@ -271,11 +338,11 @@ void TileWriter::goBuffers(const pdal::PointBufferSet& bufs) {
     printf("made %d tiles\n", tileCount);
     
     // now fill in the upper levels: use max of children
+    m_root0->fillInCells();
     m_root1->fillInCells();
-    m_root2->fillInCells();
     
+    m_root0->dump();
     m_root1->dump();
-    m_root2->dump();
 }
     
 
@@ -292,18 +359,21 @@ void TileWriter::goBuffer(const pdal::PointBufferPtr& buf)
         double x = buf->getFieldAs<double>(xdim, idx);
         double y = buf->getFieldAs<double>(ydim, idx);
         double z = buf->getFieldAs<double>(zdim, idx);
-        
-        bool ok;
-        
-        if (x <= 0.0) {
-            ok = m_root1->setPoint(x, y, z);
+    
+        if (x <= 0.0 && m_root0->containsPoint(x,y)) {
+            m_root0->setPoint(x, y, z);
         } else {
-            ok = m_root2->setPoint(x, y, z);
+            m_root1->setPoint(x, y, z);
         }
-        assert(ok);
         
         if (idx % 10000 == 0) {
             printf("%f complete\n", ((double)idx/(double)buf->size()) * 100.0);
         }
     }
+}
+
+
+void TileWriter::write(const std::string& prefix) const {
+    m_root0->write(prefix);
+    m_root1->write(prefix);
 }

@@ -83,6 +83,8 @@ void PdalBridge::write() {
     const pdal::PointBufferSet& bufs = m_manager->buffers();
     TileWriter* tw = new TileWriter();
     tw->goBuffers(bufs);
+    
+    tw->write("./tmp");
 }
 
 
