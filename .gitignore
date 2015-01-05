@@ -16,3 +16,5 @@ rialto_server/packages
 rialto_pdal/camp1scan1_wgs84.las
 
 rialto_pdal/info
+
+*.o

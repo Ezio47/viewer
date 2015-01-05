@@ -1,15 +1,9 @@
-#include <pdal/pdal.hpp>
-
 #include <pdal/PipelineManager.hpp>
-#include <pdal/PipelineReader.hpp>
-#include <pdal/filters/Stats.hpp>
+#include "TileWriter.hpp"
 
 class PdalBridge
 {
 public:
-    typedef pdal::Dimension::Id::Enum DimId;
-    typedef pdal::Dimension::Type::Enum DimType;
-    
     PdalBridge(bool debug=false, boost::uint32_t verbosity=0);
 
     ~PdalBridge();
@@ -22,25 +16,29 @@ public:
     std::vector<char*> getMetadataKeys();
     std::vector<char*> getMetadataValues();
     
-    pdal::point_count_t getNumPoints() const;
+    boost::uint64_t getNumPoints() const;
     
-    std::vector<pdal::Dimension::Id::Enum> getDimIds() const;
-    std::vector<pdal::Dimension::Type::Enum> getDimTypes() const;
+    const pdal::Dimension::IdList& getDimIds() const;
+    pdal::Dimension::Type::Enum getDimType(pdal::Dimension::Id::Enum) const;
     
     void getStats(pdal::Dimension::Id::Enum id, double& min, double& mean, double& max) const;
     
-private:    
-    pdal::filters::Stats* m_statsStage;
+    std::string getWkt() const;
     
+    void write();
+
+private:    
     std::vector<char*> m_keys;
     std::vector<char*> m_values;
     
     bool m_debug;
     boost::uint32_t m_verbosity;
     pdal::PipelineManager* m_manager;
-    pdal::PipelineReader* m_reader;
-    pdal::point_count_t m_numPoints;
+    pdal::Reader* m_reader;
+    pdal::Filter* m_filter1;
+    pdal::Filter* m_filter2;
+    pdal::Writer* m_writer;
+    boost::uint64_t m_numPoints;
 
-    std::vector<DimId> m_dimensionIds;
-    std::vector<DimType> m_dimensionTypes;
+    pdal::Dimension::IdList m_dimensionIds;
 };

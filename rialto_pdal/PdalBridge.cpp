@@ -1,13 +1,15 @@
 #include "PdalBridge.hpp"
 
 
+const char* epsg4326_wkt = "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433],AUTHORITY[\"EPSG\",\"4326\"]]";
+
+
 PdalBridge::PdalBridge(bool debug, boost::uint32_t verbosity) :
     m_debug(debug),
     m_verbosity(verbosity),
     m_manager(NULL),
     m_reader(NULL),
-    m_numPoints(0),
-    m_statsStage(NULL)
+    m_numPoints(0)
 {
 }
 
@@ -28,57 +30,45 @@ void PdalBridge::open(const std::string& fname)
     }
 
     {
-        pdal::StageFactory factory;
-        const std::string driver = factory.inferReaderDriver(fname);
-        if (driver == "")
-            throw pdal::pdal_error("File type not supported by PDAL");
-        pdal::Reader* reader = m_manager->addReader(driver);
+        m_reader = m_manager->addReader("readers.las");
         pdal::Options opts;
         opts.add("filename", fname);
-        reader->setOptions(opts);
+        m_reader->setOptions(opts);
     }
 
-    pdal::Stage* stage = m_manager->addFilter("filters.stats", m_manager->getStage());
-    m_statsStage = (pdal::filters::Stats*)stage;
-    
-    m_numPoints = m_manager->execute();
-
-    const pdal::PointContextRef& context = m_manager->context();
-    
-    // set lists of default ids and types
     {
-        m_dimensionIds.clear();
-        m_dimensionTypes.clear();
+        m_filter1 = m_manager->addFilter("filters.reprojection", m_reader);
+        pdal::Options opts;
         
-        m_dimensionIds = context.dims();
-        std::vector<DimId>::const_iterator iter = m_dimensionIds.begin();
-        while (iter != m_dimensionIds.end())
-        {
-            DimId id = *iter;
-            DimType type = context.dimType(id);
-            m_dimensionTypes.push_back(type);
-            ++iter;
-        }
+        const pdal::SpatialReference out_ref(epsg4326_wkt);
+        opts.add("out_srs", out_ref.getWKT());
+        m_filter1->setOptions(opts);
     }
 
+    {
+        m_filter2 = m_manager->addFilter("filters.stats", m_filter1);
+        pdal::Options opts;
+    }
+
+    pdal::PointContextRef context = m_manager->context();
+    
+    m_manager->prepare();
+    m_numPoints = m_manager->execute();
+    m_dimensionIds = context.dims();
+    
+    /*const pdal::PointBufferSet& bufs = m_manager->buffers();
+    for (auto pi = bufs.begin(); pi != bufs.end(); ++pi)
+    {
+        pdal::PointBufferPtr buf = *pi;
+        printf("buf: %ld\n", buf->size());
+    }*/
+    
     return;
 }
 
 
 void PdalBridge::close()
 {
-    if (m_buffer)
-    {
-        delete m_buffer;    
-        m_buffer = NULL;
-    }
-    
-    if (m_reader)
-    {
-        delete m_reader;
-        m_reader = NULL;
-    }
-    
     if (m_manager)
     {
         delete m_manager;
@@ -89,28 +79,73 @@ void PdalBridge::close()
 }
 
 
-pdal::point_count_t PdalBridge::getNumPoints() const
+void PdalBridge::write() {
+    const pdal::PointBufferSet& bufs = m_manager->buffers();
+    TileWriter* tw = new TileWriter();
+    tw->goBuffers(bufs);
+}
+
+
+boost::uint64_t PdalBridge::getNumPoints() const
 {
     return m_numPoints;
 }
 
 
+static void dumper(pdal::MetadataNode m, int indent=0)
+{
+    for (int i=0; i<indent*4; i++)
+        printf(" ");
+        
+    printf("%s  --  %s\n", m.name().c_str(), m.value().c_str());
+        
+    std::vector<pdal::MetadataNode> ms = m.children();
+    for (auto mi: ms)
+    {    
+        dumper(mi, indent+1);
+    }
+}
+    
+    
 void PdalBridge::getStats(pdal::Dimension::Id::Enum id, double& min, double& mean, double& max) const
 {
-    const pdal::filters::stats::Summary& summary = m_statsStage->getStats(id);
-    min = summary.minimum();
-    mean = summary.average();
-    max = summary.maximum();
+    pdal::MetadataNode m = m_filter2->getMetadata();
+    std::vector<pdal::MetadataNode> children = m.children("statistic");
+    for (auto mi: children)
+    {    
+        dumper(mi, 0);
+    }
+    
+    //pdal::PointContextRef context = m_manager->context();
+    //dumper(context.metadata());
+    
+//    const pdal::filters::stats::Summary& summary = m_statsStage->getStats(id);
+//    min = summary.minimum();
+//    mean = summary.average();
+//    max = summary.maximum();
 }
 
 
-std::vector<pdal::Dimension::Id::Enum> PdalBridge::getDimIds() const
+const pdal::Dimension::IdList& PdalBridge::getDimIds() const
 {
     return m_dimensionIds;
 }
 
 
-std::vector<pdal::Dimension::Type::Enum> PdalBridge::getDimTypes() const
+pdal::Dimension::Type::Enum PdalBridge::getDimType(pdal::Dimension::Id::Enum id) const
 {
-    return m_dimensionTypes;
+    pdal::PointContextRef context = m_manager->context();
+    pdal::Dimension::Type::Enum type = context.dimType(id);
+    return type;
+}
+
+
+std::string PdalBridge::getWkt() const
+{
+    
+    pdal::PointContextRef context = m_manager->context();
+    
+    const pdal::SpatialReference& srs = context.spatialRef();
+    std::string s = srs.getWKT();
+    return s;
 }
