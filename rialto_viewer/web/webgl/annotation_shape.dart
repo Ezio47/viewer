@@ -120,6 +120,7 @@ class AnnotationShape extends Shape {
             _selectionColorArray[i * 4 + 2] = 0.5;
             _selectionColorArray[i * 4 + 3] = 1.0;
         }
+        _selectionMaskArray = new Float32List(_colorArray.length ~/ 4);
         for (int i = 0; i < _selectionMaskArray.length; i++) {
             _selectionMaskArray[i] = 0.0;
         }
