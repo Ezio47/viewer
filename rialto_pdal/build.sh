@@ -11,13 +11,18 @@ g++ -c PdalBridge.cpp \
   -I /usr/local/include 
   
   #exit
+
+  g++ -c Tile.cpp \
+  -g -std=c++11 -ferror-limit=3 -isystem /usr/local/include \
+  -I $PDAL_INC -I /usr/local/include 
+  
   
  g++ -c TileWriter.cpp \
  -g -std=c++11 -ferror-limit=3 -isystem /usr/local/include \
  -I $PDAL_INC -I /usr/local/include 
 
-  g++ -o info info.cpp PdalBridge.o TileWriter.o \
+  g++ -o info info.cpp PdalBridge.o TileWriter.o Tile.o \
   -g -std=c++11 -ferror-limit=3 -isystem /usr/local/include \
   -I $PDAL_INC -I /usr/local/include \
-  $PDAL_LIB/libpdalcpp.dylib
+  $PDAL_LIB/libpdalcpp.dylib -lz
   
