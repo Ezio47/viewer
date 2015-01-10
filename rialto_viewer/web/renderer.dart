@@ -26,6 +26,16 @@ class Renderer {
     AxesShape _axesShape;
     BoxShape _bboxShape;
 
+<<<<<<< HEAD
+    Renderer(RenderablePointCloudSet rpcSet) {
+        _hub = Hub.root;
+
+        var csViewer = new JsObject(context['CsViewer'], [_hub.cesiumContainer]);
+           var rect1 = csViewer.callMethod('createRect', [-92.0, 20.0, -86.0, 27.0]);
+           var rect2 = csViewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
+
+
+=======
     List<Annotation> annotations = new List<Annotation>();
 
     List<Measurement>  measurements = new List<Measurement>();
@@ -38,11 +48,19 @@ class Renderer {
               _hub = Hub.root,
               _axesVisible = false,
               _bboxVisible = false {
+>>>>>>> FETCH_HEAD
         _canvas.width = _hub.width;
         _canvas.height = _hub.height;
 
         _renderSource = rpcSet;
 
+<<<<<<< HEAD
+
+        _axesVisible = false;
+        _bboxVisible = false;
+
+        //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
+=======
         var attribs = ['aVertexPosition', 'aVertexColor', 'aSelectionColor', 'aSelectionMask'];
         var uniforms = ['uMVMatrix', 'uPMatrix'];
         _glProgram = new GlProgram(gl, fragmentShader, vertexShader, attribs, uniforms);
@@ -51,6 +69,7 @@ class Renderer {
 
         update();
 
+>>>>>>> FETCH_HEAD
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
         //_hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
@@ -197,10 +216,15 @@ class Renderer {
     void draw(num viewWidth, num viewHeight, num aspect) {
 
         //off-screen rendering
+<<<<<<< HEAD
+          gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
+          _drawScene(viewWidth, viewHeight, aspect);
+=======
         if (_hub.isPickingEnabled) {
             gl.bindFramebuffer(FRAMEBUFFER, _hub.picker._frameBuffer);
             _drawScene(viewWidth, viewHeight, aspect, offscreen: true);
         }
+>>>>>>> FETCH_HEAD
 
         //on-screen rendering
         gl.bindFramebuffer(FRAMEBUFFER, null);

@@ -10,6 +10,7 @@ import 'dart:html';
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:web_gl';
+import 'dart:js';
 
 import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
@@ -60,6 +61,8 @@ class Hub {
     ColorizationDialog colorizationDialog;
     RialtoElement rialtoElement;
 
+    Element cesiumContainer;
+
     Renderer mainRenderer;
     Renderer navRenderer;
 
@@ -108,10 +111,17 @@ class Hub {
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
-        CanvasElement canvas = mainRenderPanel.$["mycanvas"];//rialtoElement.querySelector("#mycanvas");
-        assert(canvas != null);
+        renderablePointCloudSet = new RenderablePointCloudSet();
 
+<<<<<<< HEAD
+        mainRenderer = new Renderer(renderablePointCloudSet);
+
+
+
+        var domElement = cesiumContainer;
+=======
         var domElement = canvas;
+>>>>>>> FETCH_HEAD
         domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
         domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
         domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));

@@ -7,7 +7,6 @@ part of rialto.viewer;
 
 // given a point cloud, this will give us an Object3D for WebGL
 class RenderablePointCloud {
-    RenderingContext gl;
     PointCloud pointCloud;
     var dims = new Map<String, Float32List>();
     int numPoints;
@@ -15,8 +14,7 @@ class RenderablePointCloud {
     CloudShape _particleSystem;
     bool visible;
 
-    RenderablePointCloud(RenderingContext this.gl, PointCloud pc) {
-        assert(this.gl != null);
+    RenderablePointCloud(PointCloud pc) {
 
         pointCloud = pc;
         visible = true;
@@ -89,8 +87,13 @@ class RenderablePointCloud {
         assert(positions != null);
         assert(colors != null);
 
+<<<<<<< HEAD
+        _particleSystem = new CloudShape(positions, colors);
+        _particleSystem.init();
+=======
         assert(gl != null);
         _particleSystem = new CloudShape(gl, positions, colors);
+>>>>>>> FETCH_HEAD
         _particleSystem.name = pointCloud.webpath;
         return _particleSystem;
     }

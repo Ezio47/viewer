@@ -7,14 +7,12 @@ part of rialto.viewer;
 
 class RenderablePointCloudSet {
     Hub _hub;
-    RenderingContext gl;
     List<RenderablePointCloud> renderablePointClouds = new List<RenderablePointCloud>();
     Vector3 min, max, len;
     int numPoints;
     String _colorRamp = "Spectral";
 
-    RenderablePointCloudSet(RenderingContext this.gl) {
-        assert(gl != null);
+    RenderablePointCloudSet() {
         _hub = Hub.root;
 
         min = new Vector3.zero();
@@ -41,7 +39,7 @@ class RenderablePointCloudSet {
     void addCloud(PointCloud cloud) {
         if (!cloud.hasXYZ) throw new RialtoStateError("point cloud must have X, Y, and Z dimensions");
 
-        var renderable = new RenderablePointCloud(gl, cloud);
+        var renderable = new RenderablePointCloud(cloud);
         renderablePointClouds.add(renderable);
 
         _computeBounds();
