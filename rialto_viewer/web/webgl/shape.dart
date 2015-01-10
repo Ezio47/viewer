@@ -20,7 +20,7 @@ abstract class Shape {
     // to change from model to world coords
     Matrix4 modelMatrix = new Matrix4.identity();
 
-    Shape(RenderingContext this.gl) {
+    Shape() {
         id = Shape.getNewId();
 
         isVisible = true;

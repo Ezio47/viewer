@@ -26,7 +26,12 @@ class Renderer {
     AxesShape _axesShape;
     BoxShape _bboxShape;
 
-<<<<<<< HEAD
+    List<Annotation> annotations = new List<Annotation>();
+    List<Measurement> measurements = new List<Measurement>();
+
+    Vector3 _cloudMin;
+    Vector3 _cloudLen;
+
     Renderer(RenderablePointCloudSet rpcSet) {
         _hub = Hub.root;
 
@@ -35,41 +40,16 @@ class Renderer {
            var rect2 = csViewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
 
 
-=======
-    List<Annotation> annotations = new List<Annotation>();
-
-    List<Measurement>  measurements = new List<Measurement>();
-
-    Vector3 _cloudMin;
-    Vector3 _cloudLen;
-
-    Renderer(CanvasElement this._canvas, this.gl, RenderablePointCloudSet rpcSet)
-            : mvMatrix = new Matrix4.identity(),
-              _hub = Hub.root,
-              _axesVisible = false,
-              _bboxVisible = false {
->>>>>>> FETCH_HEAD
         _canvas.width = _hub.width;
         _canvas.height = _hub.height;
 
         _renderSource = rpcSet;
 
-<<<<<<< HEAD
 
         _axesVisible = false;
         _bboxVisible = false;
 
         //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
-=======
-        var attribs = ['aVertexPosition', 'aVertexColor', 'aSelectionColor', 'aSelectionMask'];
-        var uniforms = ['uMVMatrix', 'uPMatrix'];
-        _glProgram = new GlProgram(gl, fragmentShader, vertexShader, attribs, uniforms);
-        gl.useProgram(_glProgram._program);
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
-
-        update();
-
->>>>>>> FETCH_HEAD
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
         //_hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
@@ -119,7 +99,7 @@ class Renderer {
 
         {
             // axes model space is (0 .. 0.25 * cloudLen)
-            _axesShape = new AxesShape(gl);
+            _axesShape = new AxesShape();
             Matrix4 s = GlMath.makeScaleMatrix(cloudLen14.x, cloudLen14.y, cloudLen14.z);
             Matrix4 t = GlMath.makeTranslationMatrix(0.0, 0.0, 0.0);
             Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
@@ -135,7 +115,7 @@ class Renderer {
 
         {
             // bbox model space is (-cloudlen/2..+cloudlen/2)
-            _bboxShape = new BoxShape(gl);
+            _bboxShape = new BoxShape();
             Matrix4 s = GlMath.makeScaleMatrix(_cloudLen.x, _cloudLen.y, _cloudLen.z);
             Matrix4 t = GlMath.makeTranslationMatrix(-0.5, -0.5, -0.5);
             Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
@@ -214,21 +194,6 @@ class Renderer {
     }
 
     void draw(num viewWidth, num viewHeight, num aspect) {
-
-        //off-screen rendering
-<<<<<<< HEAD
-          gl.bindFramebuffer(FRAMEBUFFER, _picker._frameBNuffer);
-          _drawScene(viewWidth, viewHeight, aspect);
-=======
-        if (_hub.isPickingEnabled) {
-            gl.bindFramebuffer(FRAMEBUFFER, _hub.picker._frameBuffer);
-            _drawScene(viewWidth, viewHeight, aspect, offscreen: true);
-        }
->>>>>>> FETCH_HEAD
-
-        //on-screen rendering
-        gl.bindFramebuffer(FRAMEBUFFER, null);
-        _drawScene(viewWidth, viewHeight, aspect, offscreen: false);
     }
 
     void _drawScene(num viewWidth, num viewHeight, num aspect, {bool offscreen}) {

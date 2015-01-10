@@ -20,7 +20,7 @@ class BoxShape extends Shape {
     Float32List _selectionMaskArray;
     Buffer _selectionMaskBuffer;
 
-    BoxShape(RenderingContext gl) : super(gl) {
+    BoxShape() : super() {
         _initArrays();
 
         _initBuffers();

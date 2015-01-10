@@ -23,7 +23,7 @@ class MeasurementShape extends Shape {
     Vector3 _point1;
     Vector3 _point2;
 
-    MeasurementShape(RenderingContext gl, Vector3 point1, Vector3 point2) : super(gl) {
+    MeasurementShape(Vector3 point1, Vector3 point2) : super() {
         _point1 = point1;
         _point2 = point2;
 

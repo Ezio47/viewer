@@ -13,7 +13,7 @@ class Picker {
     var _frameBuffer;
     var _renderBuffer;
 
-    Picker(RenderingContext this.gl, CanvasElement this._canvas) {
+    Picker() {
         _hub = Hub.root;
         _configure();
         _hub.eventRegistry.WindowResize.subscribe0(_handleWindowResize);

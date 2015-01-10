@@ -17,7 +17,7 @@ class AxesShape extends Shape {
     Float32List _selectionMaskArray;
     Buffer _selectionMaskBuffer;
 
-    AxesShape(RenderingContext gl) : super(gl) {
+    AxesShape() : super() {
         _initArrays();
 
         _initBuffers();

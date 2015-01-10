@@ -96,6 +96,6 @@ class Measurement {
     }
 
     void _makeShape() {
-        shape = new MeasurementShape(Hub.root.gl, _point1, _point2);
+        shape = new MeasurementShape(_point1, _point2);
     }
 }

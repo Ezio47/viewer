@@ -94,7 +94,6 @@ class Hub {
     // singleton
     static Hub _root;
 
-
     Hub() {
         _root = this;
         eventRegistry = new EventRegistry();
@@ -113,15 +112,11 @@ class Hub {
 
         renderablePointCloudSet = new RenderablePointCloudSet();
 
-<<<<<<< HEAD
         mainRenderer = new Renderer(renderablePointCloudSet);
 
 
 
         var domElement = cesiumContainer;
-=======
-        var domElement = canvas;
->>>>>>> FETCH_HEAD
         domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
         domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
         domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));
@@ -130,21 +125,18 @@ class Hub {
         window.onKeyDown.listen((e) => eventRegistry.KeyDown.fire(new KeyboardData(e)));
         window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
 
-        RenderingContext gl = canvas.getContext3d();
-        assert(gl != null);
-
         modeController = new ModeController();
         camera = new Camera();
-        cameraController = new CameraController(camera, canvas);
+        cameraController = new CameraController(camera);
         annotationController = new AnnotationController();
         measurementController = new MeasurementController();
         selectionController = new SelectionController();
 
-        renderablePointCloudSet = new RenderablePointCloudSet(gl);
+        renderablePointCloudSet = new RenderablePointCloudSet();
 
-        mainRenderer = new Renderer(canvas, gl, renderablePointCloudSet);
+        mainRenderer = new Renderer(renderablePointCloudSet);
 
-        picker = new Picker(gl, canvas);
+        picker = new Picker();
 
         eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT));
 

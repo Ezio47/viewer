@@ -26,7 +26,7 @@ class CloudShape extends Shape {
 
     List<int> selectedPoints = new List<int>();
 
-    CloudShape(RenderingContext gl, Float32List this.points, Float32List this.colors) : super(gl) {
+    CloudShape(Float32List this.points, Float32List this.colors) : super() {
         numPoints = points.length ~/ 3;
         assert(numPoints * 3 == points.length);
         assert(numPoints * 4 == colors.length);

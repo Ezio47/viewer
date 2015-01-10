@@ -7,9 +7,9 @@ import 'dart:core';
 import 'package:polymer/polymer.dart';
 import 'hub.dart';
 import 'dart:js';
-import 'dart:math';
-import 'dart:html';
-import 'dart:typed_data';
+//import 'dart:math';
+//import 'dart:html';
+//import 'dart:typed_data';
 
 void main() {
 
@@ -73,14 +73,8 @@ void boot1() {
     hub.defaultServer = "http://www.example.com/";
 
     hub.eventRegistry.OpenServerCompleted.subscribe0(() {
-<<<<<<< HEAD
         hub.eventRegistry.OpenFile.fire("/terrain1.dat");
         hub.eventRegistry.OpenFile.fire("/terrain2.dat");
-=======
-        hub.eventRegistry.OpenFile.fire("/dir1/random.dat");
-        //hub.eventRegistry.OpenFile.fire("/terrain1.dat");
-        //hub.eventRegistry.OpenFile.fire("/terrain2.dat");
->>>>>>> FETCH_HEAD
     });
 
     hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {

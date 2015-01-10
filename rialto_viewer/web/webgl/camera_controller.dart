@@ -43,7 +43,7 @@ class CameraController implements IController {
     Vector2 _panStart, _panEnd;
     Vector3 _lastPosition;
 
-    CameraController(Camera this._camera, CanvasElement this._canvas)
+    CameraController(Camera this._camera)
             : _hub = Hub.root,
               isRunning = false {
         _hub.modeController.register(this, ModeData.MOVEMENT);

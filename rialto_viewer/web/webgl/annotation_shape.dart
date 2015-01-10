@@ -23,7 +23,7 @@ class AnnotationShape extends Shape {
     Vector3 _point1;
     Vector3 _point2;
 
-    AnnotationShape(RenderingContext gl, Vector3 point1, Vector3 point2) : super(gl) {
+    AnnotationShape(Vector3 point1, Vector3 point2) : super() {
         _point1 = point1;
         _point2 = point2;
 

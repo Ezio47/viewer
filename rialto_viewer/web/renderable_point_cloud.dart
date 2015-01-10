@@ -87,13 +87,8 @@ class RenderablePointCloud {
         assert(positions != null);
         assert(colors != null);
 
-<<<<<<< HEAD
         _particleSystem = new CloudShape(positions, colors);
-        _particleSystem.init();
-=======
-        assert(gl != null);
-        _particleSystem = new CloudShape(gl, positions, colors);
->>>>>>> FETCH_HEAD
+        //_particleSystem.init();
         _particleSystem.name = pointCloud.webpath;
         return _particleSystem;
     }

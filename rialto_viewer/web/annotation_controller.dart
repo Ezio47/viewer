@@ -98,7 +98,7 @@ class Annotation {
     }
 
     void _makeShape() {
-        shape = new AnnotationShape(Hub.root.gl, _point1, _point2);
+        shape = new AnnotationShape(_point1, _point2);
     }
 
     void _fixCorners() {
