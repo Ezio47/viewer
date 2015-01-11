@@ -8,10 +8,11 @@ class AxesShape extends Shape {
     double _xlen, _ylen, _zlen;
 
     AxesShape(double this._xlen, double this._ylen, double this._zlen) : super() {
+        _primitive = _createCesiumObject();
     }
 
     @override
-    void _createCesiumObject() {
-        _hub.cesium.createAxes(_xlen, _ylen, _zlen);
+    dynamic _createCesiumObject() {
+        return _hub.cesium.createAxes(_xlen, _ylen, _zlen);
     }
 }

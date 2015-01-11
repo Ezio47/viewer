@@ -15,10 +15,12 @@ class CloudShape extends Shape {
         assert(numPoints * 4 == colors.length);
 
         isSelectable = true;
+
+        _primitive = _createCesiumObject();
     }
 
     @override
-    void _createCesiumObject() {
-        _hub.cesium.createCloud(numPoints, points, colors);
+    dynamic _createCesiumObject() {
+        return _hub.cesium.createCloud(numPoints, points, colors);
     }
 }

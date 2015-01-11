@@ -55,7 +55,7 @@ var CesiumBridge = function (element) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
 
-        for (var i = 0; i<cnt; i++) {
+        /*for (var i = 0; i<cnt; i++) {
             var x = ps[i*3+0];
             var y = ps[i*3+1];
             var z = ps[i*3+2];
@@ -63,11 +63,7 @@ var CesiumBridge = function (element) {
             ps[i*3+0] = p.x;
             ps[i*3+1] = p.y;
             ps[i*3+2] = p.z;
-        }
-
-        console.log(cnt);
-        console.log(ps[34]);
-        console.log(cs[34]);
+        }*/
 
         var pointInstance = new Cesium.GeometryInstance({
             geometry : new Cesium.PointGeometry({
@@ -88,10 +84,10 @@ var CesiumBridge = function (element) {
 
     this._createLineInstance = function(x0, y0, z0, x1, y1, z1, color) {
       var geom = new Cesium.PolylineGeometry({
-            positions : Cesium.Cartesian3.fromDegreesArrayHeights([
+            positions : [ //Cesium.Cartesian3.fromDegreesArrayHeights([
                 x0, y0, z0,
                 x1, y1, z1,
-            ]),
+            ],
             width : 1.0,
             vertexFormat : Cesium.PolylineColorAppearance.VERTEX_FORMAT,
             followSurface: true

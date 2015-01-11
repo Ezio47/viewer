@@ -17,7 +17,7 @@ abstract class Shape {
     bool isSelectable;
     int id;
 
-    var _csPrimitive;
+    var _primitive;
 
     Shape() {
         _hub = Hub.root;
@@ -29,15 +29,12 @@ abstract class Shape {
         isSelectable = false;
 
         Hub.root.shapesMap[id] = this;
-
-        _createCesiumObject();
-        assert(_csPrimitive != null);
     }
 
     static int getNewId() => _ids++;
 
     // should set _csPrimitive
-    void _createCesiumObject();
+    dynamic _createCesiumObject();
 
     // called when picked
     void pick(int pickedId) {

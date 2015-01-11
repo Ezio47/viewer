@@ -18,6 +18,14 @@ class Cesium {
         _viewer.callMethod('setUpdater', [f]);
     }
 
+    dynamic createFloat64Array(int len) {
+        return new JsObject(context['Float64Array'], [len]);
+    }
+
+    dynamic createUint8Array(int len) {
+        return new JsObject(context['Uint8Array'], [len]);
+    }
+
     Vector3 get cameraEyePosition {
         assert(false);
         return null;
@@ -64,7 +72,7 @@ class Cesium {
     dynamic createAxes(double x, double y, double z) {
         var axes = _viewer.callMethod('createAxes', [x, y, z]);
         return axes;
-   }
+    }
 
     dynamic createBbox(Vector3 point1, Vector3 point2) {
         var prim = _viewer.callMethod('createBbox', [0.0, 0.0, 0.0, 25.0, 25.0, 1000.0 * 1000.0]);
@@ -72,12 +80,28 @@ class Cesium {
     }
 
     dynamic createLine(Vector3 point1, Vector3 point2) {
-        var prim = _viewer.callMethod('createLine', [point1.x,point1.y,point1.z,point2.x,point2.y,point2.z]);
+        var prim = _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z]);
         return prim;
     }
 
     dynamic createCloud(int numPoints, Float32List points, Float32List colors) {
-        var prim = _viewer.callMethod('createCloud', [numPoints, points, colors]);
+        assert(numPoints >= 0);
+        assert(points.length == numPoints * 3);
+        assert(colors.length == numPoints * 4);
+        log(points[34]);
+
+        var points2 = createFloat64Array(numPoints*3);
+        var colors2 = createUint8Array(numPoints*4);
+        for (int i=0; i<numPoints; i++) {
+            points2[i*3+0] = points[i*3+0];
+            points2[i*3+1] = points[i*3+1];
+            points2[i*3+2] = points[i*3+2];
+            colors2[i*4+0] = (colors[i*4+0] * 255.0).toInt();
+            colors2[i*4+1] = (colors[i*4+1] * 255.0).toInt();
+            colors2[i*4+2] = (colors[i*4+2] * 255.0).toInt();
+            colors2[i*4+3] = (colors[i*4+3] * 255.0).toInt();
+        }
+        var prim = _viewer.callMethod('createCloud', [numPoints, points2, colors2]);
         return prim;
     }
 

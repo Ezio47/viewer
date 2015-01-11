@@ -107,8 +107,10 @@ class Renderer {
         cameraUpDirection = new Vector3(0.0, 0.0, 1.0);
     }
 
-    // this gets called whenever something major changes, e.g. add a new cloud
-    void update() {
+    void checkUpdate([dynamic theScene=null, dynamic theTime=null]) {
+    }
+
+    void update([dynamic theScene=null, dynamic theTime=null]) {
         // model space: cloud's (xmin,ymin,zmin)..cloud's (xmax,ymax,zmax)
         // world space: (0,0,0).. cloud's (xlen,ylen,zlen)
         //
@@ -146,25 +148,25 @@ class Renderer {
         // r = (rx * ry * rz);
         // modelMatrix = t * r * s;
 
-        {
+        /*{
             // axes model space is (0 .. 0.25 * cloudLen)
             _axesShape = new AxesShape(cloudLen14.x, cloudLen14.y, cloudLen14.z);
             _hub.shapesList.add(_axesShape);
-        }
+        }*/
 
-        {
+        /*{
             // bbox model space is (cloudMin....cloudMax)
             _bboxShape = new BboxShape(_cloudMin, _cloudMax);
             _hub.shapesList.add(_bboxShape);
-        }
+        }*/
 
-        {
+        /*{
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.isVisible = rpc.visible;
                 _hub.shapesList.add(obj);
             }
-        }
+        }*/
 
         for (var annotation in annotations) {
             addAnnotationToScene(annotation);

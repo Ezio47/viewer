@@ -9,10 +9,11 @@ class BboxShape extends Shape {
     Vector3 _point1, _point2;
 
     BboxShape(Vector3 this._point1, Vector3 this._point2) : super() {
+        _primitive = _createCesiumObject();
     }
 
     @override
-    void _createCesiumObject() {
-        _hub.cesium.createBbox(_point1, _point2);
+    dynamic _createCesiumObject() {
+        return _hub.cesium.createBbox(_point1, _point2);
     }
 }

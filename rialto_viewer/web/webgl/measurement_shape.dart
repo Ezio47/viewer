@@ -10,10 +10,11 @@ class MeasurementShape extends Shape {
 
     MeasurementShape(Vector3 this._point1, Vector3 this._point2) : super() {
         isSelectable = true;
+        _primitive = _createCesiumObject();
     }
 
     @override
-    void _createCesiumObject() {
-        _hub.cesium.createLine(_point1, _point2);
+    dynamic _createCesiumObject() {
+        return _hub.cesium.createLine(_point1, _point2);
     }
 }

@@ -6,6 +6,7 @@ import 'dart:core';
 import 'package:polymer/polymer.dart';
 import 'hub.dart';
 
+
 void main() {
 
     initPolymer().run(() {
@@ -39,8 +40,8 @@ void boot1() {
     hub.defaultServer = "http://www.example.com/";
 
     hub.eventRegistry.OpenServerCompleted.subscribe0(() {
-        hub.eventRegistry.OpenFile.fire("/terrain1.dat");
-        hub.eventRegistry.OpenFile.fire("/terrain2.dat");
+        hub.eventRegistry.OpenFile.fire("/dir1/random.dat");
+        //hub.eventRegistry.OpenFile.fire("/terrain2.dat");
     });
 
     hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {

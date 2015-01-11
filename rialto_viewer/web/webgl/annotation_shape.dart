@@ -17,10 +17,12 @@ class AnnotationShape extends Shape {
         assert(_point1.y <= _point2.y);
         assert(_point1.z == _point2.z);
         isSelectable = true;
+
+        _primitive = _createCesiumObject();
     }
 
     @override
-    void _createCesiumObject() {
-        _hub.cesium.createRectangle(_point1, _point2);
+    dynamic _createCesiumObject() {
+        return _hub.cesium.createRectangle(_point1, _point2);
     }
 }

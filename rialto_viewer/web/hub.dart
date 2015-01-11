@@ -48,6 +48,13 @@ part 'webgl/measurement_shape.dart';
 part 'webgl/picker.dart';
 part 'webgl/shape.dart';
 
+
+void log(o)
+{
+    window.console.log(o);
+}
+
+
 class Hub {
     RenderPanel mainRenderPanel;
     RenderPanel navRenderPanel;
@@ -109,7 +116,7 @@ class Hub {
 
         mainRenderer = new Renderer(renderablePointCloudSet);
 
-        cesium.setUpdateFunction(mainRenderer.update);
+        cesium.setUpdateFunction(mainRenderer.checkUpdate);
 
         var domElement = cesiumContainer;
         window.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
