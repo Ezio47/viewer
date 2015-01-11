@@ -4,16 +4,15 @@
 
 part of rialto.viewer;
 
-class MeasurementShape extends Shape {
-    Vector3 _point1;
-    Vector3 _point2;
 
-    MeasurementShape(Vector3 this._point1, Vector3 this._point2) : super() {
-        isSelectable = true;
+class BboxShape extends Shape {
+    Vector3 _point1, _point2;
+
+    BboxShape(Vector3 this._point1, Vector3 this._point2) : super() {
     }
 
     @override
     void _createCesiumObject() {
-        _hub.cesium.createLine(_point1, _point2);
+        _hub.cesium.createBbox(_point1, _point2);
     }
 }

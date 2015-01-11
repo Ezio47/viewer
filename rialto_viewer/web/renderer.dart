@@ -7,10 +7,6 @@ part of rialto.viewer;
 class Renderer {
     Hub _hub;
 
-    CanvasElement _canvas;
-    RenderingContext gl;
-    GlProgram _glProgram;
-
     Matrix4 pMatrix;
     Matrix4 mvMatrix;
 
@@ -24,13 +20,22 @@ class Renderer {
     RenderablePointCloudSet _renderSource;
 
     AxesShape _axesShape;
-    BoxShape _bboxShape;
+    BboxShape _bboxShape;
 
     List<Annotation> annotations = new List<Annotation>();
     List<Measurement> measurements = new List<Measurement>();
 
     Vector3 _cloudMin;
+    Vector3 _cloudMax;
     Vector3 _cloudLen;
+
+    Vector3 _defaultCameraEyePosition;
+    Vector3 _cameraEyePosition;
+    Vector3 _defaultCameraTargetPosition;
+    Vector3 _cameraTargetPosition;
+    Vector3 _defaultCameraUpDirection;
+    Vector3 _cameraUpDirection;
+    // BUG: camera fov?
 
     Renderer(RenderablePointCloudSet rpcSet) {
         _hub = Hub.root;
@@ -39,9 +44,6 @@ class Renderer {
            var rect1 = csViewer.callMethod('createRect', [-92.0, 20.0, -86.0, 27.0]);
            var rect2 = csViewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
 
-
-        _canvas.width = _hub.width;
-        _canvas.height = _hub.height;
 
         _renderSource = rpcSet;
 
@@ -54,8 +56,72 @@ class Renderer {
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
         //_hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
         //_hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
+    }
 
-        _hub.eventRegistry.WindowResize.subscribe0(_handleWindowResize);
+    Vector3 get defaultCameraEyePosition {
+        assert(false);
+        return _defaultCameraEyePosition;
+    }
+
+    set defaultCameraEyePosition(Vector3 value) {
+        assert(false);
+        _defaultCameraEyePosition = value;
+    }
+
+    Vector3 get cameraEyePosition {
+        assert(false);
+        return _cameraEyePosition;
+    }
+
+    set cameraEyePosition(Vector3 value) {
+        assert(false);
+        _cameraEyePosition = value;
+    }
+
+    Vector3 get defaultCameraTargetPosition {
+        assert(false);
+        return _defaultCameraTargetPosition;
+    }
+
+    set defaultCameraTargetPosition(Vector3 value) {
+        assert(false);
+        _defaultCameraTargetPosition = value;
+    }
+
+    Vector3 get cameraTargetPosition {
+        assert(false);
+        return _cameraTargetPosition;
+    }
+
+    set cameraTargetPosition(Vector3 value) {
+        assert(false);
+        _cameraTargetPosition = value;
+    }
+
+    Vector3 get defaultCameraUpDirection {
+        assert(false);
+        return _defaultCameraUpDirection;
+    }
+
+    set defaultCameraUpDirection(Vector3 value) {
+        assert(false);
+        _defaultCameraUpDirection = value;
+    }
+
+    Vector3 get cameraUpDirection {
+        assert(false);
+        return _cameraUpDirection;
+    }
+
+    set cameraUpDirection(Vector3 value) {
+        assert(false);
+        _cameraUpDirection = value;
+    }
+
+    void goHome() {
+        cameraEyePosition = defaultCameraEyePosition;
+        cameraTargetPosition = defaultCameraTargetPosition;
+        cameraUpDirection = new Vector3(0.0, 0.0, 1.0);
     }
 
     // this gets called whenever something major changes, e.g. add a new cloud
@@ -80,12 +146,12 @@ class Renderer {
         final cloudLen14 = _cloudLen / 4.0;
 
         final ideal = new Vector3(-1.0, -2.0, 2.0);
-        _hub.camera.defaultEye = new Vector3(ideal.x * _cloudLen.x, ideal.y * _cloudLen.y, ideal.z * _cloudLen.z);
-        _hub.camera.defaultTarget = new Vector3(0.0, 0.0, 0.0);
-        _hub.camera.eye = _hub.camera.defaultEye;
-        _hub.camera.target = _hub.camera.defaultTarget;
-        _hub.camera.fovy = 65.0;
-        _hub.camera.up = new Vector3(0.0, 0.0, 1.0);
+        defaultCameraEyePosition = new Vector3(ideal.x * _cloudLen.x, ideal.y * _cloudLen.y, ideal.z * _cloudLen.z);
+        defaultCameraTargetPosition = new Vector3(0.0, 0.0, 0.0);
+        defaultCameraUpDirection = new Vector3(0.0, 0.0, 1.0);
+        cameraEyePosition = defaultCameraEyePosition;
+        cameraTargetPosition = defaultCameraTargetPosition;
+        cameraUpDirection = defaultCameraUpDirection;
 
         // "rotate then translate" (spinning) vs "translate then rotate" (orbiting)
         //
@@ -99,33 +165,13 @@ class Renderer {
 
         {
             // axes model space is (0 .. 0.25 * cloudLen)
-            _axesShape = new AxesShape();
-            Matrix4 s = GlMath.makeScaleMatrix(cloudLen14.x, cloudLen14.y, cloudLen14.z);
-            Matrix4 t = GlMath.makeTranslationMatrix(0.0, 0.0, 0.0);
-            Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
-            Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
-            Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
-            var m = s * rz;
-            m = m * ry;
-            m = m * rx;
-            m = m * t;
-            _axesShape.modelMatrix = m;
+            _axesShape = new AxesShape(cloudLen14.x, cloudLen14.y, cloudLen14.z);
             _hub.shapesList.add(_axesShape);
         }
 
         {
-            // bbox model space is (-cloudlen/2..+cloudlen/2)
-            _bboxShape = new BoxShape();
-            Matrix4 s = GlMath.makeScaleMatrix(_cloudLen.x, _cloudLen.y, _cloudLen.z);
-            Matrix4 t = GlMath.makeTranslationMatrix(-0.5, -0.5, -0.5);
-            Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
-            Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
-            Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
-            var m = s * rz;
-            m = m * ry;
-            m = m * rx;
-            m = m * t;
-            _bboxShape.modelMatrix = m;
+            // bbox model space is (cloudMin....cloudMax)
+            _bboxShape = new BboxShape(_cloudMin, _cloudMax);
             _hub.shapesList.add(_bboxShape);
         }
 
@@ -133,17 +179,6 @@ class Renderer {
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.isVisible = rpc.visible;
-                Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
-                final d = -_cloudMin - cloudLen12;
-                Matrix4 t = GlMath.makeTranslationMatrix(d.x, d.y, d.z);
-                Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
-                Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
-                Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
-                var m = s * rz;
-                m = m * ry;
-                m = m * rx;
-                m = m * t;
-                obj.modelMatrix = m;
                 _hub.shapesList.add(obj);
             }
         }
@@ -156,93 +191,20 @@ class Renderer {
             addMeasurementToScene(measurement);
         }
 
-        _hub.camera.goHome();
+        goHome();
     }
 
     void addAnnotationToScene(Annotation annotation) {
-        final cloudLen12 = _cloudLen / 2.0;
-
-        Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
-        final d = -_cloudMin - cloudLen12;
-        Matrix4 t = GlMath.makeTranslationMatrix(d.x, d.y, d.z);
-        Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
-        Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
-        Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
-        var m = s * rz;
-        m = m * ry;
-        m = m * rx;
-        m = m * t;
-        annotation.shape.modelMatrix = m;
         _hub.shapesList.add(annotation.shape);
     }
 
     void addMeasurementToScene(Measurement measurement) {
-        final cloudLen12 = _cloudLen / 2.0;
-
-        Matrix4 s = GlMath.makeScaleMatrix(1.0, 1.0, 1.0);
-        final d = -_cloudMin - cloudLen12;
-        Matrix4 t = GlMath.makeTranslationMatrix(d.x, d.y, d.z);
-        Matrix4 rx = GlMath.makeXRotationMatrix(degToRad(0.0));
-        Matrix4 ry = GlMath.makeYRotationMatrix(degToRad(0.0));
-        Matrix4 rz = GlMath.makeZRotationMatrix(degToRad(0.0));
-        var m = s * rz;
-        m = m * ry;
-        m = m * rx;
-        m = m * t;
-        measurement.shape.modelMatrix = m;
         _hub.shapesList.add(measurement.shape);
     }
 
     void draw(num viewWidth, num viewHeight, num aspect) {
     }
 
-    void _drawScene(num viewWidth, num viewHeight, num aspect, {bool offscreen}) {
-
-        gl.viewport(0, 0, viewWidth, viewHeight);
-        gl.clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
-        gl.enable(DEPTH_TEST);
-        gl.disable(BLEND);
-
-        pMatrix = _hub.camera.getPerspectiveMatrix(aspect);
-        var viewMatrix = _hub.camera.getViewMatrix();
-
-        for (var shape in _hub.shapesList) {
-            var modelMatrix = shape.modelMatrix;
-            mvMatrix = viewMatrix * modelMatrix;
-            shape.draw(
-                    _glProgram._attributes['aVertexPosition'],
-                    _glProgram._attributes['aVertexColor'],
-                    _glProgram._attributes['aSelectionColor'],
-                    _glProgram._attributes['aSelectionMask'],
-                    _setMatrixUniforms,
-                    offscreen);
-        }
-    }
-
-    void _setMatrixUniforms(Shape shape, bool offscreen) {
-        gl.uniformMatrix4fv(_glProgram._uniforms['uPMatrix'], false, pMatrix.storage);
-        gl.uniformMatrix4fv(_glProgram._uniforms['uMVMatrix'], false, mvMatrix.storage);
-        gl.uniform1i(_glProgram._uniforms['uOffscreen'], offscreen ? 1 : 0);
-    }
-
-    void tick(time) {
-        //window.animationFrame.then(tick);
-        //draw(_canvas.width, _canvas.height, _canvas.width / _canvas.height);
-
-        // BUG???
-
-        window.animationFrame.then((_) {
-            draw(_canvas.width, _canvas.height, _canvas.width / _canvas.height);
-            tick(0);
-        });
-    }
-
-    void _handleWindowResize() {
-        final w = _hub.width;
-        final h = _hub.height;
-        _canvas.width = w;
-        _canvas.height = h;
-    }
 
     void _handleDisplayAxes(bool v) {
         _axesVisible = v;
@@ -255,11 +217,11 @@ class Renderer {
     }
 
     void _handleUpdateCameraTargetPosition(Vector3 data) {
-        _hub.camera.target = _hub.camera.defaultTarget;
+        cameraTargetPosition = data;
     }
 
     void _handleUpdateCameraEyePosition(Vector3 data) {
-        _hub.camera.eye = _hub.camera.defaultEye;
+        cameraEyePosition = data;
     }
 }
 

@@ -39,26 +39,13 @@ class AnnotationController implements IController {
 
         if (point1 == null) {
 
-            Point p = _hub.cameraController.get2DCoords(data.x, data.y);
-
-            List l = _hub.picker.find(p);
-            if (l == null) return;
-            var shape = l[0];
-            var pickedId = l[1];
-
-            if (shape is! CloudShape) return;
-            point1 = shape.getPoint(pickedId);
+            point1 = _hub.cesium.getMouseCoordinates();
+            if (point1 == null) return;
 
         } else if (point2 == null) {
-            Point p = _hub.cameraController.get2DCoords(data.x, data.y);
+            point2 = _hub.cesium.getMouseCoordinates();
+            if (point2 == null) return;
 
-            List l = _hub.picker.find(p);
-            if (l == null) return;
-            var shape = l[0];
-            var pickedId = l[1];
-
-            if (shape is! CloudShape) return;
-            point2 = shape.getPoint(pickedId);
         } else {
             // already have point, do nothing
         }

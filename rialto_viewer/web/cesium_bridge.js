@@ -1,4 +1,8 @@
-var CsViewer = function (element) {
+// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
+var CesiumBridge = function (element) {
     var options = {
         timeline: false,
         geocoder: false,
@@ -137,6 +141,8 @@ var CsViewer = function (element) {
         });
         this.viewer.scene.primitives.add(prim);
         return prim;
+    }
 
+    this.getCurrentPoint = function() {
     }
 }

@@ -9,7 +9,6 @@ class SelectionController implements IController {
     bool isRunning;
 
     Shape _possibleShape;
-    int _possibleId;
 
     SelectionController() {
         _hub = Hub.root;
@@ -22,17 +21,14 @@ class SelectionController implements IController {
         _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
 
         _possibleShape = null;
-        _possibleId = -1;
     }
 
     void startMode() {
         _possibleShape = null;
-        _possibleId = -1;
     }
 
     void endMode() {
         _possibleShape = null;
-        _possibleId = -1;
     }
 
     void _handleMouseMove(MouseData data) {
@@ -42,13 +38,8 @@ class SelectionController implements IController {
     void _handleMouseDown(MouseData data) {
         if (!isRunning) return;
 
-        Point p = _hub.cameraController.get2DCoords(data.x, data.y);
-
-        List l = _hub.picker.find(p);
-        if (l == null) return;
-
-        _possibleShape = l[0];
-        _possibleId = l[1];
+        Shape s = _hub.picker.getCurrentShape();
+        if (s != null) _possibleShape = s;
     }
 
     void _handleMouseUp(MouseData data) {
@@ -60,30 +51,17 @@ class SelectionController implements IController {
 
         if (!_possibleShape.isSelectable) {
             _possibleShape = null;
-            _possibleId = -1;
             return;
         }
 
         if (_possibleShape.isSelected) {
-            if (_possibleShape is CloudShape) {
-                CloudShape cs = _possibleShape;
-                cs.selectedPoints.remove(_possibleId);
-                if (cs.selectedPoints.length == 0) {
-                    _possibleShape.isSelected = false;
-                }
-            } else {
-                _possibleShape.isSelected = false;
-            }
+            // unselect
+            _possibleShape.isSelected = false;
             _possibleShape = null;
-            _possibleId = -1;
             return;
         }
 
         _possibleShape.isSelected = true;
-        if (_possibleShape is CloudShape) {
-            CloudShape cs = _possibleShape;
-            cs.selectedPoints.add(_possibleId);
-        }
         _possibleShape = null;
     }
 }

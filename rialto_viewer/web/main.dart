@@ -3,13 +3,8 @@
 // license found in the accompanying LICENSE.txt file.
 
 import 'dart:core';
-//import 'package:vector_math/vector_math.dart';
 import 'package:polymer/polymer.dart';
 import 'hub.dart';
-import 'dart:js';
-//import 'dart:math';
-//import 'dart:html';
-//import 'dart:typed_data';
 
 void main() {
 
@@ -29,11 +24,11 @@ void main() {
         });
 
 
-    var csViewer = new JsObject(context['CsViewer'], ['cesiumContainer']);
-    var rect1 = csViewer.callMethod('createRect', [-92.0, 20.0, -86.0, 27.0]);
+/*
+ *     var rect1 = csViewer.callMethod('createRect', [-92.0, 20.0, -86.0, 27.0]);
     var rect2 = csViewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
     //csViewer.callMethod('removePrimitive', [rect1]);
-/*
+
     var cnt = 1000;
     var ps = new JsObject(context['Float64Array'], [cnt * 3]);
     var cs = new JsObject(context['Uint8Array'], [cnt * 4]);

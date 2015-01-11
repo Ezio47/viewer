@@ -9,7 +9,6 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:web_gl';
 import 'dart:js';
 
 import 'package:http/browser_client.dart' as BHttp;
@@ -22,6 +21,7 @@ import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
 part 'annotation_controller.dart';
+part 'cesium.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'event_registry.dart';
@@ -42,17 +42,11 @@ part 'utils/utils.dart';
 
 part 'webgl/annotation_shape.dart';
 part 'webgl/axes_shape.dart';
-part 'webgl/box_shape.dart';
-part 'webgl/camera.dart';
-part 'webgl/camera_controller.dart';
+part 'webgl/bbox_shape.dart';
 part 'webgl/cloud_shape.dart';
-part 'webgl/fragment_shader.dart';
-part 'webgl/gl_program.dart';
-part 'webgl/gl_math.dart';
 part 'webgl/measurement_shape.dart';
 part 'webgl/picker.dart';
 part 'webgl/shape.dart';
-part 'webgl/vertex_shader.dart';
 
 class Hub {
     RenderPanel mainRenderPanel;
@@ -70,12 +64,9 @@ class Hub {
 
     AnnotationController annotationController;
     Picker picker;
-    RenderingContext gl;
     MeasurementController measurementController;
     ModeController modeController;
     SelectionController selectionController;
-    Camera camera;
-    CameraController cameraController;
 
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -94,6 +85,8 @@ class Hub {
     // singleton
     static Hub _root;
 
+    Cesium cesium;
+
     Hub() {
         _root = this;
         eventRegistry = new EventRegistry();
@@ -105,6 +98,8 @@ class Hub {
     }
 
     void init() {
+        cesium = new Cesium('cesiumContainer');
+
         eventRegistry.OpenServer.subscribe(_handleOpenServer);
         eventRegistry.CloseServer.subscribe0(_handleCloseServer);
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
@@ -126,8 +121,6 @@ class Hub {
         window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
 
         modeController = new ModeController();
-        camera = new Camera();
-        cameraController = new CameraController(camera);
         annotationController = new AnnotationController();
         measurementController = new MeasurementController();
         selectionController = new SelectionController();
@@ -139,8 +132,6 @@ class Hub {
         picker = new Picker();
 
         eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT));
-
-        mainRenderer.tick(0);
     }
 
     int get width => window.innerWidth;
