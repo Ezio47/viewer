@@ -40,11 +40,6 @@ class Renderer {
     Renderer(RenderablePointCloudSet rpcSet) {
         _hub = Hub.root;
 
-        var csViewer = new JsObject(context['CsViewer'], [_hub.cesiumContainer]);
-           var rect1 = csViewer.callMethod('createRect', [-92.0, 20.0, -86.0, 27.0]);
-           var rect2 = csViewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
-
-
         _renderSource = rpcSet;
 
 
@@ -59,62 +54,50 @@ class Renderer {
     }
 
     Vector3 get defaultCameraEyePosition {
-        assert(false);
         return _defaultCameraEyePosition;
     }
 
     set defaultCameraEyePosition(Vector3 value) {
-        assert(false);
         _defaultCameraEyePosition = value;
     }
 
     Vector3 get cameraEyePosition {
-        assert(false);
         return _cameraEyePosition;
     }
 
     set cameraEyePosition(Vector3 value) {
-        assert(false);
         _cameraEyePosition = value;
     }
 
     Vector3 get defaultCameraTargetPosition {
-        assert(false);
         return _defaultCameraTargetPosition;
     }
 
     set defaultCameraTargetPosition(Vector3 value) {
-        assert(false);
         _defaultCameraTargetPosition = value;
     }
 
     Vector3 get cameraTargetPosition {
-        assert(false);
         return _cameraTargetPosition;
     }
 
     set cameraTargetPosition(Vector3 value) {
-        assert(false);
         _cameraTargetPosition = value;
     }
 
     Vector3 get defaultCameraUpDirection {
-        assert(false);
         return _defaultCameraUpDirection;
     }
 
     set defaultCameraUpDirection(Vector3 value) {
-        assert(false);
         _defaultCameraUpDirection = value;
     }
 
     Vector3 get cameraUpDirection {
-        assert(false);
         return _cameraUpDirection;
     }
 
     set cameraUpDirection(Vector3 value) {
-        assert(false);
         _cameraUpDirection = value;
     }
 

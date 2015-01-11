@@ -11,6 +11,10 @@ var CesiumBridge = function (element) {
     };
     this.viewer = new Cesium.Viewer(element, options);
 
+    this.setUpdater = function(f) {
+        this.viewer.scene.preRender.addEventListener(f);
+    }
+
     this.createRect = function(a,b,c,d) {
 
         var scene = this.viewer.scene;

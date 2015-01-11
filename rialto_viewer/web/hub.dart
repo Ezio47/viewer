@@ -109,13 +109,13 @@ class Hub {
 
         mainRenderer = new Renderer(renderablePointCloudSet);
 
-
+        cesium.setUpdateFunction(mainRenderer.update);
 
         var domElement = cesiumContainer;
-        domElement.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
-        domElement.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
-        domElement.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));
-        domElement.onMouseWheel.listen((e) => eventRegistry.MouseWheel.fire(new WheelData(e)));
+        window.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
+        window.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
+        window.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));
+        window.onMouseWheel.listen((e) => eventRegistry.MouseWheel.fire(new WheelData(e)));
         window.onKeyUp.listen((e) => eventRegistry.KeyUp.fire(new KeyboardData(e)));
         window.onKeyDown.listen((e) => eventRegistry.KeyDown.fire(new KeyboardData(e)));
         window.onResize.listen((e) => eventRegistry.WindowResize.fire0());

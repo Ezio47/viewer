@@ -10,49 +10,20 @@ void main() {
 
     initPolymer().run(() {
 
-            // Code that doesn't need to wait.
-            var hub = new Hub();
+        // Code that doesn't need to wait.
+        var hub = new Hub();
 
-            Polymer.onReady.then((_) {
-                // Code that executes after elements have been upgraded.
+        Polymer.onReady.then((_) {
+            // Code that executes after elements have been upgraded.
 
-                Hub.root.init();
+            Hub.root.init();
 
 
-                boot1();
-            });
+            boot1();
         });
-
-
-/*
- *     var rect1 = csViewer.callMethod('createRect', [-92.0, 20.0, -86.0, 27.0]);
-    var rect2 = csViewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
-    //csViewer.callMethod('removePrimitive', [rect1]);
-
-    var cnt = 1000;
-    var ps = new JsObject(context['Float64Array'], [cnt * 3]);
-    var cs = new JsObject(context['Uint8Array'], [cnt * 4]);
-
-    var rnd = new Random();
-    for (var i = 0; i < cnt; i++) {
-        var rx = rnd.nextDouble() * 60.0 + 20.0;
-        var ry = rnd.nextDouble() * 60.0 + 20.0;
-        var rz = rnd.nextDouble() * 10000.0;
-        ps[i * 3 + 0] = -rx;
-        ps[i * 3 + 1] = ry;
-        ps[i * 3 + 2] = rz;
-        cs[i * 4 + 0] = 255;
-        cs[i * 4 + 1] = 255;
-        cs[i * 4 + 2] = 255;
-        cs[i * 4 + 3] = 255;
-    }
-    var cloud1 = csViewer.callMethod('createCloud', [cnt, ps, cs]);
-
-    var axes = csViewer.callMethod('createAxes', [-100.0, 20.0, 0.0, -50.0, 70, 1000.0 * 1000.0]);
-
-    var bbox = csViewer.callMethod('createBbox', [0.0, 0.0, 0.0, 25.0, 25.0, 1000.0 * 1000.0]);
-*/
+    });
 }
+
 
 void boot0() {
     Hub hub = Hub.root;
