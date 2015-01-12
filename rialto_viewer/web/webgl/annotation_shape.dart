@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -9,7 +9,7 @@ class AnnotationShape extends Shape {
     Vector3 _point1;
     Vector3 _point2;
 
-    AnnotationShape(Vector3 point1, Vector3 point2) : super() {
+    AnnotationShape(Vector3 point1, Vector3 point2) : super("annotation") {
         _point1 = point1;
         _point2 = point2;
 

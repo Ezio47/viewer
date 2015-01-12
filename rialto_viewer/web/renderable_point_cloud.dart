@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -11,7 +11,7 @@ class RenderablePointCloud {
     var dims = new Map<String, Float32List>();
     int numPoints;
     Vector3 min, max, len;
-    CloudShape _particleSystem;
+    CloudShape _cloudShape;
     bool visible;
 
     RenderablePointCloud(PointCloud pc) {
@@ -21,7 +21,6 @@ class RenderablePointCloud {
 
         _createRenderArrays();
         _computeBounds();
-        //_createParticles();
     }
 
     void _computeBounds() {
@@ -87,10 +86,9 @@ class RenderablePointCloud {
         assert(positions != null);
         assert(colors != null);
 
-        _particleSystem = new CloudShape(positions, colors);
-        //_particleSystem.init();
-        _particleSystem.name = pointCloud.webpath;
-        return _particleSystem;
+        _cloudShape = new CloudShape(positions, colors);
+        _cloudShape.name = pointCloud.webpath;
+        return _cloudShape;
     }
 
     void colorize(Colorizer colorizer) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -11,11 +11,6 @@ class Cesium {
 
     Cesium(String elementName) {
         _viewer = new JsObject(context['CesiumBridge'], [elementName]);
-
-        //_viewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
-        //var p1 = new Vector3(-120.0, 40.0, 123.0);
-        //var p2 = new Vector3(-116.0, 47.0, 456.0);
-        //createRectangle(p1, p2);
     }
 
     void setUpdateFunction(f) {
@@ -32,9 +27,7 @@ class Cesium {
 
     static bool _isValidLatLon(Vector3 v) {
         const zmax = 100000;
-        return (v.x >= -180.0 && v.x <= 180.0) &&
-                (v.y >= -90.0 && v.y <= 90.0) &&
-                (v.z >= -zmax && v.z <= zmax);
+        return (v.x >= -180.0 && v.x <= 180.0) && (v.y >= -90.0 && v.y <= 90.0) && (v.z >= -zmax && v.z <= zmax);
     }
 
     Vector3 get cameraEyePosition {
@@ -84,7 +77,7 @@ class Cesium {
     dynamic createRectangle(Vector3 point1, Vector3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        return _viewer.callMethod('createRect', [point1.x, point1.y, point2.x, point2.y, colorR, colorG, colorB]);
+        return _viewer.callMethod('createRectangle', [point1.x, point1.y, point2.x, point2.y, colorR, colorG, colorB]);
     }
 
     dynamic createAxes(Vector3 origin, Vector3 length) {
@@ -103,8 +96,7 @@ class Cesium {
     dynamic createLine(Vector3 point1, Vector3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        var prim = _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z,
-                                                     colorR, colorG, colorB]);
+        var prim = _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z, colorR, colorG, colorB]);
         assert(prim != null);
         return prim;
     }
@@ -114,19 +106,19 @@ class Cesium {
         assert(points.length == numPoints * 3);
         assert(colors.length == numPoints * 4);
 
-        var points2 = createFloat64Array(numPoints*3);
-        var colors2 = createUint8Array(numPoints*4);
-        for (int i=0; i<numPoints; i++) {
-            assert(_isValidLatLon(new Vector3(points[i*3+0], points[i*3+1], points[i*3+2])));
+        var points2 = createFloat64Array(numPoints * 3);
+        var colors2 = createUint8Array(numPoints * 4);
+        for (int i = 0; i < numPoints; i++) {
+            assert(_isValidLatLon(new Vector3(points[i * 3 + 0], points[i * 3 + 1], points[i * 3 + 2])));
 
-            points2[i*3+0] = points[i*3+0];
-            points2[i*3+1] = points[i*3+1];
-            points2[i*3+2] = points[i*3+2];
+            points2[i * 3 + 0] = points[i * 3 + 0];
+            points2[i * 3 + 1] = points[i * 3 + 1];
+            points2[i * 3 + 2] = points[i * 3 + 2];
 
-            colors2[i*4+0] = (colors[i*4+0] * 255.0).toInt();
-            colors2[i*4+1] = (colors[i*4+1] * 255.0).toInt();
-            colors2[i*4+2] = (colors[i*4+2] * 255.0).toInt();
-            colors2[i*4+3] = (colors[i*4+3] * 255.0).toInt();
+            colors2[i * 4 + 0] = (colors[i * 4 + 0] * 255.0).toInt();
+            colors2[i * 4 + 1] = (colors[i * 4 + 1] * 255.0).toInt();
+            colors2[i * 4 + 2] = (colors[i * 4 + 2] * 255.0).toInt();
+            colors2[i * 4 + 3] = (colors[i * 4 + 3] * 255.0).toInt();
         }
         var prim = _viewer.callMethod('createCloud', [numPoints, points2, colors2]);
         return prim;
@@ -135,32 +127,9 @@ class Cesium {
     void remove(dynamic primitive) {
         _viewer.callMethod('removePrimitive', [primitive]);
     }
-}
 
+    dynamic createLabel(String text, Vector3 point) {
 
-
-/*
- *     var rect1 = csViewer.callMethod('createRect', [-92.0, 20.0, -86.0, 27.0]);
-    var rect2 = csViewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
-    //csViewer.callMethod('removePrimitive', [rect1]);
-
-    var cnt = 1000;
-    var ps = new JsObject(context['Float64Array'], [cnt * 3]);
-    var cs = new JsObject(context['Uint8Array'], [cnt * 4]);
-
-    var rnd = new Random();
-    for (var i = 0; i < cnt; i++) {
-        var rx = rnd.nextDouble() * 60.0 + 20.0;
-        var ry = rnd.nextDouble() * 60.0 + 20.0;
-        var rz = rnd.nextDouble() * 10000.0;
-        ps[i * 3 + 0] = -rx;
-        ps[i * 3 + 1] = ry;
-        ps[i * 3 + 2] = rz;
-        cs[i * 4 + 0] = 255;
-        cs[i * 4 + 1] = 255;
-        cs[i * 4 + 2] = 255;
-        cs[i * 4 + 3] = 255;
+        return _viewer.callMethofd('createLabel', [text, point.x, point.y, point.z]);
     }
-
-
-   */
+}

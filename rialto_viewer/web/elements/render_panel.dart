@@ -24,13 +24,7 @@ class RenderPanel extends PolymerElement {
     @override
     void ready() {
         _hub = Hub.root;
-
-        if (id == "main") {
-            _hub.mainRenderPanel = this;
-        } else {
-            assert(id == "nav");
-            _hub.navRenderPanel = this;
-        }
+        _hub.renderPanel = this;
     }
 
     @override

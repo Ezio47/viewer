@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -57,10 +57,7 @@ class RenderablePointCloudSet {
         final bool visible = data.visible;
         var rpc = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath);
         rpc.visible = visible;
-        _hub.mainRenderer.update();
-        if (_hub.navRenderer != null) {
-            _hub.navRenderer.update();
-        }
+        _hub.renderer.update();
     }
 
     void _computeBounds() {
@@ -90,6 +87,6 @@ class RenderablePointCloudSet {
         for (var cloud in renderablePointClouds) {
             cloud.colorize(colorizer);
         }
-        _hub.mainRenderer.update();
+        _hub.renderer.update();
     }
 }

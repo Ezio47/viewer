@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -63,8 +63,8 @@ class MeasurementController implements IController {
 
         Measurement m = new Measurement(point1, point2);
 
-        _hub.mainRenderer.addMeasurementToScene(m);
-        _hub.mainRenderer.measurements.add(m);
+        _hub.renderer.addMeasurementToScene(m);
+        _hub.renderer.measurements.add(m);
 
         point1 = point2 = null;
     }

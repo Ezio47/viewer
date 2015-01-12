@@ -53,8 +53,7 @@ class DisplayPanel extends PolymerElement {
         _hub.colorizationDialog.openDialog();
     }
 
-    Vector3 parseTriplet(String triplet)
-    {
+    Vector3 parseTriplet(String triplet) {
         if (triplet == null || triplet.isEmpty) return null;
         var vec = new Vector3.zero();
         var list = triplet.split(",");

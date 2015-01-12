@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -79,18 +79,12 @@ class PointCloud {
     }
 
     bool get hasXYZ {
-        final bool xyz =
-                dimensions.containsKey("positions.x") &&
-                dimensions.containsKey("positions.y") &&
-                dimensions.containsKey("positions.z");
+        final bool xyz = dimensions.containsKey("positions.x") && dimensions.containsKey("positions.y") && dimensions.containsKey("positions.z");
         return xyz;
     }
 
     bool get hasColor3 {
-        final bool xyz =
-                dimensions.containsKey("colors.x") &&
-                dimensions.containsKey("colors.y") &&
-                dimensions.containsKey("colors.z");
+        final bool xyz = dimensions.containsKey("colors.x") && dimensions.containsKey("colors.y") && dimensions.containsKey("colors.z");
         return xyz;
     }
 }

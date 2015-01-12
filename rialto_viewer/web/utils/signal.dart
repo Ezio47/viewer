@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -61,7 +61,7 @@ class Signal<T> {
         var mySignalSubscription = new SignalSubscription(streamSubscription, name: name);
 
         var wrappingHandler = (_SignalData<T> data) {
-                userHandler(data.data);
+            userHandler(data.data);
         };
 
         streamSubscription.onData(wrappingHandler);

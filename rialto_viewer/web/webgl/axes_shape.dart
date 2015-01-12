@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -8,7 +8,7 @@ class AxesShape extends Shape {
     Vector3 origin;
     Vector3 length;
 
-    AxesShape(Vector3 this.origin, Vector3 this.length) : super() {
+    AxesShape(Vector3 this.origin, Vector3 this.length) : super("axes") {
         _primitive = _createCesiumObject();
     }
 

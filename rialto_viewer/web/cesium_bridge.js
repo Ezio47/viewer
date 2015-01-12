@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -9,19 +9,23 @@ var CesiumBridge = function (element) {
         animation: false,
         sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
     };
+
+
     this.viewer = new Cesium.Viewer(element, options);
+
 
     this.setUpdater = function(f) {
         this.viewer.scene.preRender.addEventListener(f);
     }
 
-    this.createRect = function(a,b,c,d, colorR, colorG, colorB) {
+
+    this.createRectangle = function(x1, y1, x2, y2, colorR, colorG, colorB) {
         var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
         var solidWhite = Cesium.ColorGeometryInstanceAttribute.fromColor(color);
 
-        var rectangle = Cesium.Rectangle.fromDegrees(a,b,c,d);
+        var rectangle = Cesium.Rectangle.fromDegrees(x1, y1, x2, y2);
 
         var rectangleInstance = new Cesium.GeometryInstance({
                 geometry : new Cesium.RectangleOutlineGeometry({
@@ -45,14 +49,15 @@ var CesiumBridge = function (element) {
         return prim;
     }
 
+
     this.removePrimitive = function(prim) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
         primitives.remove(prim);
     }
 
-    this.createCloud = function(cnt, ps, cs) {
 
+    this.createCloud = function(cnt, ps, cs) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
 
@@ -83,6 +88,7 @@ var CesiumBridge = function (element) {
         return prim;
     }
 
+
     this._createLineInstance = function(x0, y0, z0, x1, y1, z1, color) {
       var p1 = Cesium.Cartesian3.fromDegrees(x0, y0, z0);
       var p2 = Cesium.Cartesian3.fromDegrees(x1, y1, z1);
@@ -104,6 +110,7 @@ var CesiumBridge = function (element) {
         return instance;
     }
 
+
     this.createLine = function(x0, y0, z0, x1, y1, z1, colorR, colorG, colorB) {
         var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
         var inst = this._createLineInstance(x0, y0, z0, x1, y1, z1, color);
@@ -115,6 +122,7 @@ var CesiumBridge = function (element) {
         this.viewer.scene.primitives.add(prim);
         return prim;
     }
+
 
     this.createAxes = function(x0, y0, z0, xlen, ylen, zlen) {
         var red = this._createLineInstance(x0, y0, z0, x0 + xlen, y0, z0, Cesium.Color.RED);
@@ -130,8 +138,8 @@ var CesiumBridge = function (element) {
         return prim;
     }
 
-    this.createBbox = function(x0, y0, z0, x1, y1, z1) {
 
+    this.createBbox = function(x0, y0, z0, x1, y1, z1) {
         var red1 = this._createLineInstance(x0, y0, z0, x1, y0, z0, Cesium.Color.RED);
         var red2 = this._createLineInstance(x0, y1, z0, x1, y1, z0, Cesium.Color.RED);
         var red3 = this._createLineInstance(x0, y0, z1, x1, y0, z1, Cesium.Color.RED);
@@ -157,6 +165,7 @@ var CesiumBridge = function (element) {
         return prim;
     }
 
+
     this.getMouseCoords = function(windowX, windowY) {
         var pt2 = new Cesium.Cartesian2(windowX, windowY);
         var pt3 = this.viewer.camera.pickEllipsoid(pt2);
@@ -168,6 +177,21 @@ var CesiumBridge = function (element) {
         return [lon, lat, h];
     }
 
-    this.getCurrentPoint = function() {
+
+    this.createLabel = function(text, x, y, z) {
+       ///// scene.primitives.removeAll();
+        var labels = scene.primitives.add(new Cesium.LabelCollection());
+        labels.add({
+             position : Cesium.Cartesian3.fromDegrees(-75.10, 39.57),
+             text     : 'Philadelphia'
+        });
+
+        var ellipsoid = this.viewer.scene.globe.ellipsoid;
+        var labels = scene.primitives.add(new Cesium.LabelCollection());
+        label = labels.add();
+        label.fillColor = Cesium.Color.VIOLET;
+        label.show = true;
+        label.text = "My house!";
+        label.position = new Cartesian3(x,y,z);
     }
 }

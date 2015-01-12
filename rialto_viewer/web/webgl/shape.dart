@@ -1,14 +1,13 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
 part of rialto.viewer;
 
-typedef void SetUniformsFunc(Shape shape, bool offscreen);
 typedef void PickFunc(int pickedId);
 
 abstract class Shape {
-    static int _ids = 257;
+    static int _ids = 1;
 
     Hub _hub;
     String name;
@@ -19,7 +18,7 @@ abstract class Shape {
 
     var _primitive;
 
-    Shape() {
+    Shape(String this.name) {
         _hub = Hub.root;
 
         id = Shape.getNewId();
@@ -28,12 +27,12 @@ abstract class Shape {
         isSelected = false;
         isSelectable = false;
 
-        Hub.root.shapesMap[id] = this;
+        _hub.shapesMap[id] = this;
     }
 
     static int getNewId() => _ids++;
 
-    // should set _csPrimitive
+    // result goes into _primitive
     dynamic _createCesiumObject();
 
     void remove() {

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -49,23 +49,20 @@ part 'webgl/picker.dart';
 part 'webgl/shape.dart';
 
 
-void log(o)
-{
+void log(o) {
     window.console.log(o);
 }
 
 
 class Hub {
-    RenderPanel mainRenderPanel;
-    RenderPanel navRenderPanel;
+    RenderPanel renderPanel;
     ServerDialog serverDialog;
     ColorizationDialog colorizationDialog;
     RialtoElement rialtoElement;
 
     Element cesiumContainer;
 
-    Renderer mainRenderer;
-    Renderer navRenderer;
+    Renderer renderer;
 
     EventRegistry eventRegistry;
 
@@ -114,9 +111,9 @@ class Hub {
 
         renderablePointCloudSet = new RenderablePointCloudSet();
 
-        mainRenderer = new Renderer(renderablePointCloudSet);
+        renderer = new Renderer(renderablePointCloudSet);
 
-        cesium.setUpdateFunction(mainRenderer.checkUpdate);
+        cesium.setUpdateFunction(renderer.checkUpdate);
 
         var domElement = cesiumContainer;
         window.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
@@ -134,7 +131,7 @@ class Hub {
 
         renderablePointCloudSet = new RenderablePointCloudSet();
 
-        mainRenderer = new Renderer(renderablePointCloudSet);
+        renderer = new Renderer(renderablePointCloudSet);
 
         picker = new Picker();
 
@@ -143,7 +140,6 @@ class Hub {
 
     int get width => window.innerWidth;
     int get height => window.innerHeight;
-
 
     void _handleOpenServer(String server) {
         proxy = new ProxyFileSystem(server);
@@ -163,7 +159,7 @@ class Hub {
         file.create().then((PointCloud pointCloud) {
             renderablePointCloudSet.addCloud(pointCloud);
 
-            mainRenderer.update();
+            renderer.update();
         });
 
         eventRegistry.OpenFileCompleted.fire(webpath);
@@ -173,7 +169,7 @@ class Hub {
 
         renderablePointCloudSet.removeCloud(webpath);
 
-        mainRenderer.update();
+        renderer.update();
 
         eventRegistry.CloseFileCompleted.fire(webpath);
     }

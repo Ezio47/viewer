@@ -1,10 +1,14 @@
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
 part of rialto.viewer;
 
 
 class Color {
-    double r,g,b,a;
+    double r, g, b, a;
 
-    Color(this.r, this.g, this.b, {this.a:0.0});
+    Color(this.r, this.g, this.b, {this.a: 0.0});
 
     Color.red() : this(1.0, 0.0, 0.0);
     Color.green() : this(0.0, 1.0, 0.0);
@@ -21,6 +25,6 @@ class Color {
     }
 
     List<double> toList() {
-        return [r,g,b,a];
+        return [r, g, b, a];
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -63,9 +63,10 @@ class AnnotationController implements IController {
 
         Annotation a = new Annotation(point1, point2);
 
-        _hub.mainRenderer.addAnnotationToScene(a);
-        _hub.mainRenderer.annotations.add(a);
+        _hub.renderer.addAnnotationToScene(a);
+        _hub.renderer.annotations.add(a);
 
+        _hub.cesium.createLabel("My house!", new Vector3(0.0,0.0,0.0));//-77.62549459934235, 38.833895271724664, 0.0));
         point1 = point2 = null;
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
@@ -75,7 +75,7 @@ class PointCloudGenerator {
         var positionsZ = new Float32List(numPoints);
         map["positions.x"] = positionsX;
         map["positions.y"] = positionsY;
-        map["positions.z"] = positionsZ;;
+        map["positions.z"] = positionsZ;
 
         final lon = -77.62549459934235;
         final lat = 38.833895271724664;
@@ -190,9 +190,9 @@ class _Terrain {
             case 1:
                 xmin = -77.62549459934235;
                 ymin = 38.833895271724664;
-                xlen = 0.05;
-                ylen = 0.05;
-                zscale = 250.0;
+                xlen = 1.5;
+                ylen = 1.5;
+                zscale = 350.0;
                 break;
             default:
                 throw new RialtoArgumentError("invalid terrain mode value");
