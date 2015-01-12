@@ -15,11 +15,11 @@ var CesiumBridge = function (element) {
         this.viewer.scene.preRender.addEventListener(f);
     }
 
-    this.createRect = function(a,b,c,d) {
-
+    this.createRect = function(a,b,c,d, colorR, colorG, colorB) {
+        var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
-        var solidWhite = Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.WHITE);
+        var solidWhite = Cesium.ColorGeometryInstanceAttribute.fromColor(color);
 
         var rectangle = Cesium.Rectangle.fromDegrees(a,b,c,d);
 
@@ -104,6 +104,18 @@ var CesiumBridge = function (element) {
         return instance;
     }
 
+    this.createLine = function(x0, y0, z0, x1, y1, z1, colorR, colorG, colorB) {
+        var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
+        var inst = this._createLineInstance(x0, y0, z0, x1, y1, z1, color);
+        var prim = new Cesium.Primitive({
+            geometryInstances : [inst],
+            appearance : new Cesium.PolylineColorAppearance()
+        });
+
+        this.viewer.scene.primitives.add(prim);
+        return prim;
+    }
+
     this.createAxes = function(x0, y0, z0, xlen, ylen, zlen) {
         var red = this._createLineInstance(x0, y0, z0, x0 + xlen, y0, z0, Cesium.Color.RED);
         var green = this._createLineInstance(x0, y0, z0, x0, y0 + ylen, z0, Cesium.Color.GREEN);
@@ -143,6 +155,17 @@ var CesiumBridge = function (element) {
         });
         this.viewer.scene.primitives.add(prim);
         return prim;
+    }
+
+    this.getMouseCoords = function(windowX, windowY) {
+        var pt2 = new Cesium.Cartesian2(windowX, windowY);
+        var pt3 = this.viewer.camera.pickEllipsoid(pt2);
+        var ellipsoid = this.viewer.scene.globe.ellipsoid;
+        var cartographic = ellipsoid.cartesianToCartographic(pt3);
+        var lon = Cesium.Math.toDegrees(cartographic.longitude);
+        var lat = Cesium.Math.toDegrees(cartographic.latitude);
+        var h = cartographic.height;
+        return [lon, lat, h];
     }
 
     this.getCurrentPoint = function() {

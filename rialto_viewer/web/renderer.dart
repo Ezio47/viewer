@@ -116,6 +116,7 @@ class Renderer {
         //
         // note mid-point of the cloud model gets tranlated to the origin of world space
 
+        _hub.shapesList.forEach((s) => s.remove());
         _hub.shapesList.clear();
 
         _cloudMin = _renderSource.min;

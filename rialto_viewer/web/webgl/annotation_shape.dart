@@ -23,6 +23,6 @@ class AnnotationShape extends Shape {
 
     @override
     dynamic _createCesiumObject() {
-        return _hub.cesium.createRectangle(_point1, _point2);
+        return _hub.cesium.createRectangle(_point1, _point2, 0.0, 1.0, 1.0);
     }
 }

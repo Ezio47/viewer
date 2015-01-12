@@ -15,6 +15,6 @@ class MeasurementShape extends Shape {
 
     @override
     dynamic _createCesiumObject() {
-        return _hub.cesium.createLine(_point1, _point2);
+        return _hub.cesium.createLine(_point1, _point2, 1.0, 1.0, 0.0);
     }
 }

@@ -176,8 +176,8 @@ class _Terrain {
 
         double xmin;
         double ymin;
-        double xlen = 0.05;
-        double ylen = 0.05;
+        double xlen = 0.20;
+        double ylen = 0.20;
         double zscale;
 
         switch (which) {

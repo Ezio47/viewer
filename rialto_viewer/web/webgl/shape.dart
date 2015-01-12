@@ -36,6 +36,10 @@ abstract class Shape {
     // should set _csPrimitive
     dynamic _createCesiumObject();
 
+    void remove() {
+        _hub.cesium.remove(_primitive);
+    }
+
     // called when picked
     void pick(int pickedId) {
         assert(id == pickedId);

@@ -39,11 +39,11 @@ class AnnotationController implements IController {
 
         if (point1 == null) {
 
-            point1 = _hub.cesium.getMouseCoordinates();
+            point1 = _hub.cesium.getMouseCoordinates(data.x, data.y);
             if (point1 == null) return;
 
         } else if (point2 == null) {
-            point2 = _hub.cesium.getMouseCoordinates();
+            point2 = _hub.cesium.getMouseCoordinates(data.x, data.y);
             if (point2 == null) return;
 
         } else {

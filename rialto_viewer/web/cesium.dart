@@ -13,9 +13,9 @@ class Cesium {
         _viewer = new JsObject(context['CesiumBridge'], [elementName]);
 
         //_viewer.callMethod('createRect', [-120.0, 40.0, -116.0, 47.0]);
-        var p1 = new Vector3(-120.0, 40.0, 123.0);
-        var p2 = new Vector3(-116.0, 47.0, 456.0);
-        createRectangle(p1, p2);
+        //var p1 = new Vector3(-120.0, 40.0, 123.0);
+        //var p2 = new Vector3(-116.0, 47.0, 456.0);
+        //createRectangle(p1, p2);
     }
 
     void setUpdateFunction(f) {
@@ -67,9 +67,12 @@ class Cesium {
         assert(false);
     }
 
-    Vector3 getMouseCoordinates() {
-        assert(false);
-        return null;
+    Vector3 getMouseCoordinates(int windowX, int windowY) {
+        dynamic xyz = _viewer.callMethod('getMouseCoords', [windowX, windowY]);
+        double x = xyz[0];
+        double y = xyz[1];
+        double z = xyz[2].toDouble();
+        return new Vector3(x, y, z);
     }
 
     int getPickedShapeId() {
@@ -78,10 +81,10 @@ class Cesium {
     }
 
     // the geometry construction functions return the primitive we made (as an opaque pointer)
-    dynamic createRectangle(Vector3 point1, Vector3 point2) {
+    dynamic createRectangle(Vector3 point1, Vector3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        return _viewer.callMethod('createRect', [point1.x, point1.y, point2.x, point2.y]);
+        return _viewer.callMethod('createRect', [point1.x, point1.y, point2.x, point2.y, colorR, colorG, colorB]);
     }
 
     dynamic createAxes(Vector3 origin, Vector3 length) {
@@ -97,10 +100,12 @@ class Cesium {
         return prim;
     }
 
-    dynamic createLine(Vector3 point1, Vector3 point2) {
+    dynamic createLine(Vector3 point1, Vector3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        var prim = _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z]);
+        var prim = _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z,
+                                                     colorR, colorG, colorB]);
+        assert(prim != null);
         return prim;
     }
 
@@ -127,6 +132,9 @@ class Cesium {
         return prim;
     }
 
+    void remove(dynamic primitive) {
+        _viewer.callMethod('removePrimitive', [primitive]);
+    }
 }
 
 
