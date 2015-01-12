@@ -119,6 +119,7 @@ class Renderer {
         _hub.shapesList.clear();
 
         _cloudMin = _renderSource.min;
+        _cloudMax = _renderSource.max;
         _cloudLen = _renderSource.len;
 
         if (_renderSource.length == 0) {
@@ -148,25 +149,25 @@ class Renderer {
         // r = (rx * ry * rz);
         // modelMatrix = t * r * s;
 
-        /*{
+        {
             // axes model space is (0 .. 0.25 * cloudLen)
-            _axesShape = new AxesShape(cloudLen14.x, cloudLen14.y, cloudLen14.z);
-            _hub.shapesList.add(_axesShape);
-        }*/
+       //     _axesShape = new AxesShape(_cloudMin, cloudLen14);
+       //     _hub.shapesList.add(_axesShape);
+        }
 
-        /*{
+        {
             // bbox model space is (cloudMin....cloudMax)
             _bboxShape = new BboxShape(_cloudMin, _cloudMax);
             _hub.shapesList.add(_bboxShape);
-        }*/
+        }
 
-        /*{
+        {
             for (var rpc in _renderSource.renderablePointClouds) {
                 var obj = rpc.buildParticleSystem();
                 obj.isVisible = rpc.visible;
                 _hub.shapesList.add(obj);
             }
-        }*/
+        }
 
         for (var annotation in annotations) {
             addAnnotationToScene(annotation);
@@ -192,11 +193,13 @@ class Renderer {
 
 
     void _handleDisplayAxes(bool v) {
+        if (_axesShape == null) return;
         _axesVisible = v;
         _axesShape.isVisible = v;
     }
 
     void _handleDisplayBbox(bool v) {
+        if (_bboxShape == null) return;
         _bboxVisible = v;
         _bboxShape.isVisible = v;
     }

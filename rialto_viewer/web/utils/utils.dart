@@ -29,7 +29,7 @@ class Key {
 
 
 class Utils {
-    static String printv(Vector3 v, [int prec = 1]) {
+    static String printv(Vector3 v, [int prec = 2]) {
         var s = Utils.printv3(v.x, v.y, v.z, prec);
         return s;
     }

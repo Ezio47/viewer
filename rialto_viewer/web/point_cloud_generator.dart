@@ -68,7 +68,7 @@ class PointCloudGenerator {
     static PointCloud _makeRandom(String webpath, String displayName) {
         Map<String, Float32List> map = new Map();
 
-        var numPoints = 100;
+        var numPoints = 10000;
 
         var positionsX = new Float32List(numPoints);
         var positionsY = new Float32List(numPoints);
@@ -77,12 +77,17 @@ class PointCloudGenerator {
         map["positions.y"] = positionsY;
         map["positions.z"] = positionsZ;;
 
-        var xmin = 0.0;
-        var xmax = 200.0;
-        var ymin = 0.0;
-        var ymax = 200.0;
+        final lon = -77.62549459934235;
+        final lat = 38.833895271724664;
+        final xdelta = 0.25;
+        final ydelta = 0.25;
+
+        var xmin = lon - xdelta;
+        var ymin = lat - ydelta;
         var zmin = 0.0;
-        var zmax = 10.0;
+        var xmax = lon + xdelta;
+        var ymax = lat + ydelta;
+        var zmax = 10000.0;
 
         var random = new Random(17);
 
@@ -169,29 +174,34 @@ class _Terrain {
         valuesY = new Float32List(width * height);
         valuesZ = new Float32List(width * height);
 
-        double xoffset;
-        double yoffset;
+        double xmin;
+        double ymin;
+        double xlen = 0.05;
+        double ylen = 0.05;
+        double zscale;
+
         switch (which) {
+            case 0:
+                xmin = 0.0;
+                ymin = 0.0;
+                xlen = 1.0;
+                ylen = 1.0;
+                break;
             case 1:
-                xoffset = 0.0;
-                yoffset = 0.0;
-                break;
-            case 2:
-                xoffset = 400.0;
-                yoffset = 400.0;
-                break;
-            case 3:
-                xoffset = 550.0;
-                yoffset = -150.0;
+                xmin = -77.62549459934235;
+                ymin = 38.833895271724664;
+                xlen = 0.05;
+                ylen = 0.05;
+                zscale = 250.0;
                 break;
             default:
                 throw new RialtoArgumentError("invalid terrain mode value");
         }
 
-        _makeGrid(xoffset, yoffset);
+        _makeGrid(xmin, ymin, xlen, ylen, zscale);
     }
 
-    void _makeGrid(double xoffset, double yoffset) {
+    void _makeGrid(double xmin, double ymin, double xlen, double ylen, double zscale) {
 
         double minz = getSample(0, 0);
         for (int w = 0; w < width; w++) {
@@ -199,8 +209,6 @@ class _Terrain {
                 minz = min(minz, getSample(w, h));
             }
         }
-
-        double scale = 5.0;
 
         int i = 0;
         for (int w = 0; w < width; w++) {
@@ -210,21 +218,22 @@ class _Terrain {
                 double z = getSample(w, h);
 
                 // jiggle the (x,y) points, to prevent visual artifacts
-                x += (rnd.nextDouble() - 0.5);
-                y += (rnd.nextDouble() - 0.5);
+                x -= rnd.nextDouble();
+                y -= rnd.nextDouble();
 
-                // for better viewing, center the data at zero and spread it out more
-                x = (x - width / 2) * scale;
-                y = (y - height / 2) * scale;
-
+                // make the min corner artificially stand out
                 if (w < width * 0.1 && h < height * 0.1) z = minz;
 
-                // for better viewing, exaggerate Z
-                z = z * 200.0;
+                // x: [0, width)
+                // y: [0, height)
+                x = xmin + x / width.toDouble() * xlen;
+                y = ymin + y / height.toDouble() * ylen;
 
-                valuesX[i] = x + xoffset * scale;
-                valuesY[i] = y + yoffset * scale;
-                valuesZ[i] = z;
+                // x: [, width)
+                // y: [0, height)
+                valuesX[i] = x;
+                valuesY[i] = y;
+                valuesZ[i] = z * zscale;
                 i++;
             }
         }

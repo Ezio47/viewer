@@ -5,14 +5,15 @@
 part of rialto.viewer;
 
 class AxesShape extends Shape {
-    double _xlen, _ylen, _zlen;
+    Vector3 origin;
+    Vector3 length;
 
-    AxesShape(double this._xlen, double this._ylen, double this._zlen) : super() {
+    AxesShape(Vector3 this.origin, Vector3 this.length) : super() {
         _primitive = _createCesiumObject();
     }
 
     @override
     dynamic _createCesiumObject() {
-        return _hub.cesium.createAxes(_xlen, _ylen, _zlen);
+        return _hub.cesium.createAxes(origin, length);
     }
 }
