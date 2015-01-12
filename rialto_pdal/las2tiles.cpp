@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     printf("WKT: %s\n", wkt.c_str());
 #endif
 
-    pdal.write();
+    pdal.writeTiles();
     
     pdal.close();
     

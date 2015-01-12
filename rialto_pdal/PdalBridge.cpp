@@ -79,7 +79,60 @@ void PdalBridge::close()
 }
 
 
-void PdalBridge::write() {
+void PdalBridge::writeRia(const char* name, boost::uint64_t targetPointCount) {
+    
+    boost::uint64_t skip = 0;
+    if (targetPointCount != 0) {
+        skip = m_numPoints / targetPointCount;
+    }
+    
+    FILE* fp = fopen(name, "wb");
+    
+    const pdal::PointBufferSet& bufs = m_manager->buffers();
+    for (auto pi = bufs.begin(); pi != bufs.end(); ++pi)
+    {
+        const pdal::PointBufferPtr buf = *pi;
+        writeRia(fp, buf, skip);
+    }
+    
+    fclose(fp);
+}
+
+
+void PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip)
+{
+    uint32_t pointIndex(0);
+    
+    for (pdal::PointId idx = 0; idx < buf->size(); ++idx)
+    {
+        if (idx % 10000 == 0) {
+            printf("%f complete\n", ((double)idx/(double)buf->size()) * 100.0);
+        }
+
+        if (skip != 0) {
+            if (idx % skip != 0) continue;
+        }
+        
+        pdal::Dimension::Id::Enum xdim = pdal::Dimension::Id::Enum::X;
+        pdal::Dimension::Id::Enum ydim = pdal::Dimension::Id::Enum::Y;
+        pdal::Dimension::Id::Enum zdim = pdal::Dimension::Id::Enum::Z;
+        
+        double x = buf->getFieldAs<double>(xdim, idx);
+        double y = buf->getFieldAs<double>(ydim, idx);
+        double z = buf->getFieldAs<double>(zdim, idx);
+        
+        float xf = (float)x;
+        float yf = (float)y;
+        float zf = (float)z;
+
+        fwrite(&xf, 4, 1, fp);
+        fwrite(&yf, 4, 1, fp);
+        fwrite(&zf, 4, 1, fp);        
+    }
+}
+
+
+void PdalBridge::writeTiles() {
     const pdal::PointBufferSet& bufs = m_manager->buffers();
     TileWriter* tw = new TileWriter();
     tw->goBuffers(bufs);

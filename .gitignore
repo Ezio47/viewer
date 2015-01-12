@@ -28,3 +28,11 @@ tmp
 *.asc
 
 rialto_pdal/js
+
+rialto_viewer/web/cesium-build
+
+rialto_pdal/las2info
+
+rialto_pdal/las2ria
+
+rialto_pdal/las2tiles

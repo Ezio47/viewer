@@ -20,7 +20,7 @@ void main() {
             Hub.root.init();
 
 
-            boot1();
+            boot2();
         });
     });
 }
@@ -63,7 +63,7 @@ void boot2() {
     hub.defaultServer = "http://localhost:12345";
 
     hub.eventRegistry.OpenServerCompleted.subscribe0(() {
-        hub.eventRegistry.OpenFile.fire("/autzen-10.ria");
+        hub.eventRegistry.OpenFile.fire("/serp-100K.ria");
     });
 
     hub.eventRegistry.OpenFileCompleted.subscribe((_) {

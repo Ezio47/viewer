@@ -25,9 +25,13 @@ public:
     
     std::string getWkt() const;
     
-    void write();
-
+    void writeTiles();
+    
+    void writeRia(const char* name, boost::uint64_t targetPointCount);
+    
 private:    
+    void writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip);
+    
     std::vector<char*> m_keys;
     std::vector<char*> m_values;
     

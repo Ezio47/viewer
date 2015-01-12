@@ -20,9 +20,20 @@ g++ -c PdalBridge.cpp \
  g++ -c TileWriter.cpp \
  -g -std=c++11 -ferror-limit=3 -isystem /usr/local/include \
  -I $PDAL_INC -I /usr/local/include 
-
-  g++ -o info info.cpp PdalBridge.o TileWriter.o Tile.o \
+ 
+ g++ -o las2info las2info.cpp PdalBridge.o TileWriter.o Tile.o \
+ -g -std=c++11 -ferror-limit=3 -isystem /usr/local/include \
+ -I $PDAL_INC -I /usr/local/include \
+ $PDAL_LIB/libpdalcpp.dylib -lz
+ 
+  g++ -o las2ria las2ria.cpp PdalBridge.o TileWriter.o Tile.o \
   -g -std=c++11 -ferror-limit=3 -isystem /usr/local/include \
   -I $PDAL_INC -I /usr/local/include \
   $PDAL_LIB/libpdalcpp.dylib -lz
+  
+  g++ -o las2tiles las2tiles.cpp PdalBridge.o TileWriter.o Tile.o \
+  -g -std=c++11 -ferror-limit=3 -isystem /usr/local/include \
+  -I $PDAL_INC -I /usr/local/include \
+  $PDAL_LIB/libpdalcpp.dylib -lz
+  
   
