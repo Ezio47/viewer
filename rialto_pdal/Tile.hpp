@@ -39,6 +39,10 @@ public:
     
     void write(const std::string& prefix) const;
     
+    static bool exists(const char* path);
+
+    void getMinMax(double& xmin, double& ymin, double& xmax, double& ymax) const;
+    
 private:
     Quadrant whichChildQuadrant(double x, double y);        
     void setBounds();

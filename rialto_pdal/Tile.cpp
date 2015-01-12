@@ -14,6 +14,8 @@
 
 #include <zlib.h>
 
+#include <sys/stat.h>
+
 const int MAXLEVEL = 14;
 const int SIZ = 64;
 
@@ -317,7 +319,7 @@ boost::uint16_t Tile::convert(double z) const {
     // the spec calls for height to be in 0.2 meter increments,
     // with a lower bound of -1000 meters
     
-    double e = (z * 5.0) + 1000.0;
+    double e = (z + 1000.0) * 5.0;
     if (e < 0.0) e = 0.0;
     if (e > 65535.0) e = 65535.0;
     
@@ -340,19 +342,18 @@ void Tile::write(gzFile fp) const {
             double z = m_data[idx];
 
             boost::uint16_t height = convert(z);
+            height = boost::uint16_t(1000.0 + 50000.0 * (double)(xx+yy)/(double)(SIZ+SIZ));
             gzwrite(fp, &height, 2);
         }
     }
     
     // child mask
-    boost::uint8_t mask;
-    if (!m_children) {
-        mask = 0x0;
-    } else {
-        if (m_children[0]) mask += 1;
-        if (m_children[1]) mask += 2;
-        if (m_children[2]) mask += 4;
-        if (m_children[3]) mask += 8;
+    boost::uint8_t mask = 0x0;
+    if (m_children) {
+        if (m_children[0]) mask += 1; // sw
+        if (m_children[1]) mask += 2; // se
+        if (m_children[2]) mask += 8; // nw
+        if (m_children[3]) mask += 4; // ne
     }
     gzwrite(fp, &mask, 1);
 
@@ -361,11 +362,33 @@ void Tile::write(gzFile fp) const {
     gzwrite(fp, &lw, 1);
 }
 
-    
+
+bool Tile::exists(const char* path) {
+    struct stat st;
+    if(stat(path,&st) == 0)
+        return true;
+    return false;
+}
+
 void Tile::write(const std::string& prefix) const {
+    //assert(dirExists("/tmp"));
+    //assert(dirExists("/tmp/x"));
+    //assert(!dirExists("/tmp/y"));
+    
     char buf[1024];
-    sprintf(buf, "%s/%d.%d.%d.terrain", prefix.c_str(), m_level, m_colNum, m_rowNum);
-    assert(strlen(buf) < 1024);
+
+    sprintf(buf, "%s/%d", prefix.c_str(), m_level);
+    if (!exists(buf)) {
+        mkdir(buf, 0777);
+    }
+    
+    sprintf(buf, "%s/%d/%d", prefix.c_str(), m_level, m_colNum);
+    if (!exists(buf)) {
+        mkdir(buf, 0777);
+    }
+    
+    sprintf(buf, "%s/%d/%d/%d.terrain", prefix.c_str(), m_level, m_colNum, m_rowNum);
+    
     printf("--> %s\n", buf);
     
     //FILE* fp = fopen(buf, "wb");
@@ -381,4 +404,22 @@ void Tile::write(const std::string& prefix) const {
             }
         }
     }
+}
+
+
+void Tile::getMinMax(double& xmin, double& ymin, double& xmax, double& ymax) const {    
+    if (m_children) {
+        for (int i=0; i<4; i++) {
+            if (m_children[i]) {
+                m_children[i]->getMinMax(xmin, ymin, xmax, ymax);
+            }
+        }
+    }
+    
+    if (m_level == MAXLEVEL) {
+        if (m_xmin < xmin) xmin = m_xmin;
+        if (m_ymin < ymin) ymin = m_ymin;
+        if (m_xmax > xmax) xmax = m_xmax;
+        if (m_ymax > ymax) ymax = m_ymax;
+    }    
 }

@@ -20,3 +20,11 @@ rialto_pdal/info
 tmp
 
 *.o
+
+*.tif
+
+*.grid
+
+*.asc
+
+rialto_pdal/js

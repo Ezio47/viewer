@@ -14,6 +14,7 @@
 
 #include <zlib.h>
 
+#include <sys/stat.h>
 #include "Tile.hpp"
 
 const int MAXLEVEL = 14;
@@ -46,6 +47,18 @@ void TileWriter::goBuffers(const pdal::PointBufferSet& bufs) {
     
     m_root0->dump();
     m_root1->dump();
+    
+    double xmin = DBL_MAX, ymin = DBL_MAX;
+    double xmax = -DBL_MAX, ymax = -DBL_MAX;
+    m_root0->getMinMax(xmin, ymin, xmax, ymax);
+    m_root1->getMinMax(xmin, ymin, xmax, ymax);
+    printf("%f %f = %f %f\n", xmin, ymin, xmax, ymax);
+    double xdelta = xmax - xmin;
+    double ydelta = ymax - ymin;
+    double delta = (xdelta < ydelta) ? xdelta : ydelta;
+    delta = delta / 2.0;
+    printf("%f %f %f\n", xdelta, ydelta, delta);
+    printf("%f %f = %f\n", xmin + delta, ymin + delta, delta);
 }
     
 
@@ -75,8 +88,27 @@ void TileWriter::goBuffer(const pdal::PointBufferPtr& buf)
     }
 }
 
-
+    
 void TileWriter::write(const std::string& prefix) const {
+    
+    if (!Tile::exists(prefix.c_str())) {
+        mkdir(prefix.c_str(), 0777);
+    }
+    
+    char buf[1024];
+    sprintf(buf, "%s/%s", prefix.c_str(), "layer.json");
+    if (!Tile::exists(buf)) {
+        FILE* fp = fopen(buf, "w");
+        fprintf(fp, "{\n");
+        fprintf(fp, "  \"tilejson\": \"2.1.0\",\n");
+        fprintf(fp, "  \"format\": \"heightmap-1.0\",\n");
+        fprintf(fp, "  \"version\": \"1.0.0\",\n");
+        fprintf(fp, "  \"scheme\": \"tms\",\n");
+        fprintf(fp, "  \"tiles\": [\"{z}/{x}/{y}.terrain?v={version}\"]\n");
+        fprintf(fp, "}\n");
+        fclose(fp);
+    }
+
     m_root0->write(prefix);
     m_root1->write(prefix);
 }
