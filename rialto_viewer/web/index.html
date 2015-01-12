@@ -8,20 +8,19 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Rialto</title>
-<script src="cesium-build/Cesium/Cesium.js"></script>
-  <style>
-      @import url(cesium-build/Cesium/Widgets/widgets.css);
-      html, body, #cesiumContainer {
-          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
-      }
-  </style>
-          <link rel="import" href="elements/rialto_element.html">
+        <script src="cesium-build/Cesium/Cesium.js"></script>
+        <style>
+            @import url(cesium-build/Cesium/Widgets/widgets.css);
+            html, body, #cesiumContainer {
+                width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+            }
+        </style>
+        <link rel="import" href="elements/rialto_element.html">
     </head>
     <body>
-      <div id="cesiumContainer"></div>
-  <script src="cesium_bridge.js">
-  </script>
-<rialto-element></rialto-element>
+        <div id="cesiumContainer"></div>
+        <script src="cesium/cesium_bridge.js"></script>
+        <rialto-element></rialto-element>
         <script type="application/dart">export 'main.dart';</script>
   </body>
 </html>

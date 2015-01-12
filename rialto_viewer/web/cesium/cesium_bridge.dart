@@ -6,10 +6,10 @@ part of rialto.viewer;
 
 
 // this serves as an interface to the JavaScript functions in CesiumBridge
-class Cesium {
+class CesiumBridge {
     var _viewer;
 
-    Cesium(String elementName) {
+    CesiumBridge(String elementName) {
         _viewer = new JsObject(context['CesiumBridge'], [elementName]);
     }
 

@@ -21,7 +21,7 @@ import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
 
 part 'annotation_controller.dart';
-part 'cesium.dart';
+part 'cesium/cesium_bridge.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'event_registry.dart';
@@ -89,7 +89,7 @@ class Hub {
     // singleton
     static Hub _root;
 
-    Cesium cesium;
+    CesiumBridge cesium;
 
     Hub() {
         _root = this;
@@ -102,7 +102,7 @@ class Hub {
     }
 
     void init() {
-        cesium = new Cesium('cesiumContainer');
+        cesium = new CesiumBridge('cesiumContainer');
 
         eventRegistry.OpenServer.subscribe(_handleOpenServer);
         eventRegistry.CloseServer.subscribe0(_handleCloseServer);
