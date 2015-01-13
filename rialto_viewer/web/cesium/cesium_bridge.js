@@ -33,6 +33,72 @@ var CesiumBridge = function (element) {
         );
     }
 
+    this.onMouseDown = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 0);
+            },
+            Cesium.ScreenSpaceEventType.LEFT_DOWN
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 1);
+            },
+            Cesium.ScreenSpaceEventType.MIDDLE_DOWN
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 2);
+            },
+            Cesium.ScreenSpaceEventType.RIGHT_DOWN
+        );
+    }
+
+    this.onMouseUp = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 0);
+            },
+            Cesium.ScreenSpaceEventType.LEFT_UP
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 1);
+            },
+            Cesium.ScreenSpaceEventType.MIDDLE_UP
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 2);
+            },
+            Cesium.ScreenSpaceEventType.RIGHT_UP
+        );
+    }
+
+    this.onMouseWheel = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+            function(delta) {
+                f(delta);
+            },
+            Cesium.ScreenSpaceEventType.WHEEL
+        );
+    }
+
     this.createRectangle = function(x1, y1, x2, y2, colorR, colorG, colorB) {
         var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
         var scene = this.viewer.scene;

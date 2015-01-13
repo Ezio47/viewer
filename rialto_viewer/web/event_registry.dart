@@ -59,7 +59,7 @@ class MouseData {
     int x;
     int y;
     bool altKey;
-    int button;
+    int button; // 0==left, 1==middle, 2==right
     CanvasElement canvas;
 
     MouseData(MouseEvent ev) {
@@ -70,6 +70,8 @@ class MouseData {
     }
 
     MouseData.fromXy(int this.x, int this.y);
+
+    MouseData.fromXyb(int this.x, int this.y, int this.button);
 }
 
 class WheelData {
@@ -81,6 +83,9 @@ class WheelData {
         } else if (event.detail != 0) { // Firefox
             delta = -event.detail / 3;
         }
+    }
+    WheelData.fromD(double d) {
+        delta = d;
     }
 }
 

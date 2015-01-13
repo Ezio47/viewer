@@ -116,14 +116,12 @@ class Hub {
         cesium.setUpdateFunction(renderer.checkUpdate);
 
         cesium.onMouseMove((x,y) => eventRegistry.MouseMove.fire(new MouseData.fromXy(x,y)));
-
-        var domElement = cesiumContainer;
-        window.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
-        window.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));
-        window.onMouseWheel.listen((e) => eventRegistry.MouseWheel.fire(new WheelData(e)));
-        window.onKeyUp.listen((e) => eventRegistry.KeyUp.fire(new KeyboardData(e)));
-        window.onKeyDown.listen((e) => eventRegistry.KeyDown.fire(new KeyboardData(e)));
-        window.onResize.listen((e) => eventRegistry.WindowResize.fire0());
+        cesium.onMouseDown((x,y,b) => eventRegistry.MouseDown.fire(new MouseData.fromXyb(x,y,b)));
+        cesium.onMouseUp((x,y,b) => eventRegistry.MouseUp.fire(new MouseData.fromXyb(x,y,b)));
+        cesium.onMouseWheel((d) => eventRegistry.MouseWheel.fire(new WheelData.fromD(d)));
+        // onKeyDown...
+        // onKeyUp...
+        // onResize...
 
         modeController = new ModeController();
         annotationController = new AnnotationController();

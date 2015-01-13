@@ -13,9 +13,10 @@ class CesiumBridge {
         _viewer = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    void onMouseMove(f) {
-        _viewer.callMethod('onMouseMove', [f]);
-    }
+    void onMouseMove(f) => _viewer.callMethod('onMouseMove', [f]);
+    void onMouseDown(f) => _viewer.callMethod('onMouseDown', [f]);
+    void onMouseUp(f) => _viewer.callMethod('onMouseUp', [f]);
+    void onMouseWheel(f) => _viewer.callMethod('onMouseWheel', [f]);
 
     void setUpdateFunction(f) {
         _viewer.callMethod('setUpdater', [f]);
@@ -101,7 +102,8 @@ class CesiumBridge {
     dynamic createLine(Vector3 point1, Vector3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        var prim = _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z, colorR, colorG, colorB]);
+        var prim =
+                _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z, colorR, colorG, colorB]);
         assert(prim != null);
         return prim;
     }

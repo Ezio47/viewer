@@ -66,7 +66,7 @@ class AnnotationController implements IController {
         _hub.renderer.addAnnotationToScene(a);
         _hub.renderer.annotations.add(a);
 
-        _hub.cesium.createLabel("My house!", new Vector3(0.0,0.0,0.0));//-77.62549459934235, 38.833895271724664, 0.0));
+    //    _hub.cesium.createLabel("My house!", new Vector3(0.0,0.0,0.0));//-77.62549459934235, 38.833895271724664, 0.0));
         point1 = point2 = null;
     }
 }
