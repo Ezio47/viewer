@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-class ColorizationSettingsVM extends VM {
+class ColorizationSettingsVM extends ViewModel {
     Hub _hub;
 
     List<_ColorizationItem> items = new List<_ColorizationItem>();

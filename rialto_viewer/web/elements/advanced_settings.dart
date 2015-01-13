@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-class AdvancedSettingsVM extends VM {
+class AdvancedSettingsVM extends ViewModel {
     bool axesChecked;
     bool bboxChecked;
     String eyePositionString;

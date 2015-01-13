@@ -4,7 +4,7 @@
 
 part of rialto.viewer;
 
-class VM {
+class ViewModel {
     String _id;
     DialogElement _dialogElement;
     ButtonElement _okayButton;
@@ -12,7 +12,7 @@ class VM {
     var $;
     Hub _hub;
 
-    VM(DialogElement dialogElement, Map dollar)
+    ViewModel(DialogElement dialogElement, Map dollar)
             : _dialogElement = dialogElement,
               $ = dollar {
         assert(_dialogElement != null);
@@ -45,7 +45,7 @@ class VM {
 }
 
 
-class LayerSettingsVM extends VM {
+class LayerSettingsVM extends ViewModel {
     LayerSettingsVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar);
 }
 

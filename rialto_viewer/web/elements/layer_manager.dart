@@ -7,10 +7,10 @@ part of rialto.viewer;
 
 
 
-class LayerManagerVM extends VM {
+class LayerManagerVM extends ViewModel {
     SelectElement _select;
     ServerManagerVM _serverManager;
-    List<_LayerItem> files = new List<_LayerItem>();
+    ControlledList<_LayerItem> items;
     bool hasData;
     var selection;
     //bool selectionEnabled = true;
@@ -19,6 +19,8 @@ class LayerManagerVM extends VM {
     LayerManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
         _select = $["layerManagerDialog_files"];
         assert(_select != null);
+
+        items = new ControlledList<_LayerItem>(_select);
 
         ["a", "b", "c"].forEach((f) {
             var opt = new OptionElement(value: f);
@@ -36,13 +38,13 @@ class LayerManagerVM extends VM {
 
         _hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
             final String displayName = _hub.proxy.getFileProxy(webpath).displayName;
-            files.add(new _LayerItem(webpath, displayName));
-            hasData = files.length > 0;
+            items.add(new _LayerItem(webpath, displayName));
+            hasData = items.length > 0;
         });
 
         _hub.eventRegistry.CloseFileCompleted.subscribe((webpath) {
-            files.removeWhere((f) => f.webpath == webpath);
-            hasData = files.length > 0;
+            items.removeWhere((f) => f.webpath == webpath);
+            hasData = items.length > 0;
         });
     }
 
@@ -52,7 +54,7 @@ class LayerManagerVM extends VM {
 
     void toggleLayer(Event e, var detail, Node target) {
         var checkbox = target as InputElement;
-        var item = files[int.parse(checkbox.id)];
+        var item = items.list[int.parse(checkbox.id)].data;
         _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
     }
 

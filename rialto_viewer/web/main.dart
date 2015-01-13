@@ -4,7 +4,7 @@
 
 import 'dart:core';
 import 'package:polymer/polymer.dart';
-import 'hub.dart';
+import 'rialto.dart';
 
 
 void main() {

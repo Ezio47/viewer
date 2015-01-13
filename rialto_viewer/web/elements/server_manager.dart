@@ -4,14 +4,14 @@
 
 part of rialto.viewer;
 
-class ServerManagerVM extends VM {
+class ServerManagerVM extends ViewModel {
     SelectElement _select;
     String _serverName;
     InputElement _serverNameElement;
     String defaultServer;
     String selectedServer;
     bool isServerOpen;
-    List<_ServerProxyItem> xitems = new List<_ServerProxyItem>();
+    ControlledList<_ServerProxyItem> items;
     bool isFileSelected;
     var selectedItem;
     bool isSelectionEnabled = true;
@@ -21,6 +21,8 @@ class ServerManagerVM extends VM {
     ServerManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
         _select = $["serverManagerDialog_files"];
         assert(_select != null);
+
+        items = new ControlledList<_ServerProxyItem>(_select);
 
         ButtonElement openServer = $["serverManagerDialog_openServer"];
         openServer.onClick.listen((e) => doOpenServer());
@@ -81,28 +83,24 @@ class ServerManagerVM extends VM {
     void _loadItemsFromProxy() {
         assert(_currentDir != null);
 
-        xitems.clear();
-        _select.children.clear();
+        items.clear();
 
         if (_currentDir != _hub.proxy.root) {
             // add a fake-out item, representing the parent proxy
             var p = new _ServerProxyItem("..", _currentDir.parent, -1);
-            xitems.add(p);
-            _select.children.add(p.option);
+            items.add(p);
         }
 
         for (var s in _currentDir.dirs) {
             var p = new _ServerProxyItem(s.displayName, s, -1);
-            xitems.add(p);
-            _select.children.add(p.option);
+            items.add(p);
         }
         for (var s in _currentDir.files) {
             assert(s != null);
             assert(s.map != null);
             final int numPoints = s.map.containsKey("size") ? s.map["size"] : -1;
             var p = new _ServerProxyItem(s.displayName, s, numPoints);
-            xitems.add(p);
-            _select.children.add(p.option);
+            items.add(p);
         }
     }
     void doOpenFile(Event e, var detail, Node target) {
@@ -113,8 +111,7 @@ class ServerManagerVM extends VM {
         close(true);
     }
     void _handleCloseServerCompleted() {
-        xitems.clear();
-        _select.children.clear();
+        items.clear();
 
         isServerOpen = false;
         isFileSelected = false;
@@ -159,16 +156,12 @@ class _ServerProxyItem {
     String get size {
         return Utils.toSI(numPoints);
     }
-    OptionElement option;
 
     _ServerProxyItem(displayName, this.source, this.numPoints) {
         name = displayName;
         if (this.source is DirectoryProxy) {
             name += "/";
         }
-
-        option = new OptionElement(value: name);
-        option.text = name;
     }
 
 }
