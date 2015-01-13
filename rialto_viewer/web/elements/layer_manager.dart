@@ -2,32 +2,36 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-library rialto.viewer.layer_panel;
-
-import 'dart:core';
-import 'dart:html';
-import 'package:polymer/polymer.dart';
-import '../hub.dart';
+part of rialto.viewer;
 
 
-@CustomTag('layer-panel')
-class LayerPanel extends PolymerElement {
-    @published ObservableList<_LayerItem> files = new ObservableList();
-    @published bool hasData;
-    @observable var selection;
-    @observable bool selectionEnabled = true;
 
+
+class LayerManagerVM extends VM {
+    SelectElement _select;
+    ServerManagerVM _serverManager;
+    List<_LayerItem> files = new List<_LayerItem>();
+    bool hasData;
+    var selection;
+    //bool selectionEnabled = true;
     Hub _hub;
 
-    LayerPanel.created() : super.created();
+    LayerManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
+        _select = $["layerManagerDialog_files"];
+        assert(_select != null);
 
-    @override
-    void attached() {
-        super.attached();
-    }
+        ["a", "b", "c"].forEach((f) {
+            var opt = new OptionElement(value: f);
+            opt.text = "sss";
+            _select.children.add(opt);
+        });
 
-    @override
-    void ready() {
+        var serverManagerDialog = $["serverManagerDialog"];
+        _serverManager = new ServerManagerVM(serverManagerDialog, $);
+
+        ButtonElement add = $["layerManagerDialog_add"];
+        add.onClick.listen((ev) => _serverManager.open());
+
         _hub = Hub.root;
 
         _hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
@@ -42,13 +46,8 @@ class LayerPanel extends PolymerElement {
         });
     }
 
-    @override
-    void detached() {
-        super.detached();
-    }
-
     void openFile(Event e, var detail, Node target) {
-        _hub.serverDialog.openDialog();
+        _serverManager.open();
     }
 
     void toggleLayer(Event e, var detail, Node target) {
@@ -65,16 +64,13 @@ class LayerPanel extends PolymerElement {
         }
         return;
     }
-
-    void selectionMade(CustomEvent e) {
-    }
 }
 
 
-class _LayerItem extends Observable {
-    @observable String webpath;
-    @observable String displayName;
-    @observable bool checked;
+class _LayerItem {
+    String webpath;
+    String displayName;
+    bool checked;
     _LayerItem(this.webpath, this.displayName) {
         checked = true;
     }

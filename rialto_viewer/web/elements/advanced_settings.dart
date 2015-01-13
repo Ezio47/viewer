@@ -2,43 +2,24 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-library rialto.viewer.display_panel;
-
-import 'dart:core';
-import 'dart:html';
-import 'package:polymer/polymer.dart';
-import 'package:vector_math/vector_math.dart';
-import '../hub.dart';
+part of rialto.viewer;
 
 
-@CustomTag('display-panel')
-class DisplayPanel extends PolymerElement {
-    @published bool axesChecked;
-    @published bool bboxChecked;
-    @published String eyePositionString;
-    @published String targetPositionString;
+class AdvancedSettingsVM extends VM {
+    bool axesChecked;
+    bool bboxChecked;
+    String eyePositionString;
+    String targetPositionString;
 
     Hub _hub;
 
-    DisplayPanel.created() : super.created();
+    AdvancedSettingsVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
 
-    @override
-    void attached() {
-        super.attached();
-    }
-
-    @override
-    void ready() {
         _hub = Hub.root;
         _hub.eventRegistry.DisplayAxes.subscribe((v) => axesChecked = v);
         _hub.eventRegistry.DisplayBbox.subscribe((v) => bboxChecked = v);
         axesChecked = false;
         bboxChecked = false;
-    }
-
-    @override
-    void detached() {
-        super.detached();
     }
 
     void doAxesChecked(var mouseEvent) {
@@ -50,7 +31,7 @@ class DisplayPanel extends PolymerElement {
     }
 
     void doColorization(Event e, var detail, Node target) {
-        _hub.colorizationDialog.openDialog();
+        //_hub.colorizationDialog.openDialog();
     }
 
     Vector3 parseTriplet(String triplet) {

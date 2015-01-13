@@ -7,7 +7,6 @@ library rialto.viewer.rialto_element;
 import 'dart:core';
 import 'dart:html';
 import 'package:polymer/polymer.dart';
-import 'package:paper_elements/paper_icon_button.dart';
 import '../hub.dart';
 
 
@@ -15,6 +14,9 @@ import '../hub.dart';
 class RialtoElement extends PolymerElement {
     Hub _hub;
     SpanElement _mouseCoords;
+    LayerManagerVM _layerManager;
+    LayerSettingsVM _layerSettings;
+    AdvancedSettingsVM _advancedSettings;
 
     RialtoElement.created() : super.created();
 
@@ -29,6 +31,15 @@ class RialtoElement extends PolymerElement {
         _hub = Hub.root;
         _hub.rialtoElement = this;
 
+        _mouseCoords = $["textMouseCoords"];
+
+        var layerManagerDialog = $["layerManagerDialog"];
+        _layerManager = new LayerManagerVM(layerManagerDialog, $);
+        var layerSettingsDialog = $["layerSettingsDialog"];
+        _layerSettings = new LayerSettingsVM(layerSettingsDialog, $);
+        var advancedSettingsDialog = $["advancedSettingsDialog"];
+        _advancedSettings = new AdvancedSettingsVM(advancedSettingsDialog, $);
+
         ButtonElement goHome = $["goHome"];
         goHome.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT)));
         ButtonElement goColorize = $["goColorize"];
@@ -40,13 +51,20 @@ class RialtoElement extends PolymerElement {
         ButtonElement goMeasure = $["goMeasure"];
         goMeasure.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MEASUREMENT)));
 
-        _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
+        ButtonElement goLayerManager = $["goLayerManager"];
+        goLayerManager.onClick.listen((ev) => _layerManager.open());
 
-        _mouseCoords = $["textMouseCoords"];
+        ButtonElement goLayerSettings = $["goLayerSettings"];
+        goLayerSettings.onClick.listen((ev) => _layerSettings.open());
+
+        ButtonElement goAdvancedSettings = $["goAdvancedSettings"];
+        goAdvancedSettings.onClick.listen((ev) => _advancedSettings.open());
+
+
+        _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
     }
 
-    void _updateCoords(MouseData d)
-    {
+    void _updateCoords(MouseData d) {
         var v = _hub.cesium.getMouseCoordinates(d.x, d.y);
         if (v == null) return;
         double lon = v.x;
@@ -61,39 +79,8 @@ class RialtoElement extends PolymerElement {
         super.detached();
     }
 
-    void toggleCollapse2(Event e, var detail, Node target) {
-        var e = $["collapse2"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
-        e.toggle();
-    }
-    void toggleCollapse3(Event e, var detail, Node target) {
-        var e = $["collapse3"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
-        e.toggle();
-    }
-    void toggleCollapse4(Event e, var detail, Node target) {
-        var e = $["collapse4"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-small:chevdown" : "rialto-icons-small:chevup";
-        e.toggle();
-    }
-
-    void toggleCollapse1(Event e, var detail, Node target) {
-        var e = $["collapse1"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-regular:chevdown" : "rialto-icons-regular:chevup";
-        e.toggle();
-    }
-    void toggleCollapse5(Event e, var detail, Node target) {
-        var e = $["collapse5"];
-        var button = target as PaperIconButton;
-        button.icon = e.opened ? "rialto-icons-regular:chevright" : "rialto-icons-regular:chevleft";
-        e.toggle();
-    }
-
-    void closeServerDialog(Event e, var detail, Node target) {
-        _hub.serverDialog.closeDialog();
+    void aboutbox(Event e, var detail, Node target) {
+        window.alert("Copyright © RadiantBlue 2014.");
     }
 }
+

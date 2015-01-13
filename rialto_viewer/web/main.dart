@@ -20,7 +20,7 @@ void main() {
             Hub.root.init();
 
 
-            boot2();
+            boot1();
         });
     });
 }

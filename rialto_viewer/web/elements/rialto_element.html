@@ -7,29 +7,6 @@
 
 <link rel="import" href="packages/polymer/polymer.html">
 
-<link rel="import" href="packages/core_elements/core_collapse.html">
-
-<link rel="import" href="packages/core_elements/core_icon.html">
-<link rel="import" href="packages/core_elements/core_icons.html">
-<link rel="import" href="packages/core_elements/core_iconset.html">
-<link rel="import" href="packages/core_elements/core_iconset_svg.html">
-<link rel="import" href="packages/core_elements/image_icons.html">
-<link rel="import" href="packages/core_elements/maps_icons.html">
-<link rel="import" href="packages/core_elements/editor_icons.html">
-
-<link rel="import" href="packages/paper_elements/paper_icon_button.html">
-
-<link rel="import" href="render_panel.html">
-<link rel="import" href="status_panel.html">
-
-<link rel="import" href="layer_panel.html">
-<link rel="import" href="info_panel.html">
-<link rel="import" href="display_panel.html">
-<link rel="import" href="server_dialog.html">
-<link rel="import" href="colorization_dialog.html">
-
-<link rel="import" href="rialto_icons.html">
-
 <polymer-element name="rialto-element">
 
     <template>
@@ -39,13 +16,6 @@
 
         <div id="rialto-window">
 
-            <!-- RENDER PANEL -->
-            <div class="render-panel-position">
-                <div class="render-panel-style">
-                    <render-panel id="main"></render-panel>
-                </div>
-            </div>
-
             <!-- TOGGLES PANEL -->
             <div class="main-toggles-position" >
                 <div horizontal layout class="regularsquare-button-style">
@@ -54,50 +24,176 @@
                     <button id="goAnnotate">Annotate</button>
                     <button id="goSelect">Select</button>
                     <button id="goMeasure">Measure</button>
+                    <span>...</span>
+                    <button id="goLayerManager">Layer Manager...</button>
+                    <button id="goLayerSettings">Layer Settings...</button>
+                    <button id="goAdvancedSettings">Advanced Settings...</button>
                 </div>
             </div>
 
+            <dialog id="layerManagerDialog">
+                Layer Manager Dialog
+                 <div layout horizontal>
 
-            <!-- LEFT PANEL -->
-            <div class="left-panel-position">
+                <button id="layerManagerDialog_add">Add...</button>
+                <select multiple="multiple" id="layerManagerDialog_files">
+                </select>
+<!--
+                <core-list-dart data="{{files}}" height="20px"
+                        selectionEnabled="{{selectionEnabled}}"
+                        selection="{{selection}}"
+                        on-core-activate = "{{selectionMade}}"
+                        class="listbox-style"
+                        multi="false"
+                        id="file-list">
+                    <template>
+                        <div layout horizontal class="{{ {selecteditemstyle: selected} }} listbox-item-style">
+                            <input type="checkbox" name="filescheck" checked="{{model.checked}}" id="{{index}}" on-click="{{toggleLayer}}" class="padright">
+                            <span>{{model.displayName}}</span>
+                        </div>
+                    </template>
+                </core-list-dart>
+-->
+                <hr class="hr-style mar3 noborder">
 
-                    <div>
-                        <layer-panel></layer-panel>
-
-                        <dialog>
-                            <server-dialog id="server-dialog"></server-dialog>
-                        </dialog>
-
-
-                        <dialog>
-                            <colorization-dialog id="colorization-dialog"></colorization-dialog>
-                        </dialog>
-                    </div>
-
-                    <div>
-                        <display-panel></display-panel>
-                    </div>
-
-                    <div>
-                        <info-panel></info-panel>
-                    </div>
-
-            </div>  <!-- left panel -->
-
-
-
-            <!-- STATUS PANEL -->
-           <div class="status-panel-style status-panel-position">
-            <div layout horizontal>
-                <div class="pad4">
-                    <span id="textMouseCoords" class="status-span"></span>
+                <div class="smallroundbutton mar0">
+                    <button on-click="{{openFile}}"><b>+</b></button>
+                    <button on-click="{{deleteFile}}"><b>-</b></button>
                 </div>
-                <div flex></div>
-                <div class="pad4">
-                    <span class="status-span status-textline status-logo" on-click="{{aboutbox}}">Rialto</span>
+
+                <button id="layerManagerDialog_okay">Okay</button>
+                <button id="layerManagerDialog_cancel">Cancel</button>
+                </div>
+            </dialog>
+
+
+            <dialog id="serverManagerDialog">
+                Server Manager Dialog
+                <div>
+                    <label>
+                        <span>Server:</span>
+                        <input id="serverManagerDialog_serverName" type="text" class="input-textbox-style">
+                    </label>
+                    <button class="regulartextbutton" id="serverManagerDialog_closeServer" type="button">
+                        <span>Close</span>
+                    </button>
+                    <button class="regulartextbutton" id="serverManagerDialog_openServer" type="button">
+                        <span>Open</span>
+                    </button>
+                </div>
+
+                <select multiple="multiple" id="serverManagerDialog_files">
+                </select>
+                <button id="serverManagerDialog_okay">Okay</button>
+                <button id="serverManagerDialog_cancel">Cancel</button>
+            </dialog>
+
+            <dialog id="layerSettingsDialog">
+                Layer Settings Dialog
+                <button id="layerSettingsDialog_okay">Okay</button>
+                <button id="layerSettingsDialog_cancel">Cancel</button>
+
+
+                <table>
+                    <tr>
+                        <td>Points:</td>
+                        <td>{{numPoints}}</td>
+                    </tr>
+                    <tr>
+                        <td>X:</td>
+                        <td>{{minx.toStringAsFixed(3)}}</td>
+                        <td>{{maxx.toStringAsFixed(3)}}</td>
+                    </tr>
+                    <tr>
+                        <td>Y:</td>
+                        <td>{{miny.toStringAsFixed(3)}}</td>
+                        <td>{{maxy.toStringAsFixed(3)}}</td>
+                    </tr>
+                    <tr>
+                        <td>Z:</td>
+                        <td>{{minz.toStringAsFixed(3)}}</td>
+                        <td>{{maxz.toStringAsFixed(3)}}</td>
+                    </tr>
+                </table>
+
+
+            </dialog>
+
+
+            <dialog id="advancedSettingsDialog">
+                Advanced Settings Dialog
+
+                <div>
+                    <label>
+                        <input type="checkbox" checked="{{axesChecked}}" on-click="{{doAxesChecked}}" class="padright">
+                        <span>Toggle axes</span>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" checked="{{bboxChecked}}" on-click={{doBboxChecked}} class="padright">
+                        <span>Toggle bbox</span>
+                    </label>
+                </div>
+
+                <button class="regulartextbutton" type="button" on-click="{{doColorization}}">
+                    <span>Colorization...</span>
+                </button>
+
+                <div layout vertical>
+                    <label>
+                        <span>Camera eye point (x,y,z):</span>
+                        <input value="{{eyePositionString}}" id="cameraposition" type="text" class="input-textbox-style">
+                    </label>
+                    <label>
+                        <span>Camera target point (x,y,z):</span>
+                        <input value="{{targetPositionString}}" id="eyeposition" type="text" class="input-textbox-style">
+                    </label>
+                    <button class="regulartextbutton" type="button" on-click="{{doCamera}}">
+                        <span>Update Camera</span>
+                    </button>
+                </div>
+
+                <button id="advancedSettingsDialog_okay">Okay</button>
+                <button id="advancedSettingsDialog_cancel">Cancel</button>
+            </dialog>
+
+
+            <dialog id="colorizationDialog">
+                Colorization Dialog
+
+<!--
+                <core-list-dart data="{{items}}" height="20px" class="listbox-style pad4"
+                                selectionEnabled="{{isSelectionEnabled}}"
+                                selection="{{selectedItem}}"
+                                on-core-activate = "{{doSelectionMade}}"
+                                multi="false"
+                                id="file-list2">
+                            <template>
+                                <div layout horizontal class="{{ {selecteditemstyle: selected} }} listbox-item-style" id="{{index}}">
+                                    <span>{{model.name}}
+                                    </span>
+                                </div>
+                            </template>
+                </core-list-dart>
+-->
+
+                <button id="advancedSettingsDialog_okay">Okay</button>
+                <button id="advancedSettingsDialog_cancel">Cancel</button>
+            </dialog>
+
+            <div class="status-panel-style status-panel-position">
+                <div layout horizontal>
+                    <div class="pad4">
+                        <span id="textMouseCoords" class="status-span"></span>
+                    </div>
+                    <div flex></div>
+                    <div class="pad4">
+                        <span class="status-span status-textline status-logo" on-click="{{aboutbox}}">Rialto</span>
+                    </div>
                 </div>
             </div>
-           </div>
+
 
         </div> <!-- main -->
 

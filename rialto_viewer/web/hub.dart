@@ -15,10 +15,13 @@ import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
 import 'package:vector_math/vector_math.dart';
 
-import 'elements/colorization_dialog.dart';
-import 'elements/render_panel.dart';
-import 'elements/server_dialog.dart';
 import 'elements/rialto_element.dart';
+
+part 'elements/advanced_settings.dart';
+part 'elements/colorization_settings.dart';
+part 'elements/layer_manager.dart';
+part 'elements/server_manager.dart';
+part 'elements/vm.dart';
 
 part 'annotation_controller.dart';
 part 'cesium/cesium_bridge.dart';
@@ -55,9 +58,6 @@ void log(o) {
 
 
 class Hub {
-    RenderPanel renderPanel;
-    ServerDialog serverDialog;
-    ColorizationDialog colorizationDialog;
     RialtoElement rialtoElement;
 
     Element cesiumContainer;
