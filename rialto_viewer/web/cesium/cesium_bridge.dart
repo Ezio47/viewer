@@ -7,10 +7,14 @@ part of rialto.viewer;
 
 // this serves as an interface to the JavaScript functions in CesiumBridge
 class CesiumBridge {
-    var _viewer;
+    JsObject _viewer;
 
     CesiumBridge(String elementName) {
         _viewer = new JsObject(context['CesiumBridge'], [elementName]);
+    }
+
+    void onMouseMove(f) {
+        _viewer.callMethod('onMouseMove', [f]);
     }
 
     void setUpdateFunction(f) {
@@ -61,9 +65,10 @@ class CesiumBridge {
     }
 
     Vector3 getMouseCoordinates(int windowX, int windowY) {
-        dynamic xyz = _viewer.callMethod('getMouseCoords', [windowX, windowY]);
-        double x = xyz[0];
-        double y = xyz[1];
+        var xyz = _viewer.callMethod('getMouseCoords', [windowX, windowY]);
+        if (xyz == null) return null;
+        double x = xyz[0].toDouble();
+        double y = xyz[1].toDouble();
         double z = xyz[2].toDouble();
         return new Vector3(x, y, z);
     }
@@ -130,6 +135,6 @@ class CesiumBridge {
 
     dynamic createLabel(String text, Vector3 point) {
 
-        return _viewer.callMethofd('createLabel', [text, point.x, point.y, point.z]);
+        return _viewer.callMethod('createLabel', [text, point.x, point.y, point.z]);
     }
 }

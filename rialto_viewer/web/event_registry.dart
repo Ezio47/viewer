@@ -61,12 +61,15 @@ class MouseData {
     bool altKey;
     int button;
     CanvasElement canvas;
+
     MouseData(MouseEvent ev) {
         altKey = ev.altKey;
         button = ev.button;
         x = ev.client.x;
         y = ev.client.y;
     }
+
+    MouseData.fromXy(int this.x, int this.y);
 }
 
 class WheelData {

@@ -19,6 +19,20 @@ var CesiumBridge = function (element) {
     }
 
 
+    this.onMouseMove = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+
+            function(event) {
+                var windowX = event.endPosition.x;
+                var windowY = event.endPosition.y;
+                f(windowX,windowY);
+            },
+
+            Cesium.ScreenSpaceEventType.MOUSE_MOVE
+        );
+    }
+
     this.createRectangle = function(x1, y1, x2, y2, colorR, colorG, colorB) {
         var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
         var scene = this.viewer.scene;
@@ -168,13 +182,17 @@ var CesiumBridge = function (element) {
 
     this.getMouseCoords = function(windowX, windowY) {
         var pt2 = new Cesium.Cartesian2(windowX, windowY);
-        var pt3 = this.viewer.camera.pickEllipsoid(pt2);
         var ellipsoid = this.viewer.scene.globe.ellipsoid;
-        var cartographic = ellipsoid.cartesianToCartographic(pt3);
-        var lon = Cesium.Math.toDegrees(cartographic.longitude);
-        var lat = Cesium.Math.toDegrees(cartographic.latitude);
-        var h = cartographic.height;
-        return [lon, lat, h];
+        var cartesian = this.viewer.camera.pickEllipsoid(pt2, ellipsoid);
+        if (cartesian) {
+            var cartographic = ellipsoid.cartesianToCartographic(cartesian);
+            var lon = Cesium.Math.toDegrees(cartographic.longitude);
+            var lat = Cesium.Math.toDegrees(cartographic.latitude);
+            var h = cartographic.height;
+            return [lon, lat, h];
+        } else {
+            return null;
+        }
     }
 
 

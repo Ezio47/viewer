@@ -115,8 +115,9 @@ class Hub {
 
         cesium.setUpdateFunction(renderer.checkUpdate);
 
+        cesium.onMouseMove((x,y) => eventRegistry.MouseMove.fire(new MouseData.fromXy(x,y)));
+
         var domElement = cesiumContainer;
-        window.onMouseMove.listen((e) => eventRegistry.MouseMove.fire(new MouseData(e)));
         window.onMouseDown.listen((e) => eventRegistry.MouseDown.fire(new MouseData(e)));
         window.onMouseUp.listen((e) => eventRegistry.MouseUp.fire(new MouseData(e)));
         window.onMouseWheel.listen((e) => eventRegistry.MouseWheel.fire(new WheelData(e)));

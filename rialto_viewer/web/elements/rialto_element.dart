@@ -14,6 +14,7 @@ import '../hub.dart';
 @CustomTag('rialto-element')
 class RialtoElement extends PolymerElement {
     Hub _hub;
+    SpanElement _mouseCoords;
 
     RialtoElement.created() : super.created();
 
@@ -27,6 +28,32 @@ class RialtoElement extends PolymerElement {
     void ready() {
         _hub = Hub.root;
         _hub.rialtoElement = this;
+
+        ButtonElement goHome = $["goHome"];
+        goHome.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT)));
+        ButtonElement goColorize = $["goColorize"];
+        goColorize.onClick.listen((ev) => _hub.eventRegistry.ColorizeLayers.fire0());
+        ButtonElement goAnnotate = $["goAnnotate"];
+        goAnnotate.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.ANNOTATION)));
+        ButtonElement goSelect = $["goSelect"];
+        goSelect.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.SELECTION)));
+        ButtonElement goMeasure = $["goMeasure"];
+        goMeasure.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MEASUREMENT)));
+
+        _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
+
+        _mouseCoords = $["textMouseCoords"];
+    }
+
+    void _updateCoords(MouseData d)
+    {
+        var v = _hub.cesium.getMouseCoordinates(d.x, d.y);
+        if (v == null) return;
+        double lon = v.x;
+        double lat = v.y;
+        String s = "(${lon.toStringAsFixed(3)}, ${lat.toStringAsFixed(3)})";
+        _mouseCoords.text = s;
+        return;
     }
 
     @override
@@ -68,26 +95,5 @@ class RialtoElement extends PolymerElement {
 
     void closeServerDialog(Event e, var detail, Node target) {
         _hub.serverDialog.closeDialog();
-    }
-
-    void goHome(Event e, var detail, Node target) {
-        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT));
-        //_hub.eventRegistry.MoveCameraHome.fire0();
-    }
-
-    void goColorize(Event e, var detail, Node target) {
-        _hub.eventRegistry.ColorizeLayers.fire0();
-    }
-
-    void goAnnotate(Event e, var detail, Node target) {
-        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.ANNOTATION));
-    }
-
-    void goSelect(Event e, var detail, Node target) {
-        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.SELECTION));
-    }
-
-    void goMeasure(Event e, var detail, Node target) {
-        _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MEASUREMENT));
     }
 }
