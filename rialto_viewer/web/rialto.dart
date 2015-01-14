@@ -15,17 +15,9 @@ import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
 import 'package:vector_math/vector_math.dart';
 
-import 'elements/rialto_element.dart';
-
-part 'elements/advanced_settings.dart';
-part 'elements/colorization_settings.dart';
-part 'elements/layer_manager.dart';
-part 'elements/controlled_list.dart';
-part 'elements/server_manager.dart';
-part 'elements/view_model.dart';
+import 'viewmodels/rialto_element.dart';
 
 part 'annotation_controller.dart';
-part 'cesium/cesium_bridge.dart';
 part 'colorizer.dart';
 part 'comms.dart';
 part 'hub.dart';
@@ -40,15 +32,23 @@ part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
 part 'selection_conroller.dart';
 
+part 'cesium/annotation_shape.dart';
+part 'cesium/axes_shape.dart';
+part 'cesium/bbox_shape.dart';
+part 'cesium/cesium_bridge.dart';
+part 'cesium/cloud_shape.dart';
+part 'cesium/measurement_shape.dart';
+part 'cesium/picker.dart';
+part 'cesium/shape.dart';
+
 part 'utils/color.dart';
 part 'utils/rialto_exceptions.dart';
 part 'utils/signal.dart';
 part 'utils/utils.dart';
 
-part 'webgl/annotation_shape.dart';
-part 'webgl/axes_shape.dart';
-part 'webgl/bbox_shape.dart';
-part 'webgl/cloud_shape.dart';
-part 'webgl/measurement_shape.dart';
-part 'webgl/picker.dart';
-part 'webgl/shape.dart';
+part 'viewmodels/advanced_settings.dart';
+part 'viewmodels/colorization_settings.dart';
+part 'viewmodels/layer_manager.dart';
+part 'viewmodels/controlled_list.dart';
+part 'viewmodels/server_manager.dart';
+part 'viewmodels/view_model.dart';
