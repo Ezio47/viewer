@@ -36,49 +36,9 @@ var CesiumBridge = function (element) {
         var up = new Cesium.Cartesian3(upX, upY, upZ);
 
         // BUG: we only support PerspectiveFrustum camera, so seeting FOV is okay
-        console.log("FOV" + Cesium.Math.toDegrees(this.viewer.camera.frustum.fov));
         this.viewer.camera.frustum.fov = Cesium.Math.toRadians(fovDegrees);
 
         this.viewer.camera.lookAt(eyeCartesian, targetCartesian, up);
-    }
-
-    // input: cartographic, height in meters
-    this.setPositionCartographic = function(lon, lat, height) {
-        console.log(height);
-        var cartographic = Cesium.Cartographic.fromDegrees(lon, lat, height);
-        console.log(cartographic.height);
-        var xyz = new Cesium.Cartesian3();
-        var ellipsoid = this.viewer.camera._projection.ellipsoid;
-        ellipsoid.cartographicToCartesian(cartographic, xyz);
-        console.log(xyz.z);
-
-        this.viewer.camera.setPositionCartographic(cartographic);
-        this.viewer.camera.moveForward(-height);
-    }
-
-    // input: cartographic
-    // output: cartesian [x,y,z]
-    this.getRectangleCameraCoordinates = function(west, south, east, north) {
-        console.log(west);
-        var rect = new Cesium.Rectangle.fromDegrees(west, south, east, north);
-        console.log(rect.west);
-        console.log(rect.south);
-        console.log(rect.east);
-        console.log(rect.north);
-        var cartesian = this.viewer.camera.getRectangleCameraCoordinates(rect);
-        var x = cartesian.x;
-        var y = cartesian.y;
-        var z = cartesian.z;
-        console.log(x);
-        console.log(y);
-        console.log(z);
-        return [x, y, z];
-    }
-
-    // input: cartographic
-    this.viewRectangle = function(west, south, east, north) {
-        var rect = new Cesium.Rectangle.fromDegrees(west, south, east, north);
-        this.viewer.camera.viewRectangle(rect);
     }
 
     this.onMouseMove = function(f) {

@@ -20,6 +20,9 @@ class AdvancedSettingsVM extends DialogVM {
     TextInputVM _upY;
     TextInputVM _upZ;
 
+    CheckboxVM _axesEnabled;
+    CheckboxVM _bboxEnabled;
+
     Hub _hub;
 
     AdvancedSettingsVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
@@ -36,19 +39,31 @@ class AdvancedSettingsVM extends DialogVM {
         _targetLon = new TextInputVM($["advancedSettingsDialog_targetLon"], "0.0");
         _targetLat = new TextInputVM($["advancedSettingsDialog_targetLat"], "0.0");
         _targetHeight = new TextInputVM($["advancedSettingsDialog_targetHeight"], "0.0");
-        _fov = new TextInputVM($["advancedSettingsDialog_fov"], "45.0");
+        _fov = new TextInputVM($["advancedSettingsDialog_fov"], "60.0");
         _upX = new TextInputVM($["advancedSettingsDialog_upX"], "0.0");
         _upY = new TextInputVM($["advancedSettingsDialog_upY"], "0.0");
         _upZ = new TextInputVM($["advancedSettingsDialog_upZ"], "1.0");
+
+        _axesEnabled = new CheckboxVM($["advancedSettingsDialog_axesEnabled"], true);
+        _bboxEnabled = new CheckboxVM($["advancedSettingsDialog_bboxEnabled"], true);
     }
 
     @override
-    void _open() {}
+    void _open() {
+        _axesEnabled.clearState();
+        _bboxEnabled.clearState();
+    }
 
     @override
     void _close(bool okay) {
         if (!okay) return;
 
+        _performCameraWork();
+
+        _performBboxWork();
+    }
+
+    void _performCameraWork() {
         var eyeLon = _eyeLon.getValueAsDouble();
         var eyeLat = _eyeLat.getValueAsDouble();
         var eyeHeight = _eyeHeight.getValueAsDouble();
@@ -63,52 +78,39 @@ class AdvancedSettingsVM extends DialogVM {
 
         var fov = _fov.getValueAsDouble();
 
+        bool eyeChanged = (_eyeLon.changed && _eyeLat.changed && _eyeHeight.changed);
+        bool targetChanged = (_targetLon.changed && _targetLat.changed && _targetHeight.changed);
+        bool upChanged = (_upX.changed && _upY.changed && _upZ.changed);
+        bool fovChanged = (_fov.changed);
+
+        if (!eyeChanged && !targetChanged && !upChanged && !fovChanged) {
+            return;
+        }
+
         bool eyeOkay = (eyeLon != null && eyeLat != null && eyeHeight != null);
         bool targetOkay = (targetLon != null && targetLat != null && targetHeight != null);
         bool upOkay = (upX != null && upY != null && upZ != null);
         bool fovOkay = (fov != null);
 
-        if (eyeOkay && targetOkay  && upOkay && fovOkay) {
+        if (eyeOkay && targetOkay && upOkay && fovOkay) {
             Vector3 eye = new Vector3(eyeLon, eyeLat, eyeHeight);
             Vector3 target = new Vector3(targetLon, targetLat, targetHeight);
             Vector3 up = new Vector3(upX, upY, upZ);
 
             var data = new CameraData(eye, target, up, fov);
             _hub.eventRegistry.UpdateCamera.fire(data);
+        } else {
+            assert(false);
+            // TODO: print error
         }
-
-        assert(true);
     }
 
-    void doAxesChecked(var mouseEvent) {
-        _hub.eventRegistry.DisplayAxes.fire(axesChecked);
-    }
-
-    void doBboxChecked(var mouseEvent) {
-        _hub.eventRegistry.DisplayBbox.fire(bboxChecked);
-    }
-
-    void doColorization(Event e, var detail, Node target) {
-        //_hub.colorizationDialog.openDialog();
-    }
-
-    Vector3 parseTriplet(String triplet) {
-        if (triplet == null || triplet.isEmpty) return null;
-        var vec = new Vector3.zero();
-        var list = triplet.split(",");
-        try {
-            vec.x = double.parse(list[0]);
-            vec.y = double.parse(list[1]);
-            vec.z = double.parse(list[2]);
-        } catch (e) {
-            // BUG: error check
-            return null;
+    void _performBboxWork() {
+        if (_axesEnabled.changed) {
+            _hub.eventRegistry.DisplayAxes.fire(_axesEnabled.value);
         }
-        return vec;
-    }
-
-    void doCamera(Event e, var detail, Node target) {
-        var eyeVec = _eyeLon.getValueAsDouble();
-        assert(false); // BUG: not supported again
+        if (_bboxEnabled.changed) {
+            _hub.eventRegistry.DisplayAxes.fire(_bboxEnabled.value);
+        }
     }
 }

@@ -5,25 +5,37 @@
 part of rialto.viewer;
 
 
+// BUG: make check to see if data has changed or not
+
 class TextInputVM {
     InputElement _element;
+    String _defaultValue;
+    String _startingValue;
 
-    TextInputVM(InputElement this._element, String value) {
+    TextInputVM(InputElement this._element, String this._defaultValue) {
         assert(_element != null);
-        setValue(value);
+        value = _defaultValue;
     }
 
-    void setValue(String value) {
-        _element.value = value;
+    void clearState() {
+        _startingValue = value;
     }
 
-    String getValueAsString() {
+    bool get changed {
+        return (_startingValue != value);
+    }
+
+    String get value {
         return _element.value;
+    }
+
+    set value(String value) {
+        _element.value = value;
     }
 
     // returns a double or null
     double getValueAsDouble() {
-        String s = getValueAsString();
+        String s = value;
         double d = null;
 
         d = double.parse(s, (s) {} );

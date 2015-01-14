@@ -65,10 +65,6 @@ class Hub {
 
         renderablePointCloudSet = new RenderablePointCloudSet();
 
-        renderer = new Renderer(renderablePointCloudSet);
-
-        cesium.setUpdateFunction(renderer.checkUpdate);
-
         cesium.onMouseMove((x,y) => eventRegistry.MouseMove.fire(new MouseData.fromXy(x,y)));
         cesium.onMouseDown((x,y,b) => eventRegistry.MouseDown.fire(new MouseData.fromXyb(x,y,b)));
         cesium.onMouseUp((x,y,b) => eventRegistry.MouseUp.fire(new MouseData.fromXyb(x,y,b)));
@@ -85,11 +81,13 @@ class Hub {
 
         renderablePointCloudSet = new RenderablePointCloudSet();
 
-        renderer = new Renderer(renderablePointCloudSet);
-
         picker = new Picker();
 
         eventRegistry.ChangeMode.fire(new ModeData(ModeData.VIEW));
+
+        renderer = new Renderer(renderablePointCloudSet);
+
+        cesium.setUpdateFunction(renderer.checkUpdate);
     }
 
     int get width => window.innerWidth;
@@ -113,7 +111,7 @@ class Hub {
         file.create().then((PointCloud pointCloud) {
             renderablePointCloudSet.addCloud(pointCloud);
 
-            renderer.update();
+            renderer.updateNeeded = true;
         });
 
         eventRegistry.OpenFileCompleted.fire(webpath);
@@ -123,7 +121,7 @@ class Hub {
 
         renderablePointCloudSet.removeCloud(webpath);
 
-        renderer.update();
+        renderer.updateNeeded = true;
 
         eventRegistry.CloseFileCompleted.fire(webpath);
     }

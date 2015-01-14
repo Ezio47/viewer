@@ -22,25 +22,6 @@ class CesiumBridge {
                 [eyeLon, eyeLat, eyeHeight * 1000.0, targetLon, targetLat, targetHeight * 1000.0, upX, upY, upZ, fovDegrees]);
     }
 
-    // input in cartographic lat/lon
-    void setPositionCartographic(double lon, double lat, double height) {
-        _bridge.callMethod('setPositionCartographic', [lon, lat, height]);
-    }
-
-    // input in cartographic lat/lon
-    // returns [x,y,z] cartesian
-    Vector3 getRectangleCameraCoordinates(double west, double south, double east, double north) {
-        var result = _bridge.callMethod('getRectangleCameraCoordinates', [west, south, east, north]);
-        var x = result[0].toDouble();
-        var y = result[1].toDouble();
-        var z = result[2].toDouble();
-        return new Vector3(x, y, z);
-    }
-
-    void viewRectangle(double west, double south, double east, double north) {
-        _bridge.callMethod('viewRectangle', [west, south, east, north]);
-    }
-
     void onMouseMove(f) => _bridge.callMethod('onMouseMove', [f]);
     void onMouseDown(f) => _bridge.callMethod('onMouseDown', [f]);
     void onMouseUp(f) => _bridge.callMethod('onMouseUp', [f]);

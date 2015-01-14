@@ -36,6 +36,7 @@ part 'view_controller.dart';
 part 'cesium/annotation_shape.dart';
 part 'cesium/axes_shape.dart';
 part 'cesium/bbox_shape.dart';
+part 'cesium/camera.dart';
 part 'cesium/cesium_bridge.dart';
 part 'cesium/cloud_shape.dart';
 part 'cesium/measurement_shape.dart';
@@ -48,6 +49,7 @@ part 'utils/signal.dart';
 part 'utils/utils.dart';
 
 part 'viewmodels/advanced_settings.dart';
+part 'viewmodels/checkbox.dart';
 part 'viewmodels/colorization_settings.dart';
 part 'viewmodels/layer_manager.dart';
 part 'viewmodels/controlled_list.dart';

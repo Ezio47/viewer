@@ -20,18 +20,13 @@ class Renderer {
     List<Annotation> annotations = new List<Annotation>();
     List<Measurement> measurements = new List<Measurement>();
 
+    Camera camera;
+
     Vector3 _cloudMin;
     Vector3 _cloudMax;
     Vector3 _cloudLen;
 
-    Vector3 _defaultCameraEyePosition;
-    Vector3 _cameraEyePosition;
-    Vector3 _defaultCameraTargetPosition;
-    Vector3 _cameraTargetPosition;
-    Vector3 _defaultCameraUpDirection;
-    Vector3 _cameraUpDirection;
-    double _defaultCameraFov = 60.0;
-    double _cameraFov;
+    bool updateNeeded;
 
     Renderer(RenderablePointCloudSet rpcSet) {
         _hub = Hub.root;
@@ -41,100 +36,24 @@ class Renderer {
         _axesVisible = false;
         _bboxVisible = false;
 
+        camera = new Camera();
+
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
-        _hub.eventRegistry.UpdateCamera.subscribe(_handleUpdateCamera);
+
+        updateNeeded = true;
     }
 
-    Vector3 get defaultCameraEyePosition {
-        return _defaultCameraEyePosition;
+
+    void checkUpdate(dynamic theScene, dynamic theTime) {
+        if (updateNeeded) {
+            _update();
+        }
     }
 
-    set defaultCameraEyePosition(Vector3 value) {
-        _defaultCameraEyePosition = value;
-    }
-
-    Vector3 get cameraEyePosition {
-        return _cameraEyePosition;
-    }
-
-    set cameraEyePosition(Vector3 value) {
-        _cameraEyePosition = value;
-    }
-
-    Vector3 get defaultCameraTargetPosition {
-        return _defaultCameraTargetPosition;
-    }
-
-    set defaultCameraTargetPosition(Vector3 value) {
-        _defaultCameraTargetPosition = value;
-    }
-
-    Vector3 get cameraTargetPosition {
-        return _cameraTargetPosition;
-    }
-
-    set cameraTargetPosition(Vector3 value) {
-        _cameraTargetPosition = value;
-    }
-
-    Vector3 get defaultCameraUpDirection {
-        return _defaultCameraUpDirection;
-    }
-
-    set defaultCameraUpDirection(Vector3 value) {
-        _defaultCameraUpDirection = value;
-    }
-
-    Vector3 get cameraUpDirection {
-        return _cameraUpDirection;
-    }
-
-    set cameraUpDirection(Vector3 value) {
-        _cameraUpDirection = value;
-    }
-
-    double get defaultCameraFov {
-        return _defaultCameraFov;
-    }
-
-    set defaultCameraFov(double value) {
-        _defaultCameraFov = value;
-    }
-
-    double get cameraFov {
-        return _cameraFov;
-    }
-
-    set cameraFov(double value) {
-        _cameraFov = value;
-    }
-
-    void _handleUpdateCamera(CameraData data) {
-        cameraEyePosition = data.eye;
-        cameraTargetPosition = data.target;
-        cameraUpDirection = data.up;
-        cameraFov = data.fov;
-
-        // _hub.cesium.setPositionCartographic(cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z);
-        // TODO: fov
-        _hub.cesium.lookAt(
-                cameraEyePosition.x,
-                cameraEyePosition.y,
-                cameraEyePosition.z,
-                cameraTargetPosition.x,
-                cameraTargetPosition.y,
-                cameraTargetPosition.z,
-                cameraUpDirection.x,
-                cameraUpDirection.y,
-                cameraUpDirection.z,
-                cameraFov);
-    }
-
-    void checkUpdate([dynamic theScene = null, dynamic theTime = null]) {
-    }
-
-    void update([dynamic theScene = null, dynamic theTime = null]) {
+    void _update() {
+        assert(updateNeeded);
+        updateNeeded = false; // BUG: should this go at end? (race condition?)
 
         _hub.shapesList.forEach((s) => s.remove());
         _hub.shapesList.clear();
@@ -149,25 +68,10 @@ class Renderer {
             _cloudLen = new Vector3(1.0, 1.0, 1.0);
         }
 
-        /*
-        double westLon = -10.0;
-        double southLat = -10.0;
-        double eastLon = 10.0;
-        double northLat = 10.0;
-        //Vector3 v = _hub.cesium.getRectangleCameraCoordinates(westLon, southLat, eastLon, northLat);
-        _hub.cesium.viewRectangle(westLon, southLat, eastLon, northLat);
-        */
-
         final cloudLen12 = _cloudLen / 2.0;
         final cloudLen14 = _cloudLen / 4.0;
 
-        final ideal = new Vector3(-1.0, -2.0, 2.0);
-        defaultCameraEyePosition = new Vector3(ideal.x * _cloudLen.x, ideal.y * _cloudLen.y, ideal.z * _cloudLen.z);
-        defaultCameraTargetPosition = new Vector3(0.0, 0.0, 0.0);
-        defaultCameraUpDirection = new Vector3(0.0, 0.0, 1.0);
-        cameraEyePosition = defaultCameraEyePosition;
-        cameraTargetPosition = defaultCameraTargetPosition;
-        cameraUpDirection = defaultCameraUpDirection;
+        // TODO: set new camera defaults here
 
         {
             // axes model space is (0 .. 0.25 * cloudLen)
@@ -196,8 +100,6 @@ class Renderer {
         for (var measurement in measurements) {
             addMeasurementToScene(measurement);
         }
-
-        //  _handleMoveCameraHome();
     }
 
     void addAnnotationToScene(Annotation annotation) {
@@ -218,13 +120,5 @@ class Renderer {
         if (_bboxShape == null) return;
         _bboxVisible = v;
         _bboxShape.isVisible = v;
-    }
-
-    void _handleUpdateCameraTargetPosition(Vector3 data) {
-        cameraTargetPosition = data;
-    }
-
-    void _handleUpdateCameraEyePosition(Vector3 data) {
-        cameraEyePosition = data;
     }
 }

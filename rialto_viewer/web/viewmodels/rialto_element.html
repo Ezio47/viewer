@@ -121,52 +121,73 @@
 
 
             <dialog id="advancedSettingsDialog">
-                Advanced Settings Dialog
-
                 <div>
-                    <label>
-                        <!-- checked="{{axesChecked}}" on-click="{{doAxesChecked}}"  -->
-                        <input type="checkbox" class="padright">
-                        <span>Toggle axes</span>
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        <input type="checkbox" class="padright">
-                        <span>Toggle bbox</span>
-                    </label>
+                    Advanced Settings Dialog
                 </div>
 
-                <button class="regulartextbutton" type="button">
-                    <span>Colorization...</span>
-                </button>
+                <div>
+                    <table>
+                    <tbody>
+                        <tr>
+                        <td>
+                            <input id="advancedSettingsDialog_axesEnabled" type="checkbox" class="padright">
+                            <span>Axes enabled</span>
+                        </td>
+                        </tr>
+                        <tr>
+                            <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
+                            <span>Bbox enabled</span>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>
 
-                <div layout vertical>
-                    <label>
-                        <span>Camera eye point: lon, lat, height (Km)</span>
-                        <input id="advancedSettingsDialog_eyeLon" type="text" class="input-textbox-style">
-                        <input id="advancedSettingsDialog_eyeLat" type="text" class="input-textbox-style">
-                        <input id="advancedSettingsDialog_eyeHeight" type="text" class="input-textbox-style">
-                    </label>
-                    <label>
-                        <span>Camera target point: lon, lat, height (Km)</span>
-                        <input id="advancedSettingsDialog_targetLon" type="text" class="input-textbox-style">
-                        <input id="advancedSettingsDialog_targetLat" type="text" class="input-textbox-style">
-                        <input id="advancedSettingsDialog_targetHeight" type="text" class="input-textbox-style">
-                    </label>
-                    <label>
-                        <span>Camera up direction: x, y, z</span>
-                        <input id="advancedSettingsDialog_upX" type="text" class="input-textbox-style">
-                        <input id="advancedSettingsDialog_upY" type="text" class="input-textbox-style">
-                        <input id="advancedSettingsDialog_upZ" type="text" class="input-textbox-style">
-                    </label>
-                    <label>
-                        <span>Camera FOV (degrees)</span>
-                        <input id="advancedSettingsDialog_fov" type="text" class="input-textbox-style">
-                    </label>
-                    <button class="regulartextbutton" type="button" on-click="{{doCamera}}">
-                        <span>Update Camera</span>
-                    </button>
+                <div>
+                    <table>
+                    <tbody>
+                    <td>
+                        <button class="regulartextbutton" type="button">
+                            <span>Colorization...</span>
+                        </button>
+                    </td>
+                    </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <table>
+                        <tbody>
+                        <td>
+                            <tr>
+                                <span>Camera eye point: lon, lat, height (Km)</span>
+                                <input id="advancedSettingsDialog_eyeLon" type="text" class="input-textbox-style">
+                                <input id="advancedSettingsDialog_eyeLat" type="text" class="input-textbox-style">
+                                <input id="advancedSettingsDialog_eyeHeight" type="text" class="input-textbox-style">
+                            </tr>
+                        </td>
+                        <td>
+                        <tr>
+                            <span>Camera target point: lon, lat, height (Km)</span>
+                            <input id="advancedSettingsDialog_targetLon" type="text" class="input-textbox-style">
+                            <input id="advancedSettingsDialog_targetLat" type="text" class="input-textbox-style">
+                            <input id="advancedSettingsDialog_targetHeight" type="text" class="input-textbox-style">
+                        </tr>
+                        </td>
+                        <td>
+                        <tr>
+                            <span>Camera up direction: x, y, z</span>
+                            <input id="advancedSettingsDialog_upX" type="text" class="input-textbox-style">
+                            <input id="advancedSettingsDialog_upY" type="text" class="input-textbox-style">
+                            <input id="advancedSettingsDialog_upZ" type="text" class="input-textbox-style">
+                        </tr>
+                        </td>
+                        <td>
+                        <tr>
+                            <span>Camera FOV (degrees)</span>
+                            <input id="advancedSettingsDialog_fov" type="text" class="input-textbox-style">
+                        </tr>
+                    </tbody>
+                </table>
                 </div>
 
                 <button id="advancedSettingsDialog_okay">Okay</button>
