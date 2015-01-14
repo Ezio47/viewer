@@ -38,7 +38,7 @@ class EventRegistry {
 
     SignalFunctions ColorizeLayers = new SignalFunctions();
 
-    SignalFunctions MoveCameraHome = new SignalFunctions();
+    SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
 
     SignalFunctions<String> UpdateColorizationSettings = new SignalFunctions<String>();
 
@@ -109,11 +109,12 @@ class DisplayLayerData {
     DisplayLayerData(this.webpath, this.visible);
 }
 
-class CameraModelData {
-    Vector3 cameraPosition;
-    Vector3 eyePosition;
-    double zExaggeartion;
-    CameraModelData(this.cameraPosition, this.eyePosition, this.zExaggeartion);
+class CameraData {
+    Vector3 eye; // cartographic
+    Vector3 target; // cartographic
+    Vector3 up; // cartesian
+    double fov;
+    CameraData(this.eye, this.target, this.up, this.fov);
 }
 
 

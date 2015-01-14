@@ -4,7 +4,7 @@
 
 part of rialto.viewer;
 
-class ServerManagerVM extends ViewModel {
+class ServerManagerVM extends DialogVM {
     SelectElement _select;
     String _serverName;
     InputElement _serverNameElement;
@@ -56,6 +56,9 @@ class ServerManagerVM extends ViewModel {
 
         _serverNameElement.value = selectedServer;
     }
+
+    @override
+    void _close(bool okay) {}
 
     void doSelectionMade(CustomEvent e) {
         var item = e.detail.data as _ServerProxyItem;

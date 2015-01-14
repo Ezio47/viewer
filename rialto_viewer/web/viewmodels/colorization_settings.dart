@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-class ColorizationSettingsVM extends ViewModel {
+class ColorizationSettingsVM extends DialogVM {
     Hub _hub;
 
     List<_ColorizationItem> items = new List<_ColorizationItem>();
@@ -22,6 +22,12 @@ class ColorizationSettingsVM extends ViewModel {
         names.forEach((s) => items.add(new _ColorizationItem(s)));
         $["button3"].disabled = true;
     }
+
+    @override
+    void _open() {}
+
+    @override
+    void _close(bool okay) {}
 
     void doOkay(Event e, var detail, Node target) {
         assert(selectedItem != null);

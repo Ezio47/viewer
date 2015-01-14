@@ -7,7 +7,7 @@ part of rialto.viewer;
 
 
 
-class LayerManagerVM extends ViewModel {
+class LayerManagerVM extends DialogVM {
     SelectElement _select;
     ServerManagerVM _serverManager;
     ControlledList<_LayerItem> items;
@@ -31,7 +31,7 @@ class LayerManagerVM extends ViewModel {
         var serverManagerDialog = $["serverManagerDialog"];
         _serverManager = new ServerManagerVM(serverManagerDialog, $);
 
-        ButtonElement add = $["layerManagerDialog_add"];
+        ButtonElement add = $["serverManagerDialog_open"];
         add.onClick.listen((ev) => _serverManager.open());
 
         _hub = Hub.root;
@@ -47,6 +47,12 @@ class LayerManagerVM extends ViewModel {
             hasData = items.length > 0;
         });
     }
+
+    @override
+    void _open() {}
+
+    @override
+    void _close(bool okay) {}
 
     void openFile(Event e, var detail, Node target) {
         _serverManager.open();

@@ -19,6 +19,14 @@ var CesiumBridge = function (element) {
     }
 
     // input: cartographic
+    this.setPositionCartographic = function(lon, lat, height) {
+        console.log(height);
+        var cartographic = Cesium.Cartographic.fromDegrees(lon, lat, height);
+        console.log(cartographic.height);
+        this.viewer.camera.setPositionCartographic(cartographic);
+    }
+
+    // input: cartographic
     // output: cartesian [x,y,z]
     this.getRectangleCameraCoordinates = function(west, south, east, north) {
         console.log(west);

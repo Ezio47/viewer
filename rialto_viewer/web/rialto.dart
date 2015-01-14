@@ -53,4 +53,5 @@ part 'viewmodels/layer_manager.dart';
 part 'viewmodels/controlled_list.dart';
 part 'viewmodels/modal_buttons.dart';
 part 'viewmodels/server_manager.dart';
-part 'viewmodels/view_model.dart';
+part 'viewmodels/text_input.dart';
+part 'viewmodels/dialog_vm.dart';

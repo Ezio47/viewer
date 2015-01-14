@@ -33,15 +33,7 @@ class RialtoElement extends PolymerElement {
 
         _mouseCoords = $["textMouseCoords"];
 
-        ButtonElement goHome = $["goHome"];
-        goHome.onClick.listen((ev) => _hub.eventRegistry.MoveCameraHome.fire0());
-
-        var layerManagerDialog = $["layerManagerDialog"];
-        _layerManager = new LayerManagerVM(layerManagerDialog, $);
-        var layerSettingsDialog = $["layerSettingsDialog"];
-        _layerSettings = new LayerSettingsVM(layerSettingsDialog, $);
-        var advancedSettingsDialog = $["advancedSettingsDialog"];
-        _advancedSettings = new AdvancedSettingsVM(advancedSettingsDialog, $);
+        $["homeButton"].onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(null));
 
         _modalButtons = new ModalButtonsVM({
             $["viewModeButton"]: new ModeData(ModeData.VIEW),
@@ -50,15 +42,9 @@ class RialtoElement extends PolymerElement {
             $["measureModeButton"]: new ModeData(ModeData.MEASUREMENT)
         }, $["viewModeButton"]);
 
-        ButtonElement goLayerManager = $["goLayerManager"];
-        goLayerManager.onClick.listen((ev) => _layerManager.open());
-
-        ButtonElement goLayerSettings = $["goLayerSettings"];
-        goLayerSettings.onClick.listen((ev) => _layerSettings.open());
-
-        ButtonElement goAdvancedSettings = $["goAdvancedSettings"];
-        goAdvancedSettings.onClick.listen((ev) => _advancedSettings.open());
-
+        _layerManager = new LayerManagerVM($["layerManagerDialog"], $);
+        _layerSettings = new LayerSettingsVM($["layerSettingsDialog"], $);
+        _advancedSettings = new AdvancedSettingsVM($["advancedSettingsDialog"], $);
 
         _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
     }

@@ -30,7 +30,8 @@ class Renderer {
     Vector3 _cameraTargetPosition;
     Vector3 _defaultCameraUpDirection;
     Vector3 _cameraUpDirection;
-    // BUG: camera fov?
+    double _defaultCameraFov;
+    double _cameraFov;
 
     Renderer(RenderablePointCloudSet rpcSet) {
         _hub = Hub.root;
@@ -42,9 +43,7 @@ class Renderer {
 
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
-        _hub.eventRegistry.MoveCameraHome.subscribe0(_handleMoveCameraHome);
-        //_hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
-        //_hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
+        _hub.eventRegistry.UpdateCamera.subscribe(_handleUpdateCamera);
     }
 
     Vector3 get defaultCameraEyePosition {
@@ -95,17 +94,37 @@ class Renderer {
         _cameraUpDirection = value;
     }
 
-    void _handleMoveCameraHome() {
-        cameraEyePosition = defaultCameraEyePosition;
-        cameraTargetPosition = defaultCameraTargetPosition;
-        cameraUpDirection = new Vector3(0.0, 0.0, 1.0);
+    double get defaultCameraFov {
+        return _defaultCameraFov;
+    }
 
-        double westLon = -10.0;
-        double southLat = -10.0;
-        double eastLon = 10.0;
-        double northLat = 10.0;
-        //Vector3 v = _hub.cesium.getRectangleCameraCoordinates(westLon, southLat, eastLon, northLat);
-        _hub.cesium.viewRectangle(westLon, southLat, eastLon, northLat);
+    set defaultCameraFov(double value) {
+        _defaultCameraFov = value;
+    }
+
+    double get cameraFov {
+        return _cameraFov;
+    }
+
+    set cameraFov(double value) {
+        _cameraFov= value;
+    }
+
+    void _handleUpdateCamera(CameraData data) {
+        cameraEyePosition = data.eye;
+        cameraTargetPosition = data.target;
+        cameraUpDirection = data.up;
+        cameraFov = data.fov;
+
+        //double westLon = -10.0;
+        //double southLat = -10.0;
+        //double eastLon = 10.0;
+        //double northLat = 10.0;
+        ////Vector3 v = _hub.cesium.getRectangleCameraCoordinates(westLon, southLat, eastLon, northLat);
+        //_hub.cesium.viewRectangle(westLon, southLat, eastLon, northLat);
+
+        // TODO: use eye, up, fov
+        _hub.cesium.setPositionCartographic(cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z);
     }
 
     void checkUpdate([dynamic theScene = null, dynamic theTime = null]) {

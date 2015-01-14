@@ -14,6 +14,11 @@ class CesiumBridge {
     }
 
     // input in cartographic lat/lon
+    void setPositionCartographic(double lon, double lat, double height) {
+        _bridge.callMethod('setPositionCartographic', [lon, lat, height]);
+    }
+
+    // input in cartographic lat/lon
     // returns [x,y,z] cartesian
     Vector3 getRectangleCameraCoordinates(double west, double south, double east, double north) {
         var result = _bridge.callMethod('getRectangleCameraCoordinates', [west, south, east, north]);
