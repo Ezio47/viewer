@@ -7,19 +7,33 @@ part of rialto.viewer;
 
 // this serves as an interface to the JavaScript functions in CesiumBridge
 class CesiumBridge {
-    JsObject _viewer;
+    JsObject _bridge;
 
     CesiumBridge(String elementName) {
-        _viewer = new JsObject(context['CesiumBridge'], [elementName]);
+        _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    void onMouseMove(f) => _viewer.callMethod('onMouseMove', [f]);
-    void onMouseDown(f) => _viewer.callMethod('onMouseDown', [f]);
-    void onMouseUp(f) => _viewer.callMethod('onMouseUp', [f]);
-    void onMouseWheel(f) => _viewer.callMethod('onMouseWheel', [f]);
+    // input in cartographic lat/lon
+    // returns [x,y,z] cartesian
+    Vector3 getRectangleCameraCoordinates(double west, double south, double east, double north) {
+        var result = _bridge.callMethod('getRectangleCameraCoordinates', [west, south, east, north]);
+        var x = result[0].toDouble();
+        var y = result[1].toDouble();
+        var z = result[2].toDouble();
+        return new Vector3(x, y, z);
+    }
+
+    void viewRectangle(double west, double south, double east, double north) {
+        _bridge.callMethod('viewRectangle', [west, south, east, north]);
+    }
+
+    void onMouseMove(f) => _bridge.callMethod('onMouseMove', [f]);
+    void onMouseDown(f) => _bridge.callMethod('onMouseDown', [f]);
+    void onMouseUp(f) => _bridge.callMethod('onMouseUp', [f]);
+    void onMouseWheel(f) => _bridge.callMethod('onMouseWheel', [f]);
 
     void setUpdateFunction(f) {
-        _viewer.callMethod('setUpdater', [f]);
+        _bridge.callMethod('setUpdater', [f]);
     }
 
     dynamic createFloat64Array(int len) {
@@ -66,7 +80,7 @@ class CesiumBridge {
     }
 
     Vector3 getMouseCoordinates(int windowX, int windowY) {
-        var xyz = _viewer.callMethod('getMouseCoords', [windowX, windowY]);
+        var xyz = _bridge.callMethod('getMouseCoords', [windowX, windowY]);
         if (xyz == null) return null;
         double x = xyz[0].toDouble();
         double y = xyz[1].toDouble();
@@ -83,19 +97,19 @@ class CesiumBridge {
     dynamic createRectangle(Vector3 point1, Vector3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        return _viewer.callMethod('createRectangle', [point1.x, point1.y, point2.x, point2.y, colorR, colorG, colorB]);
+        return _bridge.callMethod('createRectangle', [point1.x, point1.y, point2.x, point2.y, colorR, colorG, colorB]);
     }
 
     dynamic createAxes(Vector3 origin, Vector3 length) {
         assert(_isValidLatLon(origin));
-        var axes = _viewer.callMethod('createAxes', [origin.x, origin.y, origin.z, length.x, length.y, length.z]);
+        var axes = _bridge.callMethod('createAxes', [origin.x, origin.y, origin.z, length.x, length.y, length.z]);
         return axes;
     }
 
     dynamic createBbox(Vector3 point1, Vector3 point2) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        var prim = _viewer.callMethod('createBbox', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z]);
+        var prim = _bridge.callMethod('createBbox', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z]);
         return prim;
     }
 
@@ -103,7 +117,7 @@ class CesiumBridge {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
         var prim =
-                _viewer.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z, colorR, colorG, colorB]);
+                _bridge.callMethod('createLine', [point1.x, point1.y, point1.z, point2.x, point2.y, point2.z, colorR, colorG, colorB]);
         assert(prim != null);
         return prim;
     }
@@ -127,16 +141,16 @@ class CesiumBridge {
             colors2[i * 4 + 2] = (colors[i * 4 + 2] * 255.0).toInt();
             colors2[i * 4 + 3] = (colors[i * 4 + 3] * 255.0).toInt();
         }
-        var prim = _viewer.callMethod('createCloud', [numPoints, points2, colors2]);
+        var prim = _bridge.callMethod('createCloud', [numPoints, points2, colors2]);
         return prim;
     }
 
     void remove(dynamic primitive) {
-        _viewer.callMethod('removePrimitive', [primitive]);
+        _bridge.callMethod('removePrimitive', [primitive]);
     }
 
     dynamic createLabel(String text, Vector3 point) {
 
-        return _viewer.callMethod('createLabel', [text, point.x, point.y, point.z]);
+        return _bridge.callMethod('createLabel', [text, point.x, point.y, point.z]);
     }
 }

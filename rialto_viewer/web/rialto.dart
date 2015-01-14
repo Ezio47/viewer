@@ -30,7 +30,8 @@ part 'proxy.dart';
 part 'renderable_point_cloud.dart';
 part 'renderable_point_cloud_set.dart';
 part 'renderer.dart';
-part 'selection_conroller.dart';
+part 'selection_controller.dart';
+part 'view_controller.dart';
 
 part 'cesium/annotation_shape.dart';
 part 'cesium/axes_shape.dart';
@@ -50,5 +51,6 @@ part 'viewmodels/advanced_settings.dart';
 part 'viewmodels/colorization_settings.dart';
 part 'viewmodels/layer_manager.dart';
 part 'viewmodels/controlled_list.dart';
+part 'viewmodels/modal_buttons.dart';
 part 'viewmodels/server_manager.dart';
 part 'viewmodels/view_model.dart';

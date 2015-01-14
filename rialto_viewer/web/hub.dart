@@ -18,11 +18,13 @@ class Hub {
 
     EventRegistry eventRegistry;
 
+    ViewController viewController;
     AnnotationController annotationController;
-    Picker picker;
     MeasurementController measurementController;
     ModeController modeController;
     SelectionController selectionController;
+
+    Picker picker;
 
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
@@ -76,6 +78,7 @@ class Hub {
         // onResize...
 
         modeController = new ModeController();
+        viewController = new ViewController();
         annotationController = new AnnotationController();
         measurementController = new MeasurementController();
         selectionController = new SelectionController();
@@ -86,7 +89,7 @@ class Hub {
 
         picker = new Picker();
 
-        eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT));
+        eventRegistry.ChangeMode.fire(new ModeData(ModeData.VIEW));
     }
 
     int get width => window.innerWidth;

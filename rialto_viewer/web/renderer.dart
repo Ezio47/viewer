@@ -40,9 +40,9 @@ class Renderer {
         _axesVisible = false;
         _bboxVisible = false;
 
-        //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
+        _hub.eventRegistry.MoveCameraHome.subscribe0(_handleMoveCameraHome);
         //_hub.eventRegistry.UpdateCameraEyePosition.subscribe(_handleUpdateCameraEyePosition);
         //_hub.eventRegistry.UpdateCameraTargetPosition.subscribe(_handleUpdateCameraTargetPosition);
     }
@@ -95,10 +95,17 @@ class Renderer {
         _cameraUpDirection = value;
     }
 
-    void goHome() {
+    void _handleMoveCameraHome() {
         cameraEyePosition = defaultCameraEyePosition;
         cameraTargetPosition = defaultCameraTargetPosition;
         cameraUpDirection = new Vector3(0.0, 0.0, 1.0);
+
+        double westLon = -10.0;
+        double southLat = -10.0;
+        double eastLon = 10.0;
+        double northLat = 10.0;
+        //Vector3 v = _hub.cesium.getRectangleCameraCoordinates(westLon, southLat, eastLon, northLat);
+        _hub.cesium.viewRectangle(westLon, southLat, eastLon, northLat);
     }
 
     void checkUpdate([dynamic theScene = null, dynamic theTime = null]) {
@@ -118,6 +125,15 @@ class Renderer {
             _cloudMin = new Vector3.zero();
             _cloudLen = new Vector3(1.0, 1.0, 1.0);
         }
+
+        /*
+        double westLon = -10.0;
+        double southLat = -10.0;
+        double eastLon = 10.0;
+        double northLat = 10.0;
+        //Vector3 v = _hub.cesium.getRectangleCameraCoordinates(westLon, southLat, eastLon, northLat);
+        _hub.cesium.viewRectangle(westLon, southLat, eastLon, northLat);
+        */
 
         final cloudLen12 = _cloudLen / 2.0;
         final cloudLen14 = _cloudLen / 4.0;
@@ -158,7 +174,7 @@ class Renderer {
             addMeasurementToScene(measurement);
         }
 
-        goHome();
+      //  _handleMoveCameraHome();
     }
 
     void addAnnotationToScene(Annotation annotation) {

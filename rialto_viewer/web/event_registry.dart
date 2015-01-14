@@ -119,13 +119,14 @@ class CameraModelData {
 
 
 class ModeData {
-    static const int MEASUREMENT = 0;
-    static const int MOVEMENT = 1;
-    static const int SELECTION = 2;
-    static const int ANNOTATION = 3;
+    static const int INVALID = 0;
+    static const int MEASUREMENT = 1;
+    static const int VIEW = 2;
+    static const int SELECTION = 3;
+    static const int ANNOTATION = 4;
     static final name = {
         MEASUREMENT: "measurement",
-        MOVEMENT: "movement",
+        VIEW: "view",
         SELECTION: "selection",
         ANNOTATION: "annotation"
     };

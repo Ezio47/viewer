@@ -18,6 +18,30 @@ var CesiumBridge = function (element) {
         this.viewer.scene.preRender.addEventListener(f);
     }
 
+    // input: cartographic
+    // output: cartesian [x,y,z]
+    this.getRectangleCameraCoordinates = function(west, south, east, north) {
+        console.log(west);
+        var rect = new Cesium.Rectangle.fromDegrees(west, south, east, north);
+        console.log(rect.west);
+        console.log(rect.south);
+        console.log(rect.east);
+        console.log(rect.north);
+        var cartesian = this.viewer.camera.getRectangleCameraCoordinates(rect);
+        var x = cartesian.x;
+        var y = cartesian.y;
+        var z = cartesian.z;
+        console.log(x);
+        console.log(y);
+        console.log(z);
+        return [x, y, z];
+    }
+
+    // input: cartographic
+    this.viewRectangle = function(west, south, east, north) {
+        var rect = new Cesium.Rectangle.fromDegrees(west, south, east, north);
+        this.viewer.camera.viewRectangle(rect);
+    }
 
     this.onMouseMove = function(f) {
         var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);

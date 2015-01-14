@@ -17,9 +17,9 @@ class RialtoElement extends PolymerElement {
     LayerManagerVM _layerManager;
     LayerSettingsVM _layerSettings;
     AdvancedSettingsVM _advancedSettings;
+    ModalButtonsVM _modalButtons;
 
     RialtoElement.created() : super.created();
-
 
     @override
     void attached() {
@@ -33,6 +33,9 @@ class RialtoElement extends PolymerElement {
 
         _mouseCoords = $["textMouseCoords"];
 
+        ButtonElement goHome = $["goHome"];
+        goHome.onClick.listen((ev) => _hub.eventRegistry.MoveCameraHome.fire0());
+
         var layerManagerDialog = $["layerManagerDialog"];
         _layerManager = new LayerManagerVM(layerManagerDialog, $);
         var layerSettingsDialog = $["layerSettingsDialog"];
@@ -40,16 +43,12 @@ class RialtoElement extends PolymerElement {
         var advancedSettingsDialog = $["advancedSettingsDialog"];
         _advancedSettings = new AdvancedSettingsVM(advancedSettingsDialog, $);
 
-        ButtonElement goHome = $["goHome"];
-        goHome.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MOVEMENT)));
-        ButtonElement goColorize = $["goColorize"];
-        goColorize.onClick.listen((ev) => _hub.eventRegistry.ColorizeLayers.fire0());
-        ButtonElement goAnnotate = $["goAnnotate"];
-        goAnnotate.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.ANNOTATION)));
-        ButtonElement goSelect = $["goSelect"];
-        goSelect.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.SELECTION)));
-        ButtonElement goMeasure = $["goMeasure"];
-        goMeasure.onClick.listen((ev) => _hub.eventRegistry.ChangeMode.fire(new ModeData(ModeData.MEASUREMENT)));
+        _modalButtons = new ModalButtonsVM({
+            $["viewModeButton"]: new ModeData(ModeData.VIEW),
+            $["annotateModeButton"]: new ModeData(ModeData.ANNOTATION),
+            $["selectModeButton"]: new ModeData(ModeData.SELECTION),
+            $["measureModeButton"]: new ModeData(ModeData.MEASUREMENT)
+        }, $["viewModeButton"]);
 
         ButtonElement goLayerManager = $["goLayerManager"];
         goLayerManager.onClick.listen((ev) => _layerManager.open());
@@ -83,4 +82,3 @@ class RialtoElement extends PolymerElement {
         window.alert("Copyright © RadiantBlue 2014.");
     }
 }
-

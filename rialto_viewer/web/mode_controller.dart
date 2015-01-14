@@ -23,14 +23,14 @@ class ModeController {
 
         if (_currentMode != null) {
             var type = _lookupType(_currentMode);
-            print("ending mode ${ModeData.name[type]}");
+            log("ending mode ${ModeData.name[type]}");
             _currentMode.isRunning = false;
             _currentMode.endMode();
         }
 
         IController thing = _modes[ev.type];
         _currentMode = thing;
-        print("starting mode ${ModeData.name[ev.type]}");
+        log("starting mode ${ModeData.name[ev.type]}");
         _currentMode.isRunning = true;
         _currentMode.startMode();
     }
