@@ -32,14 +32,14 @@ class AdvancedSettingsVM extends DialogVM {
 
         _eyeLon = new TextInputVM($["advancedSettingsDialog_eyeLon"], "0.0");
         _eyeLat = new TextInputVM($["advancedSettingsDialog_eyeLat"], "0.0");
-        _eyeHeight = new TextInputVM($["advancedSettingsDialog_eyeHeight"], "0.0");
+        _eyeHeight = new TextInputVM($["advancedSettingsDialog_eyeHeight"], "15000.0");
         _targetLon = new TextInputVM($["advancedSettingsDialog_targetLon"], "0.0");
         _targetLat = new TextInputVM($["advancedSettingsDialog_targetLat"], "0.0");
-        _targetHeight = new TextInputVM($["advancedSettingsDialog_targetHeight"], "50000.0");
-        _fov = new TextInputVM($["advancedSettingsDialog_fov"], "0.0");
+        _targetHeight = new TextInputVM($["advancedSettingsDialog_targetHeight"], "0.0");
+        _fov = new TextInputVM($["advancedSettingsDialog_fov"], "45.0");
         _upX = new TextInputVM($["advancedSettingsDialog_upX"], "0.0");
         _upY = new TextInputVM($["advancedSettingsDialog_upY"], "0.0");
-        _upZ = new TextInputVM($["advancedSettingsDialog_upZ"], "0.0");
+        _upZ = new TextInputVM($["advancedSettingsDialog_upZ"], "1.0");
     }
 
     @override

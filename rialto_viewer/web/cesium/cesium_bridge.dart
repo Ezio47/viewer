@@ -13,6 +13,15 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    // eye & taregt inputs in cartographic lat/lon, height in kilometers
+    // up vector is cartsian
+    void lookAt(double eyeLon, double eyeLat, double eyeHeight, double targetLon, double targetLat, double targetHeight,
+            double upX, double upY, double upZ, double fovDegrees) {
+        _bridge.callMethod(
+                'lookAtCartographic',
+                [eyeLon, eyeLat, eyeHeight * 1000.0, targetLon, targetLat, targetHeight * 1000.0, upX, upY, upZ, fovDegrees]);
+    }
+
     // input in cartographic lat/lon
     void setPositionCartographic(double lon, double lat, double height) {
         _bridge.callMethod('setPositionCartographic', [lon, lat, height]);

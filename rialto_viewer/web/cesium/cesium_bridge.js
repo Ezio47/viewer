@@ -7,7 +7,7 @@ var CesiumBridge = function (element) {
         timeline: false,
         geocoder: false,
         animation: false,
-        sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
+        sceneMode : Cesium.SceneMode.SCENE3D
     };
 
 
@@ -18,12 +18,42 @@ var CesiumBridge = function (element) {
         this.viewer.scene.preRender.addEventListener(f);
     }
 
-    // input: cartographic
+    // input: cartographic, height in meters
+    this.lookAtCartographic = function(eyeLon, eyeLat, eyeHeight,
+                                       targetLon, targetLat, targetHeight,
+                                       upX, upY, upZ, fovDegrees) {
+
+        var ellipsoid = this.viewer.scene.globe.ellipsoid;
+
+        var eyeCartographic = Cesium.Cartographic.fromDegrees(eyeLon, eyeLat, eyeHeight);
+        var targetCartographic = Cesium.Cartographic.fromDegrees(targetLon, targetLat, targetHeight);
+        var eyeCartesian = ellipsoid.cartographicToCartesian(eyeCartographic);
+        var targetCartesian = ellipsoid.cartographicToCartesian(targetCartographic);
+
+        //console.log("eye cartesian: " + eyeCartesian.x + ", " + eyeCartesian.y + ", " + eyeCartesian.z);
+        //console.log("target cartesian: " + targetCartesian.x + ", " + targetCartesian.y + ", " + targetCartesian.z);
+
+        var up = new Cesium.Cartesian3(upX, upY, upZ);
+
+        // BUG: we only support PerspectiveFrustum camera, so seeting FOV is okay
+        console.log("FOV" + Cesium.Math.toDegrees(this.viewer.camera.frustum.fov));
+        this.viewer.camera.frustum.fov = Cesium.Math.toRadians(fovDegrees);
+
+        this.viewer.camera.lookAt(eyeCartesian, targetCartesian, up);
+    }
+
+    // input: cartographic, height in meters
     this.setPositionCartographic = function(lon, lat, height) {
         console.log(height);
         var cartographic = Cesium.Cartographic.fromDegrees(lon, lat, height);
         console.log(cartographic.height);
+        var xyz = new Cesium.Cartesian3();
+        var ellipsoid = this.viewer.camera._projection.ellipsoid;
+        ellipsoid.cartographicToCartesian(cartographic, xyz);
+        console.log(xyz.z);
+
         this.viewer.camera.setPositionCartographic(cartographic);
+        this.viewer.camera.moveForward(-height);
     }
 
     // input: cartographic

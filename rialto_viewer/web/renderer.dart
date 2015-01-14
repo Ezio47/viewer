@@ -30,7 +30,7 @@ class Renderer {
     Vector3 _cameraTargetPosition;
     Vector3 _defaultCameraUpDirection;
     Vector3 _cameraUpDirection;
-    double _defaultCameraFov;
+    double _defaultCameraFov = 60.0;
     double _cameraFov;
 
     Renderer(RenderablePointCloudSet rpcSet) {
@@ -107,7 +107,7 @@ class Renderer {
     }
 
     set cameraFov(double value) {
-        _cameraFov= value;
+        _cameraFov = value;
     }
 
     void _handleUpdateCamera(CameraData data) {
@@ -116,15 +116,19 @@ class Renderer {
         cameraUpDirection = data.up;
         cameraFov = data.fov;
 
-        //double westLon = -10.0;
-        //double southLat = -10.0;
-        //double eastLon = 10.0;
-        //double northLat = 10.0;
-        ////Vector3 v = _hub.cesium.getRectangleCameraCoordinates(westLon, southLat, eastLon, northLat);
-        //_hub.cesium.viewRectangle(westLon, southLat, eastLon, northLat);
-
-        // TODO: use eye, up, fov
-        _hub.cesium.setPositionCartographic(cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z);
+        // _hub.cesium.setPositionCartographic(cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z);
+        // TODO: fov
+        _hub.cesium.lookAt(
+                cameraEyePosition.x,
+                cameraEyePosition.y,
+                cameraEyePosition.z,
+                cameraTargetPosition.x,
+                cameraTargetPosition.y,
+                cameraTargetPosition.z,
+                cameraUpDirection.x,
+                cameraUpDirection.y,
+                cameraUpDirection.z,
+                cameraFov);
     }
 
     void checkUpdate([dynamic theScene = null, dynamic theTime = null]) {
@@ -193,7 +197,7 @@ class Renderer {
             addMeasurementToScene(measurement);
         }
 
-      //  _handleMoveCameraHome();
+        //  _handleMoveCameraHome();
     }
 
     void addAnnotationToScene(Annotation annotation) {
