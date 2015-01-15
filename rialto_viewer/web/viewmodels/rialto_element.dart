@@ -18,6 +18,7 @@ class RialtoElement extends PolymerElement {
     LayerManagerVM _layerManager;
     AdvancedSettingsVM _advancedSettings;
     ModalButtonsVM _modalButtons;
+    AboutVM _about;
 
     RialtoElement.created() : super.created();
 
@@ -47,6 +48,8 @@ class RialtoElement extends PolymerElement {
         _layerManager = new LayerManagerVM($["layerManagerDialog"], $);
         _advancedSettings = new AdvancedSettingsVM($["advancedSettingsDialog"], $);
 
+        _about = new AboutVM($["aboutDialog"], $);
+
         _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
     }
 
@@ -63,9 +66,5 @@ class RialtoElement extends PolymerElement {
     @override
     void detached() {
         super.detached();
-    }
-
-    void aboutbox(Event e, var detail, Node target) {
-        window.alert("Copyright © RadiantBlue 2014-2015.");
     }
 }

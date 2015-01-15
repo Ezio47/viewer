@@ -48,6 +48,7 @@ part 'utils/rialto_exceptions.dart';
 part 'utils/signal.dart';
 part 'utils/utils.dart';
 
+part 'viewmodels/about.dart';
 part 'viewmodels/advanced_settings.dart';
 part 'viewmodels/checkbox.dart';
 part 'viewmodels/colorizer.dart';

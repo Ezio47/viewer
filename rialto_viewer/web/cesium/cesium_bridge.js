@@ -7,7 +7,9 @@ var CesiumBridge = function (element) {
         timeline: false,
         geocoder: false,
         animation: false,
-        sceneMode : Cesium.SceneMode.SCENE3D
+        sceneMode : Cesium.SceneMode.SCENE3D,
+        fullscreenButton: false
+        //creditContainer: "creditContainer"
     };
 
 
