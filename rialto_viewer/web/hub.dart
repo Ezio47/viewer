@@ -94,15 +94,18 @@ class Hub {
     int get height => window.innerHeight;
 
     void _handleOpenServer(String server) {
+        currentServer = null;
         proxy = new ProxyFileSystem(server);
         proxy.load().then((_) => eventRegistry.OpenServerCompleted.fire0());
     }
 
     void _handleCloseServer() {
+        currentServer = null;
         if (proxy != null) {
             proxy.close();
             proxy = null;
         }
+        eventRegistry.CloseServerCompleted.fire0();
     }
 
     void _handleOpenFile(String webpath) {

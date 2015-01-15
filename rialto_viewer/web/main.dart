@@ -19,7 +19,6 @@ void main() {
 
             Hub.root.init();
 
-
             boot1();
         });
     });
@@ -29,7 +28,7 @@ void main() {
 void boot0() {
     Hub hub = Hub.root;
 
-    hub.eventRegistry.DisplayBbox.fire(true);
+   // hub.eventRegistry.DisplayBbox.fire(true);
     //hub.eventRegistry.UpdateCameraEyePosition.fire(new Vector3(-200.0, -200.0, 200.0));
     //hub.eventRegistry.UpdateCameraTargetPosition.fire(new Vector3(0.0, 0.0, 0.0));
 }

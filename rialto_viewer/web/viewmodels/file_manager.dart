@@ -9,10 +9,11 @@ part of rialto.viewer;
 
 class FileManagerVM extends DialogVM {
     TextInputVM _serverName;
-    bool isServerOpen;
     ListBoxVM<_ProxyItem> _filesList;
     ProxyItem _currentItem = null;
     DirectoryProxy _currentDir = null;
+    ButtonElement _openServerButton;
+    ButtonElement _closeServerButton;
 
     FileManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
 
@@ -21,16 +22,24 @@ class FileManagerVM extends DialogVM {
         $["fileManagerDialog_addSelectedFiles"].onClick.listen((e) => _doAddFiles());
         $["fileManagerDialog_removeSelectedFiles"].onClick.listen((e) => _doRemoveFiles());
 
-        ButtonElement openServer = $["fileManagerDialog_openServer"];
-        openServer.onClick.listen((e) => _doOpenServer());
+        _openServerButton = $["fileManagerDialog_openServer"];
+        _openServerButton.onClick.listen((e) => _doOpenServer());
 
-        ButtonElement closeServer = $["fileManagerDialog_closeServer"];
-        closeServer.onClick.listen((e) => _doCloseServer());
+        _closeServerButton = $["fileManagerDialog_closeServer"];
+        _closeServerButton.onClick.listen((e) => _doCloseServer());
 
         _serverName = new TextInputVM($["fileManagerDialog_serverName"], _hub.defaultServer);
 
         Hub.root.eventRegistry.OpenServerCompleted.subscribe0(_handleOpenServerCompleted);
         Hub.root.eventRegistry.CloseServerCompleted.subscribe0(_handleCloseServerCompleted);
+
+        if (_hub.currentServer == null) {
+            _openServerButton.text = "Open";
+            _closeServerButton.text = "(close)";
+        } else {
+            _openServerButton.text = "(open)";
+            _closeServerButton.text = "Close";
+        }
     }
 
     @override
@@ -128,14 +137,17 @@ class FileManagerVM extends DialogVM {
     void _handleCloseServerCompleted() {
         _filesList.clear();
 
-        isServerOpen = false;
+        _openServerButton.text = "Open";
+        _closeServerButton.text = "(close)";
     }
 
 
     void _handleOpenServerCompleted() {
         _currentDir = _hub.proxy.root;
         _loadItemsFromProxy();
-        isServerOpen = true;
+
+        _openServerButton.text = "(open)";
+        _closeServerButton.text = "Close";
     }
 
 
