@@ -62,6 +62,8 @@ class Renderer {
         _cloudMax = _renderSource.max;
         _cloudLen = _renderSource.len;
 
+        camera.changeDataExtents(_cloudMin.x, _cloudMin.y, _cloudMax.x, _cloudMax.y);
+
         if (_renderSource.length == 0) {
             // a reasonable default
             _cloudMin = new Vector3.zero();

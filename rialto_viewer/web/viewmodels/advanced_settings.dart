@@ -50,6 +50,17 @@ class AdvancedSettingsVM extends DialogVM {
 
     @override
     void _open() {
+        _eyeLon.clearState();
+        _eyeLat.clearState();
+        _eyeHeight.clearState();
+        _targetLon.clearState();
+        _targetLat.clearState();
+        _targetHeight.clearState();
+        _fov.clearState();
+        _upX.clearState();
+        _upY.clearState();
+        _upZ.clearState();
+
         _axesEnabled.clearState();
         _bboxEnabled.clearState();
     }
@@ -64,6 +75,15 @@ class AdvancedSettingsVM extends DialogVM {
     }
 
     void _performCameraWork() {
+        bool eyeChanged = (_eyeLon.changed && _eyeLat.changed && _eyeHeight.changed);
+        bool targetChanged = (_targetLon.changed && _targetLat.changed && _targetHeight.changed);
+        bool upChanged = (_upX.changed && _upY.changed && _upZ.changed);
+        bool fovChanged = (_fov.changed);
+
+        if (!eyeChanged && !targetChanged && !upChanged && !fovChanged) {
+            return;
+        }
+
         var eyeLon = _eyeLon.getValueAsDouble();
         var eyeLat = _eyeLat.getValueAsDouble();
         var eyeHeight = _eyeHeight.getValueAsDouble();
@@ -77,15 +97,6 @@ class AdvancedSettingsVM extends DialogVM {
         var upZ = _upZ.getValueAsDouble();
 
         var fov = _fov.getValueAsDouble();
-
-        bool eyeChanged = (_eyeLon.changed && _eyeLat.changed && _eyeHeight.changed);
-        bool targetChanged = (_targetLon.changed && _targetLat.changed && _targetHeight.changed);
-        bool upChanged = (_upX.changed && _upY.changed && _upZ.changed);
-        bool fovChanged = (_fov.changed);
-
-        if (!eyeChanged && !targetChanged && !upChanged && !fovChanged) {
-            return;
-        }
 
         bool eyeOkay = (eyeLon != null && eyeLat != null && eyeHeight != null);
         bool targetOkay = (targetLon != null && targetLat != null && targetHeight != null);

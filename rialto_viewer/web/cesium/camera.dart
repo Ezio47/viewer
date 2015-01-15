@@ -7,8 +7,12 @@ part of rialto.viewer;
 class Camera {
     Hub _hub;
 
-    Vector3 defaultCameraEyePosition;
-    Vector3 defaultCameraTargetPosition;
+    Vector3 defaultWorldCameraEyePosition;
+    Vector3 defaultWorldCameraTargetPosition;
+
+    Vector3 defaultDataCameraEyePosition;
+    Vector3 defaultDataCameraTargetPosition;
+
     Vector3 defaultCameraUpDirection;
     double defaultCameraFov;
 
@@ -20,26 +24,54 @@ class Camera {
     Camera() {
         _hub = Hub.root;
 
-        defaultCameraEyePosition = new Vector3(0.0, 0.0, 15000.0);
-        defaultCameraTargetPosition = new Vector3(0.0, 0.0, 0.0);
+        defaultWorldCameraEyePosition = new Vector3(0.0, 0.0, 15000.0);
+        defaultWorldCameraTargetPosition = new Vector3(0.0, 0.0, 0.0);
+
+        defaultDataCameraEyePosition = new Vector3(0.0, 0.0, 15000.0);
+        defaultDataCameraTargetPosition = new Vector3(0.0, 0.0, 0.0);
+
         defaultCameraUpDirection = new Vector3(0.0, 0.0, 1.0);
+
         defaultCameraFov = 60.0;
 
         _hub.eventRegistry.UpdateCamera.subscribe(_handleUpdateCamera);
     }
 
+    void changeDataExtents(double west, double south, double east, double north) {
+        double centerLon = east + (west - east) / 2.0;
+        double centerLat = south + (north - south) / 2.0;
+
+        defaultDataCameraTargetPosition = new Vector3(centerLon, centerLat, 0.0);
+
+        var h = max(west - east, north - south) * 1000.0;
+        defaultDataCameraEyePosition = new Vector3(centerLon, centerLat, h);
+    }
 
     void _handleUpdateCamera(CameraData data) {
-        if (data == null) {
-            cameraEyePosition = defaultCameraEyePosition;
-            cameraEyePosition = defaultCameraEyePosition;
-            cameraUpDirection = defaultCameraUpDirection;
-            cameraFov = defaultCameraFov;
-        } else {
-            cameraEyePosition = data.eye;
-            cameraTargetPosition = data.target;
-            cameraUpDirection = data.up;
-            cameraFov = data.fov;
+        assert(data != null);
+
+        switch (data.mode) {
+            case 0:
+                cameraEyePosition = data.eye;
+                cameraTargetPosition = data.target;
+                cameraUpDirection = data.up;
+                cameraFov = data.fov;
+                break;
+            case 1: // world view
+                cameraEyePosition = defaultWorldCameraEyePosition;
+                cameraTargetPosition = defaultWorldCameraTargetPosition;
+                cameraUpDirection = defaultCameraUpDirection;
+                cameraFov = defaultCameraFov;
+                break;
+            case 2: // data view
+                cameraEyePosition = defaultDataCameraEyePosition;
+                cameraTargetPosition = defaultDataCameraTargetPosition;
+                cameraUpDirection = defaultCameraUpDirection;
+                cameraFov = defaultCameraFov;
+                break;
+            default:
+                assert(false);
+                break;
         }
 
         // _hub.cesium.setPositionCartographic(cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z);

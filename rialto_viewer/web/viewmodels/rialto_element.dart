@@ -33,7 +33,8 @@ class RialtoElement extends PolymerElement {
 
         _mouseCoords = $["textMouseCoords"];
 
-        $["homeButton"].onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(null));
+        $["homeWorldButton"].onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(1)));
+        $["homeDataButton"].onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(2)));
 
         _modalButtons = new ModalButtonsVM({
             $["viewModeButton"]: new ModeData(ModeData.VIEW),

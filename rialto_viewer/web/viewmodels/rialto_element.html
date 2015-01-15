@@ -19,7 +19,8 @@
             <!-- TOGGLES PANEL -->
             <div class="main-toggles-position" >
                 <div horizontal layout class="regularsquare-button-style">
-                    <button id="homeButton">Home</button>
+                    <button id="homeWorldButton">Home (w)</button>
+                    <button id="homeDataButton">Home (d)</button>
                     <span>...</span>
                     <button id="viewModeButton">View</button>
                     <button id="annotateModeButton">Annotate</button>
@@ -122,7 +123,8 @@
 
             <dialog id="advancedSettingsDialog">
                 <div>
-                    Advanced Settings Dialog
+                    <b>Advanced Settings Dialog</b>
+                    <hr>
                 </div>
 
                 <div>
@@ -130,68 +132,97 @@
                     <tbody>
                         <tr>
                         <td>
-                            <input id="advancedSettingsDialog_axesEnabled" type="checkbox" class="padright">
                             <span>Axes enabled</span>
+                        </td>
+                        <td>
+                            <input id="advancedSettingsDialog_axesEnabled" type="checkbox" class="padright">
                         </td>
                         </tr>
                         <tr>
-                            <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
+                        <td>
                             <span>Bbox enabled</span>
+                        </td>
+                        <td>
+                            <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
+                        </td>
                         </tr>
                     </tbody>
                     </table>
-                </div>
-
-                <div>
-                    <table>
-                    <tbody>
-                    <td>
-                        <button class="regulartextbutton" type="button">
-                            <span>Colorization...</span>
-                        </button>
-                    </td>
-                    </tbody>
-                    </table>
+                    <hr>
                 </div>
 
                 <div>
                     <table>
                         <tbody>
-                        <td>
                             <tr>
-                                <span>Camera eye point: lon, lat, height (Km)</span>
-                                <input id="advancedSettingsDialog_eyeLon" type="text" class="input-textbox-style">
-                                <input id="advancedSettingsDialog_eyeLat" type="text" class="input-textbox-style">
-                                <input id="advancedSettingsDialog_eyeHeight" type="text" class="input-textbox-style">
+                                <td><i>Camera eye point</i></td>
                             </tr>
-                        </td>
-                        <td>
-                        <tr>
-                            <span>Camera target point: lon, lat, height (Km)</span>
-                            <input id="advancedSettingsDialog_targetLon" type="text" class="input-textbox-style">
-                            <input id="advancedSettingsDialog_targetLat" type="text" class="input-textbox-style">
-                            <input id="advancedSettingsDialog_targetHeight" type="text" class="input-textbox-style">
-                        </tr>
-                        </td>
-                        <td>
-                        <tr>
-                            <span>Camera up direction: x, y, z</span>
-                            <input id="advancedSettingsDialog_upX" type="text" class="input-textbox-style">
-                            <input id="advancedSettingsDialog_upY" type="text" class="input-textbox-style">
-                            <input id="advancedSettingsDialog_upZ" type="text" class="input-textbox-style">
-                        </tr>
-                        </td>
-                        <td>
-                        <tr>
-                            <span>Camera FOV (degrees)</span>
-                            <input id="advancedSettingsDialog_fov" type="text" class="input-textbox-style">
-                        </tr>
-                    </tbody>
-                </table>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_eyeLon">Lon:</label>
+                                    <input id="advancedSettingsDialog_eyeLon" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_eyeLat">Lat:</label>
+                                    <input id="advancedSettingsDialog_eyeLat" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_eyeHeight">Height (km):</label>
+                                    <input id="advancedSettingsDialog_eyeHeight" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera target point</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_targetLon">Lon:</label>
+                                    <input id="advancedSettingsDialog_targetLon" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_targetLat">Lat:</label>
+                                    <input id="advancedSettingsDialog_targetLat" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_targetHeight">Height (km):</label>
+                                    <input id="advancedSettingsDialog_targetHeight" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera up direction</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_upX">X:</label>
+                                    <input id="advancedSettingsDialog_upX" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_upY">Y:</label>
+                                    <input id="advancedSettingsDialog_upY" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_upZ">Z:</label>
+                                    <input id="advancedSettingsDialog_upZ" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera FOV</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_fov">Degrees:</label>
+                                    <input id="advancedSettingsDialog_fov" type="text">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr>
                 </div>
 
-                <button id="advancedSettingsDialog_okay">Okay</button>
-                <button id="advancedSettingsDialog_cancel">Cancel</button>
+                <div>
+                    <button id="advancedSettingsDialog_okay">Okay</button>
+                    <button id="advancedSettingsDialog_cancel">Cancel</button>
+                </div>
             </dialog>
 
 
