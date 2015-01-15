@@ -50,8 +50,9 @@ part 'utils/utils.dart';
 
 part 'viewmodels/advanced_settings.dart';
 part 'viewmodels/checkbox.dart';
-part 'viewmodels/colorization_settings.dart';
+part 'viewmodels/colorizer.dart';
 part 'viewmodels/file_manager.dart';
+part 'viewmodels/info.dart';
 part 'viewmodels/list_box.dart';
 part 'viewmodels/modal_buttons.dart';
 part 'viewmodels/layer_manager.dart';

@@ -6,13 +6,15 @@ part of rialto.viewer;
 
 abstract class DialogVM {
     String _id;
+    bool _hasCancelButton;
     DialogElement _dialogElement;
     var $;
     Hub _hub;
 
-    DialogVM(DialogElement dialogElement, Map dollar)
+    DialogVM(DialogElement dialogElement, Map dollar, {bool hasCancelButton: true})
             : _dialogElement = dialogElement,
-              $ = dollar {
+              $ = dollar,
+              _hasCancelButton = hasCancelButton {
         assert(_dialogElement != null);
 
         _id = _dialogElement.id;
@@ -25,13 +27,13 @@ abstract class DialogVM {
 
         var okayButton = $[_id + "_okay"];
         assert(okayButton != null);
-        okayButton.onClick.listen((e) =>
-                close(true));
+        okayButton.onClick.listen((e) => close(true));
 
-        var cancelButton = $[_id + "_cancel"];
-        assert(cancelButton != null);
-        cancelButton.onClick.listen((e) =>
-                close(false));
+        if (_hasCancelButton) {
+            var cancelButton = $[_id + "_cancel"];
+            assert(cancelButton != null);
+            cancelButton.onClick.listen((e) => close(false));
+        }
     }
 
     void open() {

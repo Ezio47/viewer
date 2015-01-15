@@ -49,22 +49,7 @@
                     <button id="fileManagerDialog_removeSelectedFiles">Remove</button>
                     <hr>
                 </div>
-<!--
-                <core-list-dart data="{{files}}" height="20px"
-                        selectionEnabled="{{selectionEnabled}}"
-                        selection="{{selection}}"
-                        on-core-activate = "{{selectionMade}}"
-                        class="listbox-style"
-                        multi="false"
-                        id="file-list">
-                    <template>
-                        <div layout horizontal class="{{ {selecteditemstyle: selected} }} listbox-item-style">
-                            <input type="checkbox" name="filescheck" checked="{{model.checked}}" id="{{index}}" on-click="{{toggleLayer}}" class="padright">
-                            <span>{{model.displayName}}</span>
-                        </div>
-                    </template>
-                </core-list-dart>
--->
+
                 <div>
                     <label for="fileManagerDialog_serverName">Server:</label>
                     <input id="fileManagerDialog_serverName" type="text" class="input-textbox-style">
@@ -91,30 +76,16 @@
                     </select>
                 </div>
 
-                <table>
-                    <tr>
-                        <td>Points:</td>
-                        <td>numPoints</td>
-                    </tr>
-                    <tr>
-                        <td>X:</td>
-                        <td>minx.toStringAsFixed(3)</td>
-                        <td>maxx.toStringAsFixed(3)</td>
-                    </tr>
-                    <tr>
-                        <td>Y:</td>
-                        <td>miny.toStringAsFixed(3)</td>
-                        <td>maxy.toStringAsFixed(3)</td>
-                    </tr>
-                    <tr>
-                        <td>Z:</td>
-                        <td>minz.toStringAsFixed(3)</td>
-                        <td>maxz.toStringAsFixed(3)</td>
-                    </tr>
-                </table>
+                <div>
+                    <button id="colorizerDialog_open">Colorizer...</button>
+                    <button id="infoDialog_open">Info...</button>
+                    <hr>
+                </div>
 
-                <button id="layerManagerDialog_okay">Okay</button>
-                <button id="layerManagerDialog_cancel">Cancel</button>
+                <div>
+                    <button id="layerManagerDialog_okay">Okay</button>
+                    <button id="layerManagerDialog_cancel">Cancel</button>
+                </div>
 
             </dialog>
 
@@ -224,27 +195,60 @@
             </dialog>
 
 
-            <dialog id="colorizationDialog">
-                Colorization Dialog
+            <dialog id="colorizerDialog">
+                <div>
+                    <b>Colorizer Dialog</b>
+                    <hr>
+                </div>
 
-<!--
-                <core-list-dart data="{{items}}" height="20px" class="listbox-style pad4"
-                                selectionEnabled="{{isSelectionEnabled}}"
-                                selection="{{selectedItem}}"
-                                on-core-activate = "{{doSelectionMade}}"
-                                multi="false"
-                                id="file-list2">
-                            <template>
-                                <div layout horizontal class="{{ {selecteditemstyle: selected} }} listbox-item-style" id="{{index}}">
-                                    <span>{{model.name}}
-                                    </span>
-                                </div>
-                            </template>
-                </core-list-dart>
--->
+                <div>
+                    <select id="colorizerDialog_items">
+                    </select>
+                </div>
 
-                <button id="colorizationDialog_okay">Okay</button>
-                <button id="colorizationDialog_cancel">Cancel</button>
+                <div>
+                    <button id="colorizerDialog_okay">Okay</button>
+                    <button id="colorizerDialog_cancel">Cancel</button>
+                    <hr>
+                </div>
+            </dialog>
+
+
+            <dialog id="infoDialog">
+                <div>
+                    <b>Colorizer Dialog</b>
+                    <hr>
+                </div>
+
+                <div>
+                    <table>
+                        <tr>
+                            <td>Points:</td>
+                            <td id="infoDialog_numPoints"></td>
+                        </tr>
+                        <tr>
+                            <td>X:</td>
+                            <td id="infoDialog_minX"></td>
+                            <td id="infoDialog_maxX"></td>
+                        </tr>
+                        <tr>
+                            <td>Y:</td>
+                            <td id="infoDialog_minY"></td>
+                            <td id="infoDialog_maxY"></td>
+                        </tr>
+                        <tr>
+                            <td>Z:</td>
+                            <td id="infoDialog_minZ"></td>
+                            <td id="infoDialog_maxZ"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div>
+                    <button id="infoDialog_okay">Okay</button>
+                    <button id="infoDialog_cancel">Cancel</button>
+                    <hr>
+                </div>
             </dialog>
 
             <div class="status-panel-style status-panel-position">

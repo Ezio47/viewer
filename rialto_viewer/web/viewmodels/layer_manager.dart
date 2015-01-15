@@ -11,6 +11,8 @@ class LayerManagerVM extends DialogVM {
     var selection;
     //bool selectionEnabled = true;
     Hub _hub;
+    ColorizerVM _colorizer;
+    InfoVM _info;
 
     LayerManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
         _select = $["layerManagerDialog_layers"];
@@ -18,14 +20,8 @@ class LayerManagerVM extends DialogVM {
 
         items = new ListBoxVM<_LayerItem>(_select);
 
-        ["a", "b", "c"].forEach((f) {
-            var opt = new OptionElement(value: f);
-            opt.text = "sss";
-            _select.children.add(opt);
-        });
-
-//        ButtonElement openServer = $["serverManagerDialog_openServer"];
-  //      openServer.onClick.listen((ev) => _serverManager.open());
+        _colorizer = new ColorizerVM($["colorizerDialog"], $);
+        _info = new InfoVM($["infoDialog"], $);
 
         _hub = Hub.root;
 
@@ -50,22 +46,22 @@ class LayerManagerVM extends DialogVM {
     void _close(bool okay) {}
     void openFile(Event e, var detail, Node target) {
 
-      }
+    }
 
-      void toggleLayer(Event e, var detail, Node target) {
-          var checkbox = target as InputElement;
-          var item = items.list[int.parse(checkbox.id)].data;
-          _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
-      }
+    void toggleLayer(Event e, var detail, Node target) {
+        var checkbox = target as InputElement;
+        var item = items.list[int.parse(checkbox.id)].data;
+        _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
+    }
 
 
-      void deleteFile(Event e, var detail, Node target) {
-          if (selection != null) {
-              assert(selection is _LayerItem);
-              _hub.eventRegistry.CloseFile.fire(selection.webpath);
-          }
-          return;
-      }
+    void deleteFile(Event e, var detail, Node target) {
+        if (selection != null) {
+            assert(selection is _LayerItem);
+            _hub.eventRegistry.CloseFile.fire(selection.webpath);
+        }
+        return;
+    }
 }
 
 
