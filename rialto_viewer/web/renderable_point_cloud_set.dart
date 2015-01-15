@@ -46,6 +46,9 @@ class RenderablePointCloudSet {
     }
 
     void removeCloud(String webpath) {
+        var obj = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath, orElse: () => null);
+        if (obj == null) return;
+
         final int len = renderablePointClouds.length;
         renderablePointClouds.removeWhere((rpc) => rpc.pointCloud.webpath == webpath);
         assert(renderablePointClouds.length == len - 1);
@@ -87,6 +90,6 @@ class RenderablePointCloudSet {
         for (var cloud in renderablePointClouds) {
             cloud.colorize(colorizer);
         }
-        _hub.renderer.updateNeeded = true;;
+        _hub.renderer.updateNeeded = true;
     }
 }

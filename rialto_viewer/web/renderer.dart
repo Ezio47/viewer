@@ -7,11 +7,6 @@ part of rialto.viewer;
 class Renderer {
     Hub _hub;
 
-    double _mouseGeoX = 0.0;
-    double _mouseGeoY = 0.0;
-    bool _axesVisible;
-    bool _bboxVisible;
-
     RenderablePointCloudSet _renderSource;
 
     AxesShape _axesShape;
@@ -32,9 +27,6 @@ class Renderer {
         _hub = Hub.root;
 
         _renderSource = rpcSet;
-
-        _axesVisible = false;
-        _bboxVisible = false;
 
         camera = new Camera();
 
@@ -114,13 +106,11 @@ class Renderer {
 
     void _handleDisplayAxes(bool v) {
         if (_axesShape == null) return;
-        _axesVisible = v;
         _axesShape.isVisible = v;
     }
 
     void _handleDisplayBbox(bool v) {
         if (_bboxShape == null) return;
-        _bboxVisible = v;
         _bboxShape.isVisible = v;
     }
 }

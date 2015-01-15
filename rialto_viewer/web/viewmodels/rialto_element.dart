@@ -14,8 +14,8 @@ import '../rialto.dart';
 class RialtoElement extends PolymerElement {
     Hub _hub;
     SpanElement _mouseCoords;
+    FileManagerVM _fileManager;
     LayerManagerVM _layerManager;
-    LayerSettingsVM _layerSettings;
     AdvancedSettingsVM _advancedSettings;
     ModalButtonsVM _modalButtons;
 
@@ -43,8 +43,8 @@ class RialtoElement extends PolymerElement {
             $["measureModeButton"]: new ModeData(ModeData.MEASUREMENT)
         }, $["viewModeButton"]);
 
+        _fileManager = new FileManagerVM($["fileManagerDialog"], $);
         _layerManager = new LayerManagerVM($["layerManagerDialog"], $);
-        _layerSettings = new LayerSettingsVM($["layerSettingsDialog"], $);
         _advancedSettings = new AdvancedSettingsVM($["advancedSettingsDialog"], $);
 
         _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
@@ -66,6 +66,6 @@ class RialtoElement extends PolymerElement {
     }
 
     void aboutbox(Event e, var detail, Node target) {
-        window.alert("Copyright © RadiantBlue 2014.");
+        window.alert("Copyright © RadiantBlue 2014-2015.");
     }
 }

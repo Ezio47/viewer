@@ -9,12 +9,12 @@ part of rialto.viewer;
 
 class TextInputVM {
     InputElement _element;
-    String _defaultValue;
+    String defaultValue;
     String _startingValue;
 
-    TextInputVM(InputElement this._element, String this._defaultValue) {
+    TextInputVM(InputElement this._element, String this.defaultValue) {
         assert(_element != null);
-        value = _defaultValue;
+        value = defaultValue;
     }
 
     void clearState() {

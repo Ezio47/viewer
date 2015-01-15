@@ -27,19 +27,28 @@
                     <button id="selectModeButton">Select</button>
                     <button id="measureModeButton">Measure</button>
                     <span>...</span>
-                    <button id="layerManagerDialog_open">Layer Manager...</button>
-                    <button id="layerSettingsDialog_open">Layer Settings...</button>
-                    <button id="advancedSettingsDialog_open">Advanced Settings...</button>
+                    <button id="fileManagerDialog_open">Files...</button>
+                    <button id="layerManagerDialog_open">Layers...</button>
+                    <button id="advancedSettingsDialog_open">Advanced...</button>
                 </div>
             </div>
 
-            <dialog id="layerManagerDialog">
-                Layer Manager Dialog
-                 <div layout horizontal>
+            <dialog id="fileManagerDialog">
+                <div>
+                    <b>File Manager Dialog</b>
+                    <hr>
+                </div>
 
-                <button id="serverManagerDialog_open">Add...</button>
-                <select multiple="multiple" id="layerManagerDialog_files">
-                </select>
+                <div>
+                    <select multiple="multiple" id="fileManagerDialog_files">
+                    </select>
+                </div>
+
+                <div>
+                    <button id="fileManagerDialog_addSelectedFiles">Add</button>
+                    <button id="fileManagerDialog_removeSelectedFiles">Remove</button>
+                    <hr>
+                </div>
 <!--
                 <core-list-dart data="{{files}}" height="20px"
                         selectionEnabled="{{selectionEnabled}}"
@@ -56,42 +65,31 @@
                     </template>
                 </core-list-dart>
 -->
-                <hr class="hr-style mar3 noborder">
-
-                <div class="smallroundbutton mar0">
-                    <button on-click="{{openFile}}"><b>+</b></button>
-                    <button on-click="{{deleteFile}}"><b>-</b></button>
-                </div>
-
-                <button id="layerManagerDialog_okay">Okay</button>
-                <button id="layerManagerDialog_cancel">Cancel</button>
-                </div>
-            </dialog>
-
-
-            <dialog id="serverManagerDialog">
-                Server Manager Dialog
                 <div>
-                    <label>
-                        <span>Server:</span>
-                        <input id="serverManagerDialog_serverName" type="text" class="input-textbox-style">
-                    </label>
-                    <button class="regulartextbutton" id="serverManagerDialog_closeServer" type="button">
-                        <span>Close</span>
-                    </button>
-                    <button class="regulartextbutton" id="serverManagerDialog_openServer" type="button">
-                        <span>Open</span>
-                    </button>
+                    <label for="fileManagerDialog_serverName">Server:</label>
+                    <input id="fileManagerDialog_serverName" type="text" class="input-textbox-style">
+                    <button id="fileManagerDialog_openServer">Open</button>
+                    <button id="fileManagerDialog_closeServer">Close</button>
+                    <hr>
                 </div>
 
-                <select multiple="multiple" id="serverManagerDialog_files">
-                </select>
-                <button id="serverManagerDialog_okay">Okay</button>
-                <button id="serverManagerDialog_cancel">Cancel</button>
+                <div>
+                    <button id="fileManagerDialog_okay">Okay</button>
+                    <button id="fileManagerDialog_cancel">Cancel</button>
+                </div>
             </dialog>
 
-            <dialog id="layerSettingsDialog">
-                Layer Settings Dialog
+
+            <dialog id="layerManagerDialog">
+                <div>
+                    <b>Layer Manager Dialog</b>
+                    <hr>
+                </div>
+
+                <div>
+                    <select multiple="multiple" id="layerManagerDialog_layers">
+                    </select>
+                </div>
 
                 <table>
                     <tr>
@@ -115,8 +113,8 @@
                     </tr>
                 </table>
 
-                <button id="layerSettingsDialog_okay">Okay</button>
-                <button id="layerSettingsDialog_cancel">Cancel</button>
+                <button id="layerManagerDialog_okay">Okay</button>
+                <button id="layerManagerDialog_cancel">Cancel</button>
 
             </dialog>
 

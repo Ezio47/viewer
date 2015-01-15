@@ -47,14 +47,3 @@ abstract class DialogVM {
     void _open();
     void _close(bool okay);
 }
-
-
-class LayerSettingsVM extends DialogVM {
-    LayerSettingsVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar);
-
-    @override
-    void _open() {}
-
-    @override
-    void _close(bool okay) {}
-}

@@ -4,23 +4,19 @@
 
 part of rialto.viewer;
 
-
-
-
 class LayerManagerVM extends DialogVM {
     SelectElement _select;
-    ServerManagerVM _serverManager;
-    ControlledList<_LayerItem> items;
+    ListBoxVM<_LayerItem> items;
     bool hasData;
     var selection;
     //bool selectionEnabled = true;
     Hub _hub;
 
     LayerManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
-        _select = $["layerManagerDialog_files"];
+        _select = $["layerManagerDialog_layers"];
         assert(_select != null);
 
-        items = new ControlledList<_LayerItem>(_select);
+        items = new ListBoxVM<_LayerItem>(_select);
 
         ["a", "b", "c"].forEach((f) {
             var opt = new OptionElement(value: f);
@@ -28,17 +24,15 @@ class LayerManagerVM extends DialogVM {
             _select.children.add(opt);
         });
 
-        var serverManagerDialog = $["serverManagerDialog"];
-        _serverManager = new ServerManagerVM(serverManagerDialog, $);
-
-        ButtonElement add = $["serverManagerDialog_open"];
-        add.onClick.listen((ev) => _serverManager.open());
+//        ButtonElement openServer = $["serverManagerDialog_openServer"];
+  //      openServer.onClick.listen((ev) => _serverManager.open());
 
         _hub = Hub.root;
 
         _hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
             final String displayName = _hub.proxy.getFileProxy(webpath).displayName;
-            items.add(new _LayerItem(webpath, displayName));
+            var p = new _LayerItem(webpath, displayName);
+            items.add(p, p.displayName);
             hasData = items.length > 0;
         });
 
@@ -46,6 +40,7 @@ class LayerManagerVM extends DialogVM {
             items.removeWhere((f) => f.webpath == webpath);
             hasData = items.length > 0;
         });
+
     }
 
     @override
@@ -53,26 +48,26 @@ class LayerManagerVM extends DialogVM {
 
     @override
     void _close(bool okay) {}
-
     void openFile(Event e, var detail, Node target) {
-        _serverManager.open();
-    }
 
-    void toggleLayer(Event e, var detail, Node target) {
-        var checkbox = target as InputElement;
-        var item = items.list[int.parse(checkbox.id)].data;
-        _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
-    }
+      }
+
+      void toggleLayer(Event e, var detail, Node target) {
+          var checkbox = target as InputElement;
+          var item = items.list[int.parse(checkbox.id)].data;
+          _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
+      }
 
 
-    void deleteFile(Event e, var detail, Node target) {
-        if (selection != null) {
-            assert(selection is _LayerItem);
-            _hub.eventRegistry.CloseFile.fire(selection.webpath);
-        }
-        return;
-    }
+      void deleteFile(Event e, var detail, Node target) {
+          if (selection != null) {
+              assert(selection is _LayerItem);
+              _hub.eventRegistry.CloseFile.fire(selection.webpath);
+          }
+          return;
+      }
 }
+
 
 
 class _LayerItem {

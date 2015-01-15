@@ -11,7 +11,6 @@ abstract class Shape {
 
     Hub _hub;
     String name;
-    bool isVisible;
     bool isSelected;
     bool isSelectable;
     int id;
@@ -23,7 +22,6 @@ abstract class Shape {
 
         id = Shape.getNewId();
 
-        isVisible = true;
         isSelected = false;
         isSelectable = false;
 
@@ -31,6 +29,10 @@ abstract class Shape {
     }
 
     static int getNewId() => _ids++;
+
+    bool get isVisible => _hub.cesium.isPrimitiveVisible(_primitive);
+
+    set isVisible(bool value) => _hub.cesium.setPrimitiveVisible(_primitive, value);
 
     // result goes into _primitive
     dynamic _createCesiumObject();

@@ -13,6 +13,14 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    bool isPrimitiveVisible(var primitive) {
+        return _bridge.callMethod('isPrimitiveVisible', [primitive]);
+    }
+
+    void setPrimitiveVisible(var primitive, bool value) {
+        _bridge.callMethod('setPrimitiveVisible', [primitive, value]);
+    }
+
     // eye & taregt inputs in cartographic lat/lon, height in kilometers
     // up vector is cartsian
     void lookAt(double eyeLon, double eyeLat, double eyeHeight, double targetLon, double targetLat, double targetHeight,

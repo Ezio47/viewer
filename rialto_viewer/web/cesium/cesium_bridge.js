@@ -13,6 +13,15 @@ var CesiumBridge = function (element) {
 
     this.viewer = new Cesium.Viewer(element, options);
 
+    this.isPrimitiveVisible = function(primitive) {
+        return primitive.show;
+    }
+
+    this.setPrimitiveVisible = function(primitive, value) {
+        //console.log("was " + primitive.show);
+        /////primitive.show = value;
+        //console.log("now " + primitive.show);
+    }
 
     this.setUpdater = function(f) {
         this.viewer.scene.preRender.addEventListener(f);
@@ -264,6 +273,7 @@ var CesiumBridge = function (element) {
             appearance : new Cesium.PolylineColorAppearance()
         });
         this.viewer.scene.primitives.add(prim);
+        //prim.show = false;
         return prim;
     }
 
