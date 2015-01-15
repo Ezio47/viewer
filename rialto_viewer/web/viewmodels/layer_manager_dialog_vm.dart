@@ -4,37 +4,33 @@
 
 part of rialto.viewer;
 
-class LayerManagerVM extends DialogVM {
-    SelectElement _select;
-    ListBoxVM<_LayerItem> items;
+class LayerManagerDialogVM extends DialogVM {
+    ListBoxVM<_LayerItem> _listbox;
     bool hasData;
     var selection;
     //bool selectionEnabled = true;
     Hub _hub;
-    ColorizerVM _colorizer;
+    ColorizerDialogVM _colorizer;
     InfoVM _info;
 
-    LayerManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
-        _select = $["layerManagerDialog_layers"];
-        assert(_select != null);
+    LayerManagerDialogVM(String id) : super(id) {
+        _listbox = new ListBoxVM<_LayerItem>("layerManagerDialog_layers");
 
-        items = new ListBoxVM<_LayerItem>(_select);
-
-        _colorizer = new ColorizerVM($["colorizerDialog"], $);
-        _info = new InfoVM($["infoDialog"], $);
+        _colorizer = new ColorizerDialogVM("colorizerDialog");
+        _info = new InfoVM("infoDialog");
 
         _hub = Hub.root;
 
         _hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
             final String displayName = _hub.proxy.getFileProxy(webpath).displayName;
             var p = new _LayerItem(webpath, displayName);
-            items.add(p, p.displayName);
-            hasData = items.length > 0;
+            _listbox.add(p, p.displayName);
+            hasData = _listbox.length > 0;
         });
 
         _hub.eventRegistry.CloseFileCompleted.subscribe((webpath) {
-            items.removeWhere((f) => f.webpath == webpath);
-            hasData = items.length > 0;
+            _listbox.removeWhere((f) => f.webpath == webpath);
+            hasData = _listbox.length > 0;
         });
 
     }
@@ -50,7 +46,7 @@ class LayerManagerVM extends DialogVM {
 
     void toggleLayer(Event e, var detail, Node target) {
         var checkbox = target as InputElement;
-        var item = items.list[int.parse(checkbox.id)].data;
+        var item = _listbox.list[int.parse(checkbox.id)].data;
         _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
     }
 

@@ -7,14 +7,14 @@ part of rialto.viewer;
 
 // BUG: make check to see if data has changed or not
 
-class CheckboxVM {
-    InputElement _element;
+class CheckBoxVM extends ViewModel {
+    InputElement _inputElement;
     bool _defaultValue;
     bool _startingValue;
 
-    CheckboxVM(InputElement this._element, bool this._defaultValue) {
-        assert(_element != null);
-        assert(_element.type == "checkbox");
+    CheckBoxVM(String id, bool this._defaultValue) : super(id) {
+        _inputElement = _element;
+        assert(_inputElement.type == "checkbox");
 
         value = _defaultValue;
     }
@@ -28,10 +28,10 @@ class CheckboxVM {
     }
 
     bool get value {
-        return _element.checked;
+        return _inputElement.checked;
     }
 
     set value(bool value) {
-        _element.checked = value;
+        _inputElement.checked = value;
     }
 }

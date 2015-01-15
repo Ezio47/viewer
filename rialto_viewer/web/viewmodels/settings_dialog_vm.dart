@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-class AdvancedSettingsVM extends DialogVM {
+class SettingsDialogVM extends DialogVM {
     bool axesChecked;
     bool bboxChecked;
 
@@ -20,12 +20,12 @@ class AdvancedSettingsVM extends DialogVM {
     TextInputVM _upY;
     TextInputVM _upZ;
 
-    CheckboxVM _axesEnabled;
-    CheckboxVM _bboxEnabled;
+    CheckBoxVM _axesEnabled;
+    CheckBoxVM _bboxEnabled;
 
     Hub _hub;
 
-    AdvancedSettingsVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
+    SettingsDialogVM(String id) : super(id) {
 
         _hub = Hub.root;
         _hub.eventRegistry.DisplayAxes.subscribe((v) => axesChecked = v);
@@ -33,19 +33,19 @@ class AdvancedSettingsVM extends DialogVM {
         axesChecked = false;
         bboxChecked = false;
 
-        _eyeLon = new TextInputVM($["advancedSettingsDialog_eyeLon"], "0.0");
-        _eyeLat = new TextInputVM($["advancedSettingsDialog_eyeLat"], "0.0");
-        _eyeHeight = new TextInputVM($["advancedSettingsDialog_eyeHeight"], "15000.0");
-        _targetLon = new TextInputVM($["advancedSettingsDialog_targetLon"], "0.0");
-        _targetLat = new TextInputVM($["advancedSettingsDialog_targetLat"], "0.0");
-        _targetHeight = new TextInputVM($["advancedSettingsDialog_targetHeight"], "0.0");
-        _fov = new TextInputVM($["advancedSettingsDialog_fov"], "60.0");
-        _upX = new TextInputVM($["advancedSettingsDialog_upX"], "0.0");
-        _upY = new TextInputVM($["advancedSettingsDialog_upY"], "0.0");
-        _upZ = new TextInputVM($["advancedSettingsDialog_upZ"], "1.0");
+        _eyeLon = new TextInputVM("advancedSettingsDialog_eyeLon", "0.0");
+        _eyeLat = new TextInputVM("advancedSettingsDialog_eyeLat", "0.0");
+        _eyeHeight = new TextInputVM("advancedSettingsDialog_eyeHeight", "15000.0");
+        _targetLon = new TextInputVM("advancedSettingsDialog_targetLon", "0.0");
+        _targetLat = new TextInputVM("advancedSettingsDialog_targetLat", "0.0");
+        _targetHeight = new TextInputVM("advancedSettingsDialog_targetHeight", "0.0");
+        _fov = new TextInputVM("advancedSettingsDialog_fov", "60.0");
+        _upX = new TextInputVM("advancedSettingsDialog_upX", "0.0");
+        _upY = new TextInputVM("advancedSettingsDialog_upY", "0.0");
+        _upZ = new TextInputVM("advancedSettingsDialog_upZ", "1.0");
 
-        _axesEnabled = new CheckboxVM($["advancedSettingsDialog_axesEnabled"], true);
-        _bboxEnabled = new CheckboxVM($["advancedSettingsDialog_bboxEnabled"], true);
+        _axesEnabled = new CheckBoxVM("advancedSettingsDialog_axesEnabled", true);
+        _bboxEnabled = new CheckBoxVM("advancedSettingsDialog_bboxEnabled", true);
     }
 
     @override

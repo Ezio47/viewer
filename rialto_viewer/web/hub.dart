@@ -24,6 +24,8 @@ class Hub {
     ModeController modeController;
     SelectionController selectionController;
 
+    InfoVM infobox; // BUG
+
     Picker picker;
 
     // the global repo for loaded data
@@ -58,6 +60,8 @@ class Hub {
     void init() {
         cesium = new CesiumBridge('cesiumContainer');
 
+        var rialtoElement = new RialtoElement();
+
         eventRegistry.OpenServer.subscribe(_handleOpenServer);
         eventRegistry.CloseServer.subscribe0(_handleCloseServer);
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
@@ -83,11 +87,11 @@ class Hub {
 
         picker = new Picker();
 
-        eventRegistry.ChangeMode.fire(new ModeData(ModeData.VIEW));
-
         renderer = new Renderer(renderablePointCloudSet);
 
         cesium.setUpdateFunction(renderer.checkUpdate);
+
+        eventRegistry.ChangeMode.fire(new ModeData(ModeData.VIEW));
     }
 
     int get width => window.innerWidth;

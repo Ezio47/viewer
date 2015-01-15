@@ -7,13 +7,13 @@ part of rialto.viewer;
 
 // BUG: make check to see if data has changed or not
 
-class TextInputVM {
-    InputElement _element;
+class TextInputVM extends ViewModel {
+    InputElement _inputElement;
     String defaultValue;
     String _startingValue;
 
-    TextInputVM(InputElement this._element, String this.defaultValue) {
-        assert(_element != null);
+    TextInputVM(String id, String this.defaultValue) : super(id) {
+        _inputElement = _element;
         value = defaultValue;
     }
 
@@ -26,11 +26,11 @@ class TextInputVM {
     }
 
     String get value {
-        return _element.value;
+        return _inputElement.value;
     }
 
     set value(String value) {
-        _element.value = value;
+        _inputElement.value = value;
     }
 
     // returns a double or null

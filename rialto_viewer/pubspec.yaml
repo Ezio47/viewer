@@ -1,12 +1,5 @@
 name: rialto_viewer
 description: The Rialto Point Cloud Viewer
 dependencies:
-  barback: any
-  core_elements: any
   http: any
-  paper_elements: any
-  polymer: any
   vector_math: any
-transformers:
-- rialto_viewer
-- polymer

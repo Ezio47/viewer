@@ -3,25 +3,19 @@
 // license found in the accompanying LICENSE.txt file.
 
 import 'dart:core';
-import 'package:polymer/polymer.dart';
 import 'rialto.dart';
 
 
 void main() {
 
-    initPolymer().run(() {
 
         // Code that doesn't need to wait.
         var hub = new Hub();
 
-        Polymer.onReady.then((_) {
-            // Code that executes after elements have been upgraded.
 
             Hub.root.init();
 
             boot1();
-        });
-    });
 }
 
 

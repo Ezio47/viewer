@@ -9,7 +9,7 @@ class AboutVM extends DialogVM {
 
     Hub _hub;
 
-    AboutVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar, hasCancelButton: false) {
+    AboutVM(String id) : super(id, hasCancelButton: false) {
     }
 
     @override

@@ -2,53 +2,38 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-library rialto.viewer.rialto_element;
+part of rialto.viewer;
 
-import 'dart:core';
-import 'dart:html';
-import 'package:polymer/polymer.dart';
-import '../rialto.dart';
-
-
-@CustomTag('rialto-element')
-class RialtoElement extends PolymerElement {
+class RialtoElement  {
     Hub _hub;
     SpanElement _mouseCoords;
-    FileManagerVM _fileManager;
-    LayerManagerVM _layerManager;
-    AdvancedSettingsVM _advancedSettings;
+    FileManagerDialogVM _fileManager;
+    LayerManagerDialogVM _layerManager;
+    SettingsDialogVM _advancedSettings;
     ModalButtonsVM _modalButtons;
     AboutVM _about;
 
-    RialtoElement.created() : super.created();
-
-    @override
-    void attached() {
-        super.attached();
-    }
-
-    @override
-    void ready() {
+    RialtoElement() {
         _hub = Hub.root;
         _hub.rialtoElement = this;
 
-        _mouseCoords = $["textMouseCoords"];
+        _mouseCoords = querySelector("#textMouseCoords");
 
-        $["homeWorldButton"].onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(1)));
-        $["homeDataButton"].onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(2)));
+        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(1)));
+        querySelector("#homeDataButton").onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(2)));
 
         _modalButtons = new ModalButtonsVM({
-            $["viewModeButton"]: new ModeData(ModeData.VIEW),
-            $["annotateModeButton"]: new ModeData(ModeData.ANNOTATION),
-            $["selectModeButton"]: new ModeData(ModeData.SELECTION),
-            $["measureModeButton"]: new ModeData(ModeData.MEASUREMENT)
-        }, $["viewModeButton"]);
+            querySelector("#viewModeButton"): new ModeData(ModeData.VIEW),
+            querySelector("#annotateModeButton"): new ModeData(ModeData.ANNOTATION),
+            querySelector("#selectModeButton"): new ModeData(ModeData.SELECTION),
+            querySelector("#measureModeButton"): new ModeData(ModeData.MEASUREMENT)
+        }, querySelector("#viewModeButton"));
 
-        _fileManager = new FileManagerVM($["fileManagerDialog"], $);
-        _layerManager = new LayerManagerVM($["layerManagerDialog"], $);
-        _advancedSettings = new AdvancedSettingsVM($["advancedSettingsDialog"], $);
+        _fileManager = new FileManagerDialogVM("fileManagerDialog");
+        _layerManager = new LayerManagerDialogVM("layerManagerDialog");
+        _advancedSettings = new SettingsDialogVM("advancedSettingsDialog");
 
-        _about = new AboutVM($["aboutDialog"], $);
+        _about = new AboutVM("aboutDialog");
 
         _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
     }
@@ -61,10 +46,5 @@ class RialtoElement extends PolymerElement {
         String s = "(${lon.toStringAsFixed(3)}, ${lat.toStringAsFixed(3)})";
         _mouseCoords.text = s;
         return;
-    }
-
-    @override
-    void detached() {
-        super.detached();
     }
 }

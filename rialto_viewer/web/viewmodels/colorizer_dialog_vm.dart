@@ -5,15 +5,15 @@
 part of rialto.viewer;
 
 
-class ColorizerVM extends DialogVM {
+class ColorizerDialogVM extends DialogVM {
     Hub _hub;
     ListBoxVM<String> _listbox;
 
-    ColorizerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
+    ColorizerDialogVM(String id) : super(id) {
 
         _hub = Hub.root;
 
-        _listbox = new ListBoxVM<String>($["colorizerDialog_items"]);
+        _listbox = new ListBoxVM<String>("colorizerDialog_items");
 
         var names = RampColorizer.names;
         names.forEach((s) => _listbox.add(s, s));

@@ -7,7 +7,7 @@ part of rialto.viewer;
 
 // BUG: add/remove of files happens right away, not when dialog Okay button pressed
 
-class FileManagerVM extends DialogVM {
+class FileManagerDialogVM extends DialogVM {
     TextInputVM _serverName;
     ListBoxVM<_ProxyItem> _filesList;
     ProxyItem _currentItem = null;
@@ -15,20 +15,20 @@ class FileManagerVM extends DialogVM {
     ButtonElement _openServerButton;
     ButtonElement _closeServerButton;
 
-    FileManagerVM(DialogElement dialogElement, var dollar) : super(dialogElement, dollar) {
+    FileManagerDialogVM(String id) : super(id) {
 
-        _filesList = new ListBoxVM<_ProxyItem>($["fileManagerDialog_files"]);
+        _filesList = new ListBoxVM<_ProxyItem>("fileManagerDialog_files");
 
-        $["fileManagerDialog_addSelectedFiles"].onClick.listen((e) => _doAddFiles());
-        $["fileManagerDialog_removeSelectedFiles"].onClick.listen((e) => _doRemoveFiles());
+        querySelector("#fileManagerDialog_addSelectedFiles").onClick.listen((e) => _doAddFiles());
+        querySelector("#fileManagerDialog_removeSelectedFiles").onClick.listen((e) => _doRemoveFiles());
 
-        _openServerButton = $["fileManagerDialog_openServer"];
+        _openServerButton = querySelector("#fileManagerDialog_openServer");
         _openServerButton.onClick.listen((e) => _doOpenServer());
 
-        _closeServerButton = $["fileManagerDialog_closeServer"];
+        _closeServerButton = querySelector("#fileManagerDialog_closeServer");
         _closeServerButton.onClick.listen((e) => _doCloseServer());
 
-        _serverName = new TextInputVM($["fileManagerDialog_serverName"], _hub.defaultServer);
+        _serverName = new TextInputVM("fileManagerDialog_serverName", _hub.defaultServer);
 
         Hub.root.eventRegistry.OpenServerCompleted.subscribe0(_handleOpenServerCompleted);
         Hub.root.eventRegistry.CloseServerCompleted.subscribe0(_handleCloseServerCompleted);

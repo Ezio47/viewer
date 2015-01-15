@@ -17,13 +17,13 @@ class ListBoxItem<T> {
 }
 
 
-class ListBoxVM<T> {
+class ListBoxVM<T> extends ViewModel {
     List<ListBoxItem<T>> _list = new List<ListBoxItem<T>>();
     SelectElement _selectElement;
     Map<OptionElement, T> _map = new Map<OptionElement, T>();
 
-    ListBoxVM(SelectElement this._selectElement) {
-        assert(_selectElement != null);
+    ListBoxVM(String id): super(id) {
+        _selectElement = _element;
         _selectElement.children.clear();
     }
 

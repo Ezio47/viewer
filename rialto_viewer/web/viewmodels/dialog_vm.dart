@@ -4,33 +4,28 @@
 
 part of rialto.viewer;
 
-abstract class DialogVM {
-    String _id;
+abstract class DialogVM extends ViewModel {
     bool _hasCancelButton;
     DialogElement _dialogElement;
-    var $;
     Hub _hub;
 
-    DialogVM(DialogElement dialogElement, Map dollar, {bool hasCancelButton: true})
-            : _dialogElement = dialogElement,
-              $ = dollar,
-              _hasCancelButton = hasCancelButton {
-        assert(_dialogElement != null);
+    DialogVM(String id, {bool hasCancelButton: true}): super(id),
+            _hasCancelButton = hasCancelButton {
 
-        _id = _dialogElement.id;
+        _dialogElement = _element;
 
         _hub = Hub.root;
 
-        var openButton = $[_id + "_open"];
+        var openButton = querySelector("#" + _id + "_open");
         assert(openButton != null);
         openButton.onClick.listen((ev) => open());
 
-        var okayButton = $[_id + "_okay"];
+        var okayButton = querySelector("#" + _id + "_okay");
         assert(okayButton != null);
         okayButton.onClick.listen((e) => close(true));
 
         if (_hasCancelButton) {
-            var cancelButton = $[_id + "_cancel"];
+            var cancelButton = querySelector("#" + _id + "_cancel");
             assert(cancelButton != null);
             cancelButton.onClick.listen((e) => close(false));
         }
