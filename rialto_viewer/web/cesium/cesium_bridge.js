@@ -3,13 +3,15 @@
 // license found in the accompanying LICENSE.txt file.
 
 var CesiumBridge = function (element) {
+    Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
+
     var options = {
         timeline: false,
         geocoder: false,
         animation: false,
         sceneMode : Cesium.SceneMode.SCENE3D,
-        fullscreenButton: false
-        //creditContainer: "creditContainer"
+        fullscreenButton: false,
+        creditContainer: "creditContainer"
     };
 
 
