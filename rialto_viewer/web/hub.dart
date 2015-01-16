@@ -113,9 +113,9 @@ class Hub {
             renderablePointCloudSet.addCloud(pointCloud);
 
             renderer.updateNeeded = true;
+            eventRegistry.OpenFileCompleted.fire(webpath);
         });
 
-        eventRegistry.OpenFileCompleted.fire(webpath);
     }
 
     void _handleCloseFile(String webpath) {
