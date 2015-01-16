@@ -7,22 +7,16 @@ import 'rialto.dart';
 
 
 void main() {
-
-
-        // Code that doesn't need to wait.
-        var hub = new Hub();
-
-
-            Hub.root.init();
-
-            boot2();
+    var hub = new Hub();
+    Hub.root.init();
+    boot2();
 }
 
 
 void boot0() {
     Hub hub = Hub.root;
 
-   // hub.eventRegistry.DisplayBbox.fire(true);
+    // hub.eventRegistry.DisplayBbox.fire(true);
     //hub.eventRegistry.UpdateCameraEyePosition.fire(new Vector3(-200.0, -200.0, 200.0));
     //hub.eventRegistry.UpdateCameraTargetPosition.fire(new Vector3(0.0, 0.0, 0.0));
 }
@@ -35,7 +29,7 @@ void boot1() {
     hub.eventRegistry.OpenServerCompleted.subscribe0(() {
         //hub.eventRegistry.OpenFile.fire("/dir1/random.dat");
         hub.eventRegistry.OpenFile.fire("/terrain1.dat");
-        //hub.eventRegistry.OpenFile.fire("/terrain2.dat");
+        hub.eventRegistry.OpenFile.fire("/terrain2.dat");
     });
 
     hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {

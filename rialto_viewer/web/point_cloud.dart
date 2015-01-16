@@ -10,27 +10,26 @@ part of rialto.viewer;
 // GeometryAttribute renderable format)
 
 class PointCloud {
-    static const int TILESIZE = 1024;
-
     String displayName;
     String webpath;
     Map<String, PointCloudDimTiles> dimensions = new Map<String, PointCloudDimTiles>();
-    Map<String, double> minimum = new Map<String, double>();
-    Map<String, double> maximum = new Map<String, double>();
     int numPoints;
 
 
-    PointCloud(String this.webpath, String this.displayName, int this.numPoints);
+    PointCloud(String this.webpath, String this.displayName) : numPoints = 0;
 
     void addDimensionData(String name, Float32List data) {
         assert(dimensions[name] != null);
-        assert(data.length <= PointCloud.TILESIZE);
 
         dimensions[name].add(data);
 
-        minimum[name] = dimensions[name].minimum;
-        maximum[name] = dimensions[name].maximum;
+        if (name == "positions.x") {
+            numPoints = dimensions[name].numPoints;
+        }
     }
+
+    double minimum(String name) => dimensions[name].minimum;
+    double maximum(String name) => dimensions[name].maximum;
 
     void createDimension(String name) {
         dimensions[name] = new PointCloudDimTiles(name);
@@ -64,11 +63,6 @@ class PointCloud {
                 dimensions.containsKey("colors.z");
         return xyz;
     }
-
-    int get numTiles => (numPoints.toDouble() / PointCloud.TILESIZE.toDouble()).ceil();
-    int get tileSize => PointCloud.TILESIZE;
-    int get tileSizeRemainder =>
-            (numPoints % PointCloud.TILESIZE == 0) ? PointCloud.TILESIZE : (numPoints % PointCloud.TILESIZE);
 }
 
 
@@ -81,21 +75,23 @@ class PointCloudTile {
     PointCloudTile(String dimension, Float32List srcData) : this.dimension = dimension {
         data = PointCloudTile._clone(srcData);
 
-        assert(data.length <= PointCloud.TILESIZE);
-
         _computeBounds();
     }
 
     void _computeBounds() {
+        if (data.length == 0) return;
+
         minimum = data[0];
         maximum = data[0];
 
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 1; i < data.length; i++) {
             double v = data[i];
             minimum = min(minimum, v);
             maximum = max(maximum, v);
         }
     }
+
+    int get numPoints => data.length;
 
     static Float32List _clone(Float32List src) {
         var dest = new Float32List(src.length);
@@ -110,28 +106,32 @@ class PointCloudDimTiles {
     String dimension;
     List<PointCloudTile> list;
     double minimum, maximum;
+    int numPoints;
 
-    PointCloudDimTiles(String this.dimension) {
-        list = new List<PointCloudTile>();
-    }
+    PointCloudDimTiles(String this.dimension)
+            : list = new List<PointCloudTile>(),
+              numPoints = 0;
 
     void add(Float32List data) {
         PointCloudTile tile = new PointCloudTile(dimension, data);
         list.add(tile);
 
         _updateBounds(tile);
+        numPoints += tile.numPoints;
     }
 
     void _updateBounds(PointCloudTile tile) {
         assert(tile != null);
+        if (tile.data.length == 0) return;
 
         if (minimum == null) {
             assert(maximum == null);
             minimum = tile.minimum;
             maximum = tile.maximum;
-        } else {
-            minimum = min(minimum, tile.minimum);
-            maximum = max(minimum, tile.maximum);
+            return;
         }
+
+        minimum = min(minimum, tile.minimum);
+        maximum = max(maximum, tile.maximum);
     }
 }

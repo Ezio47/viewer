@@ -24,12 +24,12 @@ class RenderablePointCloud {
     }
 
     void _computeBounds() {
-        double xmin = pointCloud.minimum["positions.x"];
-        double ymin = pointCloud.minimum["positions.y"];
-        double zmin = pointCloud.minimum["positions.z"];
-        double xmax = pointCloud.maximum["positions.x"];
-        double ymax = pointCloud.maximum["positions.y"];
-        double zmax = pointCloud.maximum["positions.z"];
+        double xmin = pointCloud.minimum("positions.x");
+        double ymin = pointCloud.minimum("positions.y");
+        double zmin = pointCloud.minimum("positions.z");
+        double xmax = pointCloud.maximum("positions.x");
+        double ymax = pointCloud.maximum("positions.y");
+        double zmax = pointCloud.maximum("positions.z");
 
         min = new Vector3(xmin, ymin, zmin);
         max = new Vector3(xmax, ymax, zmax);
@@ -48,18 +48,26 @@ class RenderablePointCloud {
 
         int idx = 0;
         final int numTiles = pointCloud.dimensions["positions.x"].list.length;
+        //log("Reading back $numTiles");
 
         for (int t = 0; t < numTiles; t++) {
             PointCloudTile xTile = pointCloud.dimensions["positions.x"].list[t];
             PointCloudTile yTile = pointCloud.dimensions["positions.y"].list[t];
             PointCloudTile zTile = pointCloud.dimensions["positions.z"].list[t];
-            final int count = xTile.data.length;
-            for (int i = 0; i< count; i++) {
+
+            final int tileSize = xTile.data.length;
+            //log("Tile $t size: $tileSize");
+
+            for (int i = 0; i< tileSize; i++) {
                 xyz[idx++] = xTile.data[i];
                 xyz[idx++] = yTile.data[i];
                 xyz[idx++] = zTile.data[i];
             }
         }
+
+        //log(idx);
+        //log(numPoints);
+        //log(numPoints*3);
         assert(idx == numPoints * 3);
 
         var color = new Float32List(numPoints * 4);
