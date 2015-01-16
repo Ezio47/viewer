@@ -16,30 +16,29 @@ class PointCloudGenerator {
         final int numFloats = floats.length;
         final int numPoints = numFloats ~/ 3;
 
-        Map<String, Float32List> map = new Map();
+        var cloud = new PointCloud(webpath, displayName, numPoints);
 
-        var positionsX = new Float32List(numPoints);
-        var positionsY = new Float32List(numPoints);
-        var positionsZ = new Float32List(numPoints);
-        map["positions.x"] = positionsX;
-        map["positions.y"] = positionsY;
-        map["positions.z"] = positionsZ;
+        cloud.createDimension("positions.x");
+        cloud.createDimension("positions.y");
+        cloud.createDimension("positions.z");
 
-        int i = 0;
-        for (int di = 0; di < numFloats; di += 3) {
-            var x = floats[di];
-            var y = floats[di + 1];
-            var z = floats[di + 2];
-            positionsX[i] = x;
-            positionsY[i] = y;
-            positionsZ[i] = z;
-            ++i;
+        int floatsIndex = 0;
+        for (int tile = 0; tile < cloud.numTiles; tile++) {
+            int imax = (tile < (cloud.numTiles - 1)) ? cloud.tileSize : cloud.tileSizeRemainder;
+            var positionsX = new Float32List(imax);
+            var positionsY = new Float32List(imax);
+            var positionsZ = new Float32List(imax);
+            for (int i = 0; i < imax; i++) {
+                positionsX[i] = floats[floatsIndex++];
+                positionsY[i] = floats[floatsIndex++];
+                positionsZ[i] = floats[floatsIndex++];
+            }
+            cloud.addDimensionData("positions.x", positionsX);
+            cloud.addDimensionData("positions.y", positionsY);
+            cloud.addDimensionData("positions.z", positionsZ);
         }
+        assert(floatsIndex == numPoints * 3);
 
-        var cloud = new PointCloud(webpath, displayName);
-        cloud.createDimensions(map);
-
-        //final cnt = Utils.toSI(numPoints);
         print("made $webpath: $numPoints points");
 
         return cloud;
@@ -48,11 +47,10 @@ class PointCloudGenerator {
     static PointCloud generate(String webpath, String displayName) {
         switch (webpath) {
             case "/dir2/line.dat":
-                return _makeLine(webpath, displayName);
             case "/newcube.dat":
-                return _makeRandom(webpath, displayName);
             case "/oldcube.dat":
-                return _makeRandom(webpath, displayName);
+                assert(false);
+                break;
             case "/dir1/random.dat":
                 return _makeRandom(webpath, displayName);
             case "/terrain1.dat":
@@ -108,48 +106,62 @@ class PointCloudGenerator {
             positionsZ[i] = z;
         }
 
-        var cloud = new PointCloud(webpath, displayName);
-        cloud.createDimensions(map);
+        var cloud = new PointCloud(webpath, displayName, numPoints);
 
-        return cloud;
-    }
+        cloud.createDimension("positions.x");
+        cloud.createDimension("positions.y");
+        cloud.createDimension("positions.z");
 
-    static PointCloud _makeLine(String webpath, String displayName) {
-        Map<String, Float32List> map = new Map();
-
-        var numPoints = 2000;
-
-        var positionsX = new Float32List(numPoints);
-        var positionsY = new Float32List(numPoints);
-        var positionsZ = new Float32List(numPoints);
-
-        map["positions.x"] = positionsX;
-        map["positions.y"] = positionsY;
-        map["positions.z"] = positionsZ;
-
-        for (var i = 0; i < numPoints; i++) {
-            double pt = i.toDouble() / 10.0;
-            positionsX[i] = pt;
-            positionsY[i] = pt;
-            positionsZ[i] = pt;
+        int positionsIndex = 0;
+        for (int tile = 0; tile < cloud.numTiles; tile++) {
+            int imax = (tile < (cloud.numTiles - 1)) ? cloud.tileSize : cloud.tileSizeRemainder;
+            var tmpX = new Float32List(imax);
+            var tmpY = new Float32List(imax);
+            var tmpZ = new Float32List(imax);
+            for (int i = 0; i < imax; i++) {
+                tmpX[i] = positionsX[positionsIndex];
+                tmpY[i] = positionsY[positionsIndex];
+                tmpZ[i] = positionsZ[positionsIndex];
+                positionsIndex++;
+            }
+            cloud.addDimensionData("positions.x", tmpX);
+            cloud.addDimensionData("positions.y", tmpY);
+            cloud.addDimensionData("positions.z", tmpZ);
         }
-
-        var cloud = new PointCloud(webpath, displayName);
-        cloud.createDimensions(map);
+        assert(positionsIndex == numPoints);
 
         return cloud;
     }
+
 
     static PointCloud _makeTerrain(int which, String webpath, String displayName) {
         _Terrain terrain = new _Terrain(which);
 
-        Map<String, Float32List> map = new Map();
-        map["positions.x"] = terrain.valuesX;
-        map["positions.y"] = terrain.valuesY;
-        map["positions.z"] = terrain.valuesZ;
+        int numPoints = terrain.valuesX.length;
 
-        var cloud = new PointCloud(webpath, displayName);
-        cloud.createDimensions(map);
+        var cloud = new PointCloud(webpath, displayName, numPoints);
+
+        cloud.createDimension("positions.x");
+        cloud.createDimension("positions.y");
+        cloud.createDimension("positions.z");
+
+        int positionsIndex = 0;
+        for (int tile = 0; tile < cloud.numTiles; tile++) {
+            int imax = (tile < (cloud.numTiles - 1)) ? cloud.tileSize : cloud.tileSizeRemainder;
+            var tmpX = new Float32List(imax);
+            var tmpY = new Float32List(imax);
+            var tmpZ = new Float32List(imax);
+            for (int i = 0; i < imax; i++) {
+                tmpX[i] = terrain.valuesX[positionsIndex];
+                tmpY[i] = terrain.valuesY[positionsIndex];
+                tmpZ[i] = terrain.valuesZ[positionsIndex];
+                positionsIndex++;
+            }
+            cloud.addDimensionData("positions.x", tmpX);
+            cloud.addDimensionData("positions.y", tmpY);
+            cloud.addDimensionData("positions.z", tmpZ);
+        }
+        assert(positionsIndex == numPoints);
 
         return cloud;
     }

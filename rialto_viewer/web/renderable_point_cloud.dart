@@ -47,28 +47,37 @@ class RenderablePointCloud {
         dims["positions"] = xyz;
 
         int idx = 0;
-        Float32List xsrc = pointCloud.dimensions["positions.x"];
-        Float32List ysrc = pointCloud.dimensions["positions.y"];
-        Float32List zsrc = pointCloud.dimensions["positions.z"];
-        for (int i = 0; i < pointCloud.numPoints; i++) {
-            xyz[idx++] = xsrc[i];
-            xyz[idx++] = ysrc[i];
-            xyz[idx++] = zsrc[i];
+        final int numTiles = pointCloud.dimensions["positions.x"].list.length;
+
+        for (int t = 0; t < numTiles; t++) {
+            PointCloudTile xTile = pointCloud.dimensions["positions.x"].list[t];
+            PointCloudTile yTile = pointCloud.dimensions["positions.y"].list[t];
+            PointCloudTile zTile = pointCloud.dimensions["positions.z"].list[t];
+            final int count = xTile.data.length;
+            for (int i = 0; i< count; i++) {
+                xyz[idx++] = xTile.data[i];
+                xyz[idx++] = yTile.data[i];
+                xyz[idx++] = zTile.data[i];
+            }
         }
+        assert(idx == numPoints * 3);
 
         var color = new Float32List(numPoints * 4);
         dims["colors"] = color;
         idx = 0;
 
         if (pointCloud.hasColor3) {
-            Float32List xsrc = pointCloud.dimensions["colors.x"];
-            Float32List ysrc = pointCloud.dimensions["colors.y"];
-            Float32List zsrc = pointCloud.dimensions["colors.z"];
-            for (int i = 0; i < pointCloud.numPoints; i++) {
-                color[idx++] = xsrc[i];
-                color[idx++] = ysrc[i];
-                color[idx++] = zsrc[i];
-                color[idx++] = 1.0;
+            for (int t=0; t<numTiles; t++) {
+                PointCloudTile xTile = pointCloud.dimensions["colors.x"].list[t];
+                PointCloudTile yTile = pointCloud.dimensions["colors.y"].list[t];
+                PointCloudTile zTile = pointCloud.dimensions["colors.z"].list[t];
+                final int count = xTile.data.length;
+                for (int i = 0; i < count; i++) {
+                    color[idx++] = xTile.data[i];
+                    color[idx++] = yTile.data[i];
+                    color[idx++] = zTile.data[i];
+                    color[idx++] = 1.0;
+                }
             }
         } else {
             for (int i = 0; i < pointCloud.numPoints; i++) {
@@ -78,6 +87,7 @@ class RenderablePointCloud {
                 color[idx++] = 1.0;
             }
         }
+        assert(idx == numPoints * 4);
     }
 
     CloudShape buildParticleSystem() {
