@@ -13,6 +13,10 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    void goHome() {
+        _bridge.callMethod('goHome');
+    }
+
     bool isPrimitiveVisible(var primitive) {
         return _bridge.callMethod('isPrimitiveVisible', [primitive]);
     }

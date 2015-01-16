@@ -17,6 +17,64 @@ var CesiumBridge = function (element) {
 
     this.viewer = new Cesium.Viewer(element, options);
 
+    // taken from HomeButtonView.viewHome
+    this.goHome = function() {
+        var scene = this.viewer.scene;
+        var mode = scene.mode;
+
+        if (Cesium.defined(scene) && mode === Cesium.SceneMode.MORPHING) {
+            scene.completeMorph();
+        }
+
+        var direction;
+        var right;
+        var up;
+
+        if (mode === Cesium.SceneMode.SCENE2D) {
+            scene.camera.flyToRectangle({
+                destination : Cesium.Rectangle.MAX_VALUE,
+                duration : 0,
+                endTransform : Cesium.Matrix4.IDENTITY
+            });
+        } else if (mode === Cesium.SceneMode.SCENE3D) {
+            var destination = scene.camera.getRectangleCameraCoordinates(Cesium.Camera.DEFAULT_VIEW_RECTANGLE);
+            var mag = Cesium.Cartesian3.magnitude(destination);
+            mag += mag * Cesium.Camera.DEFAULT_VIEW_FACTOR;
+            Cesium.Cartesian3.normalize(destination, destination);
+            Cesium.Cartesian3.multiplyByScalar(destination, mag, destination);
+
+            direction = Cesium.Cartesian3.normalize(destination, new Cesium.Cartesian3());
+            Cesium.Cartesian3.negate(direction, direction);
+            right = Cesium.Cartesian3.cross(direction, Cesium.Cartesian3.UNIT_Z, new Cesium.Cartesian3());
+            up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
+
+            scene.camera.flyTo({
+                destination : destination,
+                direction: direction,
+                up : up,
+                duration : 0,
+                endTransform : Cesium.Matrix4.IDENTITY
+            });
+        } else if (mode === Cesium.SceneMode.COLUMBUS_VIEW) {
+            var maxRadii = scene.globe.ellipsoid.maximumRadius;
+            var position = new Cesium.Cartesian3(0.0, -1.0, 1.0);
+            position = Cesium.Cartesian3.multiplyByScalar(Cesium.Cartesian3.normalize(position, position), 5.0 * maxRadii, position);
+            direction = new Cesium.Cartesian3();
+            direction = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(Cesium.Cartesian3.ZERO, position, direction), direction);
+            right = Cesium.Cartesian3.cross(direction, Cesium.Cartesian3.UNIT_Z, new Cesium.Cartesian3());
+            up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
+
+            scene.camera.flyTo({
+                destination : position,
+                duration : 0,
+                up : up,
+                direction : direction,
+                endTransform : Cesium.Matrix4.IDENTITY,
+                convert : false
+            });
+        }
+    }
+
     this.isPrimitiveVisible = function(primitive) {
         return primitive.show;
     }
@@ -35,8 +93,21 @@ var CesiumBridge = function (element) {
     this.lookAtCartographic = function(eyeLon, eyeLat, eyeHeight,
                                        targetLon, targetLat, targetHeight,
                                        upX, upY, upZ, fovDegrees) {
+        var scene = this.viewer.scene;
+        var mode = scene.mode;
 
-        var ellipsoid = this.viewer.scene.globe.ellipsoid;
+        if (Cesium.defined(scene) && mode === Cesium.SceneMode.MORPHING) {
+            scene.completeMorph();
+        }
+
+        if (mode === Cesium.SceneMode.SCENE2D ||
+            mode == Cesium.SceneMode.COLUMBUS_VIEW) {
+            // BUG: hack fix for now
+            this.goHome();
+            return;
+        }
+
+        var ellipsoid = scene.globe.ellipsoid;
 
         var eyeCartographic = Cesium.Cartographic.fromDegrees(eyeLon, eyeLat, eyeHeight);
         var targetCartographic = Cesium.Cartographic.fromDegrees(targetLon, targetLat, targetHeight);

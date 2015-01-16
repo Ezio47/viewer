@@ -7,9 +7,6 @@ part of rialto.viewer;
 class Camera {
     Hub _hub;
 
-    Vector3 defaultWorldCameraEyePosition;
-    Vector3 defaultWorldCameraTargetPosition;
-
     Vector3 defaultDataCameraEyePosition;
     Vector3 defaultDataCameraTargetPosition;
 
@@ -23,9 +20,6 @@ class Camera {
 
     Camera() {
         _hub = Hub.root;
-
-        defaultWorldCameraEyePosition = new Vector3(0.0, 0.0, 15000.0);
-        defaultWorldCameraTargetPosition = new Vector3(0.0, 0.0, 0.0);
 
         defaultDataCameraEyePosition = new Vector3(0.0, 0.0, 15000.0);
         defaultDataCameraTargetPosition = new Vector3(0.0, 0.0, 0.0);
@@ -58,11 +52,8 @@ class Camera {
                 cameraFov = data.fov;
                 break;
             case 1: // world view
-                cameraEyePosition = defaultWorldCameraEyePosition;
-                cameraTargetPosition = defaultWorldCameraTargetPosition;
-                cameraUpDirection = defaultCameraUpDirection;
-                cameraFov = defaultCameraFov;
-                break;
+                _hub.cesium.goHome();
+                return;
             case 2: // data view
                 cameraEyePosition = defaultDataCameraEyePosition;
                 cameraTargetPosition = defaultDataCameraTargetPosition;
