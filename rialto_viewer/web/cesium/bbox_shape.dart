@@ -6,9 +6,9 @@ part of rialto.viewer;
 
 
 class BboxShape extends Shape {
-    Vector3 _point1, _point2;
+    Cartographic3 _point1, _point2;
 
-    BboxShape(Vector3 this._point1, Vector3 this._point2) : super("bbox") {
+    BboxShape(Cartographic3 this._point1, Cartographic3 this._point2) : super("bbox") {
         _primitive = _createCesiumObject();
     }
 

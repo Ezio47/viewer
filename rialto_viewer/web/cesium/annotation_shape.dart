@@ -6,16 +6,16 @@ part of rialto.viewer;
 
 class AnnotationShape extends Shape {
 
-    Vector3 _point1;
-    Vector3 _point2;
+    Cartographic3 _point1;
+    Cartographic3 _point2;
 
-    AnnotationShape(Vector3 point1, Vector3 point2) : super("annotation") {
+    AnnotationShape(Cartographic3 point1, Cartographic3 point2) : super("annotation") {
         _point1 = point1;
         _point2 = point2;
 
-        assert(_point1.x <= _point2.x);
-        assert(_point1.y <= _point2.y);
-        assert(_point1.z == _point2.z);
+        assert(_point1.longitude <= _point2.longitude);
+        assert(_point1.latitude <= _point2.latitude);
+        assert(_point1.height == _point2.height);
         isSelectable = true;
 
         _primitive = _createCesiumObject();

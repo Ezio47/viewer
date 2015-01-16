@@ -41,8 +41,8 @@ class RialtoElement  {
     void _updateCoords(MouseData d) {
         var v = _hub.cesium.getMouseCoordinates(d.x, d.y);
         if (v == null) return;
-        double lon = v.x;
-        double lat = v.y;
+        double lon = v.longitude;
+        double lat = v.latitude;
         String s = "(${lon.toStringAsFixed(3)}, ${lat.toStringAsFixed(3)})";
         _mouseCoords.text = s;
         return;

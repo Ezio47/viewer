@@ -41,6 +41,8 @@ part 'cesium/cloud_shape.dart';
 part 'cesium/measurement_shape.dart';
 part 'cesium/shape.dart';
 
+part 'utils/cartesian3.dart';
+part 'utils/cartographic3.dart';
 part 'utils/color.dart';
 part 'utils/rialto_exceptions.dart';
 part 'utils/signal.dart';

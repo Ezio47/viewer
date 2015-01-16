@@ -75,9 +75,9 @@ class SettingsDialogVM extends DialogVM {
     }
 
     void _performCameraWork() {
-        bool eyeChanged = (_eyeLon.changed && _eyeLat.changed && _eyeHeight.changed);
-        bool targetChanged = (_targetLon.changed && _targetLat.changed && _targetHeight.changed);
-        bool upChanged = (_upX.changed && _upY.changed && _upZ.changed);
+        bool eyeChanged = (_eyeLon.changed || _eyeLat.changed || _eyeHeight.changed);
+        bool targetChanged = (_targetLon.changed || _targetLat.changed || _targetHeight.changed);
+        bool upChanged = (_upX.changed || _upY.changed || _upZ.changed);
         bool fovChanged = (_fov.changed);
 
         if (!eyeChanged && !targetChanged && !upChanged && !fovChanged) {
@@ -104,9 +104,9 @@ class SettingsDialogVM extends DialogVM {
         bool fovOkay = (fov != null);
 
         if (eyeOkay && targetOkay && upOkay && fovOkay) {
-            Vector3 eye = new Vector3(eyeLon, eyeLat, eyeHeight);
-            Vector3 target = new Vector3(targetLon, targetLat, targetHeight);
-            Vector3 up = new Vector3(upX, upY, upZ);
+            Cartographic3 eye = new Cartographic3(eyeLon, eyeLat, eyeHeight);
+            Cartographic3 target = new Cartographic3(targetLon, targetLat, targetHeight);
+            Cartesian3 up = new Cartesian3(upX, upY, upZ);
 
             var data = new CameraData(eye, target, up, fov);
             _hub.eventRegistry.UpdateCamera.fire(data);

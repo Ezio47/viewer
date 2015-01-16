@@ -5,10 +5,10 @@
 part of rialto.viewer;
 
 class AxesShape extends Shape {
-    Vector3 origin;
+    Cartographic3 origin;
     Vector3 length;
 
-    AxesShape(Vector3 this.origin, Vector3 this.length) : super("axes") {
+    AxesShape(Cartographic3 this.origin, Vector3 this.length) : super("axes") {
         _primitive = _createCesiumObject();
     }
 

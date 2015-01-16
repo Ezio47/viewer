@@ -5,10 +5,10 @@
 part of rialto.viewer;
 
 class MeasurementShape extends Shape {
-    Vector3 _point1;
-    Vector3 _point2;
+    Cartographic3 _point1;
+    Cartographic3 _point2;
 
-    MeasurementShape(Vector3 this._point1, Vector3 this._point2) : super("measurement") {
+    MeasurementShape(Cartographic3 this._point1, Cartographic3 this._point2) : super("measurement") {
         isSelectable = true;
         _primitive = _createCesiumObject();
     }

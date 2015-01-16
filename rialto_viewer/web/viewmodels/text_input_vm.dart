@@ -5,8 +5,6 @@
 part of rialto.viewer;
 
 
-// BUG: make check to see if data has changed or not
-
 class TextInputVM extends ViewModel {
     InputElement _inputElement;
     String defaultValue;

@@ -17,8 +17,8 @@ class Renderer {
 
     Camera camera;
 
-    Vector3 _cloudMin;
-    Vector3 _cloudMax;
+    Cartographic3 _cloudMin;
+    Cartographic3 _cloudMax;
     Vector3 _cloudLen;
 
     bool updateNeeded;
@@ -50,15 +50,15 @@ class Renderer {
         _hub.shapesList.forEach((s) => s.remove());
         _hub.shapesList.clear();
 
-        _cloudMin = _renderSource.min;
-        _cloudMax = _renderSource.max;
+        _cloudMin = new Cartographic3.fromVector3(_renderSource.min);
+        _cloudMax = new Cartographic3.fromVector3(_renderSource.max);
         _cloudLen = _renderSource.len;
 
-        camera.changeDataExtents(_cloudMin.x, _cloudMin.y, _cloudMax.x, _cloudMax.y);
+        camera.changeDataExtents(_cloudMin.longitude, _cloudMin.latitude, _cloudMax.longitude, _cloudMax.latitude);
 
         if (_renderSource.length == 0) {
             // a reasonable default
-            _cloudMin = new Vector3.zero();
+            _cloudMin = new Cartographic3.zero();
             _cloudLen = new Vector3(1.0, 1.0, 1.0);
         }
 

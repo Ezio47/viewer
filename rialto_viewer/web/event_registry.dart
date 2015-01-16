@@ -111,9 +111,9 @@ class DisplayLayerData {
 
 class CameraData {
     int mode; // 0:normal, 1:worldview, 2:dataview
-    Vector3 eye; // cartographic
-    Vector3 target; // cartographic
-    Vector3 up; // cartesian
+    Cartographic3 eye; // cartographic
+    Cartographic3 target; // cartographic
+    Cartesian3 up; // cartesian
     double fov;
     CameraData(this.eye, this.target, this.up, this.fov) : mode=0;
     CameraData.fromMode(this.mode);

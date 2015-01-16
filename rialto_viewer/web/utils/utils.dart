@@ -34,6 +34,11 @@ class Utils {
         return s;
     }
 
+    static String printc(Cartographic3 v, [int prec = 2]) {
+        var s = Utils.printv3(v.longitude, v.latitude, v.height, prec);
+        return s;
+    }
+
     static String printv3(double x, double y, double z, [int prec = 1]) {
         var s = "${x.toStringAsFixed(prec)},${y.toStringAsFixed(prec)},${z.toStringAsFixed(prec)}";
         return s;
