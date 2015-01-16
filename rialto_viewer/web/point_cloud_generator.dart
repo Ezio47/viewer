@@ -48,6 +48,21 @@ class PointCloudGenerator {
         return cloud;
     }
 
+    static PointCloud fromRawInit(String webpath, String displayName) {
+        var cloud = new PointCloud(webpath, displayName);
+
+        cloud.createDimension("positions.x");
+        cloud.createDimension("positions.y");
+        cloud.createDimension("positions.z");
+
+        return cloud;
+    }
+
+    static PointCloud fromRawAdd(PointCloud cloud, String name, Float32List data) {
+        cloud.addDimensionData(name, data);
+        return cloud;
+    }
+
     static PointCloud generate(String webpath, String displayName) {
         switch (webpath) {
             case "/dir2/line.dat":

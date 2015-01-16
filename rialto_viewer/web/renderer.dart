@@ -58,14 +58,14 @@ class Renderer {
             camera.changeDataExtents(_cloudMin.longitude, _cloudMin.latitude, _cloudMax.longitude, _cloudMax.latitude);
         }
 
-        if (_renderSource.length > 0) {
+        if (_renderSource.numPoints > 0) {
             // axes model space is (0 .. 0.25 * cloudLen)
             final cloudLen14 = _cloudLen / 4.0;
             _axesShape = new AxesShape(_cloudMin, cloudLen14);
             _hub.shapesList.add(_axesShape);
         }
 
-        if (_renderSource.length > 0) {
+        if (_renderSource.numPoints > 0) {
             // bbox model space is (cloudMin....cloudMax)
             _bboxShape = new BboxShape(_cloudMin, _cloudMax);
             _hub.shapesList.add(_bboxShape);

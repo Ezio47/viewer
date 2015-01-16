@@ -19,6 +19,10 @@ class RenderablePointCloud {
         pointCloud = pc;
         visible = true;
 
+        min = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
+        max = new Vector3(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
+        len = new Vector3.zero();
+
         _createRenderArrays();
         _computeBounds();
     }
@@ -31,9 +35,15 @@ class RenderablePointCloud {
         double ymax = pointCloud.maximum("positions.y");
         double zmax = pointCloud.maximum("positions.z");
 
-        min = new Vector3(xmin, ymin, zmin);
-        max = new Vector3(xmax, ymax, zmax);
-        len = new Vector3(xmax - xmin, ymax - ymin, zmax - zmin);
+        min.x = xmin;
+        min.y = ymin;
+        min.z = zmin;
+        max.x = xmax;
+        max.y = ymax;
+        max.z = zmax;
+        len.x = xmax - xmin;
+        len.y = ymax - ymin;
+        len.z = zmax - zmin;
 
         print("Bounds: min=${Utils.printv(min)} max=${Utils.printv(max)} len=${Utils.printv(len)}");
     }
@@ -48,11 +58,14 @@ class RenderablePointCloud {
 
         int idx = 0;
         final int numTiles = pointCloud.dimensions["positions.x"].list.length;
-        //log("Reading back $numTiles");
+        log("Reading back $numTiles");
 
         for (int t = 0; t < numTiles; t++) {
+            log("reading $t for x");
             PointCloudTile xTile = pointCloud.dimensions["positions.x"].list[t];
+            log("reading $t for y");
             PointCloudTile yTile = pointCloud.dimensions["positions.y"].list[t];
+            log("reading $t for z");
             PointCloudTile zTile = pointCloud.dimensions["positions.z"].list[t];
 
             final int tileSize = xTile.data.length;

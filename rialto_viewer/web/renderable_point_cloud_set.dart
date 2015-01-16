@@ -9,14 +9,14 @@ class RenderablePointCloudSet {
     Hub _hub;
     List<RenderablePointCloud> renderablePointClouds = new List<RenderablePointCloud>();
     Vector3 min, max, len;
-    int numPoints;
+    int numPoints = 0;
     String _colorRamp = "Spectral";
 
     RenderablePointCloudSet() {
         _hub = Hub.root;
 
-        min = new Vector3.zero();
-        max = new Vector3.zero();
+        min = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
+        max = new Vector3(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
         len = new Vector3.zero();
 
         _hub.eventRegistry.DisplayLayer.subscribe(_handleDisplayLayer);
@@ -69,17 +69,16 @@ class RenderablePointCloudSet {
     }
 
     void _computeBounds() {
+        min.x = min.y = min.z = double.MAX_FINITE;
+        max.x = max.y = max.z = -double.MAX_FINITE;
+        len.x = len.y = len.z = 0.0;
+
+        numPoints = 0;
+
         if (renderablePointClouds.length == 0) {
-            min = new Vector3.zero();
-            max = new Vector3.zero();
-            len = new Vector3.zero();
             return;
         }
 
-        renderablePointClouds.first.min.copyInto(min);
-        renderablePointClouds.first.max.copyInto(max);
-
-        numPoints = 0;
         for (var cloud in renderablePointClouds) {
             min = Utils.vectorMinV(min, cloud.min);
             max = Utils.vectorMaxV(max, cloud.max);

@@ -14,7 +14,7 @@ abstract class Comms {
     void open();
     void close();
     Future<String> readAsString(String path);
-    Future<Float32List> readAsBytes(String path);
+    Future<Float32List> readAsBytes(String path, handler);
 }
 
 
@@ -55,7 +55,7 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<Float32List> readAsBytes(String webpath) {
+    Future<Float32List> readAsBytes(String webpath, handler) {
         Completer c = new Completer();
 
         WebSocket ws = new WebSocket('ws://localhost:12345/points/');
@@ -69,12 +69,13 @@ class HttpComms extends Comms {
             ws.binaryType = "arraybuffer";
             ws.onMessage.listen((MessageEvent e) {
                 ByteBuffer buf = e.data;
-                bufs.add(buf);
+                handler(buf);
+                /*bufs.add(buf);
                 print("read ${buf.lengthInBytes} bytes");
-                siz += buf.lengthInBytes;
+                siz += buf.lengthInBytes;*/
             });
             ws.onClose.listen((_) {
-                var bigbuf = new Float32List(siz ~/ 4);
+                /*var bigbuf = new Float32List(siz ~/ 4);
                 int j = 0;
                 for (var buf in bufs) {
                     for (int i = 0; i < buf.lengthInBytes ~/ 4; i++) {
@@ -84,7 +85,8 @@ class HttpComms extends Comms {
                     }
                 }
                 assert(j * 4 == siz);
-                c.complete(bigbuf);
+                c.complete(bigbuf);*/
+                c.complete(null);
             });
             ws.onError.listen((_) {
                 assert(false);
@@ -99,6 +101,29 @@ class HttpComms extends Comms {
     }
 }
 
+class _ReadBuffer {
+    int maxsize;
+    ByteData buffer;
+    int currentMax;
+
+    _ReadBuffer(int this.maxsize) {
+        buffer = new ByteData(maxsize);
+        currentMax = 0;
+    }
+
+    void push(ByteBuffer data){
+        int p = 0;
+        while (p < data.lengthInBytes) {
+            append min (num bytes needed, num bytes avail)
+            advance p
+            flush check
+        }
+    }
+
+    void flush() {
+
+    }
+}
 
 class FauxComms extends Comms {
 
@@ -113,7 +138,7 @@ class FauxComms extends Comms {
     }
 
     @override
-    Future<Float32List> readAsBytes(String path) {
+    Future<Float32List> readAsBytes(String path, handler) {
         throw new UnimplementedError();
     }
 

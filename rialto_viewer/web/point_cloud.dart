@@ -32,6 +32,7 @@ class PointCloud {
     double maximum(String name) => dimensions[name].maximum;
 
     void createDimension(String name) {
+        assert(!dimensions.containsKey(name));
         dimensions[name] = new PointCloudDimTiles(name);
     }
 
@@ -70,10 +71,12 @@ class PointCloud {
 class PointCloudTile {
     String dimension;
     Float32List data;
-    double minimum, maximum;
+    double minimum = double.MAX_FINITE;
+    double maximum = -double.MAX_FINITE;
 
-    PointCloudTile(String dimension, Float32List srcData) : this.dimension = dimension {
-        data = PointCloudTile._clone(srcData);
+    PointCloudTile(String dimension, Float32List srcData)
+            : this.dimension = dimension,
+              data = PointCloudTile._clone(srcData) {
 
         _computeBounds();
     }
@@ -81,10 +84,7 @@ class PointCloudTile {
     void _computeBounds() {
         if (data.length == 0) return;
 
-        minimum = data[0];
-        maximum = data[0];
-
-        for (int i = 1; i < data.length; i++) {
+        for (int i = 0; i < data.length; i++) {
             double v = data[i];
             minimum = min(minimum, v);
             maximum = max(maximum, v);
@@ -104,15 +104,15 @@ class PointCloudTile {
 // all the tiles for a given dimension
 class PointCloudDimTiles {
     String dimension;
-    List<PointCloudTile> list;
-    double minimum, maximum;
-    int numPoints;
+    List<PointCloudTile> list = new List<PointCloudTile>();
+    double minimum = double.MAX_FINITE;
+    double maximum = -double.MAX_FINITE;
+    int numPoints = 0;
 
-    PointCloudDimTiles(String this.dimension)
-            : list = new List<PointCloudTile>(),
-              numPoints = 0;
+    PointCloudDimTiles(String this.dimension);
 
     void add(Float32List data) {
+        assert(data.length > 0);
         PointCloudTile tile = new PointCloudTile(dimension, data);
         list.add(tile);
 
@@ -123,13 +123,6 @@ class PointCloudDimTiles {
     void _updateBounds(PointCloudTile tile) {
         assert(tile != null);
         if (tile.data.length == 0) return;
-
-        if (minimum == null) {
-            assert(maximum == null);
-            minimum = tile.minimum;
-            maximum = tile.maximum;
-            return;
-        }
 
         minimum = min(minimum, tile.minimum);
         maximum = max(maximum, tile.maximum);
