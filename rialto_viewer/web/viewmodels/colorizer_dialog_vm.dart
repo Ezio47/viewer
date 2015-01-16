@@ -4,6 +4,7 @@
 
 part of rialto.viewer;
 
+// BUG: colorizer should affect only one layer, not all
 
 class ColorizerDialogVM extends DialogVM {
     Hub _hub;

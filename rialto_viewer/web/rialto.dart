@@ -39,7 +39,6 @@ part 'cesium/camera.dart';
 part 'cesium/cesium_bridge.dart';
 part 'cesium/cloud_shape.dart';
 part 'cesium/measurement_shape.dart';
-part 'cesium/picker.dart';
 part 'cesium/shape.dart';
 
 part 'utils/color.dart';

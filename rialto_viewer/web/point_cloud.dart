@@ -13,9 +13,9 @@ class PointCloud {
     String displayName;
     String webpath;
     var dimensions = new Map<String, Float32List>();
-    var minimum = new Map<String, double>();
-    var maximum = new Map<String, double>();
-    var average = new Map<String, double>();
+    Map<String, double> minimum = new Map<String, double>();
+    Map<String, double> maximum = new Map<String, double>();
+    Map<String, double> average = new Map<String, double>();
     int numPoints;
 
 

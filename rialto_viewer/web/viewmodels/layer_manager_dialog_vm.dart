@@ -17,7 +17,7 @@ class LayerManagerDialogVM extends DialogVM {
         _listbox = new ListBoxVM<_LayerItem>("layerManagerDialog_layers");
 
         _colorizer = new ColorizerDialogVM("colorizerDialog");
-        _info = new InfoVM("infoDialog");
+        _info = new InfoVM("infoDialog", this);
 
         _hub = Hub.root;
 
@@ -32,7 +32,6 @@ class LayerManagerDialogVM extends DialogVM {
             _listbox.removeWhere((f) => f.webpath == webpath);
             hasData = _listbox.length > 0;
         });
-
     }
 
     @override
@@ -40,8 +39,13 @@ class LayerManagerDialogVM extends DialogVM {
 
     @override
     void _close(bool okay) {}
-    void openFile(Event e, var detail, Node target) {
 
+    PointCloud get currentSelection {
+        var list = _listbox.getCurrentSelection();
+        if (list==null) return null;
+        String webpath = list[0].webpath;
+        var rpc = _hub.renderablePointCloudSet.getCloud(webpath);
+        return rpc.pointCloud;
     }
 
     void toggleLayer(Event e, var detail, Node target) {

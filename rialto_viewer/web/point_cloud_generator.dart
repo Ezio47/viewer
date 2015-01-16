@@ -181,17 +181,18 @@ class _Terrain {
         double zscale;
 
         switch (which) {
-            case 0:
-                xmin = 0.0;
-                ymin = 0.0;
-                xlen = 1.0;
-                ylen = 1.0;
-                break;
             case 1:
                 xmin = -77.62549459934235;
                 ymin = 38.833895271724664;
-                xlen = 1.5;
-                ylen = 1.5;
+                xlen = 5.0;
+                ylen = 5.0;
+                zscale = 350.0;
+                break;
+            case 2:
+                xmin = -81.62549459934235;
+                ymin = 34.833895271724664;
+                xlen = 3.0;
+                ylen = 3.0;
                 zscale = 350.0;
                 break;
             default:

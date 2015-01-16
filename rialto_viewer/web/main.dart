@@ -34,7 +34,7 @@ void boot1() {
 
     hub.eventRegistry.OpenServerCompleted.subscribe0(() {
         hub.eventRegistry.OpenFile.fire("/terrain1.dat");
-        //hub.eventRegistry.OpenFile.fire("/terrain2.dat");
+        hub.eventRegistry.OpenFile.fire("/terrain2.dat");
     });
 
     hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {

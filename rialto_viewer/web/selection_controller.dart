@@ -38,8 +38,8 @@ class SelectionController implements IController {
     void _handleMouseDown(MouseData data) {
         if (!isRunning) return;
 
-        Shape s = _hub.picker.getCurrentShape();
-        if (s != null) _possibleShape = s;
+        //Shape s = _hub.picker.getCurrentShape();
+        //if (s != null) _possibleShape = s;
     }
 
     void _handleMouseUp(MouseData data) {

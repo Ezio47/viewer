@@ -24,10 +24,6 @@ class Hub {
     ModeController modeController;
     SelectionController selectionController;
 
-    InfoVM infobox; // BUG
-
-    Picker picker;
-
     // the global repo for loaded data
     RenderablePointCloudSet renderablePointCloudSet;
 
@@ -84,8 +80,6 @@ class Hub {
         selectionController = new SelectionController();
 
         renderablePointCloudSet = new RenderablePointCloudSet();
-
-        picker = new Picker();
 
         renderer = new Renderer(renderablePointCloudSet);
 

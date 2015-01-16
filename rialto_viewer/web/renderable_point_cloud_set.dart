@@ -55,6 +55,11 @@ class RenderablePointCloudSet {
         _computeBounds();
     }
 
+    RenderablePointCloud getCloud(String webpath) {
+        var obj = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath, orElse: () => null);
+        return obj;
+    }
+
     void _handleDisplayLayer(DisplayLayerData data) {
         final String webpath = data.webpath;
         final bool visible = data.visible;
