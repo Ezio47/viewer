@@ -1,5 +1,5 @@
-PDAL_INC=/Users/mgerlek/work/dev/PDAL/include
-PDAL_LIB=/Users/mgerlek/work/dev/PDAL/lib
+PDAL_INC=/Users/$(USER)/work/dev/build/pdal/include
+PDAL_LIB=/Users/$(USER)/work/dev/build/pdal/lib
 
 CC=g++
 LD=g++
