@@ -25,7 +25,9 @@ ProxyFileSystem fileSystem;
 
 
 void main() {
-    var srcDir = "/Users/mgerlek/work/data";
+    var env = Platform.environment["HOME"];
+    var srcDir = "$env/work/data";
+    print("Running in $srcDir");
 
     buildFileSystem(srcDir);
 
