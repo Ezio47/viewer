@@ -14,7 +14,7 @@ abstract class Comms {
     void open();
     void close();
     Future<String> readAsString(String path);
-    Future<Float32List> readAsBytes(String path, handler);
+    Future<bool> readAsBytes(String path, FlushFunc handler);
 }
 
 
@@ -55,37 +55,23 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<Float32List> readAsBytes(String webpath, handler) {
+    Future<bool> readAsBytes(String webpath, FlushFunc handler) {
         Completer c = new Completer();
+
+        _ReadBuffer readBuffer = new _ReadBuffer(3*4*1024*10, handler);
 
         WebSocket ws = new WebSocket('ws://localhost:12345/points/');
         ws.onOpen.listen((_) {
             print("socket opened");
 
-            var bufs = new List<ByteBuffer>();
-            int siz = 0;
-
             ws.send(webpath); // {+file}
             ws.binaryType = "arraybuffer";
             ws.onMessage.listen((MessageEvent e) {
                 ByteBuffer buf = e.data;
-                handler(buf);
-                /*bufs.add(buf);
-                print("read ${buf.lengthInBytes} bytes");
-                siz += buf.lengthInBytes;*/
+                readBuffer.push(buf);
             });
             ws.onClose.listen((_) {
-                /*var bigbuf = new Float32List(siz ~/ 4);
-                int j = 0;
-                for (var buf in bufs) {
-                    for (int i = 0; i < buf.lengthInBytes ~/ 4; i++) {
-                        Float32List tmp = new Float32List.view(buf);
-                        bigbuf[j] = tmp[i];
-                        j++;
-                    }
-                }
-                assert(j * 4 == siz);
-                c.complete(bigbuf);*/
+                readBuffer.flush(force:true);
                 c.complete(null);
             });
             ws.onError.listen((_) {
@@ -101,27 +87,56 @@ class HttpComms extends Comms {
     }
 }
 
+typedef FlushFunc(ByteBuffer, used);
+
 class _ReadBuffer {
     int maxsize;
-    ByteData buffer;
-    int currentMax;
+    Uint8List buf;
+    int used;
+    FlushFunc flushfunc;
 
-    _ReadBuffer(int this.maxsize) {
-        buffer = new ByteData(maxsize);
-        currentMax = 0;
+    _ReadBuffer(int this.maxsize, FlushFunc this.flushfunc) {
+        open();
     }
 
-    void push(ByteBuffer data){
+    void open() {
+        buf = null;
+        used = 0;
+    }
+
+    void push(ByteBuffer src) {
         int p = 0;
-        while (p < data.lengthInBytes) {
-            append min (num bytes needed, num bytes avail)
-            advance p
-            flush check
+        while (p < src.lengthInBytes) {
+            int amt = min(maxsize - used, src.lengthInBytes  - p);
+            append(src, p, amt);
+            flush();
+            p += amt;
         }
     }
 
-    void flush() {
+    void close() {
+        flush(force:true);
+    }
 
+    void append(ByteBuffer src, int p, int amt) {
+        Uint8List src8 = new Uint8List.view(src);
+        assert(used + amt <= maxsize);
+        if (buf == null) {
+            assert(used == 0);
+            buf = new Uint8List(maxsize);
+        }
+        for (int i=p; i<p+amt; i++) {
+            buf[used] = src8[i];
+            used++;
+        }
+    }
+
+    void flush({bool force:false}) {
+        if (buf == null || used == 0) return;
+        if (used < maxsize && !force) return;
+        flushfunc(buf.buffer, used);
+        buf = null;
+        used = 0;
     }
 }
 
@@ -138,7 +153,7 @@ class FauxComms extends Comms {
     }
 
     @override
-    Future<Float32List> readAsBytes(String path, handler) {
+    Future<bool> readAsBytes(String path, FlushFunc handler) {
         throw new UnimplementedError();
     }
 

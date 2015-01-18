@@ -118,6 +118,8 @@ class PointCloudDimTiles {
 
         _updateBounds(tile);
         numPoints += tile.numPoints;
+
+        print("$dimension has ${list.length} tiles");
     }
 
     void _updateBounds(PointCloudTile tile) {

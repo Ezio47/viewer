@@ -213,12 +213,11 @@ class FileProxy extends ProxyItem {
 
         PointCloud cloud = PointCloudGenerator.fromRawInit(webpath, displayName);
 
-        var handler = (ByteBuffer buf) {
-            int numBytes = buf.lengthInBytes;
-            log("handler: $numBytes");
+        var handler = (ByteBuffer buf, int used) {
+            int numBytes = used;
             int numFloats = numBytes ~/ 4;
             int numPoints = numFloats ~/ 3;
-            assert(numPoints * 3 * 4 <= numBytes);//assert(numPoints * 3 * 4 == numBytes);
+            assert(numPoints * 3 * 4 == numBytes);
 
             Float32List xlist = new Float32List(numPoints);
             Float32List ylist = new Float32List(numPoints);
@@ -229,7 +228,6 @@ class FileProxy extends ProxyItem {
                 xlist[i] = tmp[i * 3 + 0];
                 ylist[i] = tmp[i * 3 + 1];
                 zlist[i] = tmp[i * 3 + 2];
-                log("(${xlist[i]}, ${ylist[i]}, ${zlist[i]})");
             }
 
             PointCloudGenerator.fromRawAdd(cloud, "positions.x", xlist);
@@ -237,8 +235,7 @@ class FileProxy extends ProxyItem {
             PointCloudGenerator.fromRawAdd(cloud, "positions.z", zlist);
         };
 
-        var f = fileSystem.comms.readAsBytes(webpath, handler).then((Float32List data) {
-
+        var f = fileSystem.comms.readAsBytes(webpath, handler).then((bool v) {
             return Utils.toFuture(cloud);
         });
         return f;

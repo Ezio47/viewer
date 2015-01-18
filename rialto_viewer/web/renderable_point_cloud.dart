@@ -58,14 +58,14 @@ class RenderablePointCloud {
 
         int idx = 0;
         final int numTiles = pointCloud.dimensions["positions.x"].list.length;
-        log("Reading back $numTiles");
+        //log("Reading back $numTiles");
 
         for (int t = 0; t < numTiles; t++) {
-            log("reading $t for x");
+            //log("reading $t for x");
             PointCloudTile xTile = pointCloud.dimensions["positions.x"].list[t];
-            log("reading $t for y");
+            //log("reading $t for y");
             PointCloudTile yTile = pointCloud.dimensions["positions.y"].list[t];
-            log("reading $t for z");
+            //log("reading $t for z");
             PointCloudTile zTile = pointCloud.dimensions["positions.z"].list[t];
 
             final int tileSize = xTile.data.length;
