@@ -108,6 +108,7 @@ class PointCloudTile {
     Map<String, double> maximum;
 
     PointCloudTile(List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
+        log("making tile $id with $numPointsInTile");
 
         minimum = new Map<String, double>();
         maximum = new Map<String, double>();
@@ -156,10 +157,10 @@ class PointCloudTile {
 
         var xyzw = new Float32List(numPointsInTile * 4);
         for (int i = 0; i < numPointsInTile; i++) {
-            xyzw[i * 3 + 0] = xdata[i];
-            xyzw[i * 3 + 1] = ydata[i];
-            xyzw[i * 3 + 2] = zdata[i];
-            xyzw[i * 3 + 3] = wdata[i];
+            xyzw[i * 4 + 0] = xdata[i];
+            xyzw[i * 4 + 1] = ydata[i];
+            xyzw[i * 4 + 2] = zdata[i];
+            xyzw[i * 4 + 3] = wdata[i];
         }
 
         data[dim] = xyzw;

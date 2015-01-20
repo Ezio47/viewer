@@ -8,55 +8,64 @@ abstract class Colorizer {
     Colorizer();
 
     void run(PointCloud cloud) {
-        _algorithm(cloud.minimum["z"], cloud.maximum["z"], cloud.numPoints, cloud.tiles);
+        List<PointCloudTile> src = cloud.tiles;
+        cloud.tiles = new List<PointCloudTile>();
+
+        for (var oldTile in src) {
+            Float32List rgba = _algorithm(cloud.minimum["z"], cloud.maximum["z"], oldTile);
+
+            var newTile = cloud.createTile(oldTile.numPointsInTile);
+            newTile.data["xyz"] = oldTile.data["xyz"];
+            newTile.data["rgba"] = rgba;
+        }
+
+        Hub.root.renderer.updateNeeded = true;
     }
 
-    void _algorithm(double zmin, double zmax, int numPoints, List<PointCloudTile> tiles);
+    Float32List _algorithm(double zmin, double zmax, PointCloudTile tile);
 }
 
 
 class FauxColorizer extends Colorizer {
 
-    void _algorithm(double zmin, double zmax, int numPoints, List<PointCloudTile> tiles) {
-        for (var tile in tiles) {
-            Float32List newColors = new Float32List(tile.numPointsInTile * 4);
+    Float32List _algorithm(double zmin, double zmax, PointCloudTile tile) {
 
-            tile.data["old_rgba"] = tile.data["rgba"];
+        Float32List newColors = new Float32List(tile.numPointsInTile * 4);
 
-            var positions = tile.data["xyz"];
+        var positions = tile.data["xyz"];
 
-            double zLen = zmax - zmin;
+        double zLen = zmax - zmin;
 
-            for (int i = 0; i < tile.numPointsInTile; i++) {
-                double z = positions[i*3 + 2];
-                double c = (z - zmin) / zLen;
+        for (int i = 0; i < tile.numPointsInTile; i++) {
+            double z = positions[i * 3 + 2];
+            double c = (z - zmin) / zLen;
 
-                // clip, due to FP math
-                assert(c >= -0.00001 && c <= 1.00001);
-                if (c < 0.0) c = 0.0;
-                if (c > 1.0) c = 1.0;
+            // clip, due to FP math
+            assert(c >= -0.00001 && c <= 1.00001);
+            if (c < 0.0) c = 0.0;
+            if (c > 1.0) c = 1.0;
 
-                // a silly ramp
-                if (c < 0.3333) {
-                    newColors[i*4] = c * 3.0;
-                    newColors[i*4 + 1] = 0.0;
-                    newColors[i*4 + 2] = 0.0;
-                } else if (c < 0.6666) {
-                    newColors[i*4] = 0.0;
-                    newColors[i*4 + 1] = (c - 0.3333) * 3.0;
-                    newColors[i*4 + 2] = 0.0;
-                } else {
-                    newColors[i*4] = 0.0;
-                    newColors[i*4 + 1] = 0.0;
-                    newColors[i*4 + 2] = (c - 0.6666) * 3.0;
-                }
-                newColors[i*4 + 3] = 1.0;
+            // a silly ramp
+            if (c < 0.3333) {
+                newColors[i * 4] = c * 3.0;
+                newColors[i * 4 + 1] = 0.0;
+                newColors[i * 4 + 2] = 0.0;
+            } else if (c < 0.6666) {
+                newColors[i * 4] = 0.0;
+                newColors[i * 4 + 1] = (c - 0.3333) * 3.0;
+                newColors[i * 4 + 2] = 0.0;
+            } else {
+                newColors[i * 4] = 0.0;
+                newColors[i * 4 + 1] = 0.0;
+                newColors[i * 4 + 2] = (c - 0.6666) * 3.0;
             }
-
-            tile.data["rgba"] = newColors;
+            newColors[i * 4 + 3] = 1.0;
         }
+
+        return newColors;
     }
 }
+
 
 
 class RampColorizer extends Colorizer {
@@ -69,59 +78,53 @@ class RampColorizer extends Colorizer {
         return l;
     }
 
-    void _algorithm(double zmin, double zmax, int numPoints, List<PointCloudTile> tiles) {
-        for (var tile in tiles) {
-            Float32List newColors = new Float32List(tile.numPointsInTile * 4);
+    Float32List _algorithm(double zmin, double zmax, PointCloudTile tile) {
 
-            tile.data["old_rgba"] = tile.data["rgba"];
+        Float32List newColors = new Float32List(tile.numPointsInTile * 4);
 
-            var positions = tile.data["xyz"];
+        var positions = tile.data["xyz"];
 
-            assert(_Ramps.list.containsKey(_name));
+        assert(_Ramps.list.containsKey(_name));
 
-            final double zLen = zmax - zmin;
+        final double zLen = zmax - zmin;
 
-            for (int i = 0; i < tile.numPointsInTile; i++) {
-                final double z = positions[i*3 + 2];
-                if (!(z >= zmin)) {
-                    int x = 0;
+        for (int i = 0; i < tile.numPointsInTile; i++) {
+            final double z = positions[i * 3 + 2];
+            assert(z >= zmin);
+            double scaledZ = (z - zmin) / zLen;
+
+            // clip, due to FP math
+            assert(scaledZ >= -0.00001 && scaledZ <= 1.00001);
+            if (scaledZ < 0.0) scaledZ = 0.0;
+            if (scaledZ > 1.0) scaledZ = 1.0;
+
+            final List<_Stop> stops = _Ramps.list[_name];
+            assert(stops.length >= 2);
+            assert(stops[0].point == 0.0);
+            assert(stops[stops.length - 1].point == 1.0);
+
+            double startRange = stops[0].point;
+            double endRange;
+            _Color result = null;
+            for (int s = 1; s < stops.length; s++) {
+                endRange = stops[s].point;
+
+                if (scaledZ >= startRange && scaledZ <= endRange) {
+                    result = _interpolate(scaledZ, startRange, endRange, stops[s - 1].color, stops[s].color);
+                    break;
                 }
-                assert(z >= zmin);
-                double scaledZ = (z - zmin) / zLen;
 
-                // clip, due to FP math
-                assert(scaledZ >= -0.00001 && scaledZ <= 1.00001);
-                if (scaledZ < 0.0) scaledZ = 0.0;
-                if (scaledZ > 1.0) scaledZ = 1.0;
-
-                final List<_Stop> stops = _Ramps.list[_name];
-                assert(stops.length >= 2);
-                assert(stops[0].point == 0.0);
-                assert(stops[stops.length - 1].point == 1.0);
-
-                double startRange = stops[0].point;
-                double endRange;
-                _Color result = null;
-                for (int s = 1; s < stops.length; s++) {
-                    endRange = stops[s].point;
-
-                    if (scaledZ >= startRange && scaledZ <= endRange) {
-                        result = _interpolate(scaledZ, startRange, endRange, stops[s - 1].color, stops[s].color);
-                        break;
-                    }
-
-                    startRange = endRange;
-                }
-                assert(result != null);
-
-                newColors[i*4 + 0] = result.r / 255.0;
-                newColors[i*4 + 1] = result.g / 255.0;
-                newColors[i*4 + 2] = result.b / 255.0;
-                newColors[i*4 + 3] = 1.0;
+                startRange = endRange;
             }
+            assert(result != null);
 
-            tile.data["rbga"] = newColors;
+            newColors[i * 4 + 0] = result.r / 255.0;
+            newColors[i * 4 + 1] = result.g / 255.0;
+            newColors[i * 4 + 2] = result.b / 255.0;
+            newColors[i * 4 + 3] = 1.0;
         }
+
+        return newColors;
     }
 
     _Color _interpolate(double z, double startRange, double endRange, _Color startColor, _Color endColor) {

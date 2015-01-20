@@ -58,7 +58,9 @@ class HttpComms extends Comms {
     Future<bool> readAsBytes(String webpath, FlushFunc handler) {
         Completer c = new Completer();
 
-        _ReadBuffer readBuffer = new _ReadBuffer(3*4*1024*10, handler);
+        final int bytesPerPoint = 3 * 4 /* + 4*4 */;
+        final int pointsPerTile = 1024 * 16;
+        _ReadBuffer readBuffer = new _ReadBuffer(bytesPerPoint * pointsPerTile, handler);
 
         WebSocket ws = new WebSocket('ws://localhost:12345/points/');
         ws.onOpen.listen((_) {
@@ -71,7 +73,7 @@ class HttpComms extends Comms {
                 readBuffer.push(buf);
             });
             ws.onClose.listen((_) {
-                readBuffer.flush(force:true);
+                readBuffer.flush(force: true);
                 c.complete(null);
             });
             ws.onError.listen((_) {
@@ -107,7 +109,7 @@ class _ReadBuffer {
     void push(ByteBuffer src) {
         int p = 0;
         while (p < src.lengthInBytes) {
-            int amt = min(maxsize - used, src.lengthInBytes  - p);
+            int amt = min(maxsize - used, src.lengthInBytes - p);
             append(src, p, amt);
             flush();
             p += amt;
@@ -115,7 +117,7 @@ class _ReadBuffer {
     }
 
     void close() {
-        flush(force:true);
+        flush(force: true);
     }
 
     void append(ByteBuffer src, int p, int amt) {
@@ -125,13 +127,13 @@ class _ReadBuffer {
             assert(used == 0);
             buf = new Uint8List(maxsize);
         }
-        for (int i=p; i<p+amt; i++) {
+        for (int i = p; i < p + amt; i++) {
             buf[used] = src8[i];
             used++;
         }
     }
 
-    void flush({bool force:false}) {
+    void flush({bool force: false}) {
         if (buf == null || used == 0) return;
         if (used < maxsize && !force) return;
         flushfunc(buf.buffer, used);

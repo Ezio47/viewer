@@ -13,6 +13,8 @@ part of rialto.viewer;
 class PointCloudGenerator {
 
     static PointCloud fromRaw(Float32List floats, String webpath, String displayName) {
+        assert(false);
+
         final int numFloats = floats.length;
         final int numPoints = numFloats ~/ 3;
 
@@ -49,6 +51,8 @@ class PointCloudGenerator {
         assert(floatsIndex == numPoints * 3);
 
         print("made $webpath: $numPoints points");
+
+        cloud.updateBounds();
 
         return cloud;
     }
@@ -96,13 +100,14 @@ class PointCloudGenerator {
         final int upperbound = sqrt(numPoints).ceil();
         int totPoints = 0;
 
-        final int numTiles = random.nextInt(upperbound);
+        final int numTiles = random.nextInt(upperbound) + 1;
         //log("Will use $numTiles tiles");
 
         for (int t = 0; t < numTiles; t++) {
 
-            final int numPointsInTile = random.nextInt(upperbound);
-            //log("Tile $t size: $tileSize");
+            // note we miust have at least one point else Cs dies later on (BUG)
+            final int numPointsInTile = random.nextInt(upperbound) + 1;
+            //log("Tile $t numPointsInTile: $numPointsInTile");
 
             var positionsX = new Float32List(numPointsInTile);
             var positionsY = new Float32List(numPointsInTile);
@@ -139,6 +144,8 @@ class PointCloudGenerator {
             tile.addData_F32x3("xyz", positionsX, positionsY, positionsZ);
             tile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
         }
+
+        cloud.updateBounds();
 
         return cloud;
     }
@@ -181,6 +188,8 @@ class PointCloudGenerator {
             thisTile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
         }
         assert(positionsIndex == numPoints);
+
+        cloud.updateBounds();
 
         return cloud;
     }
