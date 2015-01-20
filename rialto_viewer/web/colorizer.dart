@@ -8,31 +8,29 @@ abstract class Colorizer {
     Colorizer();
 
     void run(PointCloud cloud) {
-        List<PointCloudTile> src = cloud.tiles;
-        cloud.tiles = new List<PointCloudTile>();
+        for (var tile in cloud.tiles) {
+            Uint8List rgba = _algorithm(cloud.minimum["z"], cloud.maximum["z"], tile);
 
-        for (var oldTile in src) {
-            Float32List rgba = _algorithm(cloud.minimum["z"], cloud.maximum["z"], oldTile);
-
-            oldTile.addData_F32x4("rgba", rgba);
-            oldTile.updateBounds();
-            oldTile.updateShape();
+            tile.addData_U8x4("rgba", rgba);
+            tile.updateBounds();
+            tile.updateShape();
         }
 
         Hub.root.renderer.updateNeeded = true;
     }
 
-    Float32List _algorithm(double zmin, double zmax, PointCloudTile tile);
+    Uint8List _algorithm(double zmin, double zmax, PointCloudTile tile);
 }
 
 
 class FauxColorizer extends Colorizer {
 
-    Float32List _algorithm(double zmin, double zmax, PointCloudTile tile) {
+    Uint8List _algorithm(double zmin, double zmax, PointCloudTile tile) {
 
-        Float32List newColors = new Float32List(tile.numPointsInTile * 4);
+        var newColors = new Uint8List(tile.numPointsInTile * 4);
 
-        var positions = tile.data["xyz"];
+        assert(tile.data["xyz"] is Float32List);
+        Float32List positions = tile.data["xyz"];
 
         double zLen = zmax - zmin;
 
@@ -47,19 +45,19 @@ class FauxColorizer extends Colorizer {
 
             // a silly ramp
             if (c < 0.3333) {
-                newColors[i * 4] = c * 3.0;
-                newColors[i * 4 + 1] = 0.0;
-                newColors[i * 4 + 2] = 0.0;
+                newColors[i * 4] = ((c * 3.0) * 255.0).toInt();
+                newColors[i * 4 + 1] = 0;
+                newColors[i * 4 + 2] = 0;
             } else if (c < 0.6666) {
-                newColors[i * 4] = 0.0;
-                newColors[i * 4 + 1] = (c - 0.3333) * 3.0;
-                newColors[i * 4 + 2] = 0.0;
+                newColors[i * 4] = 0;
+                newColors[i * 4 + 1] = (((c - 0.3333) * 3.0) *255.0).toInt();
+                newColors[i * 4 + 2] = 0;
             } else {
-                newColors[i * 4] = 0.0;
-                newColors[i * 4 + 1] = 0.0;
-                newColors[i * 4 + 2] = (c - 0.6666) * 3.0;
+                newColors[i * 4] = 0;
+                newColors[i * 4 + 1] = 0;
+                newColors[i * 4 + 2] = (((c - 0.6666) * 3.0) * 255.0).toInt();
             }
-            newColors[i * 4 + 3] = 1.0;
+            newColors[i * 4 + 3] = 255;
         }
 
         return newColors;
@@ -78,11 +76,12 @@ class RampColorizer extends Colorizer {
         return l;
     }
 
-    Float32List _algorithm(double zmin, double zmax, PointCloudTile tile) {
+    Uint8List _algorithm(double zmin, double zmax, PointCloudTile tile) {
 
-        Float32List newColors = new Float32List(tile.numPointsInTile * 4);
+        var newColors = new Uint8List(tile.numPointsInTile * 4);
 
-        var positions = tile.data["xyz"];
+        assert(tile.data["xyz"] is Float32List);
+        Float32List positions = tile.data["xyz"];
 
         assert(_Ramps.list.containsKey(_name));
 
@@ -118,10 +117,13 @@ class RampColorizer extends Colorizer {
             }
             assert(result != null);
 
-            newColors[i * 4 + 0] = result.r / 255.0;
-            newColors[i * 4 + 1] = result.g / 255.0;
-            newColors[i * 4 + 2] = result.b / 255.0;
-            newColors[i * 4 + 3] = 1.0;
+            assert(result.r >= 0 && result.r <= 255);
+            assert(result.g >= 0 && result.g <= 255);
+            assert(result.b >= 0 && result.b <= 255);
+            newColors[i * 4 + 0] = result.r;
+            newColors[i * 4 + 1] = result.g;
+            newColors[i * 4 + 2] = result.b;
+            newColors[i * 4 + 3] = 255;
         }
 
         return newColors;

@@ -10,7 +10,7 @@ class PointCloudTile {
     int numPointsInTile;
     int id;
     List<String> dimensionNames;
-    Map<String, Float32List> data;
+    Map<String, TypedData> data;
     Map<String, double> minimum;
     Map<String, double> maximum;
     CloudShape shape;
@@ -20,7 +20,7 @@ class PointCloudTile {
 
         minimum = new Map<String, double>();
         maximum = new Map<String, double>();
-        data = new Map<String, Float32List>();
+        data = new Map<String, TypedData>();
 
         dimensionNames.forEach((dimensionName) {
             if (dimensionName == "xyz") {
@@ -53,7 +53,9 @@ class PointCloudTile {
         var rgba = data["rgba"];
         if (rgba == null) return;
 
-        if (shape != null) shape.remove();
+        if (shape != null) {
+            shape.remove();
+        }
 
         shape = new CloudShape(xyz, rgba);
         shape.name = "{pointCloud.webpath}-$id";
@@ -77,15 +79,15 @@ class PointCloudTile {
         addData_F32x3(dim, xyz);
     }
 
-    void addData_F32x4(String dim, Float32List xyzw) {
+    void addData_U8x4(String dim, Uint8List xyzw) {
         assert(dimensionNames.contains(dim));
         data[dim] = xyzw;
     }
 
-    void addData_F32x4_from4(String dim, Float32List xdata, Float32List ydata, Float32List zdata, Float32List wdata) {
+    void addData_U8x4_from4(String dim, Uint8List xdata, Uint8List ydata, Uint8List zdata, Uint8List wdata) {
         assert(dimensionNames.contains(dim));
 
-        var xyzw = new Float32List(numPointsInTile * 4);
+        var xyzw = new Uint8List(numPointsInTile * 4);
         for (int i = 0; i < numPointsInTile; i++) {
             xyzw[i * 4 + 0] = xdata[i];
             xyzw[i * 4 + 1] = ydata[i];
@@ -93,16 +95,18 @@ class PointCloudTile {
             xyzw[i * 4 + 3] = wdata[i];
         }
 
-        addData_F32x4(dim, xyzw);
+        addData_U8x4(dim, xyzw);
     }
 
     void updateBounds() {
         for (var dimensionName in dimensionNames) {
             if (dimensionName == "xyz") {
+                assert(data["xyz"] is Float32List);
+                Float32List d = data["xyz"];
                 for (int i = 0; i < numPointsInTile; i++) {
-                    double x = data["xyz"][i * 3];
-                    double y = data["xyz"][i * 3 + 1];
-                    double z = data["xyz"][i * 3 + 2];
+                    double x = d[i * 3];
+                    double y = d[i * 3 + 1];
+                    double z = d[i * 3 + 2];
                     minimum["x"] = min(minimum["x"], x);
                     maximum["x"] = max(maximum["x"], x);
                     minimum["y"] = min(minimum["y"], y);
@@ -111,11 +115,13 @@ class PointCloudTile {
                     maximum["z"] = max(maximum["z"], z);
                 }
             } else if (dimensionName == "rgba") {
+                assert(data["rgba"] is Uint8List);
+                Uint8List d = data["rgba"];
                 for (int i = 0; i < numPointsInTile; i++) {
-                    double r = data["rgba"][i * 4];
-                    double g = data["rgba"][i * 4 + 1];
-                    double b = data["rgba"][i * 4 + 2];
-                    double a = data["rgba"][i * 4 + 3];
+                    double r = d[i * 4].toDouble();
+                    double g = d[i * 4 + 1].toDouble();
+                    double b = d[i * 4 + 2].toDouble();
+                    double a = d[i * 4 + 3].toDouble();
                     minimum["r"] = min(minimum["r"], r);
                     maximum["r"] = max(maximum["r"], r);
                     minimum["g"] = min(minimum["g"], g);
@@ -126,18 +132,14 @@ class PointCloudTile {
                     maximum["a"] = max(maximum["a"], a);
                 }
             } else {
+                assert(data[dimensionName] is Float32List);
+                Float32List d = data[dimensionName];
                 for (int i = 0; i < numPointsInTile; i++) {
-                    double v = data[dimensionName][i];
+                    double v = d[i];
                     minimum[dimensionName] = min(minimum[dimensionName], v);
                     maximum[dimensionName] = max(maximum[dimensionName], v);
                 }
             }
         }
     }
-
-    //static Float32List _clone(Float32List src) {
-    //    var dest = new Float32List(src.length);
-    //    for (int i = 0; i < src.length; i++) dest[i] = src[i];
-    //    return dest;
-    //}
 }

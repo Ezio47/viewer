@@ -95,7 +95,7 @@ class CesiumBridge {
         return prim;
     }
 
-    dynamic createCloud(int numPoints, Float32List points, Float32List colors) {
+    dynamic createCloud(int numPoints, Float32List points, Uint8List colors) {
         assert(numPoints >= 0);
         assert(points.length == numPoints * 3);
         assert(colors.length == numPoints * 4);
@@ -109,10 +109,10 @@ class CesiumBridge {
             points2[i * 3 + 1] = points[i * 3 + 1];
             points2[i * 3 + 2] = points[i * 3 + 2];
 
-            colors2[i * 4 + 0] = (colors[i * 4 + 0] * 255.0).toInt();
-            colors2[i * 4 + 1] = (colors[i * 4 + 1] * 255.0).toInt();
-            colors2[i * 4 + 2] = (colors[i * 4 + 2] * 255.0).toInt();
-            colors2[i * 4 + 3] = (colors[i * 4 + 3] * 255.0).toInt();
+            colors2[i * 4 + 0] = colors[i * 4 + 0];
+            colors2[i * 4 + 1] = colors[i * 4 + 1];
+            colors2[i * 4 + 2] = colors[i * 4 + 2];
+            colors2[i * 4 + 3] = colors[i * 4 + 3];
         }
         var prim = _bridge.callMethod('createCloud', [numPoints, points2, colors2]);
         return prim;
