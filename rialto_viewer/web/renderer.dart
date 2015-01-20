@@ -7,7 +7,7 @@ part of rialto.viewer;
 class Renderer {
     Hub _hub;
 
-    RenderablePointCloudSet _renderSource;
+    PointCloudSet _renderSource;
 
     AxesShape _axesShape;
     BboxShape _bboxShape;
@@ -23,7 +23,7 @@ class Renderer {
 
     bool updateNeeded;
 
-    Renderer(RenderablePointCloudSet rpcSet) {
+    Renderer(PointCloudSet rpcSet) {
         _hub = Hub.root;
 
         _renderSource = rpcSet;

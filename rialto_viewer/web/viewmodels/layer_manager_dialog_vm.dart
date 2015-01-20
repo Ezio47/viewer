@@ -45,7 +45,7 @@ class LayerManagerDialogVM extends DialogVM {
         if (list==null) return null;
         String webpath = list[0].webpath;
         var rpc = _hub.renderablePointCloudSet.getCloud(webpath);
-        return rpc.pointCloud;
+        return rpc;
     }
 
     void toggleLayer(Event e, var detail, Node target) {

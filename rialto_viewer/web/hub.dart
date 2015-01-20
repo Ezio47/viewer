@@ -25,7 +25,7 @@ class Hub {
     SelectionController selectionController;
 
     // the global repo for loaded data
-    RenderablePointCloudSet renderablePointCloudSet;
+    PointCloudSet renderablePointCloudSet;
 
     // the server we're currently connected to
     ProxyFileSystem proxy;
@@ -63,7 +63,7 @@ class Hub {
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
-        renderablePointCloudSet = new RenderablePointCloudSet();
+        renderablePointCloudSet = new PointCloudSet();
 
         cesium.onMouseMove((x,y) => eventRegistry.MouseMove.fire(new MouseData.fromXy(x,y)));
         cesium.onMouseDown((x,y,b) => eventRegistry.MouseDown.fire(new MouseData.fromXyb(x,y,b)));
@@ -79,7 +79,7 @@ class Hub {
         measurementController = new MeasurementController();
         selectionController = new SelectionController();
 
-        renderablePointCloudSet = new RenderablePointCloudSet();
+        renderablePointCloudSet = new PointCloudSet();
 
         renderer = new Renderer(renderablePointCloudSet);
 

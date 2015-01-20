@@ -18,8 +18,13 @@ class PointCloud {
     Map<String, double> maximum;
     int numPoints;
     int tileId = 0;
+    List<CloudShape> _cloudShapes = new List<CloudShape>();
+    bool visible;
+    Vector3 vmin, vmax, vlen;
 
-    PointCloud(String this.webpath, String this.displayName, List<String> names) : numPoints = 0 {
+    PointCloud(String this.webpath, String this.displayName, List<String> names)
+            : numPoints = 0,
+              visible = true {
 
         dimensionNames = new List<String>.from(names);
 
@@ -86,6 +91,32 @@ class PointCloud {
             }
             numPoints += tile.numPointsInTile;
         }
+
+        vmin = new Vector3(minimum["x"], minimum["y"], minimum["z"]);
+        vmax = new Vector3(maximum["x"], maximum["y"], maximum["z"]);
+        vlen = vmax - vmin;
+
+        print("Bounds: min=${Utils.printv(vmin)} max=${Utils.printv(vmax)} len=${Utils.printv(vlen)}");
+    }
+
+
+    List<CloudShape> buildParticleSystem() {
+        for (PointCloudTile tile in tiles) {
+
+            var positions = tile.data["xyz"];
+            var colors = tile.data["rgba"];
+            assert(positions != null);
+            assert(colors != null);
+
+            var cloudShape = new CloudShape(positions, colors);
+            cloudShape.name = "{pointCloud.webpath}-${tile.id}";
+            _cloudShapes.add(cloudShape);
+        }
+        return _cloudShapes;
+    }
+
+    void colorize(Colorizer colorizer) {
+        colorizer.run(this);
     }
 
     bool get hasXyz {

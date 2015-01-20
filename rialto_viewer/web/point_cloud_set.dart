@@ -5,14 +5,14 @@
 part of rialto.viewer;
 
 
-class RenderablePointCloudSet {
+class PointCloudSet {
     Hub _hub;
-    List<RenderablePointCloud> renderablePointClouds = new List<RenderablePointCloud>();
+    List<PointCloud> renderablePointClouds = new List<PointCloud>();
     Vector3 min, max, len;
     int numPoints = 0;
     String _colorRamp = "Spectral";
 
-    RenderablePointCloudSet() {
+    PointCloudSet() {
         _hub = Hub.root;
 
         min = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
@@ -39,31 +39,31 @@ class RenderablePointCloudSet {
     void addCloud(PointCloud cloud) {
         if (!cloud.hasXyz) throw new RialtoStateError("point cloud must have X, Y, and Z dimensions");
 
-        var renderable = new RenderablePointCloud(cloud);
+        var renderable = (cloud);
         renderablePointClouds.add(renderable);
 
         _computeBounds();
     }
 
     void removeCloud(String webpath) {
-        var obj = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath, orElse: () => null);
+        var obj = renderablePointClouds.firstWhere((rpc) => rpc.webpath == webpath, orElse: () => null);
         if (obj == null) return;
 
         final int len = renderablePointClouds.length;
-        renderablePointClouds.removeWhere((rpc) => rpc.pointCloud.webpath == webpath);
+        renderablePointClouds.removeWhere((rpc) => rpc.webpath == webpath);
         assert(renderablePointClouds.length == len - 1);
         _computeBounds();
     }
 
-    RenderablePointCloud getCloud(String webpath) {
-        var obj = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath, orElse: () => null);
+    PointCloud getCloud(String webpath) {
+        var obj = renderablePointClouds.firstWhere((rpc) => rpc.webpath == webpath, orElse: () => null);
         return obj;
     }
 
     void _handleDisplayLayer(DisplayLayerData data) {
         final String webpath = data.webpath;
         final bool visible = data.visible;
-        var rpc = renderablePointClouds.firstWhere((rpc) => rpc.pointCloud.webpath == webpath);
+        var rpc = renderablePointClouds.firstWhere((rpc) => rpc.webpath == webpath);
         rpc.visible = visible;
         _hub.renderer.updateNeeded = true;
     }
@@ -80,9 +80,9 @@ class RenderablePointCloudSet {
         }
 
         for (var cloud in renderablePointClouds) {
-            min = Utils.vectorMinV(min, cloud.min);
-            max = Utils.vectorMaxV(max, cloud.max);
-            numPoints += cloud.pointCloud.numPoints;
+            min = Utils.vectorMinV(min, cloud.vmin);
+            max = Utils.vectorMaxV(max, cloud.vmax);
+            numPoints += cloud.numPoints;
         }
 
         len = max - min;

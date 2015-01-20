@@ -111,7 +111,7 @@ class Utils {
         assert(toSI(1000000000) == "1G");
     }
 
-    static Vector3 getCameraPointTarget(RenderablePointCloudSet set) {
+    static Vector3 getCameraPointTarget(PointCloudSet set) {
 
         double minx = 0.0;
         double miny = 0.0;
@@ -134,7 +134,7 @@ class Utils {
         return new Vector3(x, y, z);
     }
 
-    static Vector3 getCameraPointEye(RenderablePointCloudSet set) {
+    static Vector3 getCameraPointEye(PointCloudSet set) {
 
         double lenx = 100.0;
         double leny = 100.0;
