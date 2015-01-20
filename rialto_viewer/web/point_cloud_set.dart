@@ -7,7 +7,7 @@ part of rialto.viewer;
 
 class PointCloudSet {
     Hub _hub;
-    List<PointCloud> renderablePointClouds = new List<PointCloud>();
+    List<PointCloud> list = new List<PointCloud>();
     Vector3 min, max, len;
     int numPoints = 0;
     String _colorRamp = "Spectral";
@@ -27,7 +27,7 @@ class PointCloudSet {
         });
     }
 
-    int get length => renderablePointClouds.length;
+    int get length => list.length;
 
 
     void addClouds(List<PointCloud> clouds) {
@@ -40,31 +40,31 @@ class PointCloudSet {
         if (!cloud.hasXyz) throw new RialtoStateError("point cloud must have X, Y, and Z dimensions");
 
         var renderable = (cloud);
-        renderablePointClouds.add(renderable);
+        list.add(renderable);
 
         _computeBounds();
     }
 
     void removeCloud(String webpath) {
-        var obj = renderablePointClouds.firstWhere((rpc) => rpc.webpath == webpath, orElse: () => null);
+        var obj = list.firstWhere((rpc) => rpc.webpath == webpath, orElse: () => null);
         if (obj == null) return;
 
-        final int len = renderablePointClouds.length;
-        renderablePointClouds.removeWhere((rpc) => rpc.webpath == webpath);
-        assert(renderablePointClouds.length == len - 1);
+        final int len = list.length;
+        list.removeWhere((rpc) => rpc.webpath == webpath);
+        assert(list.length == len - 1);
         _computeBounds();
     }
 
     PointCloud getCloud(String webpath) {
-        var obj = renderablePointClouds.firstWhere((rpc) => rpc.webpath == webpath, orElse: () => null);
+        var obj = list.firstWhere((rpc) => rpc.webpath == webpath, orElse: () => null);
         return obj;
     }
 
     void _handleDisplayLayer(DisplayLayerData data) {
         final String webpath = data.webpath;
         final bool visible = data.visible;
-        var rpc = renderablePointClouds.firstWhere((rpc) => rpc.webpath == webpath);
-        rpc.visible = visible;
+        var rpc = list.firstWhere((rpc) => rpc.webpath == webpath);
+        rpc.isVisible = visible;
         _hub.renderer.updateNeeded = true;
     }
 
@@ -75,11 +75,11 @@ class PointCloudSet {
 
         numPoints = 0;
 
-        if (renderablePointClouds.length == 0) {
+        if (list.length == 0) {
             return;
         }
 
-        for (var cloud in renderablePointClouds) {
+        for (var cloud in list) {
             min = Utils.vectorMinV(min, cloud.vmin);
             max = Utils.vectorMaxV(max, cloud.vmax);
             numPoints += cloud.numPoints;
@@ -91,7 +91,7 @@ class PointCloudSet {
     void _handleColorizeLayers() {
         var colorizer = new RampColorizer(_colorRamp);
 
-        for (var cloud in renderablePointClouds) {
+        for (var cloud in list) {
             cloud.colorize(colorizer);
         }
         _hub.renderer.updateNeeded = true;

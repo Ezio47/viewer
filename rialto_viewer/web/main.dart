@@ -9,7 +9,7 @@ import 'rialto.dart';
 void main() {
     var hub = new Hub();
     Hub.root.init();
-    boot2();
+    boot1();
 }
 
 

@@ -35,9 +35,6 @@ class Hub {
 
     bool isPickingEnabled = true;
 
-    Map<int, Shape> shapesMap = {};
-    List<Shape> shapesList = [];
-
     // singleton
     static Hub _root;
 

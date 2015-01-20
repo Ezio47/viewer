@@ -14,9 +14,9 @@ abstract class Colorizer {
         for (var oldTile in src) {
             Float32List rgba = _algorithm(cloud.minimum["z"], cloud.maximum["z"], oldTile);
 
-            var newTile = cloud.createTile(oldTile.numPointsInTile);
-            newTile.data["xyz"] = oldTile.data["xyz"];
-            newTile.data["rgba"] = rgba;
+            oldTile.addData_F32x4("rgba", rgba);
+            oldTile.updateBounds();
+            oldTile.updateShape();
         }
 
         Hub.root.renderer.updateNeeded = true;

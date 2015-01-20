@@ -24,8 +24,6 @@ abstract class Shape {
 
         isSelected = false;
         isSelectable = false;
-
-        _hub.shapesMap[id] = this;
     }
 
     static int getNewId() => _ids++;

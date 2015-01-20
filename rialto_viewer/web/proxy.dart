@@ -240,8 +240,10 @@ class FileProxy extends ProxyItem {
             }
 
             var tile = cloud.createTile(numPoints);
-            tile.addData_F32x3("xyz", xlist, ylist, zlist);
-            tile.addData_F32x4("rgba", rlist, glist, blist, alist);
+            tile.addData_F32x3_from3("xyz", xlist, ylist, zlist);
+            tile.addData_F32x4_from4("rgba", rlist, glist, blist, alist);
+            tile.updateBounds();
+            tile.updateShape();
         };
 
         var f = fileSystem.comms.readAsBytes(webpath, handler).then((bool v) {

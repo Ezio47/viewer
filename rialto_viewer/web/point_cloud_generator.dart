@@ -12,52 +12,6 @@ part of rialto.viewer;
 
 class PointCloudGenerator {
 
-    static PointCloud fromRaw(Float32List floats, String webpath, String displayName) {
-        assert(false);
-
-        final int numFloats = floats.length;
-        final int numPoints = numFloats ~/ 3;
-
-        var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
-
-        final int tileSize = 1024;
-        final int numTiles = (numPoints.toDouble() / tileSize.toDouble()).ceil();
-        final int tileSizeRemainder = (numPoints % tileSize == 0) ? tileSize : (numPoints % tileSize);
-
-        int floatsIndex = 0;
-        for (int tile = 0; tile < numTiles; tile++) {
-            int numPointsInTile = (tile < (numTiles - 1)) ? tileSize : tileSizeRemainder;
-            var positionsX = new Float32List(numPointsInTile);
-            var positionsY = new Float32List(numPointsInTile);
-            var positionsZ = new Float32List(numPointsInTile);
-            var colorsR = new Float32List(numPointsInTile);
-            var colorsG = new Float32List(numPointsInTile);
-            var colorsB = new Float32List(numPointsInTile);
-            var colorsA = new Float32List(numPointsInTile);
-            for (int i = 0; i < numPointsInTile; i++) {
-                positionsX[i] = floats[floatsIndex++];
-                positionsY[i] = floats[floatsIndex++];
-                positionsZ[i] = floats[floatsIndex++];
-                colorsR[i] = 1.0;
-                colorsG[i] = 1.0;
-                colorsB[i] = 1.0;
-                colorsA[i] = 1.0;
-            }
-
-            var thisTile = cloud.createTile(numPointsInTile);
-            thisTile.addData_F32x3("xyz", positionsX, positionsY, positionsZ);
-            thisTile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
-        }
-        assert(floatsIndex == numPoints * 3);
-
-        print("made $webpath: $numPoints points");
-
-        cloud.updateBounds();
-
-        return cloud;
-    }
-
-
     static PointCloud generate(String webpath, String displayName) {
         switch (webpath) {
             case "/dir2/line.dat":
@@ -141,8 +95,10 @@ class PointCloudGenerator {
             }
 
             var tile = cloud.createTile(numPointsInTile);
-            tile.addData_F32x3("xyz", positionsX, positionsY, positionsZ);
-            tile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
+            tile.addData_F32x3_from3("xyz", positionsX, positionsY, positionsZ);
+            tile.addData_F32x4_from4("rgba", colorsR, colorsG, colorsB, colorsA);
+            tile.updateBounds();
+            tile.updateShape();
         }
 
         cloud.updateBounds();
@@ -184,8 +140,10 @@ class PointCloudGenerator {
             }
 
             var thisTile = cloud.createTile(numPointsInTile);
-            thisTile.addData_F32x3("xyz", positionsX, positionsY, positionsZ);
-            thisTile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
+            thisTile.addData_F32x3_from3("xyz", positionsX, positionsY, positionsZ);
+            thisTile.addData_F32x4_from4("rgba", colorsR, colorsG, colorsB, colorsA);
+            thisTile.updateBounds();
+            thisTile.updateShape();
         }
         assert(positionsIndex == numPoints);
 

@@ -18,13 +18,12 @@ class PointCloud {
     Map<String, double> maximum;
     int numPoints;
     int tileId = 0;
-    List<CloudShape> _cloudShapes = new List<CloudShape>();
-    bool visible;
+    bool isVisible;
     Vector3 vmin, vmax, vlen;
 
     PointCloud(String this.webpath, String this.displayName, List<String> names)
             : numPoints = 0,
-              visible = true {
+              isVisible = true {
 
         dimensionNames = new List<String>.from(names);
 
@@ -61,6 +60,7 @@ class PointCloud {
     PointCloudTile createTile(int numPointsInTile) {
         var tile = new PointCloudTile(dimensionNames, numPointsInTile, tileId++);
         tiles.add(tile);
+
         return tile;
     }
 
@@ -99,22 +99,6 @@ class PointCloud {
         print("Bounds: min=${Utils.printv(vmin)} max=${Utils.printv(vmax)} len=${Utils.printv(vlen)}");
     }
 
-
-    List<CloudShape> buildParticleSystem() {
-        for (PointCloudTile tile in tiles) {
-
-            var positions = tile.data["xyz"];
-            var colors = tile.data["rgba"];
-            assert(positions != null);
-            assert(colors != null);
-
-            var cloudShape = new CloudShape(positions, colors);
-            cloudShape.name = "{pointCloud.webpath}-${tile.id}";
-            _cloudShapes.add(cloudShape);
-        }
-        return _cloudShapes;
-    }
-
     void colorize(Colorizer colorizer) {
         colorizer.run(this);
     }
@@ -137,6 +121,7 @@ class PointCloudTile {
     Map<String, Float32List> data;
     Map<String, double> minimum;
     Map<String, double> maximum;
+    CloudShape shape;
 
     PointCloudTile(List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
         log("making tile $id with $numPointsInTile");
@@ -169,7 +154,25 @@ class PointCloudTile {
         });
     }
 
-    void addData_F32x3(String dim, Float32List xdata, Float32List ydata, Float32List zdata) {
+    void updateShape() {
+        var xyz = data["xyz"];
+        if (xyz == null) return;
+
+        var rgba = data["rgba"];
+        if (rgba == null) return;
+
+        if (shape != null) shape.remove();
+
+        shape = new CloudShape(xyz, rgba);
+        shape.name = "{pointCloud.webpath}-$id";
+    }
+
+    void addData_F32x3(String dim, Float32List xyz) {
+        assert(dimensionNames.contains(dim));
+        data[dim] = xyz;
+    }
+
+    void addData_F32x3_from3(String dim, Float32List xdata, Float32List ydata, Float32List zdata) {
         assert(dimensionNames.contains(dim));
 
         var xyz = new Float32List(numPointsInTile * 3);
@@ -179,11 +182,15 @@ class PointCloudTile {
             xyz[i * 3 + 2] = zdata[i];
         }
 
-        data[dim] = xyz;
-        _updateBounds(dim);
+        addData_F32x3(dim, xyz);
     }
 
-    void addData_F32x4(String dim, Float32List xdata, Float32List ydata, Float32List zdata, Float32List wdata) {
+    void addData_F32x4(String dim, Float32List xyzw) {
+        assert(dimensionNames.contains(dim));
+        data[dim] = xyzw;
+    }
+
+    void addData_F32x4_from4(String dim, Float32List xdata, Float32List ydata, Float32List zdata, Float32List wdata) {
         assert(dimensionNames.contains(dim));
 
         var xyzw = new Float32List(numPointsInTile * 4);
@@ -194,43 +201,44 @@ class PointCloudTile {
             xyzw[i * 4 + 3] = wdata[i];
         }
 
-        data[dim] = xyzw;
-        _updateBounds(dim);
+        addData_F32x4(dim, xyzw);
     }
 
-    void _updateBounds(String dimensionName) {
-        if (dimensionName == "xyz") {
-            for (int i = 0; i < numPointsInTile; i++) {
-                double x = data["xyz"][i * 3];
-                double y = data["xyz"][i * 3 + 1];
-                double z = data["xyz"][i * 3 + 2];
-                minimum["x"] = min(minimum["x"], x);
-                maximum["x"] = max(maximum["x"], x);
-                minimum["y"] = min(minimum["y"], y);
-                maximum["y"] = max(maximum["y"], y);
-                minimum["z"] = min(minimum["z"], z);
-                maximum["z"] = max(maximum["z"], z);
-            }
-        } else if (dimensionName == "rgba") {
-            for (int i = 0; i < numPointsInTile; i++) {
-                double r = data["rgba"][i * 4];
-                double g = data["rgba"][i * 4 + 1];
-                double b = data["rgba"][i * 4 + 2];
-                double a = data["rgba"][i * 4 + 3];
-                minimum["r"] = min(minimum["r"], r);
-                maximum["r"] = max(maximum["r"], r);
-                minimum["g"] = min(minimum["g"], g);
-                maximum["g"] = max(maximum["g"], g);
-                minimum["b"] = min(minimum["b"], b);
-                maximum["b"] = max(maximum["b"], b);
-                minimum["a"] = min(minimum["a"], a);
-                maximum["a"] = max(maximum["a"], a);
-            }
-        } else {
-            for (int i = 0; i < numPointsInTile; i++) {
-                double v = data[dimensionName][i];
-                minimum[dimensionName] = min(minimum[dimensionName], v);
-                maximum[dimensionName] = max(maximum[dimensionName], v);
+    void updateBounds() {
+        for (var dimensionName in dimensionNames) {
+            if (dimensionName == "xyz") {
+                for (int i = 0; i < numPointsInTile; i++) {
+                    double x = data["xyz"][i * 3];
+                    double y = data["xyz"][i * 3 + 1];
+                    double z = data["xyz"][i * 3 + 2];
+                    minimum["x"] = min(minimum["x"], x);
+                    maximum["x"] = max(maximum["x"], x);
+                    minimum["y"] = min(minimum["y"], y);
+                    maximum["y"] = max(maximum["y"], y);
+                    minimum["z"] = min(minimum["z"], z);
+                    maximum["z"] = max(maximum["z"], z);
+                }
+            } else if (dimensionName == "rgba") {
+                for (int i = 0; i < numPointsInTile; i++) {
+                    double r = data["rgba"][i * 4];
+                    double g = data["rgba"][i * 4 + 1];
+                    double b = data["rgba"][i * 4 + 2];
+                    double a = data["rgba"][i * 4 + 3];
+                    minimum["r"] = min(minimum["r"], r);
+                    maximum["r"] = max(maximum["r"], r);
+                    minimum["g"] = min(minimum["g"], g);
+                    maximum["g"] = max(maximum["g"], g);
+                    minimum["b"] = min(minimum["b"], b);
+                    maximum["b"] = max(maximum["b"], b);
+                    minimum["a"] = min(minimum["a"], a);
+                    maximum["a"] = max(maximum["a"], a);
+                }
+            } else {
+                for (int i = 0; i < numPointsInTile; i++) {
+                    double v = data[dimensionName][i];
+                    minimum[dimensionName] = min(minimum[dimensionName], v);
+                    maximum[dimensionName] = max(maximum[dimensionName], v);
+                }
             }
         }
     }
