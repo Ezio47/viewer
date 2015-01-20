@@ -223,25 +223,16 @@ class FileProxy extends ProxyItem {
             Float32List ylist = new Float32List(numPoints);
             Float32List zlist = new Float32List(numPoints);
 
-            var rlist = new Uint8List(numPoints);
-            var glist = new Uint8List(numPoints);
-            var blist = new Uint8List(numPoints);
-            var alist = new Uint8List(numPoints);
-
             Float32List tmp = new Float32List.view(buf);
             for (int i = 0; i < numPoints; i++) {
                 xlist[i] = tmp[i * 3 + 0];
                 ylist[i] = tmp[i * 3 + 1];
                 zlist[i] = tmp[i * 3 + 2];
-                rlist[i] = 255;
-                glist[i] = 255;
-                blist[i] = 255;
-                alist[i] = 255;
             }
 
             var tile = cloud.createTile(numPoints);
             tile.addData_F32x3_from3("xyz", xlist, ylist, zlist);
-            tile.addData_U8x4_from4("rgba", rlist, glist, blist, alist);
+            tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             tile.updateBounds();
             tile.updateShape();
         };

@@ -98,6 +98,20 @@ class PointCloudTile {
         addData_U8x4(dim, xyzw);
     }
 
+    void addData_U8x4_fromConstant(String dim, int x, int y, int z, int w) {
+        assert(dimensionNames.contains(dim));
+
+        var xyzw = new Uint8List(numPointsInTile * 4);
+        for (int i = 0; i < numPointsInTile; i++) {
+            xyzw[i * 4 + 0] = x;
+            xyzw[i * 4 + 1] = y;
+            xyzw[i * 4 + 2] = z;
+            xyzw[i * 4 + 3] = w;
+        }
+
+        addData_U8x4(dim, xyzw);
+    }
+
     void updateBounds() {
         for (var dimensionName in dimensionNames) {
             if (dimensionName == "xyz") {
