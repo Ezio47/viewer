@@ -211,7 +211,7 @@ class FileProxy extends ProxyItem {
             return Utils.toFuture(cloud);
         }
 
-        PointCloud cloud = PointCloudGenerator.fromRawInit(webpath, displayName);
+        var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
 
         var handler = (ByteBuffer buf, int used) {
             int numBytes = used;
@@ -223,19 +223,29 @@ class FileProxy extends ProxyItem {
             Float32List ylist = new Float32List(numPoints);
             Float32List zlist = new Float32List(numPoints);
 
+            Float32List rlist = new Float32List(numPoints);
+            Float32List glist = new Float32List(numPoints);
+            Float32List blist = new Float32List(numPoints);
+            Float32List alist = new Float32List(numPoints);
+
             Float32List tmp = new Float32List.view(buf);
             for (int i = 0; i < numPoints; i++) {
                 xlist[i] = tmp[i * 3 + 0];
                 ylist[i] = tmp[i * 3 + 1];
                 zlist[i] = tmp[i * 3 + 2];
+                rlist[i] = 1.0;
+                glist[i] = 1.0;
+                blist[i] = 1.0;
+                alist[i] = 1.0;
             }
 
-            PointCloudGenerator.fromRawAdd(cloud, "positions.x", xlist);
-            PointCloudGenerator.fromRawAdd(cloud, "positions.y", ylist);
-            PointCloudGenerator.fromRawAdd(cloud, "positions.z", zlist);
+            var tile = cloud.createTile(numPoints);
+            tile.addData_F32x3("xyz", xlist, ylist, zlist);
+            tile.addData_F32x4("rgba", rlist, glist, blist, alist);
         };
 
         var f = fileSystem.comms.readAsBytes(webpath, handler).then((bool v) {
+            cloud.updateBounds();
             return Utils.toFuture(cloud);
         });
         return f;

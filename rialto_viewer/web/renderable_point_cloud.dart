@@ -8,124 +8,35 @@ part of rialto.viewer;
 // given a point cloud, this will give us an Object3D for WebGL
 class RenderablePointCloud {
     PointCloud pointCloud;
-    var dims = new Map<String, Float32List>();
-    int numPoints;
-    Vector3 min, max, len;
-    CloudShape _cloudShape;
+    List<CloudShape> _cloudShapes = new List<CloudShape>();
     bool visible;
+    Vector3 min, max, len;
 
-    RenderablePointCloud(PointCloud pc) {
+    RenderablePointCloud(PointCloud this.pointCloud) : visible = true {
 
-        pointCloud = pc;
-        visible = true;
-
-        min = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
-        max = new Vector3(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
-        len = new Vector3.zero();
-
-        _createRenderArrays();
-        _computeBounds();
-    }
-
-    void _computeBounds() {
-        double xmin = pointCloud.minimum("positions.x");
-        double ymin = pointCloud.minimum("positions.y");
-        double zmin = pointCloud.minimum("positions.z");
-        double xmax = pointCloud.maximum("positions.x");
-        double ymax = pointCloud.maximum("positions.y");
-        double zmax = pointCloud.maximum("positions.z");
-
-        min.x = xmin;
-        min.y = ymin;
-        min.z = zmin;
-        max.x = xmax;
-        max.y = ymax;
-        max.z = zmax;
-        len.x = xmax - xmin;
-        len.y = ymax - ymin;
-        len.z = zmax - zmin;
+        min = new Vector3(pointCloud.minimum["x"], pointCloud.minimum["y"], pointCloud.minimum["z"]);
+        max = new Vector3(pointCloud.maximum["x"], pointCloud.maximum["y"], pointCloud.maximum["z"]);
+        len = max - min;
 
         print("Bounds: min=${Utils.printv(min)} max=${Utils.printv(max)} len=${Utils.printv(len)}");
     }
 
-    void _createRenderArrays() {
-        int sum = 0;
+    List<CloudShape> buildParticleSystem() {
+        for (PointCloudTile tile in pointCloud.tiles) {
 
-        numPoints = pointCloud.numPoints;
+            var positions = tile.data["xyz"];
+            var colors = tile.data["rgba"];
+            assert(positions != null);
+            assert(colors != null);
 
-        var xyz = new Float32List(numPoints * 3);
-        dims["positions"] = xyz;
-
-        int idx = 0;
-        final int numTiles = pointCloud.dimensions["positions.x"].list.length;
-        //log("Reading back $numTiles");
-
-        for (int t = 0; t < numTiles; t++) {
-            //log("reading $t for x");
-            PointCloudTile xTile = pointCloud.dimensions["positions.x"].list[t];
-            //log("reading $t for y");
-            PointCloudTile yTile = pointCloud.dimensions["positions.y"].list[t];
-            //log("reading $t for z");
-            PointCloudTile zTile = pointCloud.dimensions["positions.z"].list[t];
-
-            final int tileSize = xTile.data.length;
-            //log("Tile $t size: $tileSize");
-
-            for (int i = 0; i< tileSize; i++) {
-                xyz[idx++] = xTile.data[i];
-                xyz[idx++] = yTile.data[i];
-                xyz[idx++] = zTile.data[i];
-            }
+            var cloudShape = new CloudShape(positions, colors);
+            cloudShape.name = "{pointCloud.webpath}-${tile.id}";
+            _cloudShapes.add(cloudShape);
         }
-
-        //log(idx);
-        //log(numPoints);
-        //log(numPoints*3);
-        assert(idx == numPoints * 3);
-
-        var color = new Float32List(numPoints * 4);
-        dims["colors"] = color;
-        idx = 0;
-
-        if (pointCloud.hasColor3) {
-            for (int t=0; t<numTiles; t++) {
-                PointCloudTile xTile = pointCloud.dimensions["colors.x"].list[t];
-                PointCloudTile yTile = pointCloud.dimensions["colors.y"].list[t];
-                PointCloudTile zTile = pointCloud.dimensions["colors.z"].list[t];
-                final int count = xTile.data.length;
-                for (int i = 0; i < count; i++) {
-                    color[idx++] = xTile.data[i];
-                    color[idx++] = yTile.data[i];
-                    color[idx++] = zTile.data[i];
-                    color[idx++] = 1.0;
-                }
-            }
-        } else {
-            for (int i = 0; i < pointCloud.numPoints; i++) {
-                color[idx++] = 1.0;
-                color[idx++] = 1.0;
-                color[idx++] = 1.0;
-                color[idx++] = 1.0;
-            }
-        }
-        assert(idx == numPoints * 4);
-    }
-
-    CloudShape buildParticleSystem() {
-        var positions = dims["positions"];
-        var colors = dims["colors"];
-        assert(positions != null);
-        assert(colors != null);
-
-        _cloudShape = new CloudShape(positions, colors);
-        _cloudShape.name = pointCloud.webpath;
-        return _cloudShape;
+        return _cloudShapes;
     }
 
     void colorize(Colorizer colorizer) {
-        var oldColors = dims["colors"];
-        var newColors = colorizer.run(this);
-        dims["oldcolors"] = oldColors;
-        dims["colors"] = newColors;
+        colorizer.run(pointCloud);
     }
 }

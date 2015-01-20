@@ -73,9 +73,11 @@ class Renderer {
 
         {
             for (var rpc in _renderSource.renderablePointClouds) {
-                var obj = rpc.buildParticleSystem();
-                obj.isVisible = rpc.visible;
-                _hub.shapesList.add(obj);
+                var shapes = rpc.buildParticleSystem();
+                shapes.forEach((shape) {
+                    shape.isVisible = rpc.visible;
+                    _hub.shapesList.add(shape);
+                });
             }
         }
 

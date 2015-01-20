@@ -16,11 +16,7 @@ class PointCloudGenerator {
         final int numFloats = floats.length;
         final int numPoints = numFloats ~/ 3;
 
-        var cloud = new PointCloud(webpath, displayName);
-
-        cloud.createDimension("positions.x");
-        cloud.createDimension("positions.y");
-        cloud.createDimension("positions.z");
+        var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
 
         final int tileSize = 1024;
         final int numTiles = (numPoints.toDouble() / tileSize.toDouble()).ceil();
@@ -28,18 +24,27 @@ class PointCloudGenerator {
 
         int floatsIndex = 0;
         for (int tile = 0; tile < numTiles; tile++) {
-            int imax = (tile < (numTiles - 1)) ? tileSize : tileSizeRemainder;
-            var positionsX = new Float32List(imax);
-            var positionsY = new Float32List(imax);
-            var positionsZ = new Float32List(imax);
-            for (int i = 0; i < imax; i++) {
+            int numPointsInTile = (tile < (numTiles - 1)) ? tileSize : tileSizeRemainder;
+            var positionsX = new Float32List(numPointsInTile);
+            var positionsY = new Float32List(numPointsInTile);
+            var positionsZ = new Float32List(numPointsInTile);
+            var colorsR = new Float32List(numPointsInTile);
+            var colorsG = new Float32List(numPointsInTile);
+            var colorsB = new Float32List(numPointsInTile);
+            var colorsA = new Float32List(numPointsInTile);
+            for (int i = 0; i < numPointsInTile; i++) {
                 positionsX[i] = floats[floatsIndex++];
                 positionsY[i] = floats[floatsIndex++];
                 positionsZ[i] = floats[floatsIndex++];
+                colorsR[i] = 1.0;
+                colorsG[i] = 1.0;
+                colorsB[i] = 1.0;
+                colorsA[i] = 1.0;
             }
-            cloud.addDimensionData("positions.x", positionsX);
-            cloud.addDimensionData("positions.y", positionsY);
-            cloud.addDimensionData("positions.z", positionsZ);
+
+            var thisTile = cloud.createTile(numPointsInTile);
+            thisTile.addData_F32x3("xyz", positionsX, positionsY, positionsZ);
+            thisTile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
         }
         assert(floatsIndex == numPoints * 3);
 
@@ -48,20 +53,6 @@ class PointCloudGenerator {
         return cloud;
     }
 
-    static PointCloud fromRawInit(String webpath, String displayName) {
-        var cloud = new PointCloud(webpath, displayName);
-
-        cloud.createDimension("positions.x");
-        cloud.createDimension("positions.y");
-        cloud.createDimension("positions.z");
-
-        return cloud;
-    }
-
-    static PointCloud fromRawAdd(PointCloud cloud, String name, Float32List data) {
-        cloud.addDimensionData(name, data);
-        return cloud;
-    }
 
     static PointCloud generate(String webpath, String displayName) {
         switch (webpath) {
@@ -86,10 +77,7 @@ class PointCloudGenerator {
 
         final int numPoints = 10000;
 
-        var cloud = new PointCloud(webpath, displayName);
-        cloud.createDimension("positions.x");
-        cloud.createDimension("positions.y");
-        cloud.createDimension("positions.z");
+        var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
 
         final lon = -77.62549459934235;
         final lat = 38.833895271724664;
@@ -113,14 +101,18 @@ class PointCloudGenerator {
 
         for (int t = 0; t < numTiles; t++) {
 
-            final int tileSize = random.nextInt(upperbound);
+            final int numPointsInTile = random.nextInt(upperbound);
             //log("Tile $t size: $tileSize");
 
-            var positionsX = new Float32List(tileSize);
-            var positionsY = new Float32List(tileSize);
-            var positionsZ = new Float32List(tileSize);
+            var positionsX = new Float32List(numPointsInTile);
+            var positionsY = new Float32List(numPointsInTile);
+            var positionsZ = new Float32List(numPointsInTile);
+            var colorsR = new Float32List(numPointsInTile);
+            var colorsG = new Float32List(numPointsInTile);
+            var colorsB = new Float32List(numPointsInTile);
+            var colorsA = new Float32List(numPointsInTile);
 
-            for (int i = 0; i < tileSize; i++) {
+            for (int i = 0; i < numPointsInTile; i++) {
 
                 double d = i.toDouble() / numPoints.toDouble();
                 double x = random.nextDouble();
@@ -135,12 +127,17 @@ class PointCloudGenerator {
                 positionsY[i] = y;
                 positionsZ[i] = z;
 
+                colorsR[i] = 1.0;
+                colorsG[i] = 1.0;
+                colorsB[i] = 1.0;
+                colorsA[i] = 1.0;
+
                 ++totPoints;
             }
 
-            cloud.addDimensionData("positions.x", positionsX);
-            cloud.addDimensionData("positions.y", positionsY);
-            cloud.addDimensionData("positions.z", positionsZ);
+            var tile = cloud.createTile(numPointsInTile);
+            tile.addData_F32x3("xyz", positionsX, positionsY, positionsZ);
+            tile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
         }
 
         return cloud;
@@ -152,11 +149,7 @@ class PointCloudGenerator {
 
         int numPoints = terrain.valuesX.length;
 
-        var cloud = new PointCloud(webpath, displayName);
-
-        cloud.createDimension("positions.x");
-        cloud.createDimension("positions.y");
-        cloud.createDimension("positions.z");
+        var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
 
         final int tileSize = 1024;
         final int numTiles = (numPoints.toDouble() / tileSize.toDouble()).ceil();
@@ -164,19 +157,28 @@ class PointCloudGenerator {
 
         int positionsIndex = 0;
         for (int tile = 0; tile < numTiles; tile++) {
-            int imax = (tile < (numTiles - 1)) ? tileSize : tileSizeRemainder;
-            var tmpX = new Float32List(imax);
-            var tmpY = new Float32List(imax);
-            var tmpZ = new Float32List(imax);
-            for (int i = 0; i < imax; i++) {
-                tmpX[i] = terrain.valuesX[positionsIndex];
-                tmpY[i] = terrain.valuesY[positionsIndex];
-                tmpZ[i] = terrain.valuesZ[positionsIndex];
+            int numPointsInTile = (tile < (numTiles - 1)) ? tileSize : tileSizeRemainder;
+            var positionsX = new Float32List(numPointsInTile);
+            var positionsY = new Float32List(numPointsInTile);
+            var positionsZ = new Float32List(numPointsInTile);
+            var colorsR = new Float32List(numPointsInTile);
+            var colorsG = new Float32List(numPointsInTile);
+            var colorsB = new Float32List(numPointsInTile);
+            var colorsA = new Float32List(numPointsInTile);
+            for (int i = 0; i < numPointsInTile; i++) {
+                positionsX[i] = terrain.valuesX[positionsIndex];
+                positionsY[i] = terrain.valuesY[positionsIndex];
+                positionsZ[i] = terrain.valuesZ[positionsIndex];
+                colorsR[i] = 1.0;
+                colorsG[i] = 1.0;
+                colorsB[i] = 1.0;
+                colorsA[i] = 1.0;
                 positionsIndex++;
             }
-            cloud.addDimensionData("positions.x", tmpX);
-            cloud.addDimensionData("positions.y", tmpY);
-            cloud.addDimensionData("positions.z", tmpZ);
+
+            var thisTile = cloud.createTile(numPointsInTile);
+            thisTile.addData_F32x3("xyz", positionsX, positionsY, positionsZ);
+            thisTile.addData_F32x4("rgba", colorsR, colorsG, colorsB, colorsA);
         }
         assert(positionsIndex == numPoints);
 

@@ -37,7 +37,7 @@ class RenderablePointCloudSet {
     }
 
     void addCloud(PointCloud cloud) {
-        if (!cloud.hasXYZ) throw new RialtoStateError("point cloud must have X, Y, and Z dimensions");
+        if (!cloud.hasXyz) throw new RialtoStateError("point cloud must have X, Y, and Z dimensions");
 
         var renderable = new RenderablePointCloud(cloud);
         renderablePointClouds.add(renderable);
@@ -82,7 +82,7 @@ class RenderablePointCloudSet {
         for (var cloud in renderablePointClouds) {
             min = Utils.vectorMinV(min, cloud.min);
             max = Utils.vectorMaxV(max, cloud.max);
-            numPoints += cloud.numPoints;
+            numPoints += cloud.pointCloud.numPoints;
         }
 
         len = max - min;
