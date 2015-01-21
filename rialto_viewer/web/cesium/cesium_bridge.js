@@ -248,19 +248,17 @@ var CesiumBridge = function (element) {
         var primitives = scene.primitives;
 
         var f32 = new Float32Array(pointBuffer, 0, cnt*3);
+
+        var carts = Cesium.Cartesian3.fromDegreesArrayHeights(f32);
+
         var f64 = new Float64Array(cnt*3);
+        for (var i = 0; i<cnt; i++) {
+            f64[i*3+0] = carts[i].x;
+            f64[i*3+1] = carts[i].y;
+            f64[i*3+2] = carts[i].z;
+        }
 
         var u8 = new Uint8Array(colorBuffer, 0, cnt*4);
-
-        for (var i = 0; i<cnt; i++) {
-            var x = f32[i*3+0];
-            var y = f32[i*3+1];
-            var z = f32[i*3+2];
-            var p = Cesium.Cartesian3.fromDegrees(x,y,z);
-            f64[i*3+0] = p.x;
-            f64[i*3+1] = p.y;
-            f64[i*3+2] = p.z;
-        }
 
         var pointInstance = new Cesium.GeometryInstance({
             geometry : new Cesium.PointGeometry({

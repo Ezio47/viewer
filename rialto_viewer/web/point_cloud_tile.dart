@@ -16,7 +16,7 @@ class PointCloudTile {
     CloudShape shape;
 
     PointCloudTile(List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
-        log("making tile $id with $numPointsInTile");
+        //log("making tile $id with $numPointsInTile");
 
         minimum = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
         maximum = new Vector3(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
@@ -24,7 +24,6 @@ class PointCloudTile {
     }
 
     void updateShape() {
-        var t0 = new DateTime.now().millisecondsSinceEpoch;
         var xyz = data["xyz"];
         if (xyz == null) return;
 
@@ -34,12 +33,9 @@ class PointCloudTile {
         if (shape != null) {
             shape.remove();
         }
-        var t1 = new DateTime.now().millisecondsSinceEpoch;
 
         shape = new CloudShape(xyz, rgba);
         shape.name = "{pointCloud.webpath}-$id";
-        var t2 = new DateTime.now().millisecondsSinceEpoch;
-        log("${t2-t1} ${t1-t0}");
     }
 
     void addData_F32x3(String dim, Float32List xyz) {

@@ -75,6 +75,7 @@ class HttpComms extends Comms {
             ws.onClose.listen((_) {
                 readBuffer.flush(force: true);
                 c.complete(null);
+                log("done");
             });
             ws.onError.listen((_) {
                 assert(false);
