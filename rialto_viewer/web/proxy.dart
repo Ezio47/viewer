@@ -219,26 +219,18 @@ class FileProxy extends ProxyItem {
             int numPoints = numFloats ~/ 3;
             assert(numPoints * 3 * 4 == numBytes);
 
-            Float32List xlist = new Float32List(numPoints);
-            Float32List ylist = new Float32List(numPoints);
-            Float32List zlist = new Float32List(numPoints);
-
-            Float32List tmp = new Float32List.view(buf);
-            for (int i = 0; i < numPoints; i++) {
-                xlist[i] = tmp[i * 3 + 0];
-                ylist[i] = tmp[i * 3 + 1];
-                zlist[i] = tmp[i * 3 + 2];
-            }
+            Float32List tmp = new Float32List.view(buf, 0, numPoints*3);
+            assert(tmp.length == numPoints * 3);
 
             var tile = cloud.createTile(numPoints);
-            tile.addData_F32x3_from3("xyz", xlist, ylist, zlist);
+            tile.addData_F32x3("xyz", tmp);
             tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             tile.updateBounds();
             tile.updateShape();
+            cloud.updateBoundsForTile(tile);
         };
 
         var f = fileSystem.comms.readAsBytes(webpath, handler).then((bool v) {
-            cloud.updateBounds();
             return Utils.toFuture(cloud);
         });
         return f;

@@ -40,8 +40,10 @@ class CesiumBridge {
         _bridge.callMethod('setUpdater', [f]);
     }
 
-    dynamic createFloat64Array(int len) {
-        return new JsObject(context['Float64Array'], [len]);
+    dynamic createFloat64Array(int len, Float32List data) {
+        //return new JsObject(context['Float64Array'], [len, data]);
+        var a = _bridge.callMethod('create64', [len, data.buffer]);
+        return a;
     }
 
     dynamic createUint8Array(int len) {
@@ -96,25 +98,13 @@ class CesiumBridge {
     }
 
     dynamic createCloud(int numPoints, Float32List points, Uint8List colors) {
+        var t0 = new DateTime.now().millisecondsSinceEpoch;
         assert(numPoints >= 0);
         assert(points.length == numPoints * 3);
         assert(colors.length == numPoints * 4);
-
-        var points2 = createFloat64Array(numPoints * 3);
-        var colors2 = createUint8Array(numPoints * 4);
-        for (int i = 0; i < numPoints; i++) {
-            assert(_isValidLatLon(new Cartographic3(points[i * 3 + 0], points[i * 3 + 1], points[i * 3 + 2])));
-
-            points2[i * 3 + 0] = points[i * 3 + 0];
-            points2[i * 3 + 1] = points[i * 3 + 1];
-            points2[i * 3 + 2] = points[i * 3 + 2];
-
-            colors2[i * 4 + 0] = colors[i * 4 + 0];
-            colors2[i * 4 + 1] = colors[i * 4 + 1];
-            colors2[i * 4 + 2] = colors[i * 4 + 2];
-            colors2[i * 4 + 3] = colors[i * 4 + 3];
-        }
-        var prim = _bridge.callMethod('createCloud', [numPoints, points2, colors2]);
+        var prim = _bridge.callMethod('createCloud', [numPoints, points.buffer, colors.buffer]);
+        var t1 = new DateTime.now().millisecondsSinceEpoch;
+ //       log("   ${t1-t0}");
         return prim;
     }
 

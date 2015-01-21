@@ -59,7 +59,7 @@ class HttpComms extends Comms {
         Completer c = new Completer();
 
         final int bytesPerPoint = 3 * 4 /* + 4*4 */;
-        final int pointsPerTile = 1024 * 16;
+        final int pointsPerTile = 1024 * 128;
         _ReadBuffer readBuffer = new _ReadBuffer(bytesPerPoint * pointsPerTile, handler);
 
         WebSocket ws = new WebSocket('ws://localhost:12345/points/');

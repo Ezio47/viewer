@@ -90,9 +90,8 @@ class PointCloudGenerator {
             tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             tile.updateBounds();
             tile.updateShape();
+            cloud.updateBoundsForTile(tile);
         }
-
-        cloud.updateBounds();
 
         return cloud;
     }
@@ -105,13 +104,13 @@ class PointCloudGenerator {
 
         var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
 
-        final int tileSize = 1024;
-        final int numTiles = (numPoints.toDouble() / tileSize.toDouble()).ceil();
-        final int tileSizeRemainder = (numPoints % tileSize == 0) ? tileSize : (numPoints % tileSize);
+        final int idealNumPointsInTile = 1024 * 64;
+        final int numTiles = (numPoints.toDouble() / idealNumPointsInTile.toDouble()).ceil();
+        final int tileSizeRemainder = (numPoints % idealNumPointsInTile == 0) ? idealNumPointsInTile : (numPoints % idealNumPointsInTile);
 
         int positionsIndex = 0;
         for (int tile = 0; tile < numTiles; tile++) {
-            int numPointsInTile = (tile < (numTiles - 1)) ? tileSize : tileSizeRemainder;
+            int numPointsInTile = (tile < (numTiles - 1)) ? idealNumPointsInTile : tileSizeRemainder;
             var positionsX = new Float32List(numPointsInTile);
             var positionsY = new Float32List(numPointsInTile);
             var positionsZ = new Float32List(numPointsInTile);
@@ -127,10 +126,9 @@ class PointCloudGenerator {
             thisTile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             thisTile.updateBounds();
             thisTile.updateShape();
+            cloud.updateBoundsForTile(thisTile);
         }
         assert(positionsIndex == numPoints);
-
-        cloud.updateBounds();
 
         return cloud;
     }

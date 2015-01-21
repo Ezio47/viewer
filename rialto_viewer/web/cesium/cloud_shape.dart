@@ -12,6 +12,10 @@ class CloudShape extends Shape {
     CloudShape(Float32List this.points, Uint8List this.colors) : super("cloud") {
         numPoints = points.length ~/ 3;
         assert(numPoints * 3 == points.length);
+        if (!(numPoints * 4 == colors.length)) {
+            log(numPoints);
+            log(colors.length);
+        }
         assert(numPoints * 4 == colors.length);
 
         isSelectable = true;

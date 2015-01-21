@@ -11,42 +11,20 @@ class PointCloudTile {
     int id;
     List<String> dimensionNames;
     Map<String, TypedData> data;
-    Map<String, double> minimum;
-    Map<String, double> maximum;
+    Vector3 minimum;
+    Vector3 maximum;
     CloudShape shape;
 
     PointCloudTile(List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
         log("making tile $id with $numPointsInTile");
 
-        minimum = new Map<String, double>();
-        maximum = new Map<String, double>();
+        minimum = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
+        maximum = new Vector3(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
         data = new Map<String, TypedData>();
-
-        dimensionNames.forEach((dimensionName) {
-            if (dimensionName == "xyz") {
-                minimum["x"] = double.MAX_FINITE;
-                maximum["x"] = -double.MAX_FINITE;
-                minimum["y"] = double.MAX_FINITE;
-                maximum["y"] = -double.MAX_FINITE;
-                minimum["z"] = double.MAX_FINITE;
-                maximum["z"] = -double.MAX_FINITE;
-            } else if (dimensionName == "rgba") {
-                minimum["r"] = double.MAX_FINITE;
-                maximum["r"] = -double.MAX_FINITE;
-                minimum["g"] = double.MAX_FINITE;
-                maximum["g"] = -double.MAX_FINITE;
-                minimum["b"] = double.MAX_FINITE;
-                maximum["b"] = -double.MAX_FINITE;
-                minimum["a"] = double.MAX_FINITE;
-                maximum["a"] = -double.MAX_FINITE;
-            } else {
-                minimum[dimensionName] = double.MAX_FINITE;
-                maximum[dimensionName] = -double.MAX_FINITE;
-            }
-        });
     }
 
     void updateShape() {
+        var t0 = new DateTime.now().millisecondsSinceEpoch;
         var xyz = data["xyz"];
         if (xyz == null) return;
 
@@ -56,9 +34,12 @@ class PointCloudTile {
         if (shape != null) {
             shape.remove();
         }
+        var t1 = new DateTime.now().millisecondsSinceEpoch;
 
         shape = new CloudShape(xyz, rgba);
         shape.name = "{pointCloud.webpath}-$id";
+        var t2 = new DateTime.now().millisecondsSinceEpoch;
+        log("${t2-t1} ${t1-t0}");
     }
 
     void addData_F32x3(String dim, Float32List xyz) {
@@ -113,47 +94,18 @@ class PointCloudTile {
     }
 
     void updateBounds() {
-        for (var dimensionName in dimensionNames) {
-            if (dimensionName == "xyz") {
-                assert(data["xyz"] is Float32List);
-                Float32List d = data["xyz"];
-                for (int i = 0; i < numPointsInTile; i++) {
-                    double x = d[i * 3];
-                    double y = d[i * 3 + 1];
-                    double z = d[i * 3 + 2];
-                    minimum["x"] = min(minimum["x"], x);
-                    maximum["x"] = max(maximum["x"], x);
-                    minimum["y"] = min(minimum["y"], y);
-                    maximum["y"] = max(maximum["y"], y);
-                    minimum["z"] = min(minimum["z"], z);
-                    maximum["z"] = max(maximum["z"], z);
-                }
-            } else if (dimensionName == "rgba") {
-                assert(data["rgba"] is Uint8List);
-                Uint8List d = data["rgba"];
-                for (int i = 0; i < numPointsInTile; i++) {
-                    double r = d[i * 4].toDouble();
-                    double g = d[i * 4 + 1].toDouble();
-                    double b = d[i * 4 + 2].toDouble();
-                    double a = d[i * 4 + 3].toDouble();
-                    minimum["r"] = min(minimum["r"], r);
-                    maximum["r"] = max(maximum["r"], r);
-                    minimum["g"] = min(minimum["g"], g);
-                    maximum["g"] = max(maximum["g"], g);
-                    minimum["b"] = min(minimum["b"], b);
-                    maximum["b"] = max(maximum["b"], b);
-                    minimum["a"] = min(minimum["a"], a);
-                    maximum["a"] = max(maximum["a"], a);
-                }
-            } else {
-                assert(data[dimensionName] is Float32List);
-                Float32List d = data[dimensionName];
-                for (int i = 0; i < numPointsInTile; i++) {
-                    double v = d[i];
-                    minimum[dimensionName] = min(minimum[dimensionName], v);
-                    maximum[dimensionName] = max(maximum[dimensionName], v);
-                }
-            }
+        assert(data["xyz"] is Float32List);
+        Float32List d = data["xyz"];
+        for (int i = 0; i < numPointsInTile; i++) {
+            double x = d[i * 3];
+            double y = d[i * 3 + 1];
+            double z = d[i * 3 + 2];
+            minimum.x = min(minimum.x, x);
+            maximum.x = max(maximum.x, x);
+            minimum.y = min(minimum.y, y);
+            maximum.y = max(maximum.y, y);
+            minimum.z = min(minimum.z, z);
+            maximum.z = max(maximum.z, z);
         }
     }
 }

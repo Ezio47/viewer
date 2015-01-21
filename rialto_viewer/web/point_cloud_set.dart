@@ -80,8 +80,8 @@ class PointCloudSet {
         }
 
         for (var cloud in list) {
-            min = Utils.vectorMinV(min, cloud.vmin);
-            max = Utils.vectorMaxV(max, cloud.vmax);
+            min = Utils.vectorMinV(min, cloud.minimum);
+            max = Utils.vectorMaxV(max, cloud.maximum);
             numPoints += cloud.numPoints;
         }
 

@@ -43,8 +43,10 @@ class Renderer {
         }
     }
 
+    void forceUpdate() => _update();
+
     void _update() {
-        assert(updateNeeded);
+        //assert(updateNeeded);
         updateNeeded = false; // BUG: should this go at end? (race condition?)
 
         if (_pointClouds.length > 0) {

@@ -243,24 +243,29 @@ var CesiumBridge = function (element) {
     }
 
 
-    this.createCloud = function(cnt, ps, cs) {
+    this.createCloud = function(cnt, pointBuffer, colorBuffer) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
 
+        var f32 = new Float32Array(pointBuffer, 0, cnt*3);
+        var f64 = new Float64Array(cnt*3);
+
+        var u8 = new Uint8Array(colorBuffer, 0, cnt*4);
+
         for (var i = 0; i<cnt; i++) {
-            var x = ps[i*3+0];
-            var y = ps[i*3+1];
-            var z = ps[i*3+2];
+            var x = f32[i*3+0];
+            var y = f32[i*3+1];
+            var z = f32[i*3+2];
             var p = Cesium.Cartesian3.fromDegrees(x,y,z);
-            ps[i*3+0] = p.x;
-            ps[i*3+1] = p.y;
-            ps[i*3+2] = p.z;
+            f64[i*3+0] = p.x;
+            f64[i*3+1] = p.y;
+            f64[i*3+2] = p.z;
         }
 
         var pointInstance = new Cesium.GeometryInstance({
             geometry : new Cesium.PointGeometry({
-                positionsTypedArray: ps,
-                colorsTypedArray: cs
+                positionsTypedArray: f64,
+                colorsTypedArray: u8
             }),
             id : 'point'
         });
@@ -384,5 +389,15 @@ var CesiumBridge = function (element) {
         label.show = true;
         label.text = "My house!";
         label.position = new Cartesian3(x,y,z);
+    }
+
+    this.create64 = function(len, buf) {
+        var f32 = new Float32Array(buf);
+        var f64 = new Float64Array(len);
+        for (var i=0; i<len; i++) {
+            //console.log(f32[i]);
+            f64[i] = f32[i];
+        }
+        return f64;
     }
 }

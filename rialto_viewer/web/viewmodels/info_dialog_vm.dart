@@ -26,12 +26,12 @@ class InfoVM extends DialogVM {
             maxx = maxy = maxz = 0.0;
         } else {
             numPoints = selectedCloud.numPoints;
-            minx = selectedCloud.minimum["x"];
-            miny = selectedCloud.minimum["y"];
-            minz = selectedCloud.minimum["z"];
-            maxx = selectedCloud.maximum["x"];
-            maxy = selectedCloud.maximum["y"];
-            maxz = selectedCloud.maximum["z"];
+            minx = selectedCloud.minimum.x;
+            miny = selectedCloud.minimum.y;
+            minz = selectedCloud.minimum.z;
+            maxx = selectedCloud.maximum.x;
+            maxy = selectedCloud.maximum.y;
+            maxz = selectedCloud.maximum.z;
         }
 
         querySelector("#infoDialog_numPoints").text = numPoints.toString();
