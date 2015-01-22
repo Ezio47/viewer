@@ -20,9 +20,14 @@ abstract class Comms {
 
 class HttpComms extends Comms {
     Http.Client _client;
+    _ReadBuffer _readBuffer;
 
     HttpComms(String myserver) : super(myserver) {
         if (server.endsWith("/")) server = server.substring(0, server.length - 1);
+
+        final int bytesPerPoint = 3 * 4 /* + 4*4 */;
+        final int pointsPerTile = 1024 * 64;
+        _readBuffer = new _ReadBuffer(bytesPerPoint * pointsPerTile);
     }
 
     @override
@@ -58,9 +63,7 @@ class HttpComms extends Comms {
     Future<bool> readAsBytes(String webpath, FlushFunc handler) {
         Completer c = new Completer();
 
-        final int bytesPerPoint = 3 * 4 /* + 4*4 */;
-        final int pointsPerTile = 1024 * 128;
-        _ReadBuffer readBuffer = new _ReadBuffer(bytesPerPoint * pointsPerTile, handler);
+        _readBuffer.open(handler);
 
         WebSocket ws = new WebSocket('ws://localhost:12345/points/');
         ws.onOpen.listen((_) {
@@ -70,10 +73,11 @@ class HttpComms extends Comms {
             ws.binaryType = "arraybuffer";
             ws.onMessage.listen((MessageEvent e) {
                 ByteBuffer buf = e.data;
-                readBuffer.push(buf);
+                _readBuffer.push(buf);
             });
             ws.onClose.listen((_) {
-                readBuffer.flush(force: true);
+                _readBuffer.flush(force: true);
+                _readBuffer.close();
                 c.complete(null);
                 log("done");
             });
@@ -93,24 +97,23 @@ class HttpComms extends Comms {
 typedef FlushFunc(ByteBuffer, used);
 
 class _ReadBuffer {
-    int maxsize;
-    Uint8List buf;
-    int used;
-    FlushFunc flushfunc;
+    int _maxsize;
+    Uint8List _buffer;
+    int _used;
+    FlushFunc _flushfunc;
 
-    _ReadBuffer(int this.maxsize, FlushFunc this.flushfunc) {
-        open();
-    }
+    _ReadBuffer(int this._maxsize);
 
-    void open() {
-        buf = null;
-        used = 0;
+    void open(FlushFunc f) {
+        _buffer = null;
+        _used = 0;
+        _flushfunc = f;
     }
 
     void push(ByteBuffer src) {
         int p = 0;
         while (p < src.lengthInBytes) {
-            int amt = min(maxsize - used, src.lengthInBytes - p);
+            int amt = min(_maxsize - _used, src.lengthInBytes - p);
             append(src, p, amt);
             flush();
             p += amt;
@@ -119,27 +122,30 @@ class _ReadBuffer {
 
     void close() {
         flush(force: true);
+        _buffer = null;
+        _used = 0;
+        _flushfunc = null;
     }
 
     void append(ByteBuffer src, int p, int amt) {
         Uint8List src8 = new Uint8List.view(src);
-        assert(used + amt <= maxsize);
-        if (buf == null) {
-            assert(used == 0);
-            buf = new Uint8List(maxsize);
+        assert(_used + amt <= _maxsize);
+        if (_buffer == null) {
+            assert(_used == 0);
+            _buffer = new Uint8List(_maxsize);
         }
         for (int i = p; i < p + amt; i++) {
-            buf[used] = src8[i];
-            used++;
+            _buffer[_used] = src8[i];
+            _used++;
         }
     }
 
     void flush({bool force: false}) {
-        if (buf == null || used == 0) return;
-        if (used < maxsize && !force) return;
-        flushfunc(buf.buffer, used);
-        buf = null;
-        used = 0;
+        if (_buffer == null || _used == 0) return;
+        if (_used < _maxsize && !force) return;
+        _flushfunc(_buffer.buffer, _used);
+        _buffer = null;
+        _used = 0;
     }
 }
 
