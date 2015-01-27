@@ -20,46 +20,51 @@ class LayerManagerDialogVM extends DialogVM {
         _info = new InfoVM("infoDialog", this);
 
         _hub = Hub.root;
+
+        _listbox.setSelectHandler(_selectHandler);
     }
 
     @override
-    void _open() {}
+    void _open() {
+        _listbox.clear();
+
+        Map layers = _hub.layerManager.layers;
+        for (var layer in layers.keys) {
+            var item = new _LayerItem(layers[layer]);
+            _listbox.add(item);
+        }
+    }
 
     @override
     void _close(bool okay) {}
 
-    PointCloud get currentSelection {
-        var list = _listbox.getCurrentSelection();
-        if (list==null) return null;
-        String webpath = list[0].webpath;
-        var rpc = _hub.renderablePointCloudSet.getCloud(webpath);
-        return rpc;
+    void _selectHandler(var e) {
+        List<_LayerItem> items = _listbox.getCurrentSelection();
+        if (items==null) return;
+        if (items[0] == null) return;
     }
 
+    Layer get currentSelection {
+        var list = _listbox.getCurrentSelection();
+        if (list==null || list[0] == null) return null;
+        return list[0].layer;
+    }
+
+    /*
     void toggleLayer(Event e, var detail, Node target) {
         var checkbox = target as InputElement;
         var item = _listbox.list[int.parse(checkbox.id)].data;
-        _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.webpath, checkbox.checked));
+        _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.layer.name, checkbox.checked));
     }
-
-
-    void deleteFile(Event e, var detail, Node target) {
-        if (selection != null) {
-            assert(selection is _LayerItem);
-            _hub.eventRegistry.CloseFile.fire(selection.webpath);
-        }
-        return;
-    }
+    */
 }
 
 
 
 class _LayerItem {
-    String webpath;
-    String displayName;
-    bool checked;
-    _LayerItem(this.webpath, this.displayName) {
-        checked = true;
-    }
-    String toString() => "<$displayName $checked>";
+    Layer layer;
+
+    _LayerItem(Layer this.layer);
+
+    String toString() => "${layer.name}";
 }

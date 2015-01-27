@@ -18,21 +18,29 @@ class InfoVM extends DialogVM {
         double minx, miny, minz;
         double maxx, maxy, maxz;
 
-        PointCloud selectedCloud = _parent.currentSelection;
+        Layer layer = _parent.currentSelection;
 
-        if (selectedCloud == null) {
+        if (layer == null) {
             numPoints = 0;
             minx = miny = minz = 0.0;
             maxx = maxy = maxz = 0.0;
         } else {
-            numPoints = selectedCloud.numPoints;
-            minx = selectedCloud.minimum.x;
-            miny = selectedCloud.minimum.y;
-            minz = selectedCloud.minimum.z;
-            maxx = selectedCloud.maximum.x;
-            maxy = selectedCloud.maximum.y;
-            maxz = selectedCloud.maximum.z;
+            minx = layer.bbox.minimum.longitude;
+            miny = layer.bbox.minimum.latitude;
+            minz = layer.bbox.minimum.height;
+            maxx = layer.bbox.maximum.longitude;
+            maxy = layer.bbox.maximum.latitude;
+            maxz = layer.bbox.maximum.height;
+
+            if (layer is PointCloudLayer) {
+                numPoints = layer.cloud.numPoints;
+            }
         }
+
+        querySelector("#infoDialog_name").text = layer.name;
+        querySelector("#infoDialog_layerType").text = layer.runtimeType.toString();
+        querySelector("#infoDialog_server").text = layer.server;
+        querySelector("#infoDialog_path").text = layer.path;
 
         querySelector("#infoDialog_numPoints").text = numPoints.toString();
 

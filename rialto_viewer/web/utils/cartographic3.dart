@@ -32,14 +32,14 @@ class Cartographic3 {
 
 
 class CartographicBbox {
-    Cartographic3 min;
-    Cartographic3 max;
+    Cartographic3 minimum;
+    Cartographic3 maximum;
 
-    CartographicBbox(Cartographic3 this.min, Cartographic3 this.max);
+    CartographicBbox(Cartographic3 this.minimum, Cartographic3 this.maximum);
 
     CartographicBbox.empty() {
-        min = new Cartographic3.asMax();
-        max = new Cartographic3.asMin();
+        minimum = new Cartographic3.asMax();
+        maximum = new Cartographic3.asMin();
     }
 
     factory CartographicBbox.fromList(List<num> list) {

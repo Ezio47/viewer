@@ -20,7 +20,7 @@ abstract class Layer {
         path = _required(map, "path");
         numBytes = _optional(map, "size", 0);
         description = _optional(map, "description", null);
-        isLoaded = _optional(map, "load", false);
+        isLoaded = _optional(map, "load", true);
         isVisible = _optional(map, "visible", true);
         bbox = new CartographicBbox.fromList(_optional(map, "bbox", null));
     }
@@ -81,7 +81,9 @@ class PointCloudLayer extends Layer {
             : super(name, map) {
         log("New pointcloud layer: $name .. $server .. $path");
 
-        Hub.root.eventRegistry.OpenFile.fire(name);
+        if (isLoaded) {
+            Hub.root.eventRegistry.OpenFile.fire(name);
+        }
     }
 
     void load() {
@@ -117,5 +119,6 @@ class PointCloudLayer extends Layer {
         }
 
         assert(cloud != null);
+        isLoaded = true;
     }
 }

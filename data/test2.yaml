@@ -1,0 +1,9 @@
+layers:
+    
+    serp_small:
+        type: pointcloud
+        server: ws://localhost:12347
+        path: /serp-100K.ria
+
+colorize:
+    ramp: Spectral
