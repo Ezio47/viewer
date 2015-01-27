@@ -20,18 +20,6 @@ class LayerManagerDialogVM extends DialogVM {
         _info = new InfoVM("infoDialog", this);
 
         _hub = Hub.root;
-
-        _hub.eventRegistry.OpenFileCompleted.subscribe((webpath) {
-            final String displayName = _hub.proxy.getFileProxy(webpath).displayName;
-            var p = new _LayerItem(webpath, displayName);
-            _listbox.add(p, p.displayName);
-            hasData = _listbox.length > 0;
-        });
-
-        _hub.eventRegistry.CloseFileCompleted.subscribe((webpath) {
-            _listbox.removeWhere((f) => f.webpath == webpath);
-            hasData = _listbox.length > 0;
-        });
     }
 
     @override

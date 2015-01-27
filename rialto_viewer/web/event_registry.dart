@@ -42,17 +42,15 @@ class EventRegistry {
 
     SignalFunctions<String> UpdateColorizationSettings = new SignalFunctions<String>();
 
-    SignalFunctions<String> OpenServer = new SignalFunctions<String>();
-    SignalFunctions OpenServerCompleted = new SignalFunctions();
-    SignalFunctions CloseServer = new SignalFunctions();
-    SignalFunctions CloseServerCompleted = new SignalFunctions();
-
     SignalFunctions<String> OpenFile = new SignalFunctions<String>();
     SignalFunctions<String> OpenFileCompleted = new SignalFunctions<String>();
     SignalFunctions<String> CloseFile = new SignalFunctions<String>();
     SignalFunctions<String> CloseFileCompleted = new SignalFunctions<String>();
 
     SignalFunctions<ModeData> ChangeMode = new SignalFunctions();
+
+    SignalFunctions<String> LoadScript = new SignalFunctions<String>();
+    SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();
 }
 
 class MouseData {

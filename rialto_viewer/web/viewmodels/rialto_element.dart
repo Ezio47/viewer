@@ -7,7 +7,7 @@ part of rialto.viewer;
 class RialtoElement  {
     Hub _hub;
     SpanElement _mouseCoords;
-    FileManagerDialogVM _fileManager;
+    InitScriptDialogVM _IniScriptDialog;
     LayerManagerDialogVM _layerManager;
     SettingsDialogVM _advancedSettings;
     ModalButtonsVM _modalButtons;
@@ -29,7 +29,7 @@ class RialtoElement  {
             querySelector("#measureModeButton"): new ModeData(ModeData.MEASUREMENT)
         }, querySelector("#viewModeButton"));
 
-        _fileManager = new FileManagerDialogVM("fileManagerDialog");
+        _IniScriptDialog = new InitScriptDialogVM("initScriptDialog");
         _layerManager = new LayerManagerDialogVM("layerManagerDialog");
         _advancedSettings = new SettingsDialogVM("advancedSettingsDialog");
 

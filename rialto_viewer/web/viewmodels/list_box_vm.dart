@@ -27,8 +27,12 @@ class ListBoxVM<T> extends ViewModel {
         _selectElement.children.clear();
     }
 
-    void add(T item, String name) {
-        var wrapper = new ListBoxItem<T>(item, name);
+    void setSelectHandler(var f) {
+        _selectElement.onClick.listen((e) => f(e));
+    }
+
+    void add(T item) {
+        var wrapper = new ListBoxItem<T>(item, item.toString());
         _list.add(wrapper);
         _selectElement.children.add(wrapper.optionElement);
         _map[wrapper.optionElement] = item;

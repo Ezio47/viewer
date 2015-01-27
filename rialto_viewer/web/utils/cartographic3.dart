@@ -16,6 +16,9 @@ class Cartographic3 {
 
     Cartographic3.zero();
 
+    Cartographic3.asMin() : this(-180.0, -90.0, -double.MAX_FINITE);
+    Cartographic3.asMax() : this(180.0, 90.0, double.MAX_FINITE);
+
     Cartographic3.fromVector3(Vector3 v) : this(v.x, v.y, v.z);
 
     double get longitude => _vector.x;
@@ -24,4 +27,15 @@ class Cartographic3 {
     set latitude(double value) => _vector.y = value;
     double get height => _vector.z;
     set height(double value) => _vector.z = value;
+}
+
+
+class CartographicBbox {
+    Cartographic3 min;
+    Cartographic3 max;
+
+    CartographicBbox() {
+        min = new Cartographic3.asMax();
+        max = new Cartographic3.asMin();
+    }
 }

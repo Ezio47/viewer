@@ -34,40 +34,37 @@
                     <button id="selectModeButton">Select</button>
                     <button id="measureModeButton">Measure</button>
                     <span>...</span>
-                    <button id="fileManagerDialog_open">Files...</button>
+                    <button id="initScriptDialog_open">Script...</button>
                     <button id="layerManagerDialog_open">Layers...</button>
                     <button id="advancedSettingsDialog_open">Advanced...</button>
                 </div>
             </div>
 
-            <dialog id="fileManagerDialog">
+            <dialog id="initScriptDialog">
                 <div>
-                    <b>File Manager Dialog</b>
+                    <b>Init Script Dialog</b>
                     <hr>
                 </div>
 
                 <div>
-                    <select multiple="multiple" id="fileManagerDialog_files">
+                    <select multiple="multiple" id="initScriptDialog_files">
                     </select>
                 </div>
 
                 <div>
-                    <button id="fileManagerDialog_addSelectedFiles">Add</button>
-                    <button id="fileManagerDialog_removeSelectedFiles">Remove</button>
+                    <label for="initScriptDialog_serverName">Server:</label>
+                    <input id="initScriptDialog_serverName" type="text" class="input-textbox-style">
+                </div>
+                <div>
+                    <label for="initScriptDialog_scriptName">Script:</label>
+                    <input id="initScriptDialog_scriptName" type="text" class="input-textbox-style">
+
                     <hr>
                 </div>
 
                 <div>
-                    <label for="fileManagerDialog_serverName">Server:</label>
-                    <input id="fileManagerDialog_serverName" type="text" class="input-textbox-style">
-                    <button id="fileManagerDialog_openServer">Open</button>
-                    <button id="fileManagerDialog_closeServer">Close</button>
-                    <hr>
-                </div>
-
-                <div>
-                    <button id="fileManagerDialog_okay">Okay</button>
-                    <button id="fileManagerDialog_cancel">Cancel</button>
+                    <button id="initScriptDialog_okay">Okay</button>
+                    <button id="initScriptDialog_cancel">Cancel</button>
                 </div>
             </dialog>
 

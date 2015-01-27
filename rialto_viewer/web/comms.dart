@@ -88,10 +88,6 @@ class HttpComms extends Comms {
 
         return c.future;
     }
-
-    static void test() {
-        var root = new ProxyFileSystem("http://localhost:12345");
-    }
 }
 
 typedef FlushFunc(ByteBuffer, used);

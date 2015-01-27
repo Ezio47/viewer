@@ -10,6 +10,8 @@ void log(o) {
 
 
 class Hub {
+    LayerManager layerManager;
+
     RialtoElement rialtoElement;
 
     Element cesiumContainer;
@@ -26,12 +28,6 @@ class Hub {
 
     // the global repo for loaded data
     PointCloudSet renderablePointCloudSet;
-
-    // the server we're currently connected to
-    ProxyFileSystem proxy;
-
-    String defaultServer = "http://www.example.com";
-    String currentServer;
 
     bool isPickingEnabled = true;
 
@@ -51,12 +47,14 @@ class Hub {
     }
 
     void init() {
+        layerManager = new LayerManager();
+
         cesium = new CesiumBridge('cesiumContainer');
 
         var rialtoElement = new RialtoElement();
 
-        eventRegistry.OpenServer.subscribe(_handleOpenServer);
-        eventRegistry.CloseServer.subscribe0(_handleCloseServer);
+        eventRegistry.LoadScript.subscribe(_handleLoadScript);
+
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
@@ -88,31 +86,24 @@ class Hub {
     int get width => window.innerWidth;
     int get height => window.innerHeight;
 
-    void _handleOpenServer(String server) {
-        currentServer = null;
-        proxy = new ProxyFileSystem(server);
-        proxy.load().then((_) => eventRegistry.OpenServerCompleted.fire0());
-    }
-
-    void _handleCloseServer() {
-        currentServer = null;
-        if (proxy != null) {
-            proxy.close();
-            proxy = null;
-        }
-        eventRegistry.CloseServerCompleted.fire0();
+    void _handleLoadScript(String url) {
+        var s = new InitScript(url);
     }
 
     void _handleOpenFile(String webpath) {
-        FileProxy file = proxy.getFileProxy(webpath);
+        Layer layer = layerManager.layers[webpath];
+        assert(layer != null);
 
-        file.create().then((PointCloud pointCloud) {
-            renderablePointCloudSet.addCloud(pointCloud);
+        PointCloudLayer pcl = layer as PointCloudLayer;
+        pcl.load();
 
-            renderer.updateNeeded = true;
-            eventRegistry.OpenFileCompleted.fire(webpath);
-        });
+        PointCloud pointCloud = pcl.cloud;
 
+        renderablePointCloudSet.addCloud(pointCloud);
+
+        renderer.updateNeeded = true;
+
+        eventRegistry.OpenFileCompleted.fire(webpath);
     }
 
     void _handleCloseFile(String webpath) {

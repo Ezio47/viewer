@@ -16,10 +16,25 @@ class Cartesian3 {
 
     Cartesian3.zero();
 
+
+    Cartesian3.asMin() : this(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
+    Cartesian3.asMax() : this(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
+
     double get x => _vector.x;
     set x(double value) => _vector.x = value;
     double get y => _vector.y;
     set y(double value) => _vector.y = value;
     double get z => _vector.z;
     set z(double value) => _vector.z = value;
+}
+
+
+class CartesianBbox {
+    Cartesian3 min;
+    Cartesian3 max;
+
+    CartesianBbox() {
+        min = new Cartesian3.asMax();
+        max = new Cartesian3.asMin();
+    }
 }

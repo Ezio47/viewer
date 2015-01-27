@@ -14,12 +14,7 @@ class PointCloudGenerator {
 
     static PointCloud generate(String webpath, String displayName) {
         switch (webpath) {
-            case "/dir2/line.dat":
-            case "/newcube.dat":
-            case "/oldcube.dat":
-                assert(false);
-                break;
-            case "/dir1/random.dat":
+            case "/random.dat":
                 return _makeRandom(webpath, displayName);
             case "/terrain1.dat":
                 return _makeTerrain(1, webpath, displayName);

@@ -9,12 +9,14 @@ import 'rialto.dart';
 void main() {
     var hub = new Hub();
     Hub.root.init();
-    boot2();
+    boot0();
 }
 
 
 void boot0() {
     Hub hub = Hub.root;
+
+//    hub.eventRegistry.LoadScript.fire("http://localhost:12345/file/test.json");
 
     // hub.eventRegistry.DisplayBbox.fire(true);
     //hub.eventRegistry.UpdateCameraEyePosition.fire(new Vector3(-200.0, -200.0, 200.0));
@@ -23,9 +25,7 @@ void boot0() {
 
 void boot1() {
     Hub hub = Hub.root;
-
-    hub.defaultServer = "http://www.example.com/";
-
+/*
     hub.eventRegistry.OpenServerCompleted.subscribe0(() {
         //hub.eventRegistry.OpenFile.fire("/dir1/random.dat");
         hub.eventRegistry.OpenFile.fire("/terrain1.dat");
@@ -40,16 +40,13 @@ void boot1() {
             //hub.eventRegistry.UpdateCameraTargetPosition.fire(new Vector3(1500.0, 1500.0, 1500.0));
         }
     });
-
-    hub.eventRegistry.OpenServer.fire(hub.defaultServer);
+*/
 }
 
 
 void boot2() {
     Hub hub = Hub.root;
-
-    hub.defaultServer = "http://localhost:12345";
-
+/*
     hub.eventRegistry.OpenServerCompleted.subscribe0(() {
         hub.eventRegistry.OpenFile.fire("/serp.ria");
     });
@@ -58,6 +55,5 @@ void boot2() {
         hub.eventRegistry.DisplayBbox.fire(true);
         hub.eventRegistry.ColorizeLayers.fire0();
     });
-
-    hub.eventRegistry.OpenServer.fire(hub.defaultServer);
+*/
 }
