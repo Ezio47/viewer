@@ -20,6 +20,7 @@ class Cartographic3 {
     Cartographic3.asMax() : this(180.0, 90.0, double.MAX_FINITE);
 
     Cartographic3.fromVector3(Vector3 v) : this(v.x, v.y, v.z);
+    Cartographic3.fromList(List<num> v) : this(v[0].toDouble(), v[1].toDouble(), v[2].toDouble());
 
     double get longitude => _vector.x;
     set longitude(double value) => _vector.x = value;
@@ -34,8 +35,19 @@ class CartographicBbox {
     Cartographic3 min;
     Cartographic3 max;
 
-    CartographicBbox() {
+    CartographicBbox(Cartographic3 this.min, Cartographic3 this.max);
+
+    CartographicBbox.empty() {
         min = new Cartographic3.asMax();
         max = new Cartographic3.asMin();
+    }
+
+    factory CartographicBbox.fromList(List<num> list) {
+        if (list == null || list.length != 6) { // BUG: should error check
+            return new CartographicBbox.empty();
+        }
+        var min = new Cartographic3.fromList(list.take(3).toList());
+        var max = new Cartographic3.fromList(list.skip(3).toList());
+        return new CartographicBbox(min, max);
     }
 }

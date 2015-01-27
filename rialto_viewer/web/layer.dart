@@ -7,71 +7,92 @@ part of rialto.viewer;
 
 abstract class Layer {
     String name;
-    String serverName;
-    String serverPath;
+    String server;
+    String path;
     int numBytes;
-    String comment;
+    String description;
     bool isLoaded;
     bool isVisible;
     CartographicBbox bbox;
 
-    Layer(String this.name, String this.serverName, String this.serverPath)
-            : numBytes = 0,
-              comment = null,
-              isLoaded = false,
-              isVisible = false;
+    Layer(String this.name, Map map) {
+        server = _required(map, "server");
+        path = _required(map, "path");
+        numBytes = _optional(map, "size", 0);
+        description = _optional(map, "description", null);
+        isLoaded = _optional(map, "load", false);
+        isVisible = _optional(map, "visible", true);
+        bbox = new CartographicBbox.fromList(_optional(map, "bbox", null));
+    }
+
+    static dynamic _required(Map map, String key) {
+        if (!map.containsKey(key)) {
+            throw new Exception();
+        }
+        return map[key];
+    }
+
+    static dynamic _optional(Map map, String key, dynamic defalt) {
+        if (!map.containsKey(key)) {
+            return defalt;
+        }
+        return map[key];
+    }
 }
 
 
 
 class BaseImageryLayer extends Layer {
-    BaseImageryLayer(String displayName, String serverName, String serverPath)
-            : super(displayName, serverName, serverPath);
+    BaseImageryLayer(String name, Map map)
+            : super(name, map);
 }
 
 
 
 class BaseTerrainLayer extends Layer {
-    BaseTerrainLayer(String displayName, String serverName, String serverPath)
-            : super(displayName, serverName, serverPath);
+    BaseTerrainLayer(String name, Map map)
+            : super(name, map);
 }
 
 
 class ImageryLayer extends Layer {
-    ImageryLayer(String displayName, String serverName, String serverPath) : super(displayName, serverName, serverPath);
+    ImageryLayer(String name, Map map)
+            : super(name, map);
 }
 
 
 
 class TerrainLayer extends Layer {
-    TerrainLayer(String displayName, String serverName, String serverPath) : super(displayName, serverName, serverPath);
+    TerrainLayer(String name, Map map)
+            : super(name, map);
 }
 
 
 class VectorLayer extends Layer {
-    VectorLayer(String displayName, String serverName, String serverPath) : super(displayName, serverName, serverPath);
+    VectorLayer(String name, Map map)
+            : super(name, map);
 }
 
 
 class PointCloudLayer extends Layer {
     PointCloud cloud;
 
-    PointCloudLayer(String displayName, String serverName, String serverPath)
-            : super(displayName, serverName, serverPath) {
-        log("New pointcloud layer: $displayName .. $serverName .. $serverPath");
+    PointCloudLayer(String name, Map map)
+            : super(name, map) {
+        log("New pointcloud layer: $name .. $server .. $path");
 
-        Hub.root.eventRegistry.OpenFile.fire(displayName);
+        Hub.root.eventRegistry.OpenFile.fire(name);
     }
 
     void load() {
-        if (serverName == "http://www.example.com") {
-            cloud = PointCloudGenerator.generate(serverPath, name);
+        if (server == "http://www.example.com") {
+            cloud = PointCloudGenerator.generate(path, name);
 
         } else {
 
-            Comms comms = new HttpComms(serverName);
+            Comms comms = new HttpComms(server);
 
-            cloud = new PointCloud(serverPath, name, ["xyz", "rgba"]);
+            cloud = new PointCloud(path, name, ["xyz", "rgba"]);
 
             var handler = (ByteBuffer buf, int used) {
                 int numBytes = used;
@@ -90,7 +111,7 @@ class PointCloudLayer extends Layer {
                 cloud.updateBoundsForTile(tile);
             };
 
-            var f = comms.readAsBytes(serverPath, handler).then((bool v) {
+            var f = comms.readAsBytes(path, handler).then((bool v) {
                 // blah
             });
         }

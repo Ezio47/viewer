@@ -3,3 +3,4 @@ description: The Rialto Point Cloud Viewer
 dependencies:
   http: any
   vector_math: any
+  yaml: any

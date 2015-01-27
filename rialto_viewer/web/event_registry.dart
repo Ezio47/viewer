@@ -36,11 +36,9 @@ class EventRegistry {
 
     SignalFunctions<DisplayLayerData> DisplayLayer = new SignalFunctions<DisplayLayerData>();
 
-    SignalFunctions ColorizeLayers = new SignalFunctions();
+    SignalFunctions<String> ColorizeLayers = new SignalFunctions<String>();
 
     SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
-
-    SignalFunctions<String> UpdateColorizationSettings = new SignalFunctions<String>();
 
     SignalFunctions<String> OpenFile = new SignalFunctions<String>();
     SignalFunctions<String> OpenFileCompleted = new SignalFunctions<String>();

@@ -16,6 +16,8 @@ class Cartesian3 {
 
     Cartesian3.zero();
 
+    Cartesian3.fromVector(Vector3 v) : this(v.x, v.y, v.z);
+    Cartesian3.fromList(List<num> v) : this(v[0].toDouble(), v[1].toDouble(), v[2].toDouble());
 
     Cartesian3.asMin() : this(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
     Cartesian3.asMax() : this(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);

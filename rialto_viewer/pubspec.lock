@@ -37,3 +37,7 @@ packages:
     description: vector_math
     source: hosted
     version: "1.4.3"
+  yaml:
+    description: yaml
+    source: hosted
+    version: "2.1.2"

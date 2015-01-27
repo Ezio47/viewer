@@ -10,50 +10,35 @@ class LayerManager {
 
     LayerManager();
 
-    void createLayer(Map map) {
-        assert(map.containsKey("name"));
-        String name = map.remove("name");
-
+    void createLayer(String name, Map map) {
         assert(!layers.containsKey(name));
 
         assert(map.containsKey("type"));
-        assert(map.containsKey("server"));
-        assert(map.containsKey("path"));
 
-        String type = map.remove("type");
-        String server = map.remove("server");
-        String path = map.remove("path");
+        String type = map["type"];
 
         Layer layer = null;
         switch (type) {
             case "base_imagery":
-                layer = new BaseImageryLayer(name,  server,  path);
+                layer = new BaseImageryLayer(name,  map);
                 break;
             case "base_terrain":
-                layer = new BaseTerrainLayer(name,  server,  path);
+                layer = new BaseTerrainLayer(name,  map);
                 break;
             case "imagery":
-                layer = new ImageryLayer(name,  server,  path);
+                layer = new ImageryLayer(name,  map);
                 break;
             case "terrain":
-                layer = new TerrainLayer(name,  server,  path);
+                layer = new TerrainLayer(name,  map);
                 break;
             case "vector":
-                layer = new VectorLayer(name,  server,  path);
+                layer = new VectorLayer(name,  map);
                 break;
             case "pointcloud":
-                layer = new PointCloudLayer(name,  server,  path);
+                layer = new PointCloudLayer(name,  map);
                 break;
             default:
                 assert(false);
-        }
-
-        // process any remaining keys
-        for (String key in map.keys) {
-            switch (key) {
-                default:
-                    assert(false);
-            }
         }
 
         layers[name] = layer;

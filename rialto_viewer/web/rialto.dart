@@ -14,6 +14,7 @@ import 'dart:js';
 import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
 import 'package:vector_math/vector_math.dart';
+import 'package:yaml/yaml.dart';
 
 part 'annotation_controller.dart';
 part 'colorizer.dart';

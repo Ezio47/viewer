@@ -20,11 +20,7 @@ class PointCloudSet {
         len = new Vector3.zero();
 
         _hub.eventRegistry.DisplayLayer.subscribe(_handleDisplayLayer);
-        _hub.eventRegistry.ColorizeLayers.subscribe0(_handleColorizeLayers);
-        _hub.eventRegistry.UpdateColorizationSettings.subscribe((s) {
-            _colorRamp = s;
-            _hub.eventRegistry.ColorizeLayers.fire0();
-        });
+        _hub.eventRegistry.ColorizeLayers.subscribe(_handleColorizeLayers);
     }
 
     int get length => list.length;
@@ -88,7 +84,9 @@ class PointCloudSet {
         len = max - min;
     }
 
-    void _handleColorizeLayers() {
+    void _handleColorizeLayers(String ramp) {
+        _colorRamp = ramp;
+
         var colorizer = new RampColorizer(_colorRamp);
 
         for (var cloud in list) {
