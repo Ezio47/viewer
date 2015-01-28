@@ -15,7 +15,7 @@ class ModeController {
             : _hub = Hub.root,
               _modes = new Map<int, IController>(),
               _currentMode = null {
-        _hub.eventRegistry.ChangeMode.subscribe(_handleChangeMode);
+        _hub.events.ChangeMode.subscribe(_handleChangeMode);
     }
 
     void _handleChangeMode(ModeData ev) {

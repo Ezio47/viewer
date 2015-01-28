@@ -12,6 +12,7 @@ class LayerManagerDialogVM extends DialogVM {
     Hub _hub;
     ColorizerDialogVM _colorizer;
     InfoVM _info;
+    Map<String, Layer> _layers = new Map<String, Layer>();
 
     LayerManagerDialogVM(String id) : super(id) {
         _listbox = new ListBoxVM<_LayerItem>("layerManagerDialog_layers");
@@ -22,21 +23,31 @@ class LayerManagerDialogVM extends DialogVM {
         _hub = Hub.root;
 
         _listbox.setSelectHandler(_selectHandler);
+
+        _hub.events.AddLayerCompleted.subscribe(_handleAddLayerCompleted);
+        _hub.events.RemoveLayerCompleted.subscribe(_handleRemoveLayerCompleted);
     }
 
     @override
     void _open() {
         _listbox.clear();
 
-        Map layers = _hub.layerManager.layers;
-        for (var layer in layers.keys) {
-            var item = new _LayerItem(layers[layer]);
+        for (var layer in _layers.values) {
+            var item = new _LayerItem(layer);
             _listbox.add(item);
         }
     }
 
     @override
     void _close(bool okay) {}
+
+    void _handleAddLayerCompleted(Layer layer) {
+        _layers[layer.name] = layer;
+    }
+
+    void _handleRemoveLayerCompleted(String name) {
+        _layers.remove(name);
+    }
 
     void _selectHandler(var e) {
         List<_LayerItem> items = _listbox.getCurrentSelection();

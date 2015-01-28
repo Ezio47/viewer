@@ -17,9 +17,9 @@ class MeasurementController implements IController {
 
         _hub.modeController.register(this, ModeData.MEASUREMENT);
 
-        _hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
-        _hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
-        _hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);
+        _hub.events.MouseMove.subscribe(_handleMouseMove);
+        _hub.events.MouseDown.subscribe(_handleMouseDown);
+        _hub.events.MouseUp.subscribe(_handleMouseUp);
     }
 
     void startMode() {

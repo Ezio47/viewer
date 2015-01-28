@@ -10,5 +10,5 @@ void main() {
     var hub = new Hub();
     Hub.root.init();
 
-    hub.eventRegistry.LoadScript.fire("http://localhost:12345/test2.yaml");
+    hub.events.LoadScript.fire("http://localhost:12345/test2.yaml");
 }

@@ -10,37 +10,30 @@ void log(o) {
 
 
 class Hub {
-    LayerManager layerManager;
-
-    RialtoElement rialtoElement;
-
-    Element cesiumContainer;
-
-    EventRegistry eventRegistry;
-
-    ViewController viewController;
-    AnnotationController annotationController;
-    MeasurementController measurementController;
-    ModeController modeController;
-    SelectionController selectionController;
-
-    bool isPickingEnabled = true;
-
     // singleton
     static Hub _root;
 
-    BboxShape bboxShape;
+    // globals
+    EventRegistry events;
+    ModeController modeController;
+    CesiumBridge cesium;
 
+    // privates
+    ViewController _viewController;
+    AnnotationController _annotationController;
+    MeasurementController _measurementController;
+    SelectionController _selectionController;
+    BboxShape _bboxShape;
+    Camera _camera;
+    LayerManager _layerManager;
+
+    // TODO: make private
     List<Annotation> annotations = new List<Annotation>();
     List<Measurement> measurements = new List<Measurement>();
 
-    Camera camera;
-
-    CesiumBridge cesium;
-
     Hub() {
         _root = this;
-        eventRegistry = new EventRegistry();
+        events = new EventRegistry();
     }
 
     static Hub get root {
@@ -49,44 +42,41 @@ class Hub {
     }
 
     void init() {
-        layerManager = new LayerManager();
+        _layerManager = new LayerManager();
 
         cesium = new CesiumBridge('cesiumContainer');
 
         var rialtoElement = new RialtoElement();
 
-        eventRegistry.LoadScript.subscribe(_handleLoadScript);
-
-        cesium.onMouseMove((x, y) => eventRegistry.MouseMove.fire(new MouseData.fromXy(x, y)));
-        cesium.onMouseDown((x, y, b) => eventRegistry.MouseDown.fire(new MouseData.fromXyb(x, y, b)));
-        cesium.onMouseUp((x, y, b) => eventRegistry.MouseUp.fire(new MouseData.fromXyb(x, y, b)));
-        cesium.onMouseWheel((d) => eventRegistry.MouseWheel.fire(new WheelData.fromD(d.toDouble())));
+        cesium.onMouseMove((x, y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
+        cesium.onMouseDown((x, y, b) => events.MouseDown.fire(new MouseData.fromXyb(x, y, b)));
+        cesium.onMouseUp((x, y, b) => events.MouseUp.fire(new MouseData.fromXyb(x, y, b)));
+        cesium.onMouseWheel((d) => events.MouseWheel.fire(new WheelData.fromD(d.toDouble())));
         // onKeyDown...
         // onKeyUp...
         // onResize...
 
-        eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
+        events.DisplayBbox.subscribe(_handleDisplayBbox);
 
-        eventRegistry.LayersBboxChanged.subscribe(_handleLayerBboxChanged);
+        events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
 
         modeController = new ModeController();
-        viewController = new ViewController();
-        annotationController = new AnnotationController();
-        measurementController = new MeasurementController();
-        selectionController = new SelectionController();
+        _viewController = new ViewController();
+        _annotationController = new AnnotationController();
+        _measurementController = new MeasurementController();
+        _selectionController = new SelectionController();
 
-        camera = new Camera();
+        _camera = new Camera();
 
-        eventRegistry.ChangeMode.fire(new ModeData(ModeData.VIEW));
+        events.ChangeMode.fire(new ModeData(ModeData.VIEW));
+
+        events.LoadScript.subscribe(_handleLoadScript);
     }
 
-    int get width => window.innerWidth;
-    int get height => window.innerHeight;
-
-    void _handleLayerBboxChanged(CartographicBbox box) {
-        if (bboxShape != null) bboxShape.remove();
+    void _handleLayersBboxChanged(CartographicBbox box) {
+        if (_bboxShape != null) _bboxShape.remove();
         if (box.isValid) {
-            bboxShape = new BboxShape(box.minimum, box.maximum);
+            _bboxShape = new BboxShape(box.minimum, box.maximum);
         }
     }
 
@@ -95,7 +85,7 @@ class Hub {
     }
 
     void _handleDisplayBbox(bool v) {
-        if (bboxShape == null) return;
-        bboxShape.isVisible = v;
+        if (_bboxShape == null) return;
+        _bboxShape.isVisible = v;
     }
 }

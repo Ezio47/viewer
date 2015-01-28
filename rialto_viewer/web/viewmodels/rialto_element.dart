@@ -15,12 +15,11 @@ class RialtoElement  {
 
     RialtoElement() {
         _hub = Hub.root;
-        _hub.rialtoElement = this;
 
         _mouseCoords = querySelector("#textMouseCoords");
 
-        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(1)));
-        querySelector("#homeDataButton").onClick.listen((ev) => _hub.eventRegistry.UpdateCamera.fire(new CameraData.fromMode(2)));
+        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(1)));
+        querySelector("#homeDataButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(2)));
 
         _modalButtons = new ModalButtonsVM({
             querySelector("#viewModeButton"): new ModeData(ModeData.VIEW),
@@ -35,7 +34,7 @@ class RialtoElement  {
 
         _about = new AboutVM("aboutDialog");
 
-        _hub.eventRegistry.MouseMove.subscribe(_updateCoords);
+        _hub.events.MouseMove.subscribe(_updateCoords);
     }
 
     void _updateCoords(MouseData d) {

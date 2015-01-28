@@ -21,8 +21,8 @@ class Camera {
 
     Camera() {
         _hub = Hub.root;
-        _hub.eventRegistry.UpdateCamera.subscribe(_handleUpdateCamera);
-        _hub.eventRegistry.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
+        _hub.events.UpdateCamera.subscribe(_handleUpdateCamera);
+        _hub.events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
 
     }
 

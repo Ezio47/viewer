@@ -39,9 +39,11 @@ class EventRegistry {
     SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
 
     SignalFunctions<LayerData> AddLayer = new SignalFunctions<LayerData>();
-    SignalFunctions<String> AddLayerCompleted = new SignalFunctions<String>();
+    SignalFunctions<Layer> AddLayerCompleted = new SignalFunctions<Layer>();
     SignalFunctions<String> RemoveLayer = new SignalFunctions<String>();
     SignalFunctions<String> RemoveLayerCompleted = new SignalFunctions<String>();
+    SignalFunctions RemoveAllLayers = new SignalFunctions();
+    SignalFunctions RemoveAllLayersCompleted = new SignalFunctions();
 
     SignalFunctions<ModeData> ChangeMode = new SignalFunctions();
 

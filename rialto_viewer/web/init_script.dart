@@ -6,7 +6,11 @@ part of rialto.viewer;
 
 
 class InitScript {
+    Hub _hub;
+
     InitScript(String url) {
+        _hub = Hub.root;
+
         Http.Client client = new BHttp.BrowserClient();
 
         Future<String> f = client.get(url).then((response) {
@@ -18,13 +22,18 @@ class InitScript {
             assert(false);
         });
 
-        f.then((s) => _execute(s));
+        f.then((s) {
+            _hub.events.RemoveAllLayersCompleted.subscribe0(() {
+                _execute(s);
+            });
 
-        Hub.root.eventRegistry.LoadScriptCompleted.fire(url);
+            _hub.events.RemoveAllLayers.fire0();
+        });
+
+        Hub.root.events.LoadScriptCompleted.fire(url);
     }
 
     void _execute(String json) {
-        Hub.root.layerManager.layers.clear();
 
         Map commands = loadYaml(json);
 
@@ -79,24 +88,24 @@ class InitScript {
         double fov = data["fov"].toDouble();
 
         var cameraData = new CameraData(eye, target, up, fov);
-        Hub.root.eventRegistry.UpdateCamera.fire(cameraData);
+        _hub.events.UpdateCamera.fire(cameraData);
     }
 
     void _doCommand_colorize(Map data) {
         assert(data.containsKey("ramp"));
         String ramp = data["ramp"];
-        Hub.root.eventRegistry.ColorizeLayers.fire(ramp);
+        _hub.events.ColorizeLayers.fire(ramp);
     }
 
     void _doCommand_display(Map data) {
         if (data.containsKey("bbox")) {
-            Hub.root.eventRegistry.DisplayBbox.fire(data["bbox"]);
+            _hub.events.DisplayBbox.fire(data["bbox"]);
         }
     }
 
     void _doCommand_layers(Map layers) {
         for (var name in layers.keys) {
-            Hub.root.eventRegistry.AddLayer.fire(new LayerData(name, layers[name]));
+            _hub.events.AddLayer.fire(new LayerData(name, layers[name]));
         }
     }
 }

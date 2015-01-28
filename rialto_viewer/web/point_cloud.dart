@@ -17,11 +17,9 @@ class PointCloud {
     List<String> dimensionNames;
     int numPoints;
     int tileId = 0;
-    bool isVisible;
 
     PointCloud(String this.webpath, String this.displayName, List<String> names)
-            : numPoints = 0,
-              isVisible = true {
+            : numPoints = 0 {
 
         dimensionNames = new List<String>.from(names);
 

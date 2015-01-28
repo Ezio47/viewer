@@ -13,8 +13,9 @@ class LayerManager {
     LayerManager() {
         _hub = Hub.root;
 
-        _hub.eventRegistry.AddLayer.subscribe(_handleAddLayer);
-        _hub.eventRegistry.RemoveLayer.subscribe(_handleRemoveLayer);
+        _hub.events.AddLayer.subscribe(_handleAddLayer);
+        _hub.events.RemoveLayer.subscribe(_handleRemoveLayer);
+        _hub.events.RemoveAllLayers.subscribe0(_handleRemoveAllLayers);
     }
 
     void _handleAddLayer(LayerData data) {
@@ -27,12 +28,12 @@ class LayerManager {
         layers[layer.name] = layer;
 
         bbox.unionWith(layer.bbox);
-        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
+        _hub.events.LayersBboxChanged.fire(bbox);
 
         layer.load().then((_) {
             bbox.unionWith(layer.bbox);
-            _hub.eventRegistry.LayersBboxChanged.fire(bbox);
-            _hub.eventRegistry.AddLayerCompleted.fire(name);
+            _hub.events.LayersBboxChanged.fire(bbox);
+            _hub.events.AddLayerCompleted.fire(layer);
         });
     }
 
@@ -47,11 +48,16 @@ class LayerManager {
         for (var layer in layers.values) {
             bbox.unionWith(layer.bbox);
         }
-        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
+        _hub.events.LayersBboxChanged.fire(bbox);
 
-        _hub.eventRegistry.RemoveLayerCompleted.fire(name);
+        _hub.events.RemoveLayerCompleted.fire(name);
     }
 
+    void _handleRemoveAllLayers() {
+        var items = layers.values.toList();
+        items.forEach((layer) => _hub.events.RemoveLayer.fire(layer.name));
+        _hub.events.RemoveAllLayersCompleted.fire0();
+    }
 
     // this function should do no heavywieght work, save that for load()
     static Layer _createLayer(String name, Map map) {
