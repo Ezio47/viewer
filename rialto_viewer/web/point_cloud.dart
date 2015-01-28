@@ -28,6 +28,12 @@ class PointCloud {
         tiles = new List<PointCloudTile>();
     }
 
+    void changeVisibility(bool v) {
+        for (var tile in tiles) {
+            tile.shape.isVisible = v;
+        }
+    }
+
     PointCloudTile createTile(int numPointsInTile) {
         var tile = new PointCloudTile(dimensionNames, numPointsInTile, tileId++);
         tiles.add(tile);

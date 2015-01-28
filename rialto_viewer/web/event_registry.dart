@@ -102,9 +102,9 @@ class KeyboardData {
 }
 
 class DisplayLayerData {
-    String webpath;
+    Layer layer;
     bool visible;
-    DisplayLayerData(this.webpath, this.visible);
+    DisplayLayerData(this.layer, this.visible);
 }
 
 class CameraData {

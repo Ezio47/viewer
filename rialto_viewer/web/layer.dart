@@ -11,24 +11,27 @@ abstract class Layer {
     String path;
     int numBytes;
     String description;
-    bool isLoaded;
     bool isVisible;
     CartographicBbox bbox;
 
     Layer(String this.name, Map map) {
         server = _required(map, "server");
         path = _required(map, "path");
-        numBytes = _optional(map, "size", 0);
+        numBytes = _optional(map, "numBytes", 0);
         description = _optional(map, "description", null);
-        isLoaded = _optional(map, "load", true);
         isVisible = _optional(map, "visible", true);
-        var v6 = _optional(map, "bbox", null);
+        List<num> v6 = _optional(map, "bbox", null);
         if (v6 == null) {
             bbox = new CartographicBbox.empty();
         } else {
             assert(v6.length == 6);
+            v6 = v6.map((i) => i.toDouble()).toList();
             bbox = new CartographicBbox.fromValues(v6[0], v6[1], v6[2], v6[3], v6[4], v6[5]);
         }
+    }
+
+    void changeVisibility(bool v) {
+        isVisible = v;
     }
 
     Future<bool> load() {
@@ -100,9 +103,10 @@ class PointCloudLayer extends Layer {
         var whenReady = () {
             assert(cloud != null);
 
+            cloud.changeVisibility(isVisible);
+
             bbox = new CartographicBbox.copy(cloud.bbox);
 
-            isLoaded = true;
             c.complete(true);
         };
 
@@ -138,5 +142,11 @@ class PointCloudLayer extends Layer {
         }
 
         return c.future;
+    }
+
+    @override
+    void changeVisibility(bool v) {
+        cloud.changeVisibility(v);
+        isVisible = v;
     }
 }

@@ -88,4 +88,9 @@ class Hub {
         if (_bboxShape == null) return;
         _bboxShape.isVisible = v;
     }
+
+    void _handleDisplayLayer(DisplayLayerData data) {
+        assert(data.layer != null);
+        data.layer.changeVisibility(data.visible);
+    }
 }
