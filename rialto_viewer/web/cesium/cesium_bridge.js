@@ -81,7 +81,7 @@ var CesiumBridge = function (element) {
 
     this.setPrimitiveVisible = function(primitive, value) {
         //console.log("was " + primitive.show);
-        /////primitive.show = value;
+        primitive.show = value;
         //console.log("now " + primitive.show);
     }
 
