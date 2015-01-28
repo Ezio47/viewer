@@ -49,7 +49,7 @@ class PointCloud {
             updateBoundsForTile(tile);
         }
 
-        //print("Bounds: min=${Utils.printv(minimum)} max=${Utils.printv(maximum)} len=${Utils.printv(len)}");
+        print("Bounds: min=${Utils.printv(minimum)} max=${Utils.printv(maximum)} len=${Utils.printv(len)}");
     }
 
     void updateBoundsForTile(PointCloudTile tile) {
@@ -64,7 +64,7 @@ class PointCloud {
 
         Hub.root.renderer.forceUpdate();
 
-        //print("Bounds: min=${Utils.printv(minimum)} max=${Utils.printv(maximum)} len=${Utils.printv(len)}");
+        print("Bounds: min=${Utils.printv(minimum)} max=${Utils.printv(maximum)} len=${Utils.printv(len)}");
     }
 
     void colorize(Colorizer colorizer) {

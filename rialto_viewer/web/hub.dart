@@ -26,9 +26,6 @@ class Hub {
     ModeController modeController;
     SelectionController selectionController;
 
-    // the global repo for loaded data
-    PointCloudSet renderablePointCloudSet;
-
     bool isPickingEnabled = true;
 
     // singleton
@@ -58,8 +55,6 @@ class Hub {
         eventRegistry.OpenFile.subscribe(_handleOpenFile);
         eventRegistry.CloseFile.subscribe(_handleCloseFile);
 
-        renderablePointCloudSet = new PointCloudSet();
-
         cesium.onMouseMove((x,y) => eventRegistry.MouseMove.fire(new MouseData.fromXy(x,y)));
         cesium.onMouseDown((x,y,b) => eventRegistry.MouseDown.fire(new MouseData.fromXyb(x,y,b)));
         cesium.onMouseUp((x,y,b) => eventRegistry.MouseUp.fire(new MouseData.fromXyb(x,y,b)));
@@ -74,9 +69,7 @@ class Hub {
         measurementController = new MeasurementController();
         selectionController = new SelectionController();
 
-        renderablePointCloudSet = new PointCloudSet();
-
-        renderer = new Renderer(renderablePointCloudSet);
+        renderer = new Renderer();
 
         cesium.setUpdateFunction(renderer.checkUpdate);
 
@@ -97,19 +90,12 @@ class Hub {
         PointCloudLayer pcl = layer as PointCloudLayer;
         pcl.load();
 
-        PointCloud pointCloud = pcl.cloud;
-
-        renderablePointCloudSet.addCloud(pointCloud);
-
         renderer.updateNeeded = true;
 
         eventRegistry.OpenFileCompleted.fire(webpath);
     }
 
     void _handleCloseFile(String webpath) {
-
-        renderablePointCloudSet.removeCloud(webpath);
-
         renderer.updateNeeded = true;
 
         eventRegistry.CloseFileCompleted.fire(webpath);

@@ -24,7 +24,12 @@ class Camera {
         _hub.eventRegistry.UpdateCamera.subscribe(_handleUpdateCamera);
     }
 
-    void changeDataExtents(double west, double south, double east, double north) {
+    void changeDataExtents(CartographicBbox bbox) {
+        double west = bbox.west;
+        double south = bbox.south;
+        double east = bbox.east;
+        double north = bbox.north;
+
         double centerLon = east + (west - east) / 2.0;
         double centerLat = south + (north - south) / 2.0;
 

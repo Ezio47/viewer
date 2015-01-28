@@ -61,6 +61,7 @@ class HttpComms extends Comms {
 
     @override
     Future<bool> readAsBytes(String webpath, FlushFunc handler) {
+
         Completer c = new Completer();
 
         _readBuffer.open(handler);
@@ -142,69 +143,5 @@ class _ReadBuffer {
         _flushfunc(_buffer.buffer, _used);
         _buffer = null;
         _used = 0;
-    }
-}
-
-class FauxComms extends Comms {
-
-    FauxComms(String server) : super(server);
-
-    @override
-    void open() {
-    }
-
-    @override
-    void close() {
-    }
-
-    @override
-    Future<bool> readAsBytes(String path, FlushFunc handler) {
-        throw new UnimplementedError();
-    }
-
-    @override
-    Future<String> readAsString(String path) {
-        var map;
-
-        switch (path) {
-            //case "http://www.example.com/":
-            case "/":
-                map = {
-                    "type": "directory",
-                    "dirs": ["/dir1", "/dir2"],
-                    "files": ["/newcube.dat", "/oldcube.dat", "/terrain1.dat", "/terrain2.dat", "/terrain3.dat"]
-                };
-                break;
-            case "/dir1":
-                map = {
-                    "type": "directory",
-                    "dirs": [],
-                    "files": ["/dir1/random.dat"]
-                };
-                break;
-            case "/dir2":
-                map = {
-                    "type": "directory",
-                    "dirs": [],
-                    "files": ["/dir2/line.dat"]
-                };
-                break;
-            case "/newcube.dat":
-            case "/oldcube.dat":
-            case "/terrain1.dat":
-            case "/terrain2.dat":
-            case "/terrain3.dat":
-            case "/dir1/random.dat":
-            case "/dir2/line.dat":
-                map = {
-                    "dims": ["x", "y", "z"],
-                    "size": 1111
-                };
-                break;
-            default:
-                throw new Error();
-        }
-
-        return Utils.toFuture(JSON.encode(map));
     }
 }

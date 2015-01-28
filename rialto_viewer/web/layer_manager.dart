@@ -7,6 +7,7 @@ part of rialto.viewer;
 
 class LayerManager {
     Map<String, Layer> layers = new Map<String, Layer>();
+    CartographicBbox bbox = new CartographicBbox.empty();
 
     LayerManager();
 
@@ -41,6 +42,21 @@ class LayerManager {
                 assert(false);
         }
 
-        layers[name] = layer;
+        addLayer(layer);
+    }
+
+    void addLayer(Layer layer) {
+        layers[layer.name] = layer;
+
+        bbox.unionWith(layer.bbox);
+    }
+
+    void removeLayer(Layer layer) {
+        layers.remove(layer.name);
+
+        bbox = new CartographicBbox.empty();
+        for (var layer in layers.values) {
+            bbox.unionWith(layer.bbox);
+        }
     }
 }

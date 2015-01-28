@@ -7,8 +7,6 @@ part of rialto.viewer;
 class Renderer {
     Hub _hub;
 
-    PointCloudSet _pointClouds;
-
     AxesShape _axesShape;
     BboxShape _bboxShape;
 
@@ -17,16 +15,10 @@ class Renderer {
 
     Camera camera;
 
-    Cartographic3 _cloudMin;
-    Cartographic3 _cloudMax;
-    Vector3 _cloudLen;
-
     bool updateNeeded;
 
-    Renderer(PointCloudSet rpcSet) {
+    Renderer() {
         _hub = Hub.root;
-
-        _pointClouds = rpcSet;
 
         camera = new Camera();
 
@@ -49,37 +41,22 @@ class Renderer {
         //assert(updateNeeded);
         updateNeeded = false; // BUG: should this go at end? (race condition?)
 
-        if (_pointClouds.length > 0) {
-            _cloudMin = new Cartographic3.fromVector3(_pointClouds.min);
-            _cloudMax = new Cartographic3.fromVector3(_pointClouds.max);
-            _cloudLen = _pointClouds.len;
+        // BUG: only do these things if any of the layer manager has changed
 
-            camera.changeDataExtents(_cloudMin.longitude, _cloudMin.latitude, _cloudMax.longitude, _cloudMax.latitude);
-        }
+        var box = _hub.layerManager.bbox;
 
-        if (_pointClouds.numPoints > 0) {
+        if (_hub.layerManager.layers.length > 0 && box.isValid) {
+            camera.changeDataExtents(box);
+
             // axes model space is (0 .. 0.25 * cloudLen)
-            final cloudLen14 = _cloudLen / 4.0;
+            final len14 = box.length / 4.0;
             if (_axesShape != null) _axesShape.remove();
-            _axesShape = new AxesShape(_cloudMin, cloudLen14);
-        }
+            _axesShape = new AxesShape(box.minimum, len14);
 
-        if (_pointClouds.numPoints > 0) {
+
             // bbox model space is (cloudMin....cloudMax)
             if (_bboxShape != null) _bboxShape.remove();
-            _bboxShape = new BboxShape(_cloudMin, _cloudMax);
-        }
-
-        for (var pointCloud in _pointClouds.list) {
-            //
-        }
-
-        for (var annotation in annotations) {
-            //
-        }
-
-        for (var measurement in measurements) {
-            //
+            _bboxShape = new BboxShape(box.minimum, box.maximum);
         }
     }
 

@@ -50,30 +50,16 @@ class Utils {
         return c.future;
     }
 
-    static Vector3 vectorMinV(Vector3 a, Vector3 b) {
-        Vector3 c = new Vector3.zero();
-        c.x = min(a.x, b.x);
-        c.y = min(a.y, b.y);
-        c.z = min(a.z, b.z);
-        return c;
+    static void vectorMinWith(Vector3 dst, Vector3 src) {
+        dst.x = min(dst.x, src.x);
+        dst.y = min(dst.y, src.y);
+        dst.z = min(dst.z, src.z);
     }
 
-    static Vector3 vectorMaxV(Vector3 a, Vector3 b) {
-        Vector3 c = new Vector3.zero();
-        c.x = max(a.x, b.x);
-        c.y = max(a.y, b.y);
-        c.z = max(a.z, b.z);
-        return c;
-    }
-
-    static double vectorMinD(Vector3 a) {
-        var d = min3(a.x, a.y, a.z);
-        return d;
-    }
-
-    static double vectorMaxD(Vector3 a) {
-        var d = max3(a.x, a.y, a.z);
-        return d;
+    static void vectorMaxWith(Vector3 dst, Vector3 src) {
+        dst.x = max(dst.x, src.x);
+        dst.y = max(dst.y, src.y);
+        dst.z = max(dst.z, src.z);
     }
 
     static String toSI(num vv, {sigfigs: 0}) {
@@ -109,50 +95,5 @@ class Utils {
         assert(toSI(999000) == "999K");
         assert(toSI(1000000) == "1M");
         assert(toSI(1000000000) == "1G");
-    }
-
-    static Vector3 getCameraPointTarget(PointCloudSet set) {
-
-        double minx = 0.0;
-        double miny = 0.0;
-        double minz = 0.0;
-        double lenx = 100.0;
-        double leny = 100.0;
-
-        if (set.length > 0) {
-            minx = set.min.x;
-            miny = set.min.y;
-            minz = set.min.z;
-            lenx = set.len.x;
-            leny = set.len.y;
-        }
-
-        final double x = minx + lenx / 2.0;
-        final double y = miny + leny / 2.0;
-        final double z = minz;
-
-        return new Vector3(x, y, z);
-    }
-
-    static Vector3 getCameraPointEye(PointCloudSet set) {
-
-        double lenx = 100.0;
-        double leny = 100.0;
-        double maxz = 25.0;
-
-        if (set.length > 0) {
-            lenx = set.len.x;
-            leny = set.len.y;
-            maxz = set.max.z;
-
-        }
-
-        var v = getCameraPointTarget(set);
-
-        v.x = v.x - 0.5 * lenx;
-        v.y = v.y - 1.25 * leny;
-        v.z = maxz * 5.0;
-
-        return v;
     }
 }

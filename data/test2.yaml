@@ -2,7 +2,7 @@ layers:
     
     serp_small:
         type: pointcloud
-        server: ws://localhost:12347
+        server: ws://localhost:12346
         path: /serp-100K.ria
 
 colorize:

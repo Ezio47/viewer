@@ -28,6 +28,9 @@ class Cartographic3 {
     set latitude(double value) => _vector.y = value;
     double get height => _vector.z;
     set height(double value) => _vector.z = value;
+
+    void minWith(Cartographic3 v) => Utils.vectorMinWith(_vector, v._vector);
+    void maxWith(Cartographic3 v) => Utils.vectorMaxWith(_vector, v._vector);
 }
 
 
@@ -42,12 +45,22 @@ class CartographicBbox {
         maximum = new Cartographic3.asMin();
     }
 
-    factory CartographicBbox.fromList(List<num> list) {
-        if (list == null || list.length != 6) { // BUG: should error check
-            return new CartographicBbox.empty();
-        }
-        var min = new Cartographic3.fromList(list.take(3).toList());
-        var max = new Cartographic3.fromList(list.skip(3).toList());
-        return new CartographicBbox(min, max);
+    CartographicBbox.fromValues(double minx, double miny, double minz, double maxx, double maxy, double maxz) {
+        minimum = new Cartographic3(minx, miny, minz);
+        maximum = new Cartographic3(maxx, maxy, maxz);
     }
+
+    bool get isValid => minimum._vector.z > -double.MAX_FINITE && minimum._vector.z < double.MAX_FINITE;
+
+    double get north => maximum.latitude;
+    double get south => minimum.latitude;
+    double get east => maximum.longitude;
+    double get west => minimum.longitude;
+
+    void unionWith(CartographicBbox bbox) {
+        minimum.minWith(bbox.minimum);
+        maximum.maxWith(bbox.maximum);
+    }
+
+    Vector3 get length => maximum._vector - minimum._vector;
 }

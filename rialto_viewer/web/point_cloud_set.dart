@@ -4,8 +4,8 @@
 
 part of rialto.viewer;
 
-
-class PointCloudSet {
+/*
+class PointCloudSetX {
     Hub _hub;
     List<PointCloud> list = new List<PointCloud>();
     Vector3 min, max, len;
@@ -95,3 +95,4 @@ class PointCloudSet {
         _hub.renderer.updateNeeded = true;
     }
 }
+*/

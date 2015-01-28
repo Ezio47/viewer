@@ -51,8 +51,17 @@ class CesiumBridge {
     }
 
     static bool _isValidLatLon(Cartographic3 v) {
-        const zmax = 100000;
-        return (v.longitude >= -180.0 && v.longitude <= 180.0) && (v.latitude >= -90.0 && v.latitude <= 90.0) && (v.hashCode >= -zmax && v.height <= zmax);
+        final lonOk = (v.longitude >= -180.0 && v.longitude <= 180.0);
+        if (!lonOk) return false;
+
+        final latOk = (v.latitude >= -90.0 && v.latitude <= 90.0);
+        if (!latOk) return false;
+
+        const MAX_HEIGHT = 100000;
+        final hOk = (v.height >= -MAX_HEIGHT && v.height <= MAX_HEIGHT);
+        if (!hOk) return false;
+
+        return true;
     }
 
     Cartographic3 getMouseCoordinates(int windowX, int windowY) {
