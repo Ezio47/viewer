@@ -91,10 +91,6 @@ class PointCloudLayer extends Layer {
     PointCloudLayer(String name, Map map)
             : super(name, map) {
         log("New pointcloud layer: $name .. $server .. $path");
-
-        if (isLoaded) {
-            Hub.root.eventRegistry.OpenFile.fire(name);
-        }
     }
 
     @override

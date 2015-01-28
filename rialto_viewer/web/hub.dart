@@ -57,9 +57,6 @@ class Hub {
 
         eventRegistry.LoadScript.subscribe(_handleLoadScript);
 
-        eventRegistry.OpenFile.subscribe(_handleOpenFile);
-        eventRegistry.CloseFile.subscribe(_handleCloseFile);
-
         cesium.onMouseMove((x, y) => eventRegistry.MouseMove.fire(new MouseData.fromXy(x, y)));
         cesium.onMouseDown((x, y, b) => eventRegistry.MouseDown.fire(new MouseData.fromXyb(x, y, b)));
         cesium.onMouseUp((x, y, b) => eventRegistry.MouseUp.fire(new MouseData.fromXyb(x, y, b)));
@@ -95,18 +92,6 @@ class Hub {
 
     void _handleLoadScript(String url) {
         var s = new InitScript(url);
-    }
-
-    void _handleOpenFile(String webpath) {
-        layerManager.load(webpath).then((_) {
-            eventRegistry.OpenFileCompleted.fire(webpath);
-        });
-    }
-
-    void _handleCloseFile(String webpath) {
-        assert(false);
-
-        eventRegistry.CloseFileCompleted.fire(webpath);
     }
 
     void _handleDisplayBbox(bool v) {

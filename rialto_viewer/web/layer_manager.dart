@@ -12,10 +12,49 @@ class LayerManager {
 
     LayerManager() {
         _hub = Hub.root;
+
+        _hub.eventRegistry.AddLayer.subscribe(_handleAddLayer);
+        _hub.eventRegistry.RemoveLayer.subscribe(_handleRemoveLayer);
     }
 
-    void createLayer(String name, Map map) {
+    void _handleAddLayer(LayerData data) {
+        final name = data.name;
+
         assert(!layers.containsKey(name));
+
+        Layer layer = LayerManager._createLayer(name, data.map);
+
+        layers[layer.name] = layer;
+
+        bbox.unionWith(layer.bbox);
+        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
+
+        layer.load().then((_) {
+            bbox.unionWith(layer.bbox);
+            _hub.eventRegistry.LayersBboxChanged.fire(bbox);
+            _hub.eventRegistry.AddLayerCompleted.fire(name);
+        });
+    }
+
+    void _handleRemoveLayer(String name) {
+        assert(layers.containsKey(name));
+        Layer layer = layers[name];
+        assert(layer != null);
+
+        layers.remove(layer.name);
+
+        bbox = new CartographicBbox.empty();
+        for (var layer in layers.values) {
+            bbox.unionWith(layer.bbox);
+        }
+        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
+
+        _hub.eventRegistry.RemoveLayerCompleted.fire(name);
+    }
+
+
+    // this function should do no heavywieght work, save that for load()
+    static Layer _createLayer(String name, Map map) {
 
         assert(map.containsKey("type"));
 
@@ -24,61 +63,27 @@ class LayerManager {
         Layer layer = null;
         switch (type) {
             case "base_imagery":
-                layer = new BaseImageryLayer(name,  map);
+                layer = new BaseImageryLayer(name, map);
                 break;
             case "base_terrain":
-                layer = new BaseTerrainLayer(name,  map);
+                layer = new BaseTerrainLayer(name, map);
                 break;
             case "imagery":
-                layer = new ImageryLayer(name,  map);
+                layer = new ImageryLayer(name, map);
                 break;
             case "terrain":
-                layer = new TerrainLayer(name,  map);
+                layer = new TerrainLayer(name, map);
                 break;
             case "vector":
-                layer = new VectorLayer(name,  map);
+                layer = new VectorLayer(name, map);
                 break;
             case "pointcloud":
-                layer = new PointCloudLayer(name,  map);
+                layer = new PointCloudLayer(name, map);
                 break;
             default:
                 assert(false);
         }
 
-        addLayer(layer);
-    }
-
-    Future<bool> load(String webpath) {
-        assert(layers.containsKey(webpath));
-        Layer layer = layers[webpath];
-        assert(layer != null);
-
-        Completer c = new Completer();
-        layer.load().then((_) {
-            bbox.unionWith(layer.bbox);
-            _hub.eventRegistry.LayersBboxChanged.fire(bbox);
-            c.complete(true);
-        });
-
-        return c.future;
-    }
-
-    void addLayer(Layer layer) {
-        layers[layer.name] = layer;
-
-        bbox.unionWith(layer.bbox);
-
-        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
-    }
-
-    void removeLayer(Layer layer) {
-        layers.remove(layer.name);
-
-        bbox = new CartographicBbox.empty();
-        for (var layer in layers.values) {
-            bbox.unionWith(layer.bbox);
-        }
-
-        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
+        return layer;
     }
 }

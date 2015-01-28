@@ -38,10 +38,10 @@ class EventRegistry {
 
     SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
 
-    SignalFunctions<String> OpenFile = new SignalFunctions<String>();
-    SignalFunctions<String> OpenFileCompleted = new SignalFunctions<String>();
-    SignalFunctions<String> CloseFile = new SignalFunctions<String>();
-    SignalFunctions<String> CloseFileCompleted = new SignalFunctions<String>();
+    SignalFunctions<LayerData> AddLayer = new SignalFunctions<LayerData>();
+    SignalFunctions<String> AddLayerCompleted = new SignalFunctions<String>();
+    SignalFunctions<String> RemoveLayer = new SignalFunctions<String>();
+    SignalFunctions<String> RemoveLayerCompleted = new SignalFunctions<String>();
 
     SignalFunctions<ModeData> ChangeMode = new SignalFunctions();
 
@@ -115,7 +115,11 @@ class CameraData {
     CameraData.fromMode(this.mode);
 }
 
-
+class LayerData {
+    String name;
+    Map map;
+    LayerData(String this.name, Map this.map);
+}
 
 class ModeData {
     static const int INVALID = 0;

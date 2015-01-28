@@ -96,7 +96,7 @@ class InitScript {
 
     void _doCommand_layers(Map layers) {
         for (var name in layers.keys) {
-            Hub.root.layerManager.createLayer(name, layers[name]);
+            Hub.root.eventRegistry.AddLayer.fire(new LayerData(name, layers[name]));
         }
     }
 }
