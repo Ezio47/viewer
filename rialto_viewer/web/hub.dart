@@ -31,17 +31,17 @@ class Hub {
     List<Annotation> annotations = new List<Annotation>();
     List<Measurement> measurements = new List<Measurement>();
 
-    Hub() {
-        _root = this;
-        events = new EventRegistry();
-    }
-
     static Hub get root {
         assert(_root != null);
         return _root;
     }
 
-    void init() {
+    Hub() {
+        assert(_root == null);
+        _root = this;
+
+        events = new EventRegistry();
+
         _layerManager = new LayerManager();
 
         cesium = new CesiumBridge('cesiumContainer');
