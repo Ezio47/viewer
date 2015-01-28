@@ -19,6 +19,10 @@ class CheckBoxVM extends ViewModel {
         value = _defaultValue;
     }
 
+    void setClickHandler(var f) {
+        _inputElement.onClick.listen((e) => f(e));
+    }
+
     void clearState() {
         _startingValue = value;
     }

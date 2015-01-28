@@ -13,16 +13,19 @@ class LayerManagerDialogVM extends DialogVM {
     ColorizerDialogVM _colorizer;
     InfoVM _info;
     Map<String, Layer> _layers = new Map<String, Layer>();
+    CheckBoxVM _layerVisible;
 
     LayerManagerDialogVM(String id) : super(id) {
+        _hub = Hub.root;
+
         _listbox = new ListBoxVM<_LayerItem>("layerManagerDialog_layers");
+        _listbox.setSelectHandler(_selectHandler);
 
         _colorizer = new ColorizerDialogVM("colorizerDialog");
         _info = new InfoVM("infoDialog", this);
 
-        _hub = Hub.root;
-
-        _listbox.setSelectHandler(_selectHandler);
+        _layerVisible = new CheckBoxVM("infoDialog_layerVisible", false);
+        _layerVisible.setClickHandler(_layerVisibleHandler);
 
         _hub.events.AddLayerCompleted.subscribe(_handleAddLayerCompleted);
         _hub.events.RemoveLayerCompleted.subscribe(_handleRemoveLayerCompleted);
@@ -32,10 +35,15 @@ class LayerManagerDialogVM extends DialogVM {
     void _open() {
         _listbox.clear();
 
-        for (var layer in _layers.values) {
-            var item = new _LayerItem(layer);
+        var names = _layers.keys.toList();
+        names.sort();
+
+        for (var name in names) {
+            var item = new _LayerItem(_layers[name]);
             _listbox.add(item);
         }
+
+        _layerVisible.clearState();
     }
 
     @override
@@ -49,15 +57,30 @@ class LayerManagerDialogVM extends DialogVM {
         _layers.remove(name);
     }
 
+    void _layerVisibleHandler(var e) {
+        List<_LayerItem> items = _listbox.getCurrentSelection();
+        if (items == null) return;
+        if (items[0] == null) return;
+        Layer layer = items[0].layer;
+
+        layer.changeVisibility(_layerVisible.value);
+        log("Visibility of ${layer.name} changed to ${layer.isVisible}");
+    }
+
     void _selectHandler(var e) {
         List<_LayerItem> items = _listbox.getCurrentSelection();
-        if (items==null) return;
+        if (items == null) return;
         if (items[0] == null) return;
+        Layer layer = items[0].layer;
+
+        log("${layer.name} selected");
+
+        _layerVisible.value = layer.isVisible;
     }
 
     Layer get currentSelection {
         var list = _listbox.getCurrentSelection();
-        if (list==null || list[0] == null) return null;
+        if (list == null || list[0] == null) return null;
         return list[0].layer;
     }
 

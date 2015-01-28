@@ -6,7 +6,7 @@ part of rialto.viewer;
 
 
 class SettingsDialogVM extends DialogVM {
-    bool bboxChecked;
+    bool _bboxChecked;
 
     TextInputVM _eyeLon;
     TextInputVM _eyeLat;
@@ -26,8 +26,8 @@ class SettingsDialogVM extends DialogVM {
     SettingsDialogVM(String id) : super(id) {
 
         _hub = Hub.root;
-        _hub.events.DisplayBbox.subscribe((v) => bboxChecked = v);
-        bboxChecked = false;
+        _hub.events.DisplayBbox.subscribe((v) => _bboxChecked = v);
+        _bboxChecked = false;
 
         _eyeLon = new TextInputVM("advancedSettingsDialog_eyeLon", "0.0");
         _eyeLat = new TextInputVM("advancedSettingsDialog_eyeLat", "0.0");
