@@ -47,6 +47,8 @@ class EventRegistry {
 
     SignalFunctions<String> LoadScript = new SignalFunctions<String>();
     SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();
+
+    SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
 }
 
 class MouseData {

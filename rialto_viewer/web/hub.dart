@@ -16,8 +16,6 @@ class Hub {
 
     Element cesiumContainer;
 
-    Renderer renderer;
-
     EventRegistry eventRegistry;
 
     ViewController viewController;
@@ -30,6 +28,13 @@ class Hub {
 
     // singleton
     static Hub _root;
+
+    BboxShape bboxShape;
+
+    List<Annotation> annotations = new List<Annotation>();
+    List<Measurement> measurements = new List<Measurement>();
+
+    Camera camera;
 
     CesiumBridge cesium;
 
@@ -63,15 +68,17 @@ class Hub {
         // onKeyUp...
         // onResize...
 
+        eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
+
+        eventRegistry.LayersBboxChanged.subscribe(_handleLayerBboxChanged);
+
         modeController = new ModeController();
         viewController = new ViewController();
         annotationController = new AnnotationController();
         measurementController = new MeasurementController();
         selectionController = new SelectionController();
 
-        renderer = new Renderer();
-
-        cesium.setUpdateFunction(renderer.checkUpdate);
+        camera = new Camera();
 
         eventRegistry.ChangeMode.fire(new ModeData(ModeData.VIEW));
     }
@@ -79,13 +86,19 @@ class Hub {
     int get width => window.innerWidth;
     int get height => window.innerHeight;
 
+    void _handleLayerBboxChanged(CartographicBbox box) {
+        if (bboxShape != null) bboxShape.remove();
+        if (box.isValid) {
+            bboxShape = new BboxShape(box.minimum, box.maximum);
+        }
+    }
+
     void _handleLoadScript(String url) {
         var s = new InitScript(url);
     }
 
     void _handleOpenFile(String webpath) {
         layerManager.load(webpath).then((_) {
-            renderer.updateNeeded = true;
             eventRegistry.OpenFileCompleted.fire(webpath);
         });
     }
@@ -93,8 +106,11 @@ class Hub {
     void _handleCloseFile(String webpath) {
         assert(false);
 
-        renderer.updateNeeded = true;
-
         eventRegistry.CloseFileCompleted.fire(webpath);
+    }
+
+    void _handleDisplayBbox(bool v) {
+        if (bboxShape == null) return;
+        bboxShape.isVisible = v;
     }
 }

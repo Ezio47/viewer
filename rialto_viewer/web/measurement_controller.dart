@@ -63,7 +63,7 @@ class MeasurementController implements IController {
 
         Measurement m = new Measurement(point1, point2);
 
-        _hub.renderer.measurements.add(m);
+        _hub.measurements.add(m);
 
         point1 = point2 = null;
     }

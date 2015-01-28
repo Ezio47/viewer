@@ -15,8 +15,6 @@ abstract class Colorizer {
             tile.updateBounds();
             tile.updateShape();
         }
-
-        Hub.root.renderer.updateNeeded = true;
     }
 
     Uint8List _algorithm(double zmin, double zmax, PointCloudTile tile);

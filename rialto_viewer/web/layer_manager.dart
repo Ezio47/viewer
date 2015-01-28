@@ -6,10 +6,13 @@ part of rialto.viewer;
 
 
 class LayerManager {
+    Hub _hub;
     Map<String, Layer> layers = new Map<String, Layer>();
     CartographicBbox bbox = new CartographicBbox.empty();
 
-    LayerManager();
+    LayerManager() {
+        _hub = Hub.root;
+    }
 
     void createLayer(String name, Map map) {
         assert(!layers.containsKey(name));
@@ -53,6 +56,7 @@ class LayerManager {
         Completer c = new Completer();
         layer.load().then((_) {
             bbox.unionWith(layer.bbox);
+            _hub.eventRegistry.LayersBboxChanged.fire(bbox);
             c.complete(true);
         });
 
@@ -63,6 +67,8 @@ class LayerManager {
         layers[layer.name] = layer;
 
         bbox.unionWith(layer.bbox);
+
+        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
     }
 
     void removeLayer(Layer layer) {
@@ -72,5 +78,7 @@ class LayerManager {
         for (var layer in layers.values) {
             bbox.unionWith(layer.bbox);
         }
+
+        _hub.eventRegistry.LayersBboxChanged.fire(bbox);
     }
 }

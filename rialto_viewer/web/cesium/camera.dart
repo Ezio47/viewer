@@ -22,9 +22,15 @@ class Camera {
     Camera() {
         _hub = Hub.root;
         _hub.eventRegistry.UpdateCamera.subscribe(_handleUpdateCamera);
+        _hub.eventRegistry.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
+
     }
 
-    void changeDataExtents(CartographicBbox bbox) {
+    void _handleLayersBboxChanged(CartographicBbox bbox) {
+        _changeDataExtents(bbox);
+    }
+
+    void _changeDataExtents(CartographicBbox bbox) {
         double west = bbox.west;
         double south = bbox.south;
         double east = bbox.east;

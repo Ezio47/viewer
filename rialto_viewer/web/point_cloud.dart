@@ -51,8 +51,6 @@ class PointCloud {
     void updateBoundsForTile(PointCloudTile tile) {
         bbox.unionWith(tile.bbox);
 
-        Hub.root.renderer.forceUpdate();
-
         print("Bounds: $bbox");
     }
 
