@@ -9,7 +9,7 @@ abstract class Colorizer {
 
     void run(PointCloud cloud) {
         for (var tile in cloud.tiles) {
-            Uint8List rgba = _algorithm(cloud.minimum.z, cloud.maximum.z, tile);
+            Uint8List rgba = _algorithm(cloud.bbox.minimum.height, cloud.bbox.maximum.height, tile);
 
             tile.addData_U8x4("rgba", rgba);
             tile.updateBounds();

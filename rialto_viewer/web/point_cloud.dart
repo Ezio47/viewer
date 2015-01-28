@@ -13,10 +13,8 @@ class PointCloud {
     String displayName;
     String webpath;
     List<PointCloudTile> tiles;
+    CartographicBbox bbox;
     List<String> dimensionNames;
-    Vector3 minimum;
-    Vector3 maximum;
-    Vector3 len;
     int numPoints;
     int tileId = 0;
     bool isVisible;
@@ -27,9 +25,7 @@ class PointCloud {
 
         dimensionNames = new List<String>.from(names);
 
-        minimum = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
-        maximum = new Vector3(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
-        len = new Vector3(0.0, 0.0, 0.0);
+        bbox = new CartographicBbox.empty();
 
         tiles = new List<PointCloudTile>();
     }
@@ -49,22 +45,15 @@ class PointCloud {
             updateBoundsForTile(tile);
         }
 
-        print("Bounds: min=${Utils.printv(minimum)} max=${Utils.printv(maximum)} len=${Utils.printv(len)}");
+        print("Bounds: $bbox");
     }
 
     void updateBoundsForTile(PointCloudTile tile) {
-        minimum.x = min(minimum.x, tile.minimum.x);
-        maximum.x = max(maximum.x, tile.maximum.x);
-        minimum.y = min(minimum.y, tile.minimum.y);
-        maximum.y = max(maximum.y, tile.maximum.y);
-        minimum.z = min(minimum.z, tile.minimum.z);
-        maximum.z = max(maximum.z, tile.maximum.z);
-
-        len = maximum - minimum;
+        bbox.unionWith(tile.bbox);
 
         Hub.root.renderer.forceUpdate();
 
-        print("Bounds: min=${Utils.printv(minimum)} max=${Utils.printv(maximum)} len=${Utils.printv(len)}");
+        print("Bounds: $bbox");
     }
 
     void colorize(Colorizer colorizer) {

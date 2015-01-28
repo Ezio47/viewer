@@ -51,15 +51,23 @@ class Utils {
     }
 
     static void vectorMinWith(Vector3 dst, Vector3 src) {
-        dst.x = min(dst.x, src.x);
-        dst.y = min(dst.y, src.y);
-        dst.z = min(dst.z, src.z);
+        Utils.vectorMinWith3(dst, src.x, src.y, src.z);
     }
 
     static void vectorMaxWith(Vector3 dst, Vector3 src) {
-        dst.x = max(dst.x, src.x);
-        dst.y = max(dst.y, src.y);
-        dst.z = max(dst.z, src.z);
+        Utils.vectorMaxWith3(dst, src.x, src.y, src.z);
+    }
+
+    static void vectorMinWith3(Vector3 dst, double x, double y, double z) {
+        dst.x = min(dst.x, x);
+        dst.y = min(dst.y, y);
+        dst.z = min(dst.z, z);
+    }
+
+    static void vectorMaxWith3(Vector3 dst, double x, double y, double z) {
+        dst.x = max(dst.x, x);
+        dst.y = max(dst.y, y);
+        dst.z = max(dst.z, z);
     }
 
     static String toSI(num vv, {sigfigs: 0}) {

@@ -11,15 +11,12 @@ class PointCloudTile {
     int id;
     List<String> dimensionNames;
     Map<String, TypedData> data;
-    Vector3 minimum;
-    Vector3 maximum;
+    CartographicBbox bbox;
     CloudShape shape;
 
     PointCloudTile(List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
         //log("making tile $id with $numPointsInTile");
-
-        minimum = new Vector3(double.MAX_FINITE, double.MAX_FINITE, double.MAX_FINITE);
-        maximum = new Vector3(-double.MAX_FINITE, -double.MAX_FINITE, -double.MAX_FINITE);
+        bbox = new CartographicBbox.empty();
         data = new Map<String, TypedData>();
     }
 
@@ -96,12 +93,7 @@ class PointCloudTile {
             double x = d[i * 3];
             double y = d[i * 3 + 1];
             double z = d[i * 3 + 2];
-            minimum.x = min(minimum.x, x);
-            maximum.x = max(maximum.x, x);
-            minimum.y = min(minimum.y, y);
-            maximum.y = max(maximum.y, y);
-            minimum.z = min(minimum.z, z);
-            maximum.z = max(maximum.z, z);
+            bbox.unionWith3(x, y, z);
         }
     }
 }

@@ -53,7 +53,6 @@ class Renderer {
             if (_axesShape != null) _axesShape.remove();
             _axesShape = new AxesShape(box.minimum, len14);
 
-
             // bbox model space is (cloudMin....cloudMax)
             if (_bboxShape != null) _bboxShape.remove();
             _bboxShape = new BboxShape(box.minimum, box.maximum);

@@ -27,7 +27,6 @@ part 'measurement_controller.dart';
 part 'mode_controller.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
-part 'point_cloud_set.dart';
 part 'point_cloud_tile.dart';
 part 'renderer.dart';
 part 'selection_controller.dart';

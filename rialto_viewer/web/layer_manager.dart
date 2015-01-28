@@ -45,6 +45,20 @@ class LayerManager {
         addLayer(layer);
     }
 
+    Future<bool> load(String webpath) {
+        assert(layers.containsKey(webpath));
+        Layer layer = layers[webpath];
+        assert(layer != null);
+
+        Completer c = new Completer();
+        layer.load().then((_) {
+            bbox.unionWith(layer.bbox);
+            c.complete(true);
+        });
+
+        return c.future;
+    }
+
     void addLayer(Layer layer) {
         layers[layer.name] = layer;
 

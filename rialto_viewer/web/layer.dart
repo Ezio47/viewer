@@ -31,6 +31,11 @@ abstract class Layer {
         }
     }
 
+    Future<bool> load() {
+        var stub = (() {});
+        return new Future(stub);
+    }
+
     static dynamic _required(Map map, String key) {
         if (!map.containsKey(key)) {
             throw new Exception();
@@ -92,24 +97,22 @@ class PointCloudLayer extends Layer {
         }
     }
 
-    void load() {
-        var f = () {
+    @override
+    Future<bool> load() {
+        Completer c = new Completer();
+
+        var whenReady = () {
             assert(cloud != null);
 
-            bbox = new CartographicBbox.fromValues(
-                    cloud.minimum.x,
-                    cloud.minimum.y,
-                    cloud.minimum.z,
-                    cloud.maximum.x,
-                    cloud.maximum.y,
-                    cloud.maximum.z);
+            bbox = new CartographicBbox.copy(cloud.bbox);
 
             isLoaded = true;
+            c.complete(true);
         };
 
         if (server == "http://www.example.com") {
             cloud = PointCloudGenerator.generate(path, name);
-            f();
+            whenReady();
         } else {
 
             Comms comms = new HttpComms(server);
@@ -134,9 +137,10 @@ class PointCloudLayer extends Layer {
             };
 
             var junk = comms.readAsBytes(path, handler).then((bool v) {
-               f();
+                whenReady();
             });
         }
 
+        return c.future;
     }
 }

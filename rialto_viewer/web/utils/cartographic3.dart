@@ -16,6 +16,8 @@ class Cartographic3 {
 
     Cartographic3.zero();
 
+    Cartographic3.copy(Cartographic3 c) : this(c.longitude, c.latitude, c.height);
+
     Cartographic3.asMin() : this(-180.0, -90.0, -double.MAX_FINITE);
     Cartographic3.asMax() : this(180.0, 90.0, double.MAX_FINITE);
 
@@ -31,6 +33,8 @@ class Cartographic3 {
 
     void minWith(Cartographic3 v) => Utils.vectorMinWith(_vector, v._vector);
     void maxWith(Cartographic3 v) => Utils.vectorMaxWith(_vector, v._vector);
+
+    void minWith3(double x, double y, double z) => Utils.vectorMinWith3(_vector, x, y, z);
 }
 
 
@@ -45,12 +49,20 @@ class CartographicBbox {
         maximum = new Cartographic3.asMin();
     }
 
+    CartographicBbox.copy(CartographicBbox box) {
+        minimum = new Cartographic3.copy(box.minimum);
+        maximum = new Cartographic3.copy(box.maximum);
+    }
+
     CartographicBbox.fromValues(double minx, double miny, double minz, double maxx, double maxy, double maxz) {
         minimum = new Cartographic3(minx, miny, minz);
         maximum = new Cartographic3(maxx, maxy, maxz);
     }
 
-    bool get isValid => minimum._vector.z > -double.MAX_FINITE && minimum._vector.z < double.MAX_FINITE;
+    bool get isValid =>
+            (minimum._vector.x > -double.MAX_FINITE && minimum._vector.x < double.MAX_FINITE) &&
+                    (minimum._vector.y > -double.MAX_FINITE && minimum._vector.y < double.MAX_FINITE) &&
+                    (minimum._vector.z > -double.MAX_FINITE && minimum._vector.z < double.MAX_FINITE);
 
     double get north => maximum.latitude;
     double get south => minimum.latitude;
@@ -62,5 +74,18 @@ class CartographicBbox {
         maximum.maxWith(bbox.maximum);
     }
 
+    void unionWith3(double x, double y, double z) {
+        Utils.vectorMinWith3(minimum._vector, x, y, z);
+        Utils.vectorMaxWith3(maximum._vector, x, y, z);
+    }
+
     Vector3 get length => maximum._vector - minimum._vector;
+
+    String toString() {
+        String s =
+                "min=${Utils.printv(minimum._vector)} " +
+                "max=${Utils.printv(maximum._vector)} " +
+                "len=${Utils.printv(length)}";
+        return s;
+    }
 }
