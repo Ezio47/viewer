@@ -23,7 +23,6 @@ camera:
 
 display:
     bbox: true
-    axes: false
 
 colorize:
     ramp: Spectral

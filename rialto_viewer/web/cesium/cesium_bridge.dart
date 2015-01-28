@@ -85,12 +85,6 @@ class CesiumBridge {
         return _bridge.callMethod('createRectangle', [point1.longitude, point1.latitude, point2.longitude, point2.latitude, colorR, colorG, colorB]);
     }
 
-    dynamic createAxes(Cartographic3 origin, Vector3 length) {
-        assert(_isValidLatLon(origin));
-        var axes = _bridge.callMethod('createAxes', [origin.longitude, origin.latitude, origin.height, length.x, length.y, length.z]);
-        return axes;
-    }
-
     dynamic createBbox(Cartographic3 point1, Cartographic3 point2) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));

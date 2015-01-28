@@ -30,8 +30,6 @@ class EventRegistry {
 
     SignalFunctions<Vector3> MouseGeoCoords = new SignalFunctions<Vector3>();
 
-    SignalFunctions<bool> DisplayAxes = new SignalFunctions<bool>();
-
     SignalFunctions<bool> DisplayBbox = new SignalFunctions<bool>();
 
     SignalFunctions<DisplayLayerData> DisplayLayer = new SignalFunctions<DisplayLayerData>();

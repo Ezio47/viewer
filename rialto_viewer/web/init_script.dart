@@ -92,9 +92,6 @@ class InitScript {
         if (data.containsKey("bbox")) {
             Hub.root.eventRegistry.DisplayBbox.fire(data["bbox"]);
         }
-        if (data.containsKey("axes")) {
-            Hub.root.eventRegistry.DisplayAxes.fire(data["axes"]);
-        }
     }
 
     void _doCommand_layers(Map layers) {

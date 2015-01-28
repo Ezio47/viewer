@@ -6,7 +6,6 @@ part of rialto.viewer;
 
 
 class SettingsDialogVM extends DialogVM {
-    bool axesChecked;
     bool bboxChecked;
 
     TextInputVM _eyeLon;
@@ -20,7 +19,6 @@ class SettingsDialogVM extends DialogVM {
     TextInputVM _upY;
     TextInputVM _upZ;
 
-    CheckBoxVM _axesEnabled;
     CheckBoxVM _bboxEnabled;
 
     Hub _hub;
@@ -28,9 +26,7 @@ class SettingsDialogVM extends DialogVM {
     SettingsDialogVM(String id) : super(id) {
 
         _hub = Hub.root;
-        _hub.eventRegistry.DisplayAxes.subscribe((v) => axesChecked = v);
         _hub.eventRegistry.DisplayBbox.subscribe((v) => bboxChecked = v);
-        axesChecked = false;
         bboxChecked = false;
 
         _eyeLon = new TextInputVM("advancedSettingsDialog_eyeLon", "0.0");
@@ -44,7 +40,6 @@ class SettingsDialogVM extends DialogVM {
         _upY = new TextInputVM("advancedSettingsDialog_upY", "0.0");
         _upZ = new TextInputVM("advancedSettingsDialog_upZ", "1.0");
 
-        _axesEnabled = new CheckBoxVM("advancedSettingsDialog_axesEnabled", true);
         _bboxEnabled = new CheckBoxVM("advancedSettingsDialog_bboxEnabled", true);
     }
 
@@ -61,7 +56,6 @@ class SettingsDialogVM extends DialogVM {
         _upY.clearState();
         _upZ.clearState();
 
-        _axesEnabled.clearState();
         _bboxEnabled.clearState();
     }
 
@@ -117,11 +111,8 @@ class SettingsDialogVM extends DialogVM {
     }
 
     void _performBboxWork() {
-        if (_axesEnabled.changed) {
-            _hub.eventRegistry.DisplayAxes.fire(_axesEnabled.value);
-        }
         if (_bboxEnabled.changed) {
-            _hub.eventRegistry.DisplayAxes.fire(_bboxEnabled.value);
+            _hub.eventRegistry.DisplayBbox.fire(_bboxEnabled.value);
         }
     }
 }

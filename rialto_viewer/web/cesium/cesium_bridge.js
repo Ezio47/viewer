@@ -313,21 +313,6 @@ var CesiumBridge = function (element) {
     }
 
 
-    this.createAxes = function(x0, y0, z0, xlen, ylen, zlen) {
-        var red = this._createLineInstance(x0, y0, z0, x0 + xlen, y0, z0, Cesium.Color.RED);
-        var green = this._createLineInstance(x0, y0, z0, x0, y0 + ylen, z0, Cesium.Color.GREEN);
-        var blue = this._createLineInstance(x0, y0, z0, x0, y0, z0 + zlen, Cesium.Color.BLUE);
-
-        var prim = new Cesium.Primitive({
-            geometryInstances : [red, green, blue],
-            appearance : new Cesium.PolylineColorAppearance()
-        });
-
-        this.viewer.scene.primitives.add(prim);
-        return prim;
-    }
-
-
     this.createBbox = function(x0, y0, z0, x1, y1, z1) {
         var red1 = this._createLineInstance(x0, y0, z0, x1, y0, z0, Cesium.Color.RED);
         var red2 = this._createLineInstance(x0, y1, z0, x1, y1, z0, Cesium.Color.RED);

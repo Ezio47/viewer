@@ -7,7 +7,6 @@ part of rialto.viewer;
 class Renderer {
     Hub _hub;
 
-    AxesShape _axesShape;
     BboxShape _bboxShape;
 
     List<Annotation> annotations = new List<Annotation>();
@@ -22,7 +21,6 @@ class Renderer {
 
         camera = new Camera();
 
-        _hub.eventRegistry.DisplayAxes.subscribe(_handleDisplayAxes);
         _hub.eventRegistry.DisplayBbox.subscribe(_handleDisplayBbox);
 
         updateNeeded = true;
@@ -48,20 +46,9 @@ class Renderer {
         if (_hub.layerManager.layers.length > 0 && box.isValid) {
             camera.changeDataExtents(box);
 
-            // axes model space is (0 .. 0.25 * cloudLen)
-            final len14 = box.length / 4.0;
-            if (_axesShape != null) _axesShape.remove();
-            _axesShape = new AxesShape(box.minimum, len14);
-
-            // bbox model space is (cloudMin....cloudMax)
             if (_bboxShape != null) _bboxShape.remove();
             _bboxShape = new BboxShape(box.minimum, box.maximum);
         }
-    }
-
-    void _handleDisplayAxes(bool v) {
-        if (_axesShape == null) return;
-        _axesShape.isVisible = v;
     }
 
     void _handleDisplayBbox(bool v) {

@@ -33,7 +33,6 @@ part 'selection_controller.dart';
 part 'view_controller.dart';
 
 part 'cesium/annotation_shape.dart';
-part 'cesium/axes_shape.dart';
 part 'cesium/bbox_shape.dart';
 part 'cesium/camera.dart';
 part 'cesium/cesium_bridge.dart';
