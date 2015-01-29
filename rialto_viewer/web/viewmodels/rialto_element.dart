@@ -43,7 +43,7 @@ class RialtoElement  {
         if (v == null) return;
         double lon = v.longitude;
         double lat = v.latitude;
-        String s = "(${lon.toStringAsFixed(3)}, ${lat.toStringAsFixed(3)})";
+        String s = "(${lon.toStringAsFixed(5)}, ${lat.toStringAsFixed(5)})";
         _mouseCoords.text = s;
         return;
     }
