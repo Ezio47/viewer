@@ -66,7 +66,11 @@ class HttpComms extends Comms {
 
         _readBuffer.open(handler);
 
+        assert(server.startsWith("ws:"));
+
         WebSocket ws = new WebSocket(server + "/points/");
+        assert(ws != null);
+
         ws.onOpen.listen((_) {
             print("socket opened");
 
