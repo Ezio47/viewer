@@ -17,6 +17,19 @@ var CesiumBridge = function (element) {
 
     this.viewer = new Cesium.Viewer(element, options);
 
+
+    this.addGeoJson = function(url) {
+        var viewer = this.viewer;
+        // these are default styling settings, if no simplestyle present
+        var ds = viewer.dataSources.add(Cesium.GeoJsonDataSource.fromUrl(url, {
+          stroke: Cesium.Color.WHITE,
+          fill: Cesium.Color.WHITE,
+          strokeWidth: 1,
+          markerSymbol: '*'
+        }));
+        return ds;
+    }
+
     // taken from HomeButtonView.viewHome
     this.goHome = function() {
         var scene = this.viewer.scene;

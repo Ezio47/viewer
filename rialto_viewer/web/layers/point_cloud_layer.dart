@@ -5,69 +5,6 @@
 part of rialto.viewer;
 
 
-abstract class Layer {
-    String name;
-    String server;
-    String path;
-    int numBytes;
-    String description;
-    bool isVisible;
-    CartographicBbox bbox;
-
-    Layer(String this.name, Map map) {
-        server = YamlUtils.getRequiredSettingAsString(map, "server");
-        path = YamlUtils.getRequiredSettingAsString(map, "path");
-        numBytes = YamlUtils.getOptionalSettingAsInt(map, "numBytes", 0);
-        description = YamlUtils.getOptionalSettingAsString(map, "description");
-        isVisible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
-    }
-
-    void changeVisibility(bool v) {
-        isVisible = v;
-    }
-
-    Future<bool> load() {
-        var stub = (() {});
-        return new Future(stub);
-    }
-
-
-}
-
-
-
-class BaseImageryLayer extends Layer {
-    BaseImageryLayer(String name, Map map)
-            : super(name, map);
-}
-
-
-
-class BaseTerrainLayer extends Layer {
-    BaseTerrainLayer(String name, Map map)
-            : super(name, map);
-}
-
-
-class ImageryLayer extends Layer {
-    ImageryLayer(String name, Map map)
-            : super(name, map);
-}
-
-
-
-class TerrainLayer extends Layer {
-    TerrainLayer(String name, Map map)
-            : super(name, map);
-}
-
-
-class VectorLayer extends Layer {
-    VectorLayer(String name, Map map)
-            : super(name, map);
-}
-
-
 class PointCloudLayer extends Layer {
     PointCloud cloud;
 

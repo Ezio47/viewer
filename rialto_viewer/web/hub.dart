@@ -84,7 +84,7 @@ class Hub {
     }
 
     void _handleLoadScript(String url) {
-        var s = new InitScript(url);
+        var s = new ConfigScript(url);
     }
 
     void _handleDisplayBbox(bool v) {

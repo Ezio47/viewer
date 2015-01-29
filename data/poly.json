@@ -1,0 +1,21 @@
+{ 
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [ [-80.0, 30.0], [-100.0, 30.0], [-100.0, 40.0], [-80.0, 40.0], [-80.0, 40.0] ]
+                ]
+            },
+            "properties": {
+                "stroke": "#ccc",
+                "stroke-opacity": 1.0,
+                "stroke-width": 2,
+                "fill": "#ccc",
+                "fill-opacity": 0.2
+            }
+        }
+    ]
+}

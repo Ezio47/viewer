@@ -5,10 +5,10 @@
 part of rialto.viewer;
 
 
-class InitScript {
+class ConfigScript {
     Hub _hub;
 
-    InitScript(String url) {
+    ConfigScript(String url) {
         _hub = Hub.root;
 
         Http.Client client = new BHttp.BrowserClient();

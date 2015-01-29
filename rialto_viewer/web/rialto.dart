@@ -20,8 +20,7 @@ part 'colorizer.dart';
 part 'comms.dart';
 part 'hub.dart';
 part 'event_registry.dart';
-part 'init_script.dart';
-part 'layer.dart';
+part 'config_script.dart';
 part 'layer_manager.dart';
 part 'measurement_controller.dart';
 part 'mode_controller.dart';
@@ -41,6 +40,10 @@ part 'cesium/cloud_shape.dart';
 part 'cesium/measurement_shape.dart';
 part 'cesium/shape.dart';
 part 'cesium/viewshed_shape.dart';
+
+part 'layers/layer.dart';
+part 'layers/point_cloud_layer.dart';
+part 'layers/vector_layer.dart';
 
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';

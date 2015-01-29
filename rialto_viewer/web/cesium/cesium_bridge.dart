@@ -13,6 +13,10 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    dynamic addGeoJson(String url) {
+        return _bridge.callMethod('addGeoJson', [url]);
+    }
+
     void goHome() {
         _bridge.callMethod('goHome');
     }

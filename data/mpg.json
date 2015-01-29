@@ -1,0 +1,17 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-77.625487, 38.833865]
+            },
+            "properties": {
+              "title": "mpg's house",
+              "marker-symbol": "zoo",
+              "marker-color": "#123456"
+            }
+        }
+    ]
+}
