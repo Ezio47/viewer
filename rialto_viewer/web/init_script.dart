@@ -57,9 +57,6 @@ class InitScript {
                 case "display":
                     _doCommand_display(data);
                     break;
-                case "colorize":
-                    _doCommand_colorize(data);
-                    break;
                 default:
                     assert(false);
             }
@@ -91,15 +88,18 @@ class InitScript {
         _hub.events.UpdateCamera.fire(cameraData);
     }
 
-    void _doCommand_colorize(Map data) {
-        assert(data.containsKey("ramp"));
-        String ramp = data["ramp"];
-        _hub.events.ColorizeLayers.fire(ramp);
-    }
-
     void _doCommand_display(Map data) {
         if (data.containsKey("bbox")) {
             _hub.events.DisplayBbox.fire(data["bbox"]);
+        }
+        if (data.containsKey("colorize")) {
+            Map colorizeData = data["colorize"];
+            assert(colorizeData.containsKey("ramp"));
+            String ramp = colorizeData["ramp"];
+            assert(colorizeData.containsKey("dimension"));
+            String dimName = colorizeData["dimension"];
+            assert(dimName == "z");
+            _hub.events.ColorizeLayers.fire(ramp);
         }
     }
 

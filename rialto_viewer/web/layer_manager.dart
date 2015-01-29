@@ -16,6 +16,17 @@ class LayerManager {
         _hub.events.AddLayer.subscribe(_handleAddLayer);
         _hub.events.RemoveLayer.subscribe(_handleRemoveLayer);
         _hub.events.RemoveAllLayers.subscribe0(_handleRemoveAllLayers);
+        _hub.events.ColorizeLayers.subscribe(_handleColorizeLayers);
+    }
+
+    void _handleColorizeLayers(String rampName) {
+        var colorizer = new RampColorizer(rampName);
+
+        for (var layer in layers.values) {
+            if (layer is PointCloudLayer) {
+                layer.cloud.colorize(colorizer);
+            }
+        }
     }
 
     void _handleAddLayer(LayerData data) {
