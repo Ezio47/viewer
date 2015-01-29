@@ -70,6 +70,8 @@ class CartographicBbox {
     double get west => minimum.longitude;
 
     void unionWith(CartographicBbox bbox) {
+        if (bbox == null) return;
+
         minimum.minWith(bbox.minimum);
         maximum.maxWith(bbox.maximum);
     }
