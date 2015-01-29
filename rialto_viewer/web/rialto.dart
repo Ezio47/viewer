@@ -31,6 +31,7 @@ part 'point_cloud_tile.dart';
 part 'selection_controller.dart';
 part 'view_controller.dart';
 part 'wps.dart';
+part 'viewshed_controller.dart';
 
 part 'cesium/annotation_shape.dart';
 part 'cesium/bbox_shape.dart';
@@ -39,6 +40,7 @@ part 'cesium/cesium_bridge.dart';
 part 'cesium/cloud_shape.dart';
 part 'cesium/measurement_shape.dart';
 part 'cesium/shape.dart';
+part 'cesium/viewshed_shape.dart';
 
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';

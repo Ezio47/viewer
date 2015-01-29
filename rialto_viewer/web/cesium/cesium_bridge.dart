@@ -28,7 +28,19 @@ class CesiumBridge {
     // eye & taregt inputs in cartographic lat/lon, height in kilometers
     // up vector is cartsian
     void lookAt(Cartographic3 eye, Cartographic3 target, Cartesian3 up, double fovDegrees) {
-        _bridge.callMethod('lookAtCartographic', [eye.longitude, eye.latitude, eye.height * 1000.0, target.longitude, target.latitude, target.height * 1000.0, up.x, up.y, up.z, fovDegrees]);
+        _bridge.callMethod(
+                'lookAtCartographic',
+                [
+                        eye.longitude,
+                        eye.latitude,
+                        eye.height * 1000.0,
+                        target.longitude,
+                        target.latitude,
+                        target.height * 1000.0,
+                        up.x,
+                        up.y,
+                        up.z,
+                        fovDegrees]);
     }
 
     void onMouseMove(f) => _bridge.callMethod('onMouseMove', [f]);
@@ -82,20 +94,43 @@ class CesiumBridge {
     dynamic createRectangle(Cartographic3 point1, Cartographic3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        return _bridge.callMethod('createRectangle', [point1.longitude, point1.latitude, point2.longitude, point2.latitude, colorR, colorG, colorB]);
+        return _bridge.callMethod(
+                'createRectangle',
+                [point1.longitude, point1.latitude, point2.longitude, point2.latitude, colorR, colorG, colorB]);
+    }
+
+    dynamic createCircle(Cartographic3 center, double radius, double colorR, double colorG, double colorB) {
+        assert(_isValidLatLon(center));
+        //assert(_isValidLatLon(point2));
+        return _bridge.callMethod(
+                'createCircle',
+                [center.longitude, center.latitude, radius, colorR, colorG, colorB]);
     }
 
     dynamic createBbox(Cartographic3 point1, Cartographic3 point2) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        var prim = _bridge.callMethod('createBbox', [point1.longitude, point1.latitude, point1.height, point2.longitude, point2.latitude, point2.height]);
+        var prim = _bridge.callMethod(
+                'createBbox',
+                [point1.longitude, point1.latitude, point1.height, point2.longitude, point2.latitude, point2.height]);
         return prim;
     }
 
     dynamic createLine(Cartographic3 point1, Cartographic3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
-        var prim = _bridge.callMethod('createLine', [point1.longitude, point1.latitude, point1.height, point2.longitude, point2.latitude, point2.height, colorR, colorG, colorB]);
+        var prim = _bridge.callMethod(
+                'createLine',
+                [
+                        point1.longitude,
+                        point1.latitude,
+                        point1.height,
+                        point2.longitude,
+                        point2.latitude,
+                        point2.height,
+                        colorR,
+                        colorG,
+                        colorB]);
         assert(prim != null);
         return prim;
     }
@@ -107,7 +142,7 @@ class CesiumBridge {
         assert(colors.length == numPoints * 4);
         var prim = _bridge.callMethod('createCloud', [numPoints, points.buffer, colors.buffer]);
         var t1 = new DateTime.now().millisecondsSinceEpoch;
- //       log("   ${t1-t0}");
+        //       log("   ${t1-t0}");
         return prim;
     }
 

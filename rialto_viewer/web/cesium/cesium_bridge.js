@@ -236,6 +236,35 @@ var CesiumBridge = function (element) {
     }
 
 
+    this.createCircle = function(lon, lat, radius, colorR, colorG, colorB) {
+        var color = new Cesium.Color(colorR, colorG, colorB, 0.5);
+        var scene = this.viewer.scene;
+        var primitives = scene.primitives;
+        var solidWhite = Cesium.ColorGeometryInstanceAttribute.fromColor(color);
+
+        var circleInstance = new Cesium.GeometryInstance({
+                geometry : new Cesium.CircleGeometry({
+                center: Cesium.Cartesian3.fromDegrees(lon, lat),
+                radius: radius
+            }),
+            attributes : {
+                color : solidWhite
+            }
+        });
+        var appearance = new Cesium.PerInstanceColorAppearance({
+                    flat : true,
+                    translucent : true,
+                    renderState : {
+                        lineWidth : Math.min(2.0, scene.maximumAliasedLineWidth)
+                    }
+                });
+        var prim = primitives.add(new Cesium.Primitive({
+                geometryInstances : [circleInstance],
+                appearance : appearance
+        }));
+        return prim;
+    }
+
     this.removePrimitive = function(prim) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;

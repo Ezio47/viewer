@@ -129,11 +129,13 @@ class ModeData {
     static const int VIEW = 2;
     static const int SELECTION = 3;
     static const int ANNOTATION = 4;
+    static const int VIEWSHED = 5;
     static final name = {
         MEASUREMENT: "measurement",
         VIEW: "view",
         SELECTION: "selection",
-        ANNOTATION: "annotation"
+        ANNOTATION: "annotation",
+        VIEWSHED: "viewshed"
     };
 
     int type;
