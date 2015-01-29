@@ -1,9 +1,9 @@
 layers:
 
-    terrain1:
+    serp:
         type: pointcloud
-        server: http://www.example.com
-        path: /terrain1.dat
+        server: ws://localhost:12346
+        path: /serp-100K.ria
         numBytes: 10            # optional, default=0
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
@@ -30,11 +30,11 @@ layers:
      #   path: /terrain2.dat
      #  visible: false
 
-#camera:
-#    eye: [10, 20, 12000]
-#    target: [-30, -40, 99]
-#    up: [0, 0, 1]
-#    fov: 60
+camera:
+    eye: [-83.43271, 39.00617, 1.0]
+    target: [-83.43271, 39.02617, 0]
+    up: [0, 0, 1]
+    fov: 60
 
 display:
     bbox: true
