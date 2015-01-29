@@ -34,32 +34,4 @@ abstract class Layer {
         var stub = (() {});
         return new Future(stub);
     }
-
-
-}
-
-
-class BaseImageryLayer extends Layer {
-    BaseImageryLayer(String name, Map map)
-            : super(name, map);
-}
-
-
-
-class BaseTerrainLayer extends Layer {
-    BaseTerrainLayer(String name, Map map)
-            : super(name, map);
-}
-
-
-class ImageryLayer extends Layer {
-    ImageryLayer(String name, Map map)
-            : super(name, map);
-}
-
-
-
-class TerrainLayer extends Layer {
-    TerrainLayer(String name, Map map)
-            : super(name, map);
 }

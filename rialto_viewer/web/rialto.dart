@@ -42,7 +42,11 @@ part 'cesium/shape.dart';
 part 'cesium/viewshed_shape.dart';
 
 part 'layers/layer.dart';
+part 'layers/base_imagery_layer.dart';
+part 'layers/base_terrain_layer.dart';
+part 'layers/imagery_layer.dart';
 part 'layers/point_cloud_layer.dart';
+part 'layers/terrain_layer.dart';
 part 'layers/vector_layer.dart';
 
 part 'utils/cartesian3.dart';
