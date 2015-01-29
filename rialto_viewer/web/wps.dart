@@ -6,9 +6,19 @@ part of rialto.viewer;
 
 
 class Wps {
-    String server;
-    int port;
-    String description;
+    final String _server;
+    final int _port;
+    final String _description;
 
-    Wps(String this.server, int this.port, [String this.description]);
+    Hub _hub;
+
+    Wps(String this._server, int this._port, [String this._description]) {
+        _hub = Hub.root;
+
+        _hub.events.WpsRequest.subscribe(_handleWpsRequest);
+    }
+
+    void _handleWpsRequest(WpsRequestData data) {
+        log("WPS request: ${WpsRequestData.name[data.type]}, params=${data.params.length}");
+    }
 }

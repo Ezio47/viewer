@@ -26,8 +26,6 @@ class EventRegistry {
     SignalFunctions<KeyboardData> KeyDown = new SignalFunctions<KeyboardData>();
     SignalFunctions<KeyboardData> KeyUp = new SignalFunctions<KeyboardData>();
 
-    SignalFunctions WindowResize = new SignalFunctions();
-
     SignalFunctions<Vector3> MouseGeoCoords = new SignalFunctions<Vector3>();
 
     SignalFunctions<bool> DisplayBbox = new SignalFunctions<bool>();
@@ -51,6 +49,8 @@ class EventRegistry {
     SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();
 
     SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
+
+    SignalFunctions<WpsRequestData> WpsRequest = new SignalFunctions<WpsRequestData>();
 }
 
 class MouseData {
@@ -141,4 +141,17 @@ class ModeData {
     int type;
 
     ModeData(int this.type);
+}
+
+class WpsRequestData {
+    static const int INVALID = 0;
+    static const int VIEWSHED = 1;
+    static final name = {
+        VIEWSHED: "viewshed"
+    };
+
+    final int type;
+    final List<Object> params;
+
+    WpsRequestData(int this.type, List<Object> this.params);
 }

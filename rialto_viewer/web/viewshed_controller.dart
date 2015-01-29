@@ -63,6 +63,9 @@ class ViewshedController implements IController {
 
         Viewshed a = new Viewshed(point1, point2);
 
+        var params = [point1.longitude, point1.latitude, point2.longitude, point2.latitude];
+        _hub.events.WpsRequest.fire(new WpsRequestData(WpsRequestData.VIEWSHED, params));
+
         point1 = point2 = null;
     }
 }
