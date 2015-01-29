@@ -99,12 +99,12 @@ class CesiumBridge {
                 [point1.longitude, point1.latitude, point2.longitude, point2.latitude, colorR, colorG, colorB]);
     }
 
-    dynamic createCircle(Cartographic3 center, double radius, double colorR, double colorG, double colorB) {
+    dynamic createCircle(Cartographic3 center, Cartographic3 point, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(center));
-        //assert(_isValidLatLon(point2));
+        assert(_isValidLatLon(point));
         return _bridge.callMethod(
                 'createCircle',
-                [center.longitude, center.latitude, radius, colorR, colorG, colorB]);
+                [center.longitude, center.latitude, point.longitude, point.latitude, colorR, colorG, colorB]);
     }
 
     dynamic createBbox(Cartographic3 point1, Cartographic3 point2) {

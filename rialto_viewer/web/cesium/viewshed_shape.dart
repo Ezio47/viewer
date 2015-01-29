@@ -7,11 +7,11 @@ part of rialto.viewer;
 class ViewshedShape extends Shape {
 
     Cartographic3 _point1;
-    double radius;
+    Cartographic3 _point2;
 
     ViewshedShape(Cartographic3 point1, Cartographic3 point2) : super("viewshed") {
         _point1 = point1;
-        radius = point1._vector.distanceTo(point2._vector);
+        _point2 = point2;
 
         isSelectable = true;
 
@@ -20,6 +20,6 @@ class ViewshedShape extends Shape {
 
     @override
     dynamic _createCesiumObject() {
-        return _hub.cesium.createCircle(_point1, 10000.0, 0.0, 1.0, 0.0);
+        return _hub.cesium.createCircle(_point1, _point2, 0.0, 1.0, 0.0);
     }
 }

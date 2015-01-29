@@ -236,7 +236,11 @@ var CesiumBridge = function (element) {
     }
 
 
-    this.createCircle = function(lon, lat, radius, colorR, colorG, colorB) {
+    this.createCircle = function(centerLon, centerLat, pointLon, pointLat, colorR, colorG, colorB) {
+        var center = Cesium.Cartesian3.fromDegrees(centerLon, centerLat);
+        var point = Cesium.Cartesian3.fromDegrees(pointLon, pointLat);
+        var radius = Cesium.Cartesian3.distance(center, point);
+
         var color = new Cesium.Color(colorR, colorG, colorB, 0.5);
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
@@ -244,7 +248,7 @@ var CesiumBridge = function (element) {
 
         var circleInstance = new Cesium.GeometryInstance({
                 geometry : new Cesium.CircleGeometry({
-                center: Cesium.Cartesian3.fromDegrees(lon, lat),
+                center: center,
                 radius: radius
             }),
             attributes : {
