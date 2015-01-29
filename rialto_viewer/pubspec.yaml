@@ -1,6 +1,7 @@
 name: rialto_viewer
 description: The Rialto Point Cloud Viewer
 dependencies:
+  browser: any
   http: any
   vector_math: any
   yaml: any

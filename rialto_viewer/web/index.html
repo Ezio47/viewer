@@ -8,7 +8,6 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Rialto</title>
-        <script src="cesium-build/Cesium/Cesium.js"></script>
         <style>
             @import url(cesium-build/Cesium/Widgets/widgets.css);
             html, body, #cesiumContainer {
@@ -16,7 +15,6 @@
             }
         </style>
         <link rel="stylesheet" href="rialto.css">
-        <script src="cesium/cesium_bridge.js"></script>
 
     </head>
     <body>
@@ -295,6 +293,12 @@
 
         </div> <!-- main -->
 
-        <script type="application/dart">export 'main.dart';</script>
+
+        <script type="application/dart" src="main.dart"></script>
+        <script data-pub-inline src="packages/browser/dart.js"></script>
+     <!--   <script type="application/dart">export 'main.dart';</script>  -->
+
+        <script src="cesium-build/Cesium/Cesium.js"></script>
+        <script src="cesium/cesium_bridge.js"></script>
   </body>
 </html>
