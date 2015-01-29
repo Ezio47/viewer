@@ -15,11 +15,11 @@ abstract class Layer {
     CartographicBbox bbox;
 
     Layer(String this.name, Map map) {
-        server = _required(map, "server");
-        path = _required(map, "path");
-        numBytes = _optional(map, "numBytes", 0);
-        description = _optional(map, "description", null);
-        isVisible = _optional(map, "visible", true);
+        server = YamlUtils.getRequiredSettingAsString(map, "server");
+        path = YamlUtils.getRequiredSettingAsString(map, "path");
+        numBytes = YamlUtils.getOptionalSettingAsInt(map, "numBytes", 0);
+        description = YamlUtils.getOptionalSettingAsString(map, "description");
+        isVisible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
     }
 
     void changeVisibility(bool v) {
@@ -31,19 +31,7 @@ abstract class Layer {
         return new Future(stub);
     }
 
-    static dynamic _required(Map map, String key) {
-        if (!map.containsKey(key)) {
-            throw new Exception();
-        }
-        return map[key];
-    }
 
-    static dynamic _optional(Map map, String key, dynamic defalt) {
-        if (!map.containsKey(key)) {
-            return defalt;
-        }
-        return map[key];
-    }
 }
 
 

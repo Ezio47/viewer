@@ -30,6 +30,7 @@ part 'point_cloud_generator.dart';
 part 'point_cloud_tile.dart';
 part 'selection_controller.dart';
 part 'view_controller.dart';
+part 'wps.dart';
 
 part 'cesium/annotation_shape.dart';
 part 'cesium/bbox_shape.dart';
@@ -45,6 +46,7 @@ part 'utils/color.dart';
 part 'utils/rialto_exceptions.dart';
 part 'utils/signal.dart';
 part 'utils/utils.dart';
+part 'utils/yaml_utils.dart';
 
 part 'viewmodels/about_dialog_vm.dart';
 part 'viewmodels/settings_dialog_vm.dart';

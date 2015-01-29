@@ -26,3 +26,7 @@ display:
         ramp: Spectral
         dimension: z
 
+wps:
+    server: http://localhost
+    port: 12347
+    description: "la la la"

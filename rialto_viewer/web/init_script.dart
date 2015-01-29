@@ -57,11 +57,23 @@ class InitScript {
                 case "display":
                     _doCommand_display(data);
                     break;
+                case "wps":
+                    _doCommand_wps(data);
+                    break;
                 default:
                     assert(false);
             }
         }
     }
+
+    void _doCommand_wps(Map data) {
+        var server = YamlUtils.getRequiredSettingAsString(data, "server");
+        var port = YamlUtils.getRequiredSettingAsInt(data, "port");
+        var description = YamlUtils.getOptionalSettingAsString(data, "description");
+        var wps = new Wps(server, port, description);
+        _hub.wps = wps;
+    }
+
 
     void _doCommand_camera(Map data) {
         assert(data.containsKey("eye"));
