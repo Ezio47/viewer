@@ -32,25 +32,20 @@ class Wps {
     Future<String> readAsync() {
 
         Completer c = new Completer<String>();
-        c.complete("");
-
-//        _hub.cesium.getget();
-
 
         String wps = "http://beta.sedac.ciesin.columbia.edu" +
-                "EEE" +
+                "" +
                 "/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=badfunctionnam";
         wps = Uri.encodeFull(wps);
         String proxy ="http://localhost:12345";
 
-        var s = proxy + "/x" + wps;
-print("LOADING: $s");
+        var s = proxy + "/___" + wps;
 
         var h = { };
 
         var f = _client.get(s, headers:h).then((response) {
             //print(r.runtimeType);
-            //print(response.body);
+            print("GOT*****************" + response.body);
             c.complete(response.body);
         }).catchError((e) {
             print(e);
