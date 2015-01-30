@@ -7,6 +7,7 @@ part of rialto.viewer;
 
 // this isn't really a tile, in that it is bounded by number of points as opposed to geo extents
 class PointCloudTile {
+    PointCloud cloud;
     int numPointsInTile;
     int id;
     List<String> dimensionNames;
@@ -14,7 +15,7 @@ class PointCloudTile {
     CartographicBbox bbox;
     CloudShape shape;
 
-    PointCloudTile(List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
+    PointCloudTile(PointCloud this.cloud, List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
         //log("making tile $id with $numPointsInTile");
         bbox = new CartographicBbox.empty();
         data = new Map<String, TypedData>();

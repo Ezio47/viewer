@@ -9,6 +9,7 @@ class LayerManager {
     Hub _hub;
     Map<String, Layer> layers = new Map<String, Layer>();
     CartographicBbox bbox = new CartographicBbox.empty();
+    PointCloudColorizer pointCloudColorizer = new PointCloudColorizer();
 
     LayerManager() {
         _hub = Hub.root;
@@ -19,14 +20,21 @@ class LayerManager {
         _hub.events.ColorizeLayers.subscribe(_handleColorizeLayers);
     }
 
-    void _handleColorizeLayers(String rampName) {
-        var colorizer = new RampColorizer(rampName);
+    void _handleColorizeLayers(String ramp) {
+        pointCloudColorizer.rampName = ramp;
+
+        var futures = new List<Future>();
 
         for (var layer in layers.values) {
             if (layer is PointCloudLayer) {
-                layer.cloud.colorize(colorizer);
+                Future f = layer.cloud.colorizeAsync(pointCloudColorizer);
+                futures.add(f);
             }
         }
+
+        var wait = Future.wait(futures); // TODO: eventually will return this
+
+        return;
     }
 
     void _handleAddLayer(LayerData data) {
@@ -36,16 +44,24 @@ class LayerManager {
 
         Layer layer = LayerManager._createLayer(name, data.map);
 
+        layer.load().then((_) {
+            Future f;
+            if (layer is PointCloudLayer) {
+                f = layer.cloud.colorizeAsync(pointCloudColorizer);
+            } else {
+                f = new Future.sync((){});
+            }
+            f.then((_) => _addLayer(layer));
+        });
+    }
+
+    void _addLayer(Layer layer) {
         layers[layer.name] = layer;
 
         bbox.unionWith(layer.bbox);
         _hub.events.LayersBboxChanged.fire(bbox);
 
-        layer.load().then((_) {
-            bbox.unionWith(layer.bbox);
-            _hub.events.LayersBboxChanged.fire(bbox);
-            _hub.events.AddLayerCompleted.fire(layer);
-        });
+        _hub.events.AddLayerCompleted.fire(layer);
     }
 
     void _handleRemoveLayer(String name) {

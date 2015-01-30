@@ -16,7 +16,7 @@ class ColorizerDialogVM extends DialogVM {
 
         _listbox = new ListBoxVM<String>("colorizerDialog_items");
 
-        var names = RampColorizer.names;
+        var names = PointCloudColorizer.names;
         names.forEach((s) => _listbox.add(s));
     }
 

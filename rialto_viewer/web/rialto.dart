@@ -16,7 +16,7 @@ import 'package:vector_math/vector_math.dart';
 import 'package:yaml/yaml.dart';
 
 part 'annotation_controller.dart';
-part 'colorizer.dart';
+part 'point_cloud_colorizer.dart';
 part 'comms.dart';
 part 'hub.dart';
 part 'event_registry.dart';

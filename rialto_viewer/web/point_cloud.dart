@@ -35,7 +35,7 @@ class PointCloud {
     }
 
     PointCloudTile createTile(int numPointsInTile) {
-        var tile = new PointCloudTile(dimensionNames, numPointsInTile, tileId++);
+        var tile = new PointCloudTile(this, dimensionNames, numPointsInTile, tileId++);
         tiles.add(tile);
 
         numPoints += numPointsInTile;
@@ -58,8 +58,12 @@ class PointCloud {
         print("Bounds: $bbox");
     }
 
-    void colorize(Colorizer colorizer) {
-        colorizer.run(this);
+    Future colorizeAsync(PointCloudColorizer colorizer) {
+        return new Future(() {
+            for (var tile in tiles) {
+                colorizer.colorizeTile(tile);
+            }
+        });
     }
 
     bool get hasXyz {
