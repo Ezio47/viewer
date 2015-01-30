@@ -6,6 +6,7 @@ library rialto.server;
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:args/args.dart';
 import 'package:shelf/shelf.dart';

@@ -17,11 +17,36 @@ class MainServer extends Server {
         final String webpath = request.scriptName;
         print("requesting file from: $dir + $webpath");
 
-        File file = new File(dir + webpath);
-        if (file == null) {
-            return new Response.notFound(null, headers: headers);
+        if (webpath.startsWith("/x")) {
+            var x = request.requestedUri.toString().substring(2);
+            print("***** $x");
+            var xx = x.split("EEE");
+            print("***** $xx");
+
+            print(request);
+
+            var host = xx[0];
+            int port = 80;
+            var path = xx[1];
+            print("HOST:" + host);
+            print("PORT: $port");
+            print("PATH:" + path);
+
+            new HttpClient().get(
+                    host,
+                    port,
+                    path).then((HttpClientRequest request) => request.close()).then((HttpClientResponse response) {
+                response.transform(UTF8.decoder).listen((contents) {
+                    print(contents);
+                });
+            });
+        } else {
+            File file = new File(dir + webpath);
+            if (file == null) {
+                return new Response.notFound(null, headers: headers);
+            }
+            var data = file.openRead();
+            return new Response.ok(data, headers: headers);
         }
-        var data = file.openRead();
-        return new Response.ok(data, headers: headers);
     }
 }

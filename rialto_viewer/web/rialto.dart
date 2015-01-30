@@ -5,6 +5,7 @@
 library rialto.viewer;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:html';
 import 'dart:math';
 import 'dart:typed_data';
