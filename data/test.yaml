@@ -9,6 +9,6 @@
 #        visible: true       # optional, default=true
 
  wps:
+    proxy: http://localhost:12347
     server: http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService
-    port: 12347
     description: "la la la"

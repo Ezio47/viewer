@@ -25,6 +25,10 @@ packages:
     description: path
     source: hosted
     version: "1.3.1"
+  petitparser:
+    description: petitparser
+    source: hosted
+    version: "1.3.4"
   source_span:
     description: source_span
     source: hosted
@@ -41,6 +45,10 @@ packages:
     description: vector_math
     source: hosted
     version: "1.4.3"
+  xml:
+    description: xml
+    source: hosted
+    version: "2.2.2"
   yaml:
     description: yaml
     source: hosted

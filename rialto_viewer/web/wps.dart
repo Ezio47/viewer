@@ -6,14 +6,14 @@ part of rialto.viewer;
 
 
 class Wps {
+    final String _proxy;
     final String _server;
-    final int _port;
     final String _description;
 
     Hub _hub;
     Http.Client _client;
 
-    Wps(String this._server, int this._port, [String this._description]) {
+    Wps(String this._proxy, String this._server, [String this._description]) {
         _hub = Hub.root;
 
         _hub.events.WpsRequest.subscribe(_handleWpsRequest);
@@ -33,19 +33,15 @@ class Wps {
 
         Completer c = new Completer<String>();
 
-        String wps = "http://beta.sedac.ciesin.columbia.edu" +
-                "" +
-                "/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=badfunctionnam";
-        wps = Uri.encodeFull(wps);
-        String proxy ="http://localhost:12345";
+        String op = "?Request=DescribeProcess&Service=WPS&identifier=badfunctionnam";
+        String wps = Uri.encodeFull(_server + op);
+        print("wps server: $wps");
 
-        var s = proxy + "/___" + wps;
+        var url = _proxy + "/x?q=\"" + wps + "\"";
 
-        var h = { };
-
-        var f = _client.get(s, headers:h).then((response) {
+        var f = _client.get(url).then((response) {
             //print(r.runtimeType);
-            print("GOT*****************" + response.body);
+            //print("response.body);
             c.complete(response.body);
         }).catchError((e) {
             print(e);
@@ -55,12 +51,16 @@ class Wps {
         return c.future;
     }
 
-
     Future<Capabilities> doGetCapabilities() {
         var c = new Completer<Capabilities>();
 
         readAsync().then((String s) {
             print(s);
+
+            Xml.XmlDocument doc = Xml.parse(s);
+
+            print(doc.toString());
+
             c.complete(null);
         });
 

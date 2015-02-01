@@ -4,4 +4,5 @@ dependencies:
   browser: any
   http: any
   vector_math: any
+  xml: any
   yaml: any

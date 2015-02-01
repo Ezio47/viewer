@@ -5,7 +5,7 @@
 library rialto.viewer;
 
 import 'dart:async';
-import 'dart:convert';
+//import 'dart:convert';
 import 'dart:html';
 import 'dart:math';
 import 'dart:typed_data';
@@ -15,6 +15,7 @@ import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
 import 'package:vector_math/vector_math.dart';
 import 'package:yaml/yaml.dart';
+import 'package:xml/xml.dart' as Xml;
 
 part 'annotation_controller.dart';
 part 'point_cloud_colorizer.dart';

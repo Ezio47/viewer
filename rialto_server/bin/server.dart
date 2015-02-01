@@ -18,6 +18,7 @@ import 'package:shelf_exception_response/exception_response.dart';
 
 part 'main_server.dart';
 part 'point_server.dart';
+part 'proxy_server.dart';
 
 
 abstract class Server {
@@ -29,7 +30,7 @@ abstract class Server {
     Function _handlerGET;
 
     final headers = {
-        "Content-Type": "application/json",
+       // "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*, ",
         "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
         "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
@@ -56,7 +57,7 @@ abstract class Server {
 
 void main(List<String> args) {
     var parser = new ArgParser()
-            ..addOption('mode', abbr: 'm', allowed: ['main', 'points'])
+            ..addOption('mode', abbr: 'm', allowed: ['main', 'points', 'proxy'])
             ..addOption('server', abbr: 's', defaultsTo: 'localhost')
             ..addOption('port', abbr: 'p', defaultsTo: '12345')
             ..addOption('dir', abbr: 'd', defaultsTo: '.');
@@ -96,6 +97,11 @@ void main(List<String> args) {
         case 'points':
             s = new PointServer(server, port, dir);
             break;
+        case 'proxy':
+            s = new ProxyServer(server, port, dir);
+            break;
+        default:
+            assert(false);
     }
 
     s.run();

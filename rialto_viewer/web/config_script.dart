@@ -67,10 +67,10 @@ class ConfigScript {
     }
 
     void _doCommand_wps(Map data) {
+        var proxy = YamlUtils.getRequiredSettingAsString(data, "proxy");
         var server = YamlUtils.getRequiredSettingAsString(data, "server");
-        var port = YamlUtils.getRequiredSettingAsInt(data, "port");
         var description = YamlUtils.getOptionalSettingAsString(data, "description");
-        var wps = new Wps(server, port, description);
+        var wps = new Wps(proxy, server, description);
         _hub.wps = wps;
     }
 
