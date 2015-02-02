@@ -1,4 +1,5 @@
 #include "PdalBridge.hpp"
+#include <pdal/StatsFilter.hpp>
 
 
 const char* epsg4326_wkt = "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433],AUTHORITY[\"EPSG\",\"4326\"]]";
@@ -79,7 +80,7 @@ void PdalBridge::close()
 }
 
 
-void PdalBridge::writeRia(const char* name, boost::uint64_t targetPointCount) {
+boost::uint32_t PdalBridge::writeRia(const char* name, boost::uint64_t targetPointCount, const char* dimMode) {
     
     boost::uint64_t skip = 0;
     if (targetPointCount != 0) {
@@ -88,24 +89,74 @@ void PdalBridge::writeRia(const char* name, boost::uint64_t targetPointCount) {
     
     FILE* fp = fopen(name, "wb");
     
+    int mode = 0;
+    if (strcmp(dimMode,"xyz")==0) {
+        mode = 1;
+        printf("dim mode xyz\n");
+    } else if (strcmp(dimMode,"all")==0) {
+        mode = 2;
+        printf("dim mode all\n");
+    } else {
+        printf("unrecognized dim mode\n");
+        exit(1);
+    }
+
+    std::vector<pdal::Dimension::Id::Enum> dimIds = getDimIds();
+    boost::uint32_t numDims = dimIds.size();
+    
+    printf("Writing %lld points with %d dimensions (approx %lld bytes)\n",
+        targetPointCount, numDims, targetPointCount * numDims * 4);
+        
+    boost::uint32_t numWritten = 0;
+    
     const pdal::PointBufferSet& bufs = m_manager->buffers();
     for (auto pi = bufs.begin(); pi != bufs.end(); ++pi)
     {
         const pdal::PointBufferPtr buf = *pi;
-        writeRia(fp, buf, skip);
+        numWritten += writeRia(fp, buf, skip, mode);
     }
     
     fclose(fp);
+    
+    return numWritten;
 }
 
 
-void PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip)
+void PdalBridge::writeRiaHeader(FILE* fp, int mode)
+{
+    std::vector<pdal::Dimension::Id::Enum> dimIds = getDimIds();
+    boost::uint32_t numDims = dimIds.size();
+    
+    fwrite(&numDims, 4, 1, fp);
+    
+    for (int i=0; i<numDims; i++) {    
+        pdal::Dimension::Id::Enum id = dimIds[i];
+        
+        const char* name = pdal::Dimension::name(id).c_str();
+        int len = strlen(name);
+        assert(strlen(name)<255);
+        fwrite(&len, 1, 1, fp);
+        fwrite(name, len, 1, fp);
+
+        double min, mean, max;
+        getStats(id, min, mean, max);
+        
+        fwrite(&min, 4, 1, fp);
+        fwrite(&max, 4, 1, fp);
+    }
+}
+
+
+boost::uint32_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, int mode)
 {
     uint32_t pointIndex(0);
+    std::vector<pdal::Dimension::Id::Enum> dimIds = getDimIds();
+    boost::uint32_t numDims = dimIds.size();
+    boost::uint32_t numWritten = 0;
     
     for (pdal::PointId idx = 0; idx < buf->size(); ++idx)
     {
-        if (idx % 10000 == 0) {
+        if (idx % 100000 == 0) {
             printf("%f complete\n", ((double)idx/(double)buf->size()) * 100.0);
         }
 
@@ -113,22 +164,41 @@ void PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint
             if (idx % skip != 0) continue;
         }
         
-        pdal::Dimension::Id::Enum xdim = pdal::Dimension::Id::Enum::X;
-        pdal::Dimension::Id::Enum ydim = pdal::Dimension::Id::Enum::Y;
-        pdal::Dimension::Id::Enum zdim = pdal::Dimension::Id::Enum::Z;
-        
-        double x = buf->getFieldAs<double>(xdim, idx);
-        double y = buf->getFieldAs<double>(ydim, idx);
-        double z = buf->getFieldAs<double>(zdim, idx);
-        
-        float xf = (float)x;
-        float yf = (float)y;
-        float zf = (float)z;
+        if (mode == 1) {
+            pdal::Dimension::Id::Enum xdim = pdal::Dimension::Id::Enum::X;
+            pdal::Dimension::Id::Enum ydim = pdal::Dimension::Id::Enum::Y;
+            pdal::Dimension::Id::Enum zdim = pdal::Dimension::Id::Enum::Z;
+            
+            double x = buf->getFieldAs<double>(xdim, idx);
+            double y = buf->getFieldAs<double>(ydim, idx);
+            double z = buf->getFieldAs<double>(zdim, idx);
+            
+            float xf = (float)x;
+            float yf = (float)y;
+            float zf = (float)z;
+    
+            fwrite(&xf, 4, 1, fp);
+            fwrite(&yf, 4, 1, fp);
+            fwrite(&zf, 4, 1, fp);  
 
-        fwrite(&xf, 4, 1, fp);
-        fwrite(&yf, 4, 1, fp);
-        fwrite(&zf, 4, 1, fp);        
+        } else if (mode == 2) {
+            for (int i=0; i<numDims; i++) {
+            
+                pdal::Dimension::Id::Enum id = dimIds[i];
+                //pdal::Dimension::Type::Enum type = pdal.getDimType(id);
+        
+                double v = buf->getFieldAs<double>(id, idx);
+            
+                float vf = (float)v;
+    
+                fwrite(&v, 4, 1, fp);
+            }
+        }    
+        
+        ++numWritten;  
     }
+    
+    return numWritten;
 }
 
 
@@ -164,20 +234,20 @@ static void dumper(pdal::MetadataNode m, int indent=0)
     
 void PdalBridge::getStats(pdal::Dimension::Id::Enum id, double& min, double& mean, double& max) const
 {
-    pdal::MetadataNode m = m_filter2->getMetadata();
-    std::vector<pdal::MetadataNode> children = m.children("statistic");
-    for (auto mi: children)
-    {    
-        dumper(mi, 0);
-    }
+    //pdal::MetadataNode m = m_filter2->getMetadata();
+    //std::vector<pdal::MetadataNode> children = m.children("statistic");
+    //for (auto mi: children)
+    //{    
+    //    dumper(mi, 0);
+    //}
     
     //pdal::PointContextRef context = m_manager->context();
     //dumper(context.metadata());
     
-//    const pdal::filters::stats::Summary& summary = m_statsStage->getStats(id);
-//    min = summary.minimum();
-//    mean = summary.average();
-//    max = summary.maximum();
+    const pdal::stats::Summary& summary = ((pdal::StatsFilter*)m_filter2)->getStats(id);
+    min = summary.minimum();
+    mean = summary.average();
+    max = summary.maximum();
 }
 
 
