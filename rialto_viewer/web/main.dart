@@ -9,7 +9,7 @@ import 'rialto.dart';
 void main() {
     var hub = new Hub();
 
-    hub.events.LoadScript.fire("http://localhost:12345/test.yaml");
+    //OgcDocumentTests.test();
 
-    ogctest();
+    hub.events.LoadScript.fire("http://localhost:12345/test.yaml");
 }

@@ -4,20 +4,15 @@
 
 part of rialto.viewer;
 
-
-class Wps {
-    final String _proxy;
-    final String _server;
-    final String _description;
-
+class OwsService {
+    final String service;
+    final String server;
+    final String proxy;
+    final String description;
     Hub _hub;
     Http.Client _client;
 
-    Wps(String this._proxy, String this._server, [String this._description]) {
-        _hub = Hub.root;
-
-        _hub.events.WpsRequest.subscribe(_handleWpsRequest);
-    }
+    OwsService(String this.service, String this.server, {String this.proxy, String this.description}) : _hub = Hub.root;
 
     void open() {
         _client = new BHttp.BrowserClient();
@@ -27,73 +22,25 @@ class Wps {
         _client.close();
     }
 
+    Future<Xml.XmlDocument> _doServerRequest(String requestType, [List<String> params = null]) {
 
-    Future<OgcDocument_WpsCapabilities> getCapabilitiesAsync() {
-        var c = new Completer<OgcDocument_WpsCapabilities>();
+        String operation = "?Request=$requestType&Service=$service";
+        if (params != null) {
+            params.forEach((s) => operation += "&$s");
+        }
 
-        _doServerRequest("?Request=GetCapabilities&Service=WPS").then((Xml.XmlDocument doc) {
-            var caps = OgcDocument.parseWpsCapabilities(doc);
-            log(caps);
-            c.complete(caps);
-        });
+        Completer c = new Completer<Xml.XmlDocument>();
 
-        return c.future;
-    }
+        String wps = Uri.encodeFull(server + operation);
+        print("wps server request: $operation");
 
-    Future<OgcDocument_WpsProcessDescription> getProcessDescriptionAsync(String processName) {
-        var c= new Completer<OgcDocument_WpsProcessDescription>();
+        var url = wps;
 
-        _doServerRequest("?Request=DescribeProcess&Service=WPS&identifier=$processName").then((Xml.XmlDocument doc) {
-            Xml.XmlDocument doc = Xml.parse(s);
-            var descs = OgcDocument.parseWpsProcessDescriptions(doc);
-            var desc = descs.descriptions[processName];
-            log(desc);
-            c.complete(desc);
-        });
-
-        return c.future;
-    }
-
-    Future<OgcDocument_WpsProcessDescription> executeProcessAsync(String processName, List<String> params) {
-        var c= new Completer<OgcDocument_WpsProcessDescription>();
-
-        _runWpsOperation("?Request=DescribeProcess&Service=WPS&identifier=processName").then((String s) {
-            Xml.XmlDocument doc = Xml.parse(s);
-            var descs = OgcDocument.parseWpsProcessDescriptions(doc);
-            var desc = descs.descriptions[processName];
-            log(desc);
-            c.complete(desc);
-        });
-
-        return c.future;
-    }
-
-    void getViewshedAsync(double observerLon, double observerLat, double radius) {
-        assert(false);
-        _runWpsOperation("?Request=GetCapabilities&Service=WPS").then((String s) {
-            //print(s);
-
-            Xml.XmlDocument doc = Xml.parse(s);
-            capabilities = OgcDocument.parseWpsCapabilities(doc);
-
-            log(capabilities);
-        });
-    }
-
-    void _handleWpsRequest(WpsRequestData data) {
-        log("WPS request: ${WpsRequestData.name[data.type]}, params=${data.params.length}");
-    }
-
-    Future<Xml.XmlDocument> _doServerRequest( operation) {
-
-        // ?Request=GetCapabilities&Service=WPS
-
-        Completer c = new Completer<String>();
-
-        String wps = Uri.encodeFull(_server + operation);
-        print("wps server: $wps");
-
-        var url = _proxy + "/x?q=\"" + wps + "\"";
+        if (proxy != null) {
+            var magic = "/x?q=";
+            url = proxy + magic + '"' + wps + '"';
+            log(url);
+        }
 
         var f = _client.get(url).then((response) {
             //print(r.runtimeType);
@@ -108,5 +55,77 @@ class Wps {
         });
 
         return c.future;
+    }
+}
+
+
+class WpsService extends OwsService {
+
+    WpsService(String server, {String proxy, String description})
+            : super("WPS", server, proxy: proxy, description: description) {
+        _hub.events.WpsRequest.subscribe(_handleWpsRequest);
+    }
+
+
+    Future<OgcDocument> getCapabilitiesAsync() {
+        var c = new Completer<OgcDocument>();
+
+        _doServerRequest("GetCapabilities").then((Xml.XmlDocument doc) {
+            var caps = OgcDocument.parse(doc);
+            log(caps);
+            c.complete(caps);
+        });
+
+        return c.future;
+    }
+
+    Future<OgcDocument> getProcessDescriptionAsync(String processName) {
+        var c = new Completer<OgcDocument>();
+
+        _doServerRequest("DescribeProcess", ["identifier=$processName"]).then((Xml.XmlDocument doc) {
+            var ret = OgcDocument.parse(doc);
+            var desc;
+
+            if (ret is OgcDocument_WpsProcessDescriptions) {
+                desc = ret.descriptions[processName];
+            } else {
+                desc = ret;
+            }
+            log(desc);
+            c.complete(desc);
+        });
+
+        return c.future;
+    }
+
+    Future<OgcDocument> executeProcessAsync(String processName, List<String> params) {
+        var c = new Completer<OgcDocument>();
+
+        _doServerRequest("Execute", ["identifier=$processName"]).then((Xml.XmlDocument doc) {
+            var resp = OgcDocument.parse(doc);
+            log(resp);
+            c.complete(resp);
+        });
+
+        return c.future;
+    }
+
+    void getViewshedAsync(double observerLon, double observerLat, double radius) {
+        var c = new Completer<OgcDocument>();
+
+        var params = ["observerLon=$observerLon", "observerLat=$observerLat", "radius=$radius"];
+        executeProcessAsync("Viewshed", params).then((OgcDocument doc) {
+            if (doc is OgcDocument_ExceptionReport) {
+                log("viewshed returned exception report");
+            }
+            log(doc);
+            c.complete(doc);
+        });
+
+        return c.future;
+    }
+
+    void _handleWpsRequest(WpsRequestData data) {
+        log("WPS request: ${WpsRequestData.name[data.type]}, params=${data.params.length}");
     }
 }

@@ -5,15 +5,40 @@
 part of rialto.viewer;
 
 
-class OgcDocumentTests {
-
-
 // http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=GetCapabilities&Service=WPS
 // http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=org.ciesin.gis.wps.algorithms.PopStats
 // http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=badfunctionname
 
-static String generalException =
-r'''
+
+class OgcDocumentTests {
+
+    static void test() {
+        var exDoc = Xml.parse(OgcDocumentTests.generalException);
+        var ex = OgcDocument.parse(exDoc);
+        print(ex);
+
+        var procDoc = Xml.parse(OgcDocumentTests.describeProcess);
+        var proc = OgcDocument.parse(procDoc);
+        print(proc);
+
+        var expDoc = Xml.parse(OgcDocumentTests.describeProcessError);
+        var exp = OgcDocument.parse(expDoc);
+        print(exp);
+
+        var wpsCapsDoc = Xml.parse(OgcDocumentTests.capabilities);
+        var wpsCaps = OgcDocument.parse(wpsCapsDoc);
+        print(wpsCaps);
+
+        var wps = new WpsService("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService", proxy: "http://localhost:12347");
+        wps.open();
+        wps.getCapabilitiesAsync().then((doc) { assert(doc is OgcDocument_WpsCapabilities); });
+        wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is OgcDocument_WpsProcessDescription); });
+        wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is OgcDocument_ExceptionReport); });
+        wps.close();
+    }
+
+
+    static String generalException = r'''
 <?xml version="1.0" encoding="UTF-8"?>
 <ns:ExceptionReport xmlns:ns="http://www.opengis.net/ows/1.1">
     <ns:Exception exceptionCode="InvalidParameterValue" locator="parameter: identifier | value: badfunctionname">
@@ -52,8 +77,7 @@ r'''
     <ns:Exception exceptionCode="JAVA_RootCause"/>
 </ns:ExceptionReport>''';
 
-static String  describeProcess =
-'''
+    static String describeProcess = '''
 <?xml version="1.0" encoding="UTF-8"?>
 <ns:ProcessDescriptions xmlns:ns="http://www.opengis.net/wps/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://geoserver:8080/wps/schemas/wps/1.0.0/wpsDescribeProcess_response.xsd" xml:lang="en-US" service="WPS" version="1.0.0"><ProcessDescription xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" wps:processVersion="2" statusSupported="true" storeSupported="true">
         <ows:Identifier>org.ciesin.gis.wps.algorithms.PopStats</ows:Identifier>
@@ -113,8 +137,7 @@ static String  describeProcess =
         </ProcessOutputs>
     </ProcessDescription></ns:ProcessDescriptions>''';
 
-static String  describeProcessError =
-r'''<?xml version="1.0" encoding="UTF-8"?>
+    static String describeProcessError = r'''<?xml version="1.0" encoding="UTF-8"?>
 <ns:ExceptionReport xmlns:ns="http://www.opengis.net/ows/1.1"><ns:Exception exceptionCode="MissingParameterValue"><ns:ExceptionText>Parameter &lt;identifier> is not specified</ns:ExceptionText></ns:Exception><ns:Exception exceptionCode="JAVA_StackTrace"><ns:ExceptionText>org.n52.wps.server.request.Request.getMapValue:108
 org.n52.wps.server.request.Request.getMapValue:136
 org.n52.wps.server.request.DescribeProcessRequest.validate:74
@@ -147,8 +170,7 @@ org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run:690
 java.lang.Thread.run:662
 </ns:ExceptionText></ns:Exception><ns:Exception exceptionCode="JAVA_RootCause"/></ns:ExceptionReport>''';
 
-static String capabilities =
-'''<?xml version="1.0" encoding="UTF-8"?>
+    static String capabilities = '''<?xml version="1.0" encoding="UTF-8"?>
 <wps:Capabilities service="WPS" version="1.0.0" xml:lang="en-US" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://geoserver.itc.nl:8080/wps/schemas/wps/1.0.0/wpsGetCapabilities_response.xsd" updateSequence="1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ows:ServiceIdentification>
         <ows:Title>CIESIN Population Statistics WPS</ows:Title>

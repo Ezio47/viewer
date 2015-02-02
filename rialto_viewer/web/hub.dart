@@ -17,7 +17,7 @@ class Hub {
     EventRegistry events;
     ModeController modeController;
     CesiumBridge cesium;
-    Wps wps;
+    WpsService wps;
 
     // privates
     ViewController _viewController;

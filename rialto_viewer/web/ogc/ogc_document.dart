@@ -19,22 +19,26 @@ class OgcDocument {
         assert(type == null || element.name.local == type);
     }
 
-    static OgcDocument_WpsCapabilities parseWpsCapabilities(Xml.XmlDocument document) {
-        var node = _getElement(document.children, "Capabilities");
-        if (node == null) return null; // TODO
-        return new OgcDocument_WpsCapabilities(node);
-    }
+    static OgcDocument parse(Xml.XmlDocument document) {
+        for (var node in document.children) {
+            if (node is Xml.XmlElement) {
+                switch (node.name.local) {
+                    case "Capabilities":
+                        return new OgcDocument_WpsCapabilities(node);
+                    case "ExceptionReport":
+                        return new OgcDocument_ExceptionReport(node);
+                    case "ProcessDescriptions":
+                        return new OgcDocument_WpsProcessDescriptions(node);
+                    case "ExecuteResponse":
+                        return new OgcDocument_WpsExecuteResponse(node);
+                    default:
+                        _unsupported(node);
+                        break;
+                }
 
-    static OgcDocument_ExceptionReport parseExceptionReport(Xml.XmlDocument document) {
-        var node = _getElement(document.children, "ExceptionReport");
-        if (node == null) return null; // TODO
-        return new OgcDocument_ExceptionReport(node);
-    }
-
-    static OgcDocument_WpsProcessDescriptions parseWpsProcessDescriptions(Xml.XmlDocument document) {
-        var node = _getElement(document.children, "ProcessDescriptions");
-        if (node == null) return null; // TODO
-        return new OgcDocument_WpsProcessDescriptions(node);
+            }
+        }
+        return null; // TODO
     }
 
     static Xml.XmlElement _getElement(List<Xml.XmlNode> nodes, String name) {
@@ -57,7 +61,7 @@ class OgcDocument {
         return "type: $type";
     }
 
-    void _unsupported(Xml.XmlElement element) {
+    static void _unsupported(Xml.XmlElement element) {
         log("Element type ${element.name.local} not supported");
     }
 }
@@ -85,6 +89,19 @@ class OgcDocument_Exception extends OgcDocument {
 }
 
 
+class OgcDocument_WpsExecuteResponse extends OgcDocument {
+    OgcDocument_WpsExecuteResponse(Xml.XmlElement element) : super(element, "ExcuteResponse") {
+        _parseElements((element) {
+            switch (element.name.local) {
+                default:
+                    OgcDocument._unsupported(element);
+                    break;
+            }
+        });
+    }
+}
+
+
 class OgcDocument_WpsCapabilities extends OgcDocument {
     OgcDocument_OwsServiceIdentification serviceIdentification;
     OgcDocument_OwsServiceProvider serviceProvider;
@@ -109,7 +126,7 @@ class OgcDocument_WpsCapabilities extends OgcDocument {
                 case "Languages":
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });
@@ -135,7 +152,7 @@ class OgcDocument_Input extends OgcDocument {
                     // ignore
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });
@@ -165,7 +182,7 @@ class OgcDocument_Output extends OgcDocument {
                     // ignore
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });
@@ -186,7 +203,7 @@ class OgcDocument_DataInputs extends OgcDocument {
                     inputs.add(new OgcDocument_Input(element));
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });
@@ -203,7 +220,7 @@ class OgcDocument_ProcessOutputs extends OgcDocument {
                     outputs.add(new OgcDocument_Output(element));
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });
@@ -237,7 +254,7 @@ class OgcDocument_WpsProcessDescription extends OgcDocument {
                     // ignore
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });
@@ -258,7 +275,7 @@ class OgcDocument_ExceptionReport extends OgcDocument {
                     exceptions.add(new OgcDocument_Exception(element));
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });
@@ -276,7 +293,7 @@ class OgcDocument_WpsProcessDescriptions extends OgcDocument {
                     descriptions[description.identifier] = description;
                     break;
                 default:
-                    _unsupported(element);
+                    OgcDocument._unsupported(element);
                     break;
             }
         });

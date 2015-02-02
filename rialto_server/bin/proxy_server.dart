@@ -13,15 +13,20 @@ class ProxyServer extends Server {
     Future<Response> _processFile(dynamic request) {
         var c = new Completer<Response>();
 
-        final String webpath = request.scriptName;
-        print("requesting proxy of ${request.requestedUri.toString()}");
+        String fullUri = request.requestedUri.toString();
+        print("requesting proxy of $fullUri");
 
-        Uri fullUri = request.requestedUri;
+        // .../x?q=%22...%22 ==> %22...%22
+        var magic = "/x?q=";
+        var idx = fullUri.indexOf(magic);
+        var target = fullUri.substring(idx + magic.length, fullUri.length);
 
-        var s = fullUri.queryParameters["q"];
-        s = s.substring(1, s.length-2);
+        // %22...%22 ==> ...
+        target = target.replaceAll("%22",  "");
 
-        var uri = Uri.parse(s);
+        var uri = Uri.parse(target);
+
+        print("requesting proxy for $uri");
 
         getter(uri).then((s) {
             var r = new Response.ok(s, headers: headers);

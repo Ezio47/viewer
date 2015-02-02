@@ -70,7 +70,9 @@ class ConfigScript {
         var proxy = YamlUtils.getRequiredSettingAsString(data, "proxy");
         var server = YamlUtils.getRequiredSettingAsString(data, "server");
         var description = YamlUtils.getOptionalSettingAsString(data, "description");
-        var wps = new Wps(proxy, server, description);
+        var wps = new WpsService(server, proxy: proxy, description: description);
+        wps.open();
+        //wps.close();
         _hub.wps = wps;
     }
 
