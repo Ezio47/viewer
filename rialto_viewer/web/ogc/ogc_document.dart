@@ -5,33 +5,19 @@
 part of rialto.viewer;
 
 
-void ogctest() {
-    var doc;
-
-    doc = Xml.parse(OgcDocumentTests.generalException);
-    var ex = OgcDocument.parseExceptionReport(doc);
-    print(ex);
-
-    doc = Xml.parse(OgcDocumentTests.describeProcess);
-    var proc = OgcDocument.parseWpsProcessDescriptions(doc);
-    print(proc);
-
-    doc = Xml.parse(OgcDocumentTests.describeProcessError);
-    var exp = OgcDocument.parseExceptionReport(doc);
-    print(exp);
-
-    doc = Xml.parse(OgcDocumentTests.capabilities);
-    var wpsCaps = OgcDocument.parseWpsCapabilities(doc);
-    print(wpsCaps);
-
-}
-
-
 // OGC 06-121r3, sec 7.4
 
 // TODO: we should respect namespace prefixes on element names
 
+typedef void _ParseFunction(Xml.XmlElement e);
+
 class OgcDocument {
+    Xml.XmlElement element;
+    String type;
+
+    OgcDocument(Xml.XmlElement this.element, [String this.type]) {
+        assert(type == null || element.name.local == type);
+    }
 
     static OgcDocument_WpsCapabilities parseWpsCapabilities(Xml.XmlDocument document) {
         var node = _getElement(document.children, "Capabilities");
@@ -57,18 +43,6 @@ class OgcDocument {
     }
 
     static bool _nameIs(Xml.XmlNode node, String name) => (node is Xml.XmlElement && node.name.local == name);
-}
-
-
-typedef void _ParseFunction(Xml.XmlElement e);
-
-class OgcDocument_element {
-    Xml.XmlElement element;
-    String type;
-
-    OgcDocument_element(Xml.XmlElement this.element, [String this.type]) {
-        assert(type == null || element.name.local == type);
-    }
 
     void _parseElements(_ParseFunction parser) {
         for (var node in element.children) {
@@ -88,30 +62,30 @@ class OgcDocument_element {
     }
 }
 
-class OgcDocument_OwsServiceIdentification extends OgcDocument_element {
+class OgcDocument_OwsServiceIdentification extends OgcDocument {
     OgcDocument_OwsServiceIdentification(Xml.XmlElement element) : super(element, "ServiceIdentification");
 }
 
-class OgcDocument_OwsServiceProvider extends OgcDocument_element {
+class OgcDocument_OwsServiceProvider extends OgcDocument {
     OgcDocument_OwsServiceProvider(Xml.XmlElement element) : super(element, "ServiceProvider");
 }
 
 
-class OgcDocument_OwsOperationsMetadata extends OgcDocument_element {
+class OgcDocument_OwsOperationsMetadata extends OgcDocument {
     OgcDocument_OwsOperationsMetadata(Xml.XmlElement element) : super(element, "OperationsMetadata");
 }
 
 
-class OgcDocument_WpsProcessOfferings extends OgcDocument_element {
+class OgcDocument_WpsProcessOfferings extends OgcDocument {
     OgcDocument_WpsProcessOfferings(Xml.XmlElement element) : super(element, "ProcessOfferings");
 }
 
-class OgcDocument_Exception extends OgcDocument_element {
+class OgcDocument_Exception extends OgcDocument {
     OgcDocument_Exception(Xml.XmlElement element) : super(element, "Exception");
 }
 
 
-class OgcDocument_WpsCapabilities extends OgcDocument_element {
+class OgcDocument_WpsCapabilities extends OgcDocument {
     OgcDocument_OwsServiceIdentification serviceIdentification;
     OgcDocument_OwsServiceProvider serviceProvider;
     OgcDocument_OwsOperationsMetadata operationsMetadata;
@@ -143,7 +117,7 @@ class OgcDocument_WpsCapabilities extends OgcDocument_element {
 }
 
 
-class OgcDocument_Input extends OgcDocument_element {
+class OgcDocument_Input extends OgcDocument {
     String identifier;
     String title;
 
@@ -173,7 +147,7 @@ class OgcDocument_Input extends OgcDocument_element {
 }
 
 
-class OgcDocument_Output extends OgcDocument_element {
+class OgcDocument_Output extends OgcDocument {
     String identifier;
     String title;
 
@@ -202,7 +176,7 @@ class OgcDocument_Output extends OgcDocument_element {
     }
 }
 
-class OgcDocument_DataInputs extends OgcDocument_element {
+class OgcDocument_DataInputs extends OgcDocument {
     List<OgcDocument_Input> inputs = new List<OgcDocument_Input>();
 
     OgcDocument_DataInputs(Xml.XmlElement element) : super(element, "DataInputs") {
@@ -219,7 +193,7 @@ class OgcDocument_DataInputs extends OgcDocument_element {
     }
 }
 
-class OgcDocument_ProcessOutputs extends OgcDocument_element {
+class OgcDocument_ProcessOutputs extends OgcDocument {
     List<OgcDocument_Output> outputs = new List<OgcDocument_Output>();
 
     OgcDocument_ProcessOutputs(Xml.XmlElement element) : super(element, "ProcessOutputs") {
@@ -237,7 +211,7 @@ class OgcDocument_ProcessOutputs extends OgcDocument_element {
 }
 
 
-class OgcDocument_WpsProcessDescription extends OgcDocument_element {
+class OgcDocument_WpsProcessDescription extends OgcDocument {
     String identifier;
     String title;
     OgcDocument_DataInputs dataInputs;
@@ -274,7 +248,7 @@ class OgcDocument_WpsProcessDescription extends OgcDocument_element {
     }
 }
 
-class OgcDocument_ExceptionReport extends OgcDocument_element {
+class OgcDocument_ExceptionReport extends OgcDocument {
     List<OgcDocument_Exception> exceptions = new List<OgcDocument_Exception>();
 
     OgcDocument_ExceptionReport(Xml.XmlElement element) : super(element, "ExceptionReport") {
@@ -291,14 +265,15 @@ class OgcDocument_ExceptionReport extends OgcDocument_element {
     }
 }
 
-class OgcDocument_WpsProcessDescriptions extends OgcDocument_element {
-    List<OgcDocument_WpsProcessDescription> descriptions = new List<OgcDocument_WpsProcessDescription>();
+class OgcDocument_WpsProcessDescriptions extends OgcDocument {
+    Map<String, OgcDocument_WpsProcessDescription> descriptions = new Map<String, OgcDocument_WpsProcessDescription>();
 
     OgcDocument_WpsProcessDescriptions(Xml.XmlElement element) : super(element, "ProcessDescriptions") {
         _parseElements((element) {
             switch (element.name.local) {
                 case "ProcessDescription":
-                    descriptions.add(new OgcDocument_WpsProcessDescription(element));
+                    var description = new OgcDocument_WpsProcessDescription(element);
+                    descriptions[description.identifier] = description;
                     break;
                 default:
                     _unsupported(element);
