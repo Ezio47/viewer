@@ -31,7 +31,7 @@ part 'point_cloud_generator.dart';
 part 'point_cloud_tile.dart';
 part 'selection_controller.dart';
 part 'view_controller.dart';
-part 'wps.dart';
+part 'ogc/wps.dart';
 part 'viewshed_controller.dart';
 
 part 'cesium/annotation_shape.dart';
@@ -50,6 +50,9 @@ part 'layers/imagery_layer.dart';
 part 'layers/point_cloud_layer.dart';
 part 'layers/terrain_layer.dart';
 part 'layers/vector_layer.dart';
+
+part 'ogc/ogc_document.dart';
+part 'ogc/ogc_document_tests.dart';
 
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';

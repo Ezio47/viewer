@@ -72,8 +72,3 @@ class Wps {
 class Capabilities {
     Capabilities();
 }
-
-
-// http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=GetCapabilities&Service=WPS
-// http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=org.ciesin.gis.wps.algorithms.PopStats
-// http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=badfunctionname
