@@ -38,20 +38,28 @@ class PointCloudColorizer {
         // TODO: reuse this every tile
         var newColors = new Uint8List(tile.numPointsInTile * 4);
 
-        assert(tile.data["xyz"] is Float32List);
-        Float32List positions = tile.data["xyz"];
+        assert(tile.data["xyz"] is Float64List);
+        Float64List positions = tile.data["xyz"];
 
         final List<_Stop> stops = _Ramps.list[_rampName];
 
         final double zLen = zmax - zmin;
 
         for (int i = 0; i < tile.numPointsInTile; i++) {
-            final double z = positions[i * 3 + 2];
-            assert(z >= zmin);
+            double z = positions[i * 3 + 2];
+
+            if (z < zmin) {
+                assert(zmin - z >= 0.0000001);
+                z = zmin;
+            } else if (z > zmax) {
+                assert(z - zmax >= 0.0000001);
+                z = zmax;
+            }
+
             double scaledZ = (z - zmin) / zLen;
 
-            // TODO: clip, due to FP math
-            assert(scaledZ >= -0.00001 && scaledZ <= 1.00001);
+            // TODO: clip, due to FP math (and above)
+            assert(scaledZ >= -0.00000001 && scaledZ <= 1.00000001);
             if (scaledZ < 0.0) scaledZ = 0.0;
             if (scaledZ > 1.0) scaledZ = 1.0;
 

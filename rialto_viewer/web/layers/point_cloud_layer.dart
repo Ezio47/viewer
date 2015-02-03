@@ -61,20 +61,23 @@ class PointCloudLayer extends Layer {
                     int index = 0;
                     for (int i = 0; i < numPoints; i++) {
                         for (int j=0; j<numDims; j++) {
-                            var v = dims[j].getter(bytes, index);
-                            dims[j].list[i] = v;
-                            index += dims[j].sizeInBytes;
+                            RiaDimension dim = dims[j];
+                            dim.getter(bytes, index, i);
+                            index += dim.sizeInBytes;
                         }
                     }
 
                     // gather x,y,z into one array
 
-                    Float32List tmp = new Float32List(numPoints * 3);
+                    Float64List tmp = new Float64List(numPoints * 3);
+                    var xlist = dims[0].list;
+                    var ylist = dims[1].list;
+                    var zlist = dims[2].list;
                     for (int i=0; i<numPoints; i++) {
 
-                        double x = dims[0].list[i];
-                        double y = dims[1].list[i];
-                        double z = dims[2].list[i];
+                        double x = xlist[i];
+                        double y = ylist[i];
+                        double z = zlist[i];
 
                         tmp[i*3] = x;
                         tmp[i*3 + 1] = y;
@@ -82,7 +85,7 @@ class PointCloudLayer extends Layer {
                     }
 
                     var tile = cloud.createTile(numPoints);
-                    tile.addData_F32x3("xyz", tmp);
+                    tile.addData_F64x3("xyz", tmp);
                     tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
                     tile.updateBounds();
                     tile.updateShape();

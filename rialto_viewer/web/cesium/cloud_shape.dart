@@ -6,10 +6,10 @@ part of rialto.viewer;
 
 class CloudShape extends Shape {
     int numPoints;
-    Float32List points;
+    Float64List points;
     Uint8List colors;
 
-    CloudShape(Float32List this.points, Uint8List this.colors) : super("cloud") {
+    CloudShape(Float64List this.points, Uint8List this.colors) : super("cloud") {
         numPoints = points.length ~/ 3;
         assert(numPoints * 3 == points.length);
         if (!(numPoints * 4 == colors.length)) {

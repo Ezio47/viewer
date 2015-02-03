@@ -293,9 +293,9 @@ var CesiumBridge = function (element) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
 
-        var f32 = new Float32Array(pointBuffer, 0, cnt*3);
+        var f64_ = new Float64Array(pointBuffer, 0, cnt*3);
 
-        var carts = Cesium.Cartesian3.fromDegreesArrayHeights(f32);
+        var carts = Cesium.Cartesian3.fromDegreesArrayHeights(f64_);
 
         var f64 = new Float64Array(cnt*3);
         for (var i = 0; i<cnt; i++) {

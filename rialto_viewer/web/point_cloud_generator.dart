@@ -58,9 +58,9 @@ class PointCloudGenerator {
             final int numPointsInTile = random.nextInt(upperbound) + 1;
             //log("Tile $t numPointsInTile: $numPointsInTile");
 
-            var positionsX = new Float32List(numPointsInTile);
-            var positionsY = new Float32List(numPointsInTile);
-            var positionsZ = new Float32List(numPointsInTile);
+            var positionsX = new Float64List(numPointsInTile);
+            var positionsY = new Float64List(numPointsInTile);
+            var positionsZ = new Float64List(numPointsInTile);
 
             for (int i = 0; i < numPointsInTile; i++) {
 
@@ -81,7 +81,7 @@ class PointCloudGenerator {
             }
 
             var tile = cloud.createTile(numPointsInTile);
-            tile.addData_F32x3_from3("xyz", positionsX, positionsY, positionsZ);
+            tile.addData_F64x3_from3("xyz", positionsX, positionsY, positionsZ);
             tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             tile.updateBounds();
             tile.updateShape();
@@ -106,9 +106,9 @@ class PointCloudGenerator {
         int positionsIndex = 0;
         for (int tile = 0; tile < numTiles; tile++) {
             int numPointsInTile = (tile < (numTiles - 1)) ? idealNumPointsInTile : tileSizeRemainder;
-            var positionsX = new Float32List(numPointsInTile);
-            var positionsY = new Float32List(numPointsInTile);
-            var positionsZ = new Float32List(numPointsInTile);
+            var positionsX = new Float64List(numPointsInTile);
+            var positionsY = new Float64List(numPointsInTile);
+            var positionsZ = new Float64List(numPointsInTile);
             for (int i = 0; i < numPointsInTile; i++) {
                 positionsX[i] = terrain.valuesX[positionsIndex];
                 positionsY[i] = terrain.valuesY[positionsIndex];
@@ -117,7 +117,7 @@ class PointCloudGenerator {
             }
 
             var thisTile = cloud.createTile(numPointsInTile);
-            thisTile.addData_F32x3_from3("xyz", positionsX, positionsY, positionsZ);
+            thisTile.addData_F64x3_from3("xyz", positionsX, positionsY, positionsZ);
             thisTile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             thisTile.updateBounds();
             thisTile.updateShape();

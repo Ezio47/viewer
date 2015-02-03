@@ -36,22 +36,22 @@ class PointCloudTile {
         shape.name = "{pointCloud.webpath}-$id";
     }
 
-    void addData_F32x3(String dim, Float32List xyz) {
+    void addData_F64x3(String dim, Float64List xyz) {
         assert(dimensionNames.contains(dim));
         data[dim] = xyz;
     }
 
-    void addData_F32x3_from3(String dim, Float32List xdata, Float32List ydata, Float32List zdata) {
+    void addData_F64x3_from3(String dim, Float64List xdata, Float64List ydata, Float64List zdata) {
         assert(dimensionNames.contains(dim));
 
-        var xyz = new Float32List(numPointsInTile * 3);
+        var xyz = new Float64List(numPointsInTile * 3);
         for (int i = 0; i < numPointsInTile; i++) {
             xyz[i * 3 + 0] = xdata[i];
             xyz[i * 3 + 1] = ydata[i];
             xyz[i * 3 + 2] = zdata[i];
         }
 
-        addData_F32x3(dim, xyz);
+        addData_F64x3(dim, xyz);
     }
 
     void addData_U8x4(String dim, Uint8List xyzw) {
@@ -88,8 +88,8 @@ class PointCloudTile {
     }
 
     void updateBounds() {
-        assert(data["xyz"] is Float32List);
-        Float32List d = data["xyz"];
+        assert(data["xyz"] is Float64List);
+        Float64List d = data["xyz"];
         for (int i = 0; i < numPointsInTile; i++) {
             double x = d[i * 3];
             double y = d[i * 3 + 1];

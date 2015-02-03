@@ -139,7 +139,7 @@ class CesiumBridge {
         return prim;
     }
 
-    dynamic createCloud(int numPoints, Float32List points, Uint8List colors) {
+    dynamic createCloud(int numPoints, Float64List points, Uint8List colors) {
         var t0 = new DateTime.now().millisecondsSinceEpoch;
         assert(numPoints >= 0);
         assert(points.length == numPoints * 3);
