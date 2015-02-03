@@ -38,10 +38,4 @@ abstract class Shape {
     void remove() {
         _hub.cesium.remove(_primitive);
     }
-
-    // called when picked
-    void pick(int pickedId) {
-        assert(id == pickedId);
-        print("PICK: $id is ${runtimeType.toString()}");
-    }
 }

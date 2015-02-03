@@ -61,7 +61,7 @@ class HttpComms extends Comms {
         int bufIndex = 0;
 
         ws.onOpen.listen((_) {
-            print("socket opened");
+            log("socket opened");
 
             ws.send(webpath); // {+file}
             ws.binaryType = "arraybuffer";
@@ -100,7 +100,7 @@ class HttpComms extends Comms {
         assert(ws != null);
 
         ws.onOpen.listen((_) {
-            print("socket opened");
+            log("socket opened");
 
             ws.send(webpath); // {+file}
             ws.binaryType = "arraybuffer";

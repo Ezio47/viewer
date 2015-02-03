@@ -58,8 +58,8 @@ class AnnotationController implements IController {
             return;
         }
 
-        print("annotation 1: ${Utils.printc(point1)}");
-        print("annotation 2: ${Utils.printc(point2)}");
+        log("annotation 1: ${Utils.toString_Cartographic3(point1)}");
+        log("annotation 2: ${Utils.toString_Cartographic3(point2)}");
 
         Annotation a = new Annotation(point1, point2);
 

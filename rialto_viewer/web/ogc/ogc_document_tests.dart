@@ -15,19 +15,19 @@ class OgcDocumentTests {
     static void test() {
         var exDoc = Xml.parse(OgcDocumentTests.generalException);
         var ex = OgcDocument.parse(exDoc);
-        print(ex);
+        log(ex);
 
         var procDoc = Xml.parse(OgcDocumentTests.describeProcess);
         var proc = OgcDocument.parse(procDoc);
-        print(proc);
+        log(proc);
 
         var expDoc = Xml.parse(OgcDocumentTests.describeProcessError);
         var exp = OgcDocument.parse(expDoc);
-        print(exp);
+        log(exp);
 
         var wpsCapsDoc = Xml.parse(OgcDocumentTests.capabilities);
         var wpsCaps = OgcDocument.parse(wpsCapsDoc);
-        print(wpsCaps);
+        log(wpsCaps);
 
         var wps = new WpsService("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService", proxy: "http://localhost:12347");
         wps.open();

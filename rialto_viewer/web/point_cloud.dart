@@ -49,13 +49,13 @@ class PointCloud {
             updateBoundsForTile(tile);
         }
 
-        print("Bounds: $bbox");
+        log("Bounds: $bbox");
     }
 
     void updateBoundsForTile(PointCloudTile tile) {
         bbox.unionWith(tile.bbox);
 
-        print("Bounds: $bbox");
+        log("Bounds: $bbox");
     }
 
     Future colorizeAsync(PointCloudColorizer colorizer) {

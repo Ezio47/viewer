@@ -39,7 +39,7 @@ class PointCloudColorizer {
         var newColors = new Uint8List(tile.numPointsInTile * 4);
 
         if (rampName == "native") {
-            print(tile.data.keys);
+            log(tile.data.keys);
             if (!tile.data.containsKey("Red") || !tile.data.containsKey("Green") || !tile.data.containsKey("Blue")) {
                 return null;
             }

@@ -29,25 +29,19 @@ class Key {
 
 
 class Utils {
-    static String printv(Vector3 v, [int prec = 2]) {
-        var s = Utils.printv3(v.x, v.y, v.z, prec);
+    static String toString_Vector3(Vector3 v, [int prec = 2]) {
+        var s = Utils.toString_double3(v.x, v.y, v.z, prec);
         return s;
     }
 
-    static String printc(Cartographic3 v, [int prec = 2]) {
-        var s = Utils.printv3(v.longitude, v.latitude, v.height, prec);
+    static String toString_Cartographic3(Cartographic3 v, [int prec = 2]) {
+        var s = Utils.toString_double3(v.longitude, v.latitude, v.height, prec);
         return s;
     }
 
-    static String printv3(double x, double y, double z, [int prec = 1]) {
+    static String toString_double3(double x, double y, double z, [int prec = 1]) {
         var s = "${x.toStringAsFixed(prec)},${y.toStringAsFixed(prec)},${z.toStringAsFixed(prec)}";
         return s;
-    }
-
-    static Future toFuture(dynamic v) {
-        Completer c = new Completer();
-        c.complete(v);
-        return c.future;
     }
 
     static void vectorMinWith(Vector3 dst, Vector3 src) {

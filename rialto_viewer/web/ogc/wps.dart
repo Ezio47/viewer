@@ -32,7 +32,7 @@ class OwsService {
         Completer c = new Completer<Xml.XmlDocument>();
 
         String wps = Uri.encodeFull(server + operation);
-        print("wps server request: $operation");
+        log("wps server request: $operation");
 
         var url = wps;
 
@@ -43,15 +43,11 @@ class OwsService {
         }
 
         var f = _client.get(url).then((response) {
-            //print(r.runtimeType);
-            //print("response.body);
-
             String s = response.body;
             var doc = Xml.parse(s);
             c.complete(doc);
         }).catchError((e) {
-            print(e);
-            assert(false); // TODO
+            Hub.error(e);
         });
 
         return c.future;
@@ -65,7 +61,6 @@ class WpsService extends OwsService {
             : super("WPS", server, proxy: proxy, description: description) {
         _hub.events.WpsRequest.subscribe(_handleWpsRequest);
     }
-
 
     Future<OgcDocument> getCapabilitiesAsync() {
         var c = new Completer<OgcDocument>();

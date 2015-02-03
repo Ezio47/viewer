@@ -14,8 +14,6 @@ class ConfigScript {
         Http.Client client = new BHttp.BrowserClient();
 
         Future<String> f = client.get(url).then((response) {
-            //print(r.runtimeType);
-            //print(response.body);
             return response.body;
         }).catchError((e) {
             log("ERROR: $e");

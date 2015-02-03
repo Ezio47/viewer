@@ -39,7 +39,7 @@ class PointCloudLayer extends Layer {
             comms.readAll(path + "hdr").then((ByteData buf) {
 
                 ria.readHeader(buf);
-                print(ria);
+                log(ria);
                 int pointSize = ria.pointSizeInBytes;
 
                 assert(ria.dimensions[0].name=="X");

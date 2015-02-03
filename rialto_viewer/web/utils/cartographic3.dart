@@ -85,9 +85,9 @@ class CartographicBbox {
 
     String toString() {
         String s =
-                "min=${Utils.printv(minimum._vector)} " +
-                "max=${Utils.printv(maximum._vector)} " +
-                "len=${Utils.printv(length)}";
+                "min=${Utils.toString_Vector3(minimum._vector)} " +
+                "max=${Utils.toString_Vector3(maximum._vector)} " +
+                "len=${Utils.toString_Vector3(length)}";
         return s;
     }
 }

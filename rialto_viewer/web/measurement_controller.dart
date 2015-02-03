@@ -59,7 +59,7 @@ class MeasurementController implements IController {
             return;
         }
 
-        print("Distance from ${Utils.printc(point1)} to ${Utils.printc(point2)}");
+        log("Distance from ${Utils.toString_Cartographic3(point1)} to ${Utils.toString_Cartographic3(point2)}");
 
         Measurement m = new Measurement(point1, point2);
 

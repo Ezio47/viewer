@@ -58,8 +58,8 @@ class ViewshedController implements IController {
             return;
         }
 
-        print("viewshed origin: ${Utils.printc(point1)}");
-        print("viewshed radius: ${Utils.printc(point2)}");
+        log("viewshed origin: ${Utils.toString_Cartographic3(point1)}");
+        log("viewshed radius: ${Utils.toString_Cartographic3(point2)}");
 
         Viewshed a = new Viewshed(point1, point2);
 
