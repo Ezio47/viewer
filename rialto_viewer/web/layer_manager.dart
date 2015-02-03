@@ -43,6 +43,7 @@ class LayerManager {
         assert(!layers.containsKey(name));
 
         Layer layer = LayerManager._createLayer(name, data.map);
+        if (layer == null) return;
 
         layer.load().then((_) {
             Future f;
@@ -114,7 +115,8 @@ class LayerManager {
                 layer = new PointCloudLayer(name, map);
                 break;
             default:
-                assert(false); // TODO
+                Hub.error("invalid layer type in script: $type");
+                return null;
         }
 
         return layer;

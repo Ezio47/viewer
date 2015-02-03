@@ -105,7 +105,7 @@ class SettingsDialogVM extends DialogVM {
             var data = new CameraData(eye, target, up, fov);
             _hub.events.UpdateCamera.fire(data);
         } else {
-            assert(false); // TODO
+            Hub.error("invalid camera settings");
         }
     }
 

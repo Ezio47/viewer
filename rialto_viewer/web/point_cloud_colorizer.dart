@@ -28,12 +28,17 @@ class PointCloudColorizer {
 
     String get rampName => _rampName;
     void set rampName(String name) {
-        assert(_Ramps.list.containsKey(name)); // TODO
+        if (!_Ramps.list.containsKey(name)) {
+            Hub.error("invalid color ramp name: $name");
+            return;
+        }
         _rampName = name;
     }
 
     Uint8List _execute(PointCloudTile tile, double zmin, double zmax) {
-        if (rampName == null || rampName.isEmpty) assert(false); // TODO
+        if (rampName == null || rampName.isEmpty) {
+            throw new StateError("color ramp is null");
+        }
 
         // TODO: reuse this every tile
         var newColors = new Uint8List(tile.numPointsInTile * 4);

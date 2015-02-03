@@ -16,8 +16,7 @@ class ConfigScript {
         Future<String> f = client.get(url).then((response) {
             return response.body;
         }).catchError((e) {
-            log("ERROR: $e");
-            assert(false); // TODO
+            Hub.error("error getting script: $e");
         });
 
         f.then((s) {
@@ -59,7 +58,8 @@ class ConfigScript {
                     _doCommand_wps(data);
                     break;
                 default:
-                    assert(false); // TODO
+                    Hub.error("invalid command in script: $command");
+                    return;
             }
         }
     }

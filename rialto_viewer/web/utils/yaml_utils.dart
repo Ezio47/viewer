@@ -45,6 +45,6 @@ class YamlUtils {
         s = s.toLowerCase();
         if (s == "true") return true;
         if (s == "false") return false;
-        throw new Error(); // TODO
+        throw new FormatException("invalid boolean: $s");
     }
 }

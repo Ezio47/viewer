@@ -42,11 +42,6 @@ class HttpComms extends Comms {
         _client.close();
     }
 
-    void _errf(Object o) // TODO
-    {
-        return;
-    }
-
     @override
     Future<ByteData> readAll(String webpath) {
 
@@ -78,8 +73,8 @@ class HttpComms extends Comms {
                 c.complete(buf);
                 log("done");
             });
-            ws.onError.listen((_) {
-                assert(false); // TODO
+            ws.onError.listen((e) {
+                Hub.error("error reading socket: $e");
             });
         });
 
@@ -111,11 +106,12 @@ class HttpComms extends Comms {
             ws.onClose.listen((_) {
                 readBuffer.flush(force: true);
                 readBuffer.close();
-                c.complete(null);
+                c.complete(true);
                 log("done");
             });
             ws.onError.listen((_) {
-                assert(false); // TODO
+                Hub.error("error reading socket");
+                c.complete(false);
             });
         });
 

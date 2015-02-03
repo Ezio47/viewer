@@ -88,8 +88,7 @@ class RiaDimension {
                 g = (ByteData buf, int bufIndex) => buf.getFloat64(bufIndex, e);
                 break;
             default:
-                assert(false); // TODO
-                break;
+                throw new ArgumentError("invalid datatype: $type");
         }
 
         setter = f;

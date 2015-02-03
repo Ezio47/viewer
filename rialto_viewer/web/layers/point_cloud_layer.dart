@@ -119,7 +119,8 @@ class PointCloudLayer extends Layer {
                     cloud.updateBoundsForTile(tile);
                 };
 
-                var junk = comms.readChunked(path, pointSize, handler).then((bool v) {
+                comms.readChunked(path, pointSize, handler).then((bool ok) {
+                    if (!ok) return;
                     whenReady();
                 });
             });
