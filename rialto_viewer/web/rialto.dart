@@ -29,6 +29,7 @@ part 'mode_controller.dart';
 part 'point_cloud.dart';
 part 'point_cloud_generator.dart';
 part 'point_cloud_tile.dart';
+part 'ria_format.dart';
 part 'selection_controller.dart';
 part 'view_controller.dart';
 part 'ogc/wps.dart';

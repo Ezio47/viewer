@@ -96,8 +96,7 @@ boost::uint64_t PdalBridge::writeRia(const char* name, boost::uint64_t targetPoi
     std::vector<pdal::Dimension::Id::Enum> dimIds = getDimIds();
     boost::uint32_t numDims = dimIds.size();
 
-    printf("Writing %lld points with %d dimensions (approx %lld bytes)\n",
-        targetPointCount, numDims, targetPointCount * numDims * 4);
+    printf("Writing %lld points with %d dimensions\n", targetPointCount, numDims);
 
     boost::uint64_t numWritten = 0;
 
@@ -207,22 +206,22 @@ boost::uint64_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, 
 
         for (int i=0; i<numDims; i++) {
 
-          const pdal::Dimension::Id::Enum id = dimIds[i];
-
-          if (xyzOnly &&
+            const pdal::Dimension::Id::Enum id = dimIds[i];
+        
+            if (xyzOnly &&
                 id != pdal::Dimension::Id::Enum::X &&
                 id != pdal::Dimension::Id::Enum::Y &&
                 id != pdal::Dimension::Id::Enum::Z)
-          {
-              continue;
-          }
-
-              pdal::Dimension::Type::Enum type = getDimType(id);
-              size_t size = pdal::Dimension::size(type);
-
-              buf->getRawField(id, idx, tmp);
-
-              fwrite(tmp, sizeof(size_t), 1, fp);
+            {
+                continue;
+            }
+        
+            pdal::Dimension::Type::Enum type = getDimType(id);
+            size_t size = pdal::Dimension::size(type);
+        
+            buf->getRawField(id, idx, tmp);
+         
+            fwrite(tmp, size, 1, fp);
         }
 
         ++numWritten;

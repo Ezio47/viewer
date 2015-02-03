@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     pdal.close();
 
-    printf("Wrote %u points (approx %u bytes)\n", numWritten, numWritten * numDims * 4);
+    printf("Wrote %u points\n", numWritten);
 
     return 0;
 }

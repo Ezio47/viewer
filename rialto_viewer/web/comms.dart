@@ -14,13 +14,12 @@ abstract class Comms {
     void open();
     void close();
     Future<ByteData> readAll(String webpath);
-    Future<bool> readChunked(String path, FlushFunc handler);
+    Future<bool> readChunked(String path, int pointSize, FlushFunc handler);
 }
 
 
 class HttpComms extends Comms {
     Http.Client _client;
-    _ReadBuffer _readBuffer;
 
     HttpComms(String myserver) : super(myserver) {
         if (server.endsWith("/")) server = server.substring(0, server.length - 1);
@@ -31,8 +30,6 @@ class HttpComms extends Comms {
 
         final int pointsPerTile = 1024 * 64;
         final int bytesPerTile = pointsPerTile * bytesPerPoint;
-
-        _readBuffer = new _ReadBuffer(bytesPerTile * 2);
     }
 
     @override
@@ -78,8 +75,6 @@ class HttpComms extends Comms {
                 }
             });
             ws.onClose.listen((_) {
-                _readBuffer.flush(force: true);
-                _readBuffer.close();
                 c.complete(buf);
                 log("done");
             });
@@ -92,11 +87,12 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<bool> readChunked(String webpath, FlushFunc handler) {
+    Future<bool> readChunked(String webpath, int pointSize, FlushFunc handler) {
 
         Completer c = new Completer();
 
-        _readBuffer.open(handler);
+        var readBuffer = new _ReadBuffer(pointSize * 1024 * 10);
+        readBuffer.open(handler);
 
         assert(server.startsWith("ws:"));
 
@@ -110,11 +106,11 @@ class HttpComms extends Comms {
             ws.binaryType = "arraybuffer";
             ws.onMessage.listen((MessageEvent e) {
                 ByteBuffer buf = e.data;
-                _readBuffer.push(buf);
+                readBuffer.push(buf);
             });
             ws.onClose.listen((_) {
-                _readBuffer.flush(force: true);
-                _readBuffer.close();
+                readBuffer.flush(force: true);
+                readBuffer.close();
                 c.complete(null);
                 log("done");
             });
