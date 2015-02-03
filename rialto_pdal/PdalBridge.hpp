@@ -9,33 +9,33 @@ public:
     ~PdalBridge();
 
     void open(const std::string& fname);
-    
+
     void close();
-    
+
     int getMetadataCount();
     std::vector<char*> getMetadataKeys();
     std::vector<char*> getMetadataValues();
     
     boost::uint64_t getNumPoints() const;
-    
+
     const pdal::Dimension::IdList& getDimIds() const;
     pdal::Dimension::Type::Enum getDimType(pdal::Dimension::Id::Enum) const;
-    
+
     void getStats(pdal::Dimension::Id::Enum id, double& min, double& mean, double& max) const;
-    
+
     std::string getWkt() const;
-    
+
     void writeTiles();
-    
+
     boost::uint32_t writeRia(const char* name, boost::uint64_t targetPointCount, const char* dimMode);
-    
-private:    
+
+private:
     void writeRiaHeader(FILE* fp, int mode);
     boost::uint32_t writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, int mode);
-    
+
     std::vector<char*> m_keys;
     std::vector<char*> m_values;
-    
+
     bool m_debug;
     boost::uint32_t m_verbosity;
     pdal::PipelineManager* m_manager;
