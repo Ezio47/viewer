@@ -42,6 +42,10 @@ class PointCloudLayer extends Layer {
                 print(ria);
                 int pointSize = ria.pointSizeInBytes;
 
+                assert(ria.dimensions[0].name=="X");
+                assert(ria.dimensions[1].name=="Y");
+                assert(ria.dimensions[2].name=="Z");
+
                 cloud = new PointCloud(path, name, ["xyz", "rgba"]);
 
                 var handler = (ByteBuffer buf, int numBytes) {
@@ -49,25 +53,33 @@ class PointCloudLayer extends Layer {
                     int numPoints = numBytes ~/ pointSize;
                     assert(numPoints * pointSize == numBytes);
 
+                    final int numDims = ria.dimensions.length;
+                    List dims = ria.dimensions;
 
                     ByteData bytes = buf.asByteData();
-                    int byteIndex = 0;
 
-                    // gather x,y,z into one array
-                    Float32List tmp = new Float32List(numPoints * 3);
-                    int tmpIndex = 0;
-
+                    int index = 0;
                     for (int i = 0; i < numPoints; i++) {
-                        for (int j = 0; j < 3; j++) {
-                            double d = bytes.getFloat64(byteIndex, Endianness.LITTLE_ENDIAN);
-                            tmp[tmpIndex] = d;
-
-                            tmpIndex++;
-                            byteIndex += 8;
+                        for (int j=0; j<numDims; j++) {
+                            var v = dims[j].getter(bytes, index);
+                            dims[j].list[i] = v;
+                            index += dims[j].sizeInBytes;
                         }
-                        byteIndex += pointSize - 8 * 3;
                     }
 
+                    // gather x,y,z into one array
+
+                    Float32List tmp = new Float32List(numPoints * 3);
+                    for (int i=0; i<numPoints; i++) {
+
+                        double x = dims[0].list[i];
+                        double y = dims[1].list[i];
+                        double z = dims[2].list[i];
+
+                        tmp[i*3] = x;
+                        tmp[i*3 + 1] = y;
+                        tmp[i*3 + 2] = z;
+                    }
 
                     var tile = cloud.createTile(numPoints);
                     tile.addData_F32x3("xyz", tmp);
