@@ -49,8 +49,25 @@ class PointCloudLayer extends Layer {
                     int numPoints = numBytes ~/ pointSize;
                     assert(numPoints * pointSize == numBytes);
 
-                    Float32List tmp = new Float32List.view(buf, 0, numPoints * 3);
-                    assert(tmp.length == numPoints * 3);
+
+                    ByteData bytes = buf.asByteData();
+                    int byteIndex = 0;
+
+                    // gather x,y,z into one array
+                    Float32List tmp = new Float32List(numPoints * 3);
+                    int tmpIndex = 0;
+
+                    for (int i = 0; i < numPoints; i++) {
+                        for (int j = 0; j < 3; j++) {
+                            double d = bytes.getFloat64(byteIndex, Endianness.LITTLE_ENDIAN);
+                            tmp[tmpIndex] = d;
+
+                            tmpIndex++;
+                            byteIndex += 8;
+                        }
+                        byteIndex += pointSize - 8 * 3;
+                    }
+
 
                     var tile = cloud.createTile(numPoints);
                     tile.addData_F32x3("xyz", tmp);

@@ -38,3 +38,5 @@ rialto_pdal/las2ria
 rialto_pdal/las2tiles
 
 *.ria
+
+*.riahdr

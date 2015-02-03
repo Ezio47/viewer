@@ -2,7 +2,7 @@ layers:
     serp:
         type: pointcloud
         server: ws://localhost:12346
-        path: /s.ria
+        path: /serp-100K.ria
         numBytes: 10            # optional, default=0
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
