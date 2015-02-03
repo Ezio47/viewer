@@ -88,7 +88,7 @@ class RiaDimension {
                 g = (ByteData buf, int bufIndex) => buf.getFloat64(bufIndex, e);
                 break;
             default:
-                assert(false);
+                assert(false); // TODO
                 break;
         }
 

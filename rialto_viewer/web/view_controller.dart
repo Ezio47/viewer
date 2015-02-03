@@ -14,7 +14,7 @@ class ViewController implements IController {
 
         _hub.modeController.register(this, ModeData.VIEW);
 
-        // BUG
+        // TODO
         //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);
         //_hub.eventRegistry.MouseDown.subscribe(_handleMouseDown);
         //_hub.eventRegistry.MouseUp.subscribe(_handleMouseUp);

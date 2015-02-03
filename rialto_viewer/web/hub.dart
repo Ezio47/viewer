@@ -4,8 +4,13 @@
 
 part of rialto.viewer;
 
-void log(o) {
-    window.console.log(o);
+void log(obj) {
+    window.console.log(obj.toString());
+}
+
+void error(obj) {
+    window.console.log(obj);
+    window.alert(obj.toString());
 }
 
 

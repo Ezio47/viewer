@@ -11,5 +11,9 @@ void main() {
 
     //OgcDocumentTests.test();
 
-    hub.events.LoadScript.fire("http://localhost:12345/test.yaml");
+    try {
+        hub.events.LoadScript.fire("http://localhost:12345/test.yaml");
+    } catch(e) {
+        error(e);
+    }
 }

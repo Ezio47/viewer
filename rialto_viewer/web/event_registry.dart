@@ -13,7 +13,7 @@ part of rialto.viewer;
 
 class EventRegistry {
 
-    // BUG: note you can't unsubscribe a handler that is an anonymous lambda
+    // TODO: note you can't unsubscribe a handler that is an anonymous lambda
     // which might be the case of 0-arity handler functions
 
     EventRegistry();

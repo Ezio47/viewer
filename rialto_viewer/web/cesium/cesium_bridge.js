@@ -115,7 +115,7 @@ var CesiumBridge = function (element) {
 
         if (mode === Cesium.SceneMode.SCENE2D ||
             mode == Cesium.SceneMode.COLUMBUS_VIEW) {
-            // BUG: hack fix for now
+            // TODO: hack fix for now
             this.goHome();
             return;
         }
@@ -132,7 +132,7 @@ var CesiumBridge = function (element) {
 
         var up = new Cesium.Cartesian3(upX, upY, upZ);
 
-        // BUG: we only support PerspectiveFrustum camera, so seeting FOV is okay
+        // TODO: we only support PerspectiveFrustum camera, so seeting FOV is okay
         this.viewer.camera.frustum.fov = Cesium.Math.toRadians(fovDegrees);
 
         this.viewer.camera.lookAt(eyeCartesian, targetCartesian, up);

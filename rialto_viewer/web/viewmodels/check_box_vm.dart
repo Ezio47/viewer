@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-// BUG: make check to see if data has changed or not
+// TODO: make check to see if data has changed or not
 
 class CheckBoxVM extends ViewModel {
     InputElement _inputElement;

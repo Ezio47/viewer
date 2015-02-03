@@ -106,7 +106,7 @@ void Tile::setBounds() {
             m_ymax = m_parent->m_ymax;
             break;
         default:
-            assert(false);
+            assert(false); // TODO
     }
 }
 
@@ -249,7 +249,7 @@ double Tile::computeCell(int x, int y) {
 
     if (!tile) return DBL_MAX;
 
-    // BUG: hack for a 4-point stencil
+    // TODO: hack for a 4-point stencil
     int cnt = 0;
     double sum = 0.0;
 
@@ -314,7 +314,7 @@ void Tile::fillInCells() {
 boost::uint16_t Tile::convert(double z) const {
     if (z == DBL_MAX) return 0;
     
-    // BUG: assume Z is in meters for now
+    // TODO: assume Z is in meters for now
     
     // the spec calls for height to be in 0.2 meter increments,
     // with a lower bound of -1000 meters
@@ -334,7 +334,7 @@ void Tile::write(gzFile fp) const {
     for (int y=0; y<SIZ + 1; y++) {
         for (int x=0; x<SIZ + 1; x++) {
             
-            // BUG: do the edge condition later
+            // TODO: do the edge condition later
             int xx = (x < SIZ) ? x : x - 1;
             int yy = (y < SIZ) ? y : y - 1;
 

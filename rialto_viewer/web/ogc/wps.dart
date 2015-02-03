@@ -51,7 +51,7 @@ class OwsService {
             c.complete(doc);
         }).catchError((e) {
             print(e);
-            assert(false);
+            assert(false); // TODO
         });
 
         return c.future;

@@ -90,7 +90,7 @@ class CesiumBridge {
     }
 
     int getPickedShapeId() {
-        assert(false);
+        assert(false); // TODO
         return null;
     }
 

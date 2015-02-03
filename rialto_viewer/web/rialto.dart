@@ -58,7 +58,6 @@ part 'ogc/ogc_document_tests.dart';
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';
 part 'utils/color.dart';
-part 'utils/rialto_exceptions.dart';
 part 'utils/signal.dart';
 part 'utils/utils.dart';
 part 'utils/yaml_utils.dart';

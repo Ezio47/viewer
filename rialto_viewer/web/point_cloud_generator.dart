@@ -23,7 +23,7 @@ class PointCloudGenerator {
             case "/terrain3.dat":
                 return _makeTerrain(3, webpath, displayName);
         }
-        throw new RialtoArgumentError("invalid file name");
+        throw new ArgumentError("invalid file name");
     }
 
     static PointCloud _makeRandom(String webpath, String displayName) {
@@ -54,7 +54,7 @@ class PointCloudGenerator {
 
         for (int t = 0; t < numTiles; t++) {
 
-            // note we miust have at least one point else Cs dies later on (BUG)
+            // note we miust have at least one point else Cs dies later on (TODO)
             final int numPointsInTile = random.nextInt(upperbound) + 1;
             //log("Tile $t numPointsInTile: $numPointsInTile");
 
@@ -170,7 +170,7 @@ class _Terrain {
                 zscale = 350.0;
                 break;
             default:
-                throw new RialtoArgumentError("invalid terrain mode value");
+                throw new ArgumentError("invalid terrain mode value");
         }
 
         _makeGrid(xmin, ymin, xlen, ylen, zscale);

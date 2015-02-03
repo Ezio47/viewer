@@ -42,7 +42,7 @@ class HttpComms extends Comms {
         _client.close();
     }
 
-    void _errf(Object o) // BUG
+    void _errf(Object o) // TODO
     {
         return;
     }
@@ -79,7 +79,7 @@ class HttpComms extends Comms {
                 log("done");
             });
             ws.onError.listen((_) {
-                assert(false);
+                assert(false); // TODO
             });
         });
 
@@ -115,7 +115,7 @@ class HttpComms extends Comms {
                 log("done");
             });
             ws.onError.listen((_) {
-                assert(false);
+                assert(false); // TODO
             });
         });
 

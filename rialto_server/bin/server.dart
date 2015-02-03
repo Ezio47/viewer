@@ -30,15 +30,13 @@ abstract class Server {
     Function _handlerGET;
 
     final headers = {
-       // "Content-Type": "application/json",
+        // "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*, ",
         "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
         "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
     };
 
-    Server(String this.type, String this.server, int this.port, String this.dir) {
-        _handlerGET = (_) { assert(false); };
-    }
+    Server(String this.type, String this.server, int this.port, String this.dir);
 
     void run() {
         var router = shelf_route.router()..get('/{+file}', _handlerGET, middleware: logRequests());
@@ -101,7 +99,7 @@ void main(List<String> args) {
             s = new ProxyServer(server, port, dir);
             break;
         default:
-            assert(false);
+            usage("invalid mode");
     }
 
     s.run();

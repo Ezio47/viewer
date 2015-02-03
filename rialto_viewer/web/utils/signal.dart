@@ -65,7 +65,7 @@ class Signal<T> {
         };
 
         streamSubscription.onData(wrappingHandler);
-        streamSubscription.onError((err) => print("Error on $name: $err")); // BUG
+        streamSubscription.onError((err) => print("Error on $name: $err")); // TODO
         ////streamSubscription.onDone(() => print("Done on $name"));
         return mySignalSubscription;
     }

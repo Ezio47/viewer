@@ -19,7 +19,7 @@ class ConfigScript {
             return response.body;
         }).catchError((e) {
             log("ERROR: $e");
-            assert(false);
+            assert(false); // TODO
         });
 
         f.then((s) {
@@ -61,7 +61,7 @@ class ConfigScript {
                     _doCommand_wps(data);
                     break;
                 default:
-                    assert(false);
+                    assert(false); // TODO
             }
         }
     }

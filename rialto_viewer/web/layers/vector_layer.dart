@@ -32,6 +32,6 @@ class VectorLayer extends Layer {
     @override
     void changeVisibility(bool v) {
         // not supported
-        assert(false);
+        assert(false); // TODO
     }
 }

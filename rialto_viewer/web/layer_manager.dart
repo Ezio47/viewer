@@ -114,7 +114,7 @@ class LayerManager {
                 layer = new PointCloudLayer(name, map);
                 break;
             default:
-                assert(false);
+                assert(false); // TODO
         }
 
         return layer;
