@@ -13,8 +13,8 @@ abstract class Comms {
 
     void open();
     void close();
-    Future<String> readAsString(String path);
-    Future<bool> readAsBytes(String path, FlushFunc handler);
+    Future<ByteData> readAll(String webpath);
+    Future<bool> readChunked(String path, FlushFunc handler);
 }
 
 
@@ -25,9 +25,14 @@ class HttpComms extends Comms {
     HttpComms(String myserver) : super(myserver) {
         if (server.endsWith("/")) server = server.substring(0, server.length - 1);
 
-        final int bytesPerPoint = 3 * 4 /* + 4*4 */;
+        final int dimsPerPoint = 3;
+        final int bytesPerDim = 4;
+        final int bytesPerPoint = dimsPerPoint * bytesPerDim;
+
         final int pointsPerTile = 1024 * 64;
-        _readBuffer = new _ReadBuffer(bytesPerPoint * pointsPerTile);
+        final int bytesPerTile = pointsPerTile * bytesPerPoint;
+
+        _readBuffer = new _ReadBuffer(bytesPerTile * 2);
     }
 
     @override
@@ -46,21 +51,48 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<String> readAsString(String webpath) {
+    Future<ByteData> readAll(String webpath) {
 
-        String s = '${server}/file${webpath}';
+        Completer c = new Completer< ByteData>();
 
-        var f = _client.get(s).then((response) {
-            //print(r.runtimeType);
-            //print(response.body);
-            return response.body;
-        }).catchError(_errf);
+        assert(server.startsWith("ws:"));
 
-        return f;
+        WebSocket ws = new WebSocket(server + "/points/");
+        assert(ws != null);
+
+        var buf = new ByteData(4096); // TODO: maxsize
+        int bufIndex = 0;
+
+        ws.onOpen.listen((_) {
+            print("socket opened");
+
+            ws.send(webpath); // {+file}
+            ws.binaryType = "arraybuffer";
+            ws.onMessage.listen((MessageEvent e) {
+                ByteBuffer bytes = e.data;
+                ByteData src = bytes.asByteData();
+                for (int i=0; i<src.lengthInBytes; i++) {
+                    final v = src.getUint8(i);
+                    buf.setUint8(bufIndex, v);
+                    ++bufIndex;
+                }
+            });
+            ws.onClose.listen((_) {
+                _readBuffer.flush(force: true);
+                _readBuffer.close();
+                c.complete(buf);
+                log("done");
+            });
+            ws.onError.listen((_) {
+                assert(false);
+            });
+        });
+
+        return c.future;
     }
 
     @override
-    Future<bool> readAsBytes(String webpath, FlushFunc handler) {
+    Future<bool> readChunked(String webpath, FlushFunc handler) {
 
         Completer c = new Completer();
 

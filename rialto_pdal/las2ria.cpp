@@ -2,22 +2,31 @@
 
 #include "PdalBridge.hpp"
 
-// las2ria file.las file.ria 1000
+
+void usage() {
+    printf("Usage:  $ las2ria in.las out.las numPoints xyzOnly\n");
+    exit(1);
+}
 
 int main(int argc, char *argv[])
 {
     PdalBridge pdal;
 
-    if (argc != 5) {
-        printf("Usage:  $ las2ria in.las out.las 1000 [xyz|all]\n");
-        exit(1);
-    }
+    if (argc != 5) usage();
 
     const char* infile = argv[1];
     const char* outfile = argv[2];
     boost::uint64_t targetPointCount = atoi(argv[3]);
-    const char* dimMode = argv[4];
-
+    
+    bool xyzOnly;
+    if (strcmp(argv[4], "true") == 0) {
+        xyzOnly = true;
+    } else if  (strcmp(argv[4], "false") == 0) {
+        xyzOnly = false;
+    } else {
+        usage();
+    }
+    
     pdal.open(infile);
 
     boost::uint64_t numPoints = pdal.getNumPoints();
@@ -45,7 +54,7 @@ int main(int argc, char *argv[])
             min, mean, max);
     }
 
-    boost::uint32_t numWritten = pdal.writeRia(argv[2], targetPointCount, dimMode);
+    boost::uint32_t numWritten = pdal.writeRia(argv[2], targetPointCount, xyzOnly);
 
     pdal.close();
 

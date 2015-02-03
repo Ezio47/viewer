@@ -27,11 +27,11 @@ public:
 
     void writeTiles();
 
-    boost::uint32_t writeRia(const char* name, boost::uint64_t targetPointCount, const char* dimMode);
+    boost::uint64_t writeRia(const char* name, boost::uint64_t targetPointCount, bool xyzOnly);
 
 private:
-    void writeRiaHeader(FILE* fp, int mode);
-    boost::uint32_t writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, int mode);
+    void writeRiaHeader(FILE* fp, bool xyzOnly, boost::uint64_t numWritten);
+    boost::uint64_t writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, bool xyzOnly);
 
     std::vector<char*> m_keys;
     std::vector<char*> m_values;

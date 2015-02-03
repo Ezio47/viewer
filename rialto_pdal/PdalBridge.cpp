@@ -80,81 +80,83 @@ void PdalBridge::close()
 }
 
 
-boost::uint32_t PdalBridge::writeRia(const char* name, boost::uint64_t targetPointCount, const char* dimMode) {
+boost::uint64_t PdalBridge::writeRia(const char* name, boost::uint64_t targetPointCount, bool xyzOnly) {
 
     boost::uint64_t skip = 0;
     if (targetPointCount != 0) {
         skip = m_numPoints / targetPointCount;
     }
-
-    FILE* fp = fopen(name, "wb");
-
-    int mode = 0;
-    if (strcmp(dimMode,"xyz")==0) {
-        mode = 1;
-        printf("dim mode xyz\n");
-    } else if (strcmp(dimMode,"all")==0) {
-        mode = 2;
-        printf("dim mode all\n");
-    } else {
-        printf("unrecognized dim mode\n");
-        exit(1);
-    }
-
+    
+    char* headerName = new char[strlen(name) + 3 + 1];
+    strcat(headerName, name);
+    strcat(headerName + strlen(name), "hdr");
+    
+    printf("Files: %s, %s\n", name, headerName);
+    
     std::vector<pdal::Dimension::Id::Enum> dimIds = getDimIds();
     boost::uint32_t numDims = dimIds.size();
 
     printf("Writing %lld points with %d dimensions (approx %lld bytes)\n",
         targetPointCount, numDims, targetPointCount * numDims * 4);
 
-    boost::uint32_t numWritten = 0;
+    boost::uint64_t numWritten = 0;
 
+    FILE* fpPoints = fopen(name, "wb");
+    
     const pdal::PointBufferSet& bufs = m_manager->buffers();
     for (auto pi = bufs.begin(); pi != bufs.end(); ++pi)
     {
         const pdal::PointBufferPtr buf = *pi;
-        numWritten += writeRia(fp, buf, skip, mode);
+        numWritten += writeRia(fpPoints, buf, skip, xyzOnly);
     }
 
-    fclose(fp);
+    fclose(fpPoints);
+
+    FILE* fpHeader = fopen(headerName, "wb");
+    writeRiaHeader(fpHeader, xyzOnly, numWritten);
+    fclose(fpHeader);
 
     return numWritten;
 }
 
 
-void PdalBridge::writeRiaHeader(FILE* fp, int mode)
+void PdalBridge::writeRiaHeader(FILE* fp, bool xyzOnly, boost::uint64_t numWritten)
 {
-    // header format:
+    // RIA header file format:
     //
-    //   version: uint8=1
+    //   version: uint8 (currently set to 1)
+    //   numPoints: uint64 (set to 0 if unknown)
     //   numDims: uint8
     //   foreach dim {
-    //       dimSize: uint8
-    //       datatype: uint16
+    //       datatype: uint16 (pdal::Dimension::Type::Enum)
     //       nameLen: uint8
     //       name: nameLen bytes
-    //       min: double
-    //       max: double
+    //       min: double (set to -DBL_MAX if unknown)
+    //       max: double (set to DBL_MAX if unknown)
     //   }
-    //   marker: uint8=42
+    //
+    // RIA data file format:
+    //
     //   foreach point {
     //       foreach dim {
-    //           data: dimSize bytes, as datatype
+    //           data: dimSize bytes, stored as datatype
     //       }
     //   }
 
-    const boost::uint8 version = 1;
+    const boost::uint8_t version = 1;
     fwrite(&version, 1, 1, fp);
-
+   
+    fwrite(&numWritten, 8, 1, fp);
+        
     std::vector<pdal::Dimension::Id::Enum> dimIds = getDimIds();
-    const boost::uint32_t numDims_ = dimIds.size();
-    assert(numDims_ < 256);
-    const boost::uint8 numDims = (boost::uint8)numDims;
+    size_t numDims_ = dimIds.size();
+    const boost::uint8_t numDims = (boost::uint8_t)numDims_;
     fwrite(&numDims, 1, 1, fp);
 
     for (int i=0; i<numDims; i++) {
-
-        if (mode == 1 &&
+        const pdal::Dimension::Id::Enum id = dimIds[i];
+        
+        if (xyzOnly &&
               id != pdal::Dimension::Id::Enum::X &&
               id != pdal::Dimension::Id::Enum::Y &&
               id != pdal::Dimension::Id::Enum::Z)
@@ -162,22 +164,16 @@ void PdalBridge::writeRiaHeader(FILE* fp, int mode)
             continue;
         }
 
-        const pdal::Dimension::Id::Enum id = dimIds[i];
-
-        const pdal::Dimension::Type::Enum dataType_ = pdal.getDimType(id);
-        assert(dataType_ < 65536);
-        boost::uint16 datatype = (boost::uint16)dataType_;
+        const pdal::Dimension::Type::Enum dataType_ = getDimType(id);
+        boost::uint16_t dataType = (boost::uint16_t)dataType_;
         fwrite(&dataType, 2, 1, fp);
 
-        const size_t dimSize_ = size(dataType_);
-        assert(dimSize_ < 256);
-        const boost::uint8 dimSize = (boost::uint8)dimSize_;
-        fwrite(&dimSize, 1, 1, fp);
+        const size_t dimSize = pdal::Dimension::size(dataType_);
 
         const char *name = pdal::Dimension::name(id).c_str();
-        const size_t nameLen_ = strlen(p);
+        const size_t nameLen_ = strlen(name);
         assert(nameLen_ < 256);
-        const boost::uint8 nameLen = (boost::uint8)nameLen_;
+        const boost::uint8_t nameLen = (boost::uint8_t)nameLen_;
         fwrite(&nameLen, 1, 1, fp);
         fwrite(name, nameLen, 1, fp);
 
@@ -187,13 +183,10 @@ void PdalBridge::writeRiaHeader(FILE* fp, int mode)
         fwrite(&min, 8, 1, fp);
         fwrite(&max, 8, 1, fp);
     }
-
-    const boost::uint8 marker = 42;
-    fwrite(&marker, 1, 1, fp);
 }
 
 
-boost::uint32_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, int mode)
+boost::uint64_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, bool xyzOnly)
 {
     uint32_t pointIndex(0);
     std::vector<pdal::Dimension::Id::Enum> dimIds = getDimIds();
@@ -216,7 +209,7 @@ boost::uint32_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, 
 
           const pdal::Dimension::Id::Enum id = dimIds[i];
 
-          if (mode == 1 &&
+          if (xyzOnly &&
                 id != pdal::Dimension::Id::Enum::X &&
                 id != pdal::Dimension::Id::Enum::Y &&
                 id != pdal::Dimension::Id::Enum::Z)
@@ -224,12 +217,12 @@ boost::uint32_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, 
               continue;
           }
 
-              pdal::Dimension::Type::Enum type = pdal.getDimType(id);
-              int siz = size(type);
+              pdal::Dimension::Type::Enum type = getDimType(id);
+              size_t size = pdal::Dimension::size(type);
 
-              buf->getFieldInternal(id, idx, tmp);
+              buf->getRawField(id, idx, tmp);
 
-              fwrite(tmp, siz, 1, fp);
+              fwrite(tmp, sizeof(size_t), 1, fp);
         }
 
         ++numWritten;
