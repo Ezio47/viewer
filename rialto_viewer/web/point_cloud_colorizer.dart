@@ -38,6 +38,27 @@ class PointCloudColorizer {
         // TODO: reuse this every tile
         var newColors = new Uint8List(tile.numPointsInTile * 4);
 
+        if (rampName == "native") {
+            print(tile.data.keys);
+            if (!tile.data.containsKey("Red") || !tile.data.containsKey("Green") || !tile.data.containsKey("Blue")) {
+                return null;
+            }
+            var rlist = tile.data["Red"];
+            var glist = tile.data["Green"];
+            var blist = tile.data["Blue"];
+            assert(rlist is Uint8List);
+            assert(glist is Uint8List);
+            assert(blist is Uint8List);
+
+            for (int i = 0; i < tile.numPointsInTile; i++) {
+                newColors[i * 4 + 0] = rlist[i];
+                newColors[i * 4 + 1] = glist[i];
+                newColors[i * 4 + 2] = blist[i];
+                newColors[i * 4 + 3] = 255;
+            }
+            return newColors;
+        }
+
         assert(tile.data["xyz"] is Float64List);
         Float64List positions = tile.data["xyz"];
 
@@ -134,6 +155,7 @@ class _Ramps {
     // These ramps are taken from http://planet.qgis.org/planet/tag/color%20ramps/
     // (there are some more at http://geotrellis.io/documentation/0.9.0/geotrellis/rendering/)
     static final list = {
+        "native" : null,
         "Blues": [
                 const _Stop(0.00, const _Color(247, 251, 255)),
                 const _Stop(0.13, const _Color(222, 235, 247)),

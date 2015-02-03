@@ -46,7 +46,14 @@ class PointCloudLayer extends Layer {
                 assert(ria.dimensions[1].name=="Y");
                 assert(ria.dimensions[2].name=="Z");
 
-                cloud = new PointCloud(path, name, ["xyz", "rgba"]);
+                var dimlist = ["xyz", "rgba"];
+                if (ria.hasRgb) {
+                    dimlist.add("Red");
+                    dimlist.add("Green");
+                    dimlist.add("Blue");
+                }
+
+                cloud = new PointCloud(path, name, dimlist);
 
                 var handler = (ByteBuffer buf, int numBytes) {
 
@@ -62,7 +69,7 @@ class PointCloudLayer extends Layer {
                     for (int i = 0; i < numPoints; i++) {
                         for (int j=0; j<numDims; j++) {
                             RiaDimension dim = dims[j];
-                            dim.getter(bytes, index, i);
+                            dim.setter(bytes, index, i);
                             index += dim.sizeInBytes;
                         }
                     }
@@ -87,6 +94,26 @@ class PointCloudLayer extends Layer {
                     var tile = cloud.createTile(numPoints);
                     tile.addData_F64x3("xyz", tmp);
                     tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
+
+                    if (ria.hasRgb) {
+                        Uint8List rtmp = new Uint8List(numPoints);
+                        Uint8List gtmp = new Uint8List(numPoints);
+                        Uint8List btmp = new Uint8List(numPoints);
+                        var rdata = ria.dimensionMap["Red"];
+                        var gdata = ria.dimensionMap["Green"];
+                        var bdata = ria.dimensionMap["Blue"];
+                        int byteIndex = rdata.byteOffset;
+                        for (int i=0; i<numPoints; i++) {
+                            rtmp[i] = rdata.getter(bytes, byteIndex);
+                            gtmp[i] = gdata.getter(bytes, byteIndex);
+                            btmp[i] = bdata.getter(bytes, byteIndex);
+                            byteIndex += ria.pointSizeInBytes;
+                        }
+                        tile.addData_U8("Red", rtmp);
+                        tile.addData_U8("Green", gtmp);
+                        tile.addData_U8("Blue", btmp);
+                    }
+
                     tile.updateBounds();
                     tile.updateShape();
                     cloud.updateBoundsForTile(tile);

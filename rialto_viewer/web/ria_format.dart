@@ -25,58 +25,75 @@ class RiaDimension {
     final double max;
     final int numPoints;
 
+    int byteOffset;
+
     List list;
+    Function setter;
     Function getter;
 
     RiaDimension(int this.type, String this.name, double this.min, double this.max, int this.numPoints) {
         Function f;
+        Function g;
+        const e = Endianness.LITTLE_ENDIAN;
+
         switch (type) {
             case Unsigned8:
                 list = new Uint8List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getUint8(bufIndex);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getUint8(bufIndex);
+                g = (ByteData buf, int bufIndex) => buf.getUint8(bufIndex);
                 break;
             case Signed8:
                 list = new Int8List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getInt8(bufIndex);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getUint8(bufIndex);
+                g = (ByteData buf, int bufIndex) => buf.getUint8(bufIndex);
                 break;
             case Unsigned16:
                 list = new Uint16List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getUint16(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getUint16(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getUint16(bufIndex, e);
                 break;
             case Signed16:
                 list = new Int16List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getInt16(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getInt16(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getInt16(bufIndex, e);
                 break;
             case Unsigned32:
                 list = new Uint32List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getUint32(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getUint32(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getUint32(bufIndex, e);
                 break;
             case Signed32:
                 list = new Int32List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getInt32(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getInt32(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getInt32(bufIndex, e);
                 break;
             case Unsigned64:
                 list = new Uint64List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getUint64(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getUint64(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getUint64(bufIndex, e);
                 break;
             case Signed64:
                 list = new Int64List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getInt64(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getInt64(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getInt64(bufIndex, e);
                 break;
             case Float:
                 list = new Float32List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getFloat32(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getFloat32(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getFloat32(bufIndex, e);
                 break;
             case Double:
                 list = new Float64List(numPoints);
-                f = (ByteData buf, int bufIndex, int listIndex) => list[listIndex] = buf.getFloat64(bufIndex, Endianness.LITTLE_ENDIAN);
+                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getFloat64(bufIndex, e);
+                g = (ByteData buf, int bufIndex) => buf.getFloat64(bufIndex, e);
                 break;
             default:
                 assert(false);
                 break;
         }
 
-        getter = f;
+        setter = f;
+        getter = g;
     }
 
     void add(int index, dynamic v) {
@@ -93,6 +110,8 @@ class RiaDimension {
 
 class RiaFormat {
     List<RiaDimension> dimensions;
+    Map<String, RiaDimension> dimensionMap;
+
     int numPoints;
 
     RiaFormat();
@@ -110,7 +129,9 @@ class RiaFormat {
         index += 1;
 
         dimensions = new List<RiaDimension>();
+        dimensionMap = new Map<String, RiaDimension>();
 
+        int byteOffset = 0;
         for (int dim = 0; dim < numDims; dim++) {
             int dimType = buf.getUint16(index, Endianness.LITTLE_ENDIAN);
             index += 2;
@@ -134,10 +155,16 @@ class RiaFormat {
 
             var dim = new RiaDimension(dimType, name, min, max, numPoints);
             dimensions.add(dim);
-        }
+            dimensionMap[name] = dim;
 
+            dim.byteOffset = byteOffset;
+            byteOffset += dim.sizeInBytes;
+        }
         //assert(index == buf.lengthInBytes);
     }
+
+    bool get hasRgb =>
+            (dimensionMap.containsKey("Red") && dimensionMap.containsKey("Green") && dimensionMap.containsKey("Blue"));
 
     int get pointSizeInBytes {
         int sum = 0;
