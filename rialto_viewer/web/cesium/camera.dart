@@ -48,25 +48,24 @@ class Camera {
     void _handleUpdateCamera(CameraData data) {
         assert(data != null);
 
-        switch (data.mode) {
-            case 0:
+        switch (data.viewMode) {
+            case CameraData.NORMAL_MODE:
                 _eyePosition = data.eye;
                 _targetPosition = data.target;
                 _upDirection = data.up;
                 _cameraFov = data.fov;
                 break;
-            case 1: // world view
+            case CameraData.WORLDVIEW_MODE:
                 _hub.cesium.goHome();
                 return;
-            case 2: // data view
+            case CameraData.DATAVIEW_MODE:
                 _eyePosition = _defaultCameraEyePosition;
                 _targetPosition = _defaultTargetPosition;
                 _upDirection = _defaultUpDirection;
                 _cameraFov = _defaultFov;
                 break;
             default:
-                assert(false); // TODO
-                break;
+                throw new ArgumentError("invalid CameraData mode");
         }
 
         _hub.cesium.lookAt(_eyePosition, _targetPosition, _upDirection, _cameraFov);

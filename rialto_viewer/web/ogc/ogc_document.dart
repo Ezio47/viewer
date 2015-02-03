@@ -38,7 +38,7 @@ class OgcDocument {
 
             }
         }
-        return null; // TODO
+        return null;
     }
 
     static Xml.XmlElement _getElement(List<Xml.XmlNode> nodes, String name) {

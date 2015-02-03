@@ -72,7 +72,7 @@ class WpsService extends OwsService {
 
         _doServerRequest("GetCapabilities").then((Xml.XmlDocument doc) {
             var caps = OgcDocument.parse(doc);
-            log(caps);
+            if (caps == null) Hub.error("error parsing capabilities response document");
             c.complete(caps);
         });
 
@@ -91,7 +91,7 @@ class WpsService extends OwsService {
             } else {
                 desc = ret;
             }
-            log(desc);
+            if (desc == null) Hub.error("error parsing process description response document");
             c.complete(desc);
         });
 
@@ -103,7 +103,7 @@ class WpsService extends OwsService {
 
         _doServerRequest("Execute", ["identifier=$processName"]).then((Xml.XmlDocument doc) {
             var resp = OgcDocument.parse(doc);
-            log(resp);
+            if (resp == null) Hub.error("error parsing execute response document");
             c.complete(resp);
         });
 

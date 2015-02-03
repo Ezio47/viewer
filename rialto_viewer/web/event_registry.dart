@@ -108,13 +108,16 @@ class DisplayLayerData {
 }
 
 class CameraData {
-    int mode; // 0:normal, 1:worldview, 2:dataview
+    static const int NORMAL_MODE = 0;
+    static const int WORLDVIEW_MODE = 1;
+    static const int DATAVIEW_MODE = 2;
+    int viewMode;
     Cartographic3 eye; // cartographic
     Cartographic3 target; // cartographic
     Cartesian3 up; // cartesian
     double fov;
-    CameraData(this.eye, this.target, this.up, this.fov) : mode=0;
-    CameraData.fromMode(this.mode);
+    CameraData(this.eye, this.target, this.up, this.fov) : viewMode=NORMAL_MODE;
+    CameraData.fromMode(this.viewMode);
 }
 
 class LayerData {

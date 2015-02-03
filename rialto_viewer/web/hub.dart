@@ -8,11 +8,6 @@ void log(obj) {
     window.console.log(obj.toString());
 }
 
-void error(obj) {
-    window.console.log(obj);
-    window.alert(obj.toString());
-}
-
 
 class Hub {
     // singleton
@@ -100,5 +95,10 @@ class Hub {
     void _handleDisplayLayer(DisplayLayerData data) {
         assert(data.layer != null);
         data.layer.changeVisibility(data.visible);
+    }
+
+    static void error(dynamic s) {
+        window.console.log(s.toString());
+        window.alert(s.toString());
     }
 }

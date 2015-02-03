@@ -31,7 +31,6 @@ class VectorLayer extends Layer {
 
     @override
     void changeVisibility(bool v) {
-        // not supported
-        assert(false); // TODO
+        throw new UnimplementedError("vector layer visibility");
     }
 }

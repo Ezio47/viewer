@@ -132,7 +132,7 @@ var CesiumBridge = function (element) {
 
         var up = new Cesium.Cartesian3(upX, upY, upZ);
 
-        // TODO: we only support PerspectiveFrustum camera, so seeting FOV is okay
+        // we only support PerspectiveFrustum camera, so seeting FOV is okay
         this.viewer.camera.frustum.fov = Cesium.Math.toRadians(fovDegrees);
 
         this.viewer.camera.lookAt(eyeCartesian, targetCartesian, up);

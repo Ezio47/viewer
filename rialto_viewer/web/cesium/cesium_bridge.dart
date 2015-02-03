@@ -89,11 +89,6 @@ class CesiumBridge {
         return new Cartographic3(x, y, z);
     }
 
-    int getPickedShapeId() {
-        assert(false); // TODO
-        return null;
-    }
-
     // the geometry construction functions return the primitive we made (as an opaque pointer)
     dynamic createRectangle(Cartographic3 point1, Cartographic3 point2, double colorR, double colorG, double colorB) {
         assert(_isValidLatLon(point1));

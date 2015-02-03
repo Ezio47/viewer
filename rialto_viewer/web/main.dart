@@ -14,6 +14,6 @@ void main() {
     try {
         hub.events.LoadScript.fire("http://localhost:12345/test.yaml");
     } catch(e) {
-        error(e);
+        Hub.error(e);
     }
 }

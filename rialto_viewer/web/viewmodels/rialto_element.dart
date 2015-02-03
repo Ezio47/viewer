@@ -18,8 +18,8 @@ class RialtoElement  {
 
         _mouseCoords = querySelector("#textMouseCoords");
 
-        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(1)));
-        querySelector("#homeDataButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(2)));
+        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.WORLDVIEW_MODE)));
+        querySelector("#homeDataButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.DATAVIEW_MODE)));
 
         _modalButtons = new ModalButtonsVM({
             querySelector("#viewModeButton"): new ModeData(ModeData.VIEW),
