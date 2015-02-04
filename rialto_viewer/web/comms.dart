@@ -14,7 +14,7 @@ abstract class Comms {
     void open();
     void close();
     Future<ByteData> readAll(String webpath);
-    Future<bool> readChunked(String path, int pointSize, FlushFunc handler);
+    Future<bool> readChunked(String path, int pointSize, BuffyFunc handler);
 }
 
 
@@ -45,7 +45,7 @@ class HttpComms extends Comms {
     @override
     Future<ByteData> readAll(String webpath) {
 
-        Completer c = new Completer< ByteData>();
+        Completer c = new Completer<ByteData>();
 
         assert(server.startsWith("ws:"));
 
@@ -63,7 +63,7 @@ class HttpComms extends Comms {
             ws.onMessage.listen((MessageEvent e) {
                 ByteBuffer bytes = e.data;
                 ByteData src = bytes.asByteData();
-                for (int i=0; i<src.lengthInBytes; i++) {
+                for (int i = 0; i < src.lengthInBytes; i++) {
                     final v = src.getUint8(i);
                     buf.setUint8(bufIndex, v);
                     ++bufIndex;
@@ -82,17 +82,35 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<bool> readChunked(String webpath, int pointSize, FlushFunc handler) {
+    Future<bool> readChunked(String webpath, int pointSize, BuffyFunc handler) {
 
         Completer c = new Completer();
 
-        var readBuffer = new _ReadBuffer(pointSize * 1024 * 10);
-        readBuffer.open(handler);
+        final siz = pointSize * 1024;
 
         assert(server.startsWith("ws:"));
 
         WebSocket ws = new WebSocket(server + "/points/");
         assert(ws != null);
+
+        StreamController sc = new StreamController();
+
+        Buffy buffy = new Buffy(siz, ((ByteData buffer) {
+            log("${buffer.lengthInBytes}");
+            handler(buffer);
+        }));
+
+        var fdata = (ByteBuffer e) {
+            buffy.push(e);
+        };
+        var ferror =  (e) {
+            int x = 0;
+        };
+        var fdone =  () {
+            buffy.close();
+            int x = 0;
+        };
+        sc.stream.listen(fdata, onError: ferror, onDone: fdone);
 
         ws.onOpen.listen((_) {
             log("socket opened");
@@ -100,12 +118,10 @@ class HttpComms extends Comms {
             ws.send(webpath); // {+file}
             ws.binaryType = "arraybuffer";
             ws.onMessage.listen((MessageEvent e) {
-                ByteBuffer buf = e.data;
-                readBuffer.push(buf);
+                sc.add(e.data);
             });
-            ws.onClose.listen((_) {
-                readBuffer.flush(force: true);
-                readBuffer.close();
+            ws.onClose.listen((e) {
+                sc.close();
                 c.complete(true);
                 log("done");
             });
@@ -119,17 +135,17 @@ class HttpComms extends Comms {
     }
 }
 
-typedef FlushFunc(ByteBuffer, used);
 
-class _ReadBuffer {
-    int _maxsize;
+
+typedef void BuffyFunc(ByteData);
+
+class Buffy {
+    int _size;
     Uint8List _buffer;
     int _used;
-    FlushFunc _flushfunc;
+    BuffyFunc _flushfunc;
 
-    _ReadBuffer(int this._maxsize);
-
-    void open(FlushFunc f) {
+    Buffy(int this._size, BuffyFunc f) {
         _buffer = null;
         _used = 0;
         _flushfunc = f;
@@ -138,26 +154,26 @@ class _ReadBuffer {
     void push(ByteBuffer src) {
         int p = 0;
         while (p < src.lengthInBytes) {
-            int amt = min(_maxsize - _used, src.lengthInBytes - p);
-            append(src, p, amt);
-            flush();
+            int amt = min(_size - _used, src.lengthInBytes - p);
+            _append(src, p, amt);
+            _flush();
             p += amt;
         }
     }
 
     void close() {
-        flush(force: true);
+        _flush(force: true);
         _buffer = null;
         _used = 0;
         _flushfunc = null;
     }
 
-    void append(ByteBuffer src, int p, int amt) {
+    void _append(ByteBuffer src, int p, int amt) {
         Uint8List src8 = new Uint8List.view(src);
-        assert(_used + amt <= _maxsize);
+        assert(_used + amt <= _size);
         if (_buffer == null) {
             assert(_used == 0);
-            _buffer = new Uint8List(_maxsize);
+            _buffer = new Uint8List(_size);
         }
         for (int i = p; i < p + amt; i++) {
             _buffer[_used] = src8[i];
@@ -165,10 +181,18 @@ class _ReadBuffer {
         }
     }
 
-    void flush({bool force: false}) {
+    void _flush({bool force: false}) {
         if (_buffer == null || _used == 0) return;
-        if (_used < _maxsize && !force) return;
-        _flushfunc(_buffer.buffer, _used);
+        if (_used < _size && !force) return;
+
+        var b = new ByteData.view(_buffer.buffer, 0, _used);
+        //var bb = b.buffer;
+        if (b.lengthInBytes != _used) {
+            int x = 0;
+        }
+
+        _flushfunc(b);
+
         _buffer = null;
         _used = 0;
     }

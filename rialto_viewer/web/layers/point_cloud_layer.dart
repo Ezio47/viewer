@@ -54,7 +54,8 @@ class PointCloudLayer extends Layer {
 
                 cloud = new PointCloud(path, name, dimlist);
 
-                var handler = (ByteBuffer buf, int numBytes) {
+                var handler = (ByteData buf) {
+                    final int numBytes = buf.lengthInBytes;
 
                     int numPointsInTile = numBytes ~/ pointSize;
                     assert(numPointsInTile * pointSize == numBytes);
@@ -62,7 +63,7 @@ class PointCloudLayer extends Layer {
                     final int numDims = ria.dimensions.length;
                     List dims = ria.dimensions;
 
-                    ByteData bytes = buf.asByteData();
+                    ByteData bytes = buf;
 
                     // for each dim, add a new data array for this tile to use
                     for (int j = 0; j < numDims; j++) {
