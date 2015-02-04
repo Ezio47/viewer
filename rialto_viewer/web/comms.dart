@@ -14,7 +14,7 @@ abstract class Comms {
     void open();
     void close();
     Future<ByteData> readAll(String webpath);
-    Future<bool> readChunked(String path, int pointSize, BuffyFunc handler);
+    Future<bool> readChunked(String path, int pointSize, _BufferFunction handler);
 }
 
 
@@ -43,16 +43,20 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<ByteData> readAll(String webpath) {
+    Future<ByteData> readAll(String webpath, {int maxsize: 4096}) {
 
         Completer c = new Completer<ByteData>();
 
-        assert(server.startsWith("ws:"));
+        if (!server.startsWith("ws:")) {
+            Hub.error("Invalid name for server: should use 'ws:' protocol");
+            c.complete(null);
+            return c.future;
+        }
 
         WebSocket ws = new WebSocket(server + "/points/");
         assert(ws != null);
 
-        var buf = new ByteData(4096); // TODO: maxsize
+        var buf = new ByteData(maxsize);
         int bufIndex = 0;
 
         ws.onOpen.listen((_) {
@@ -82,7 +86,7 @@ class HttpComms extends Comms {
     }
 
     @override
-    Future<bool> readChunked(String webpath, int pointSize, BuffyFunc handler) {
+    Future<bool> readChunked(String webpath, int pointSize, _BufferFunction handler) {
 
         Completer c = new Completer();
 
@@ -93,35 +97,18 @@ class HttpComms extends Comms {
         WebSocket ws = new WebSocket(server + "/points/");
         assert(ws != null);
 
-        StreamController sc = new StreamController();
-
-        Buffy buffy = new Buffy(siz, ((ByteData buffer) {
-            log("${buffer.lengthInBytes}");
-            handler(buffer);
-        }));
-
-        var fdata = (ByteBuffer e) {
-            buffy.push(e);
-        };
-        var ferror =  (e) {
-            int x = 0;
-        };
-        var fdone =  () {
-            buffy.close();
-            int x = 0;
-        };
-        sc.stream.listen(fdata, onError: ferror, onDone: fdone);
+        var buffer = new _BufferController(siz, handler);
 
         ws.onOpen.listen((_) {
             log("socket opened");
 
-            ws.send(webpath); // {+file}
+            ws.send(webpath);
             ws.binaryType = "arraybuffer";
             ws.onMessage.listen((MessageEvent e) {
-                sc.add(e.data);
+                buffer.add(e.data);
             });
-            ws.onClose.listen((e) {
-                sc.close();
+            ws.onClose.listen((_) {
+                buffer.close();
                 c.complete(true);
                 log("done");
             });
@@ -136,20 +123,44 @@ class HttpComms extends Comms {
 }
 
 
-
-typedef void BuffyFunc(ByteData);
-
-class Buffy {
+class _BufferController {
+    StreamController _controller;
     int _size;
-    Uint8List _buffer;
-    int _used;
-    BuffyFunc _flushfunc;
+    _BufferFunction _handler;
 
-    Buffy(int this._size, BuffyFunc f) {
-        _buffer = null;
-        _used = 0;
-        _flushfunc = f;
+    _BufferController(int this._size, _BufferFunction this._handler) {
+
+        _controller = new StreamController();
+
+        _Buffer buffy = new _Buffer(_size, _handler);
+
+        _controller.stream.listen(
+                ((ByteBuffer b) => buffy.push(b)),
+                onError: ((e) => throw new StateError("internal buffering error: $e")),
+                onDone: (() => buffy.close()));
     }
+
+    void add(e) {
+        _controller.add(e);
+    }
+
+    void close() {
+        _controller.close();
+    }
+}
+
+
+typedef void _BufferFunction(ByteData);
+
+class _Buffer {
+    final int _size;
+    final _BufferFunction _handler;
+    int _used;
+    Uint8List _buffer;
+
+    _Buffer(int this._size, _BufferFunction this._handler)
+            : _buffer = null,
+              _used = 0;
 
     void push(ByteBuffer src) {
         int p = 0;
@@ -163,9 +174,6 @@ class Buffy {
 
     void close() {
         _flush(force: true);
-        _buffer = null;
-        _used = 0;
-        _flushfunc = null;
     }
 
     void _append(ByteBuffer src, int p, int amt) {
@@ -186,12 +194,9 @@ class Buffy {
         if (_used < _size && !force) return;
 
         var b = new ByteData.view(_buffer.buffer, 0, _used);
-        //var bb = b.buffer;
-        if (b.lengthInBytes != _used) {
-            int x = 0;
-        }
+        assert(b.lengthInBytes == _used);
 
-        _flushfunc(b);
+        _handler(b);
 
         _buffer = null;
         _used = 0;
