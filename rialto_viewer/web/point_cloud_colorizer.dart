@@ -5,18 +5,35 @@
 part of rialto.viewer;
 
 class PointCloudColorizer {
-    String _rampName;
+    String _ramp;
+    String _dimension;
+    PointCloud _cloud;
+    static const _defaultRamp = "Spectral";
+    static const _defaultDimension = "Z";
 
-    PointCloudColorizer();
+    PointCloudColorizer(PointCloud this._cloud);
 
-    void colorizeTile(PointCloudTile tile, String dimension) {
+    void colorize() {
+        String thisRamp = ramp;
+        if (thisRamp == null || thisRamp.isEmpty) {
+            thisRamp = _defaultRamp;
+        }
 
-        PointCloud cloud = tile.cloud;
+        String thisDimension = dimension;
+        if (thisDimension == null || thisDimension.isEmpty) {
+            thisDimension = _defaultDimension;
+        }
 
-        _execute(tile, tile.data[dimension] as List, cloud.minimums[dimension], cloud.maximums[dimension]);
+        for (var tile in _cloud.tiles) {
+            final double min = _cloud.minimums[thisDimension];
+            final double max = _cloud.maximums[thisDimension];
+            final List data = tile.data[thisDimension] as List;
 
-        tile.updateBounds();
-        tile.updateShape();
+            _execute(tile, thisRamp, data, min, max);
+
+            tile.updateBounds();
+            tile.updateShape();
+        }
     }
 
     static List<String> get names {
@@ -25,24 +42,43 @@ class PointCloudColorizer {
         return l;
     }
 
-    String get rampName => _rampName;
-    void set rampName(String name) {
+    String get dimension => _dimension;
+
+    void set dimension(String name) {
+        if (name == null || name.isEmpty) {
+            // leave as-is
+            return;
+        }
+
+        if (!_cloud.dimensionNames.contains(name)) {
+            Hub.error("invalid colorization dimension: $name");
+            return;
+        }
+
+        _dimension = name;
+    }
+
+    String get ramp => _ramp;
+    void set ramp(String name) {
+        if (name == null || name.isEmpty) {
+            // leave as-is
+            return;
+        }
+
         if (!_Ramps.list.containsKey(name)) {
             Hub.error("invalid color ramp name: $name");
             return;
         }
-        _rampName = name;
+
+        _ramp = name;
     }
 
-    void _execute(PointCloudTile tile, List sourceDimension, double zmin, double zmax) {
-        if (rampName == null || rampName.isEmpty) {
-            throw new StateError("color ramp is null");
-        }
+    void _execute(PointCloudTile tile, String rampType, List sourceDimension, double zmin, double zmax) {
 
         var rgba = tile.data["rgba"];
         assert(rgba is Uint8List);
 
-        if (rampName == "native") {
+        if (ramp == "native") {
             log(tile.data.keys);
             if (!tile.data.containsKey("Red") || !tile.data.containsKey("Green") || !tile.data.containsKey("Blue")) {
                 Hub.error("Native colorization not supported for point clouds without RGB data");
@@ -64,7 +100,7 @@ class PointCloudColorizer {
             return rgba;
         }
 
-        final List<_Stop> stops = _Ramps.list[_rampName];
+        final List<_Stop> stops = _Ramps.list[rampType];
 
         final double zLen = zmax - zmin;
 
@@ -166,7 +202,7 @@ class _Ramps {
     // These ramps are taken from http://planet.qgis.org/planet/tag/color%20ramps/
     // (there are some more at http://geotrellis.io/documentation/0.9.0/geotrellis/rendering/)
     static final list = {
-        "native" : null,
+        "native": null,
         "Blues": [
                 const _Stop(0.00, const _Color(247, 251, 255)),
                 const _Stop(0.13, const _Color(222, 235, 247)),

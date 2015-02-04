@@ -7,13 +7,13 @@ layers:
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
 
-#    a_poly:
-#        type: vector
-#        server: http://localhost:12345
-#        path: /poly.json
-#        numBytes: 10            # optional, default=0
-#        description: "foor bar yow"  # optional, default=""
-#        visible: true       # optional, default=true
+    a_poly:
+        type: vector
+        server: http://localhost:12345
+        path: /poly.json
+        numBytes: 10            # optional, default=0
+        description: "foor bar yow"  # optional, default=""
+        visible: true       # optional, default=true
 
 #    a_point:
 #        type: vector

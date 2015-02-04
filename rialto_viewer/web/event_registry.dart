@@ -32,7 +32,7 @@ class EventRegistry {
 
     SignalFunctions<DisplayLayerData> DisplayLayer = new SignalFunctions<DisplayLayerData>();
 
-    SignalFunctions<String> ColorizeLayers = new SignalFunctions<String>();
+    SignalFunctions<ColorizeLayersData> ColorizeLayers = new SignalFunctions<ColorizeLayersData>();
 
     SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
 
@@ -157,4 +157,10 @@ class WpsRequestData {
     final List<Object> params;
 
     WpsRequestData(int this.type, List<Object> this.params);
+}
+
+class ColorizeLayersData {
+    String ramp;
+    String dimension;
+    ColorizeLayersData({String this.ramp: null, String this.dimension: null});
 }

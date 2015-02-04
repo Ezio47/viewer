@@ -9,7 +9,6 @@ class LayerManager {
     Hub _hub;
     Map<String, Layer> layers = new Map<String, Layer>();
     CartographicBbox bbox = new CartographicBbox.empty();
-    PointCloudColorizer pointCloudColorizer = new PointCloudColorizer();
 
     LayerManager() {
         _hub = Hub.root;
@@ -20,14 +19,12 @@ class LayerManager {
         _hub.events.ColorizeLayers.subscribe(_handleColorizeLayers);
     }
 
-    void _handleColorizeLayers(String ramp) {
-        pointCloudColorizer.rampName = ramp;
-
+    void _handleColorizeLayers(ColorizeLayersData data) {
         var futures = new List<Future>();
 
         for (var layer in layers.values) {
             if (layer is PointCloudLayer) {
-                Future f = layer.cloud.colorizeAsync(pointCloudColorizer);
+                Future f = layer.colorizeAsync(data);
                 futures.add(f);
             }
         }
@@ -48,7 +45,7 @@ class LayerManager {
         layer.load().then((_) {
             Future f;
             if (layer is PointCloudLayer) {
-                f = layer.cloud.colorizeAsync(pointCloudColorizer);
+                f = layer.colorizeAsync(new ColorizeLayersData());
             } else {
                 f = new Future.sync((){});
             }

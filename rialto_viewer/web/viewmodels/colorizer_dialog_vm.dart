@@ -34,6 +34,6 @@ class ColorizerDialogVM extends DialogVM {
 
         String rampName = list[0];
 
-        _hub.events.ColorizeLayers.fire(rampName);
+        _hub.events.ColorizeLayers.fire(new ColorizeLayersData(ramp: rampName));
     }
 }

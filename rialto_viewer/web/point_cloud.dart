@@ -72,13 +72,4 @@ class PointCloud {
 
         log("Bounds: $bbox");
     }
-
-    Future colorizeAsync(PointCloudColorizer colorizer) {
-        return new Future(() {
-            String dimension = "Z";
-            for (var tile in tiles) {
-                colorizer.colorizeTile(tile, dimension);
-            }
-        });
-    }
 }

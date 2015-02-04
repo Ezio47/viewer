@@ -7,6 +7,7 @@ part of rialto.viewer;
 
 class PointCloudLayer extends Layer {
     PointCloud cloud;
+    PointCloudColorizer _colorizer;
 
     PointCloudLayer(String name, Map map)
             : super(name, map) {
@@ -23,6 +24,8 @@ class PointCloudLayer extends Layer {
             cloud.changeVisibility(isVisible);
 
             bbox = new CartographicBbox.copy(cloud.bbox);
+
+            _colorizer = new PointCloudColorizer(cloud);
 
             c.complete(true);
         };
@@ -108,5 +111,13 @@ class PointCloudLayer extends Layer {
     void changeVisibility(bool v) {
         cloud.changeVisibility(v);
         isVisible = v;
+    }
+
+    Future colorizeAsync(ColorizeLayersData data) {
+        return new Future(() {
+            _colorizer.ramp = data.ramp;
+            _colorizer.dimension = data.dimension;
+            _colorizer.colorize();
+        });
     }
 }
