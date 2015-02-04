@@ -13,9 +13,8 @@ class PointCloudColorizer {
 
         PointCloud cloud = tile.cloud;
 
-        Uint8List rgba = _execute(tile, cloud.bbox.minimum.height, cloud.bbox.maximum.height);
+        _execute(tile, cloud.bbox.minimum.height, cloud.bbox.maximum.height);
 
-        tile.addData_U8x4("rgba", rgba);
         tile.updateBounds();
         tile.updateShape();
     }
@@ -35,13 +34,12 @@ class PointCloudColorizer {
         _rampName = name;
     }
 
-    Uint8List _execute(PointCloudTile tile, double zmin, double zmax) {
+    void _execute(PointCloudTile tile, double zmin, double zmax) {
         if (rampName == null || rampName.isEmpty) {
             throw new StateError("color ramp is null");
         }
 
-        // TODO: reuse this every tile
-        var newColors = new Uint8List(tile.numPointsInTile * 4);
+        var rgba = tile.data["rgba"] as List;
 
         if (rampName == "native") {
             log(tile.data.keys);
@@ -56,16 +54,14 @@ class PointCloudColorizer {
             assert(blist is Uint8List);
 
             for (int i = 0; i < tile.numPointsInTile; i++) {
-                newColors[i * 4 + 0] = rlist[i];
-                newColors[i * 4 + 1] = glist[i];
-                newColors[i * 4 + 2] = blist[i];
-                newColors[i * 4 + 3] = 255;
+                rgba[i * 4 + 0] = rlist[i];
+                rgba[i * 4 + 1] = glist[i];
+                rgba[i * 4 + 2] = blist[i];
+                rgba[i * 4 + 3] = 255;
             }
-            return newColors;
+            return rgba;
         }
 
-        //Float64List positionsX = tile.data["X"];
-        //Float64List positionsY = tile.data["Y"];
         Float64List positionsZ = tile.data["Z"];
 
         final List<_Stop> stops = _Ramps.list[_rampName];
@@ -112,13 +108,11 @@ class PointCloudColorizer {
             assert(result.r >= 0 && result.r <= 255);
             assert(result.g >= 0 && result.g <= 255);
             assert(result.b >= 0 && result.b <= 255);
-            newColors[i * 4 + 0] = result.r;
-            newColors[i * 4 + 1] = result.g;
-            newColors[i * 4 + 2] = result.b;
-            newColors[i * 4 + 3] = 255;
+            rgba[i * 4 + 0] = result.r;
+            rgba[i * 4 + 1] = result.g;
+            rgba[i * 4 + 2] = result.b;
+            rgba[i * 4 + 3] = 255;
         }
-
-        return newColors;
     }
 
     _Color _interpolate(double z, double startRange, double endRange, _Color startColor, _Color endColor) {
