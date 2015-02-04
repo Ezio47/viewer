@@ -5,55 +5,32 @@
 part of rialto.viewer;
 
 
-abstract class Comms {
-    String server;
-    Comms comms;
 
-    Comms(String this.server);
-
-    void open();
-    void close();
-    Future<ByteData> readAll(String webpath);
-    Future<bool> readChunked(String path, int pointSize, _BufferFunction handler);
-}
-
-
-class HttpComms extends Comms {
+class WebSocketReader {
+    String _server;
     Http.Client _client;
 
-    HttpComms(String myserver) : super(myserver) {
-        if (server.endsWith("/")) server = server.substring(0, server.length - 1);
+    WebSocketReader(String this._server) {
+        if (_server.endsWith("/")) _server = _server.substring(0, _server.length - 1);
 
-        final int dimsPerPoint = 3;
-        final int bytesPerDim = 4;
-        final int bytesPerPoint = dimsPerPoint * bytesPerDim;
-
-        final int pointsPerTile = 1024 * 64;
-        final int bytesPerTile = pointsPerTile * bytesPerPoint;
+        if (!_server.startsWith("ws:")) {
+            Hub.error("Invalid name for server: should use 'ws:' protocol");
+        }
     }
 
-    @override
     void open() {
         _client = new BHttp.BrowserClient();
     }
 
-    @override
     void close() {
         _client.close();
     }
 
-    @override
     Future<ByteData> readAll(String webpath, {int maxsize: 4096}) {
 
         Completer c = new Completer<ByteData>();
 
-        if (!server.startsWith("ws:")) {
-            Hub.error("Invalid name for server: should use 'ws:' protocol");
-            c.complete(null);
-            return c.future;
-        }
-
-        WebSocket ws = new WebSocket(server + "/points/");
+        WebSocket ws = new WebSocket(_server + "/points/");
         assert(ws != null);
 
         var buf = new ByteData(maxsize);
@@ -85,19 +62,14 @@ class HttpComms extends Comms {
         return c.future;
     }
 
-    @override
-    Future<bool> readChunked(String webpath, int pointSize, _BufferFunction handler) {
+    Future<bool> readChunked(String webpath, int numBytes, _BufferFunction handler) {
 
         Completer c = new Completer();
 
-        final siz = pointSize * 1024;
-
-        assert(server.startsWith("ws:"));
-
-        WebSocket ws = new WebSocket(server + "/points/");
+        WebSocket ws = new WebSocket(_server + "/points/");
         assert(ws != null);
 
-        var buffer = new _BufferController(siz, handler);
+        var buffer = new _BufferController(numBytes, handler);
 
         ws.onOpen.listen((_) {
             log("socket opened");

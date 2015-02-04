@@ -19,7 +19,7 @@ import 'package:xml/xml.dart' as Xml;
 
 part 'annotation_controller.dart';
 part 'point_cloud_colorizer.dart';
-part 'comms.dart';
+part 'web_socket_reader.dart';
 part 'hub.dart';
 part 'event_registry.dart';
 part 'config_script.dart';

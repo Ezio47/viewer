@@ -10,6 +10,8 @@ class PointCloudLayer extends Layer {
     PointCloudColorizer _colorizer;
     RiaFormat _ria;
 
+    static const int _pointsPerTile = 1024 * 10;
+
     PointCloudLayer(String name, Map map)
             : super(name, map) {
         log("New pointcloud layer: $name .. $server .. $path");
@@ -36,7 +38,7 @@ class PointCloudLayer extends Layer {
             whenReady();
         } else {
 
-            Comms comms = new HttpComms(server);
+            var comms = new WebSocketReader(server);
 
             _ria = new RiaFormat();
 
@@ -69,7 +71,8 @@ class PointCloudLayer extends Layer {
 
                 cloud = new PointCloud(path, name, dimlist);
 
-                comms.readChunked(path, pointSize, _createTile).then((bool ok) {
+                final int numBytes = pointSize * _pointsPerTile;
+                comms.readChunked(path, numBytes, _createTile).then((bool ok) {
                     if (!ok) {
                         c.complete(false);
                         return;
