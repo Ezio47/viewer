@@ -54,9 +54,10 @@ class PointCloudTile {
         addData_F64x3(dim, xyz);
     }
 
-    void addData_U8(String dim, Uint8List d) {
+    void addData_generic(String dim, List d) {
         assert(dimensionNames.contains(dim));
-        data[dim] = d;
+        TypedData td = d as TypedData;
+        data[dim] = td;
     }
 
     void addData_U8x4(String dim, Uint8List xyzw) {

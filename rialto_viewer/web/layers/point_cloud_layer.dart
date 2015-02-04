@@ -42,16 +42,16 @@ class PointCloudLayer extends Layer {
                 log(ria);
                 int pointSize = ria.pointSizeInBytes;
 
-                assert(ria.dimensions[0].name=="X");
-                assert(ria.dimensions[1].name=="Y");
-                assert(ria.dimensions[2].name=="Z");
+                assert(ria.dimensions[0].name == "X");
+                assert(ria.dimensions[1].name == "Y");
+                assert(ria.dimensions[2].name == "Z");
 
-                var dimlist = ["xyz", "rgba"];
-                if (ria.hasRgb) {
-                    dimlist.add("Red");
-                    dimlist.add("Green");
-                    dimlist.add("Blue");
-                }
+                var dimlist = ria.dimensionMap.keys.toList();
+                dimlist.add("xyz");
+                dimlist.add("rgba");
+                dimlist.remove("X");
+                dimlist.remove("Y");
+                dimlist.remove("Z");
 
                 cloud = new PointCloud(path, name, dimlist);
 
@@ -65,54 +65,46 @@ class PointCloudLayer extends Layer {
 
                     ByteData bytes = buf.asByteData();
 
+                    // read the data into the array inside each RiaDim
                     int index = 0;
                     for (int i = 0; i < numPoints; i++) {
-                        for (int j=0; j<numDims; j++) {
+                        for (int j = 0; j < numDims; j++) {
                             RiaDimension dim = dims[j];
                             dim.setter(bytes, index, i);
                             index += dim.sizeInBytes;
                         }
                     }
 
-                    // gather x,y,z into one array
+                    var tile = cloud.createTile(numPoints);
 
-                    Float64List tmp = new Float64List(numPoints * 3);
+                    // now move the data from RiaDim into the tile
+                    // skip X, Y, and Z since we'll add those as a special "xyz"
+                    for (int j = 0; j < numDims; j++) {
+                        RiaDimension dim = dims[j];
+                        if (dim.name == "X" || dim.name == "Y" || dim.name == "Z") continue;
+                        List list = dim.list;
+                        tile.addData_generic(dim.name, list);
+                    }
+
+                    // gather x,y,z into one array
+                    Float64List xyz = new Float64List(numPoints * 3);
                     var xlist = dims[0].list;
                     var ylist = dims[1].list;
                     var zlist = dims[2].list;
-                    for (int i=0; i<numPoints; i++) {
+                    for (int i = 0; i < numPoints; i++) {
 
                         double x = xlist[i];
                         double y = ylist[i];
                         double z = zlist[i];
 
-                        tmp[i*3] = x;
-                        tmp[i*3 + 1] = y;
-                        tmp[i*3 + 2] = z;
+                        xyz[i * 3] = x;
+                        xyz[i * 3 + 1] = y;
+                        xyz[i * 3 + 2] = z;
                     }
+                    tile.addData_F64x3("xyz", xyz);
 
-                    var tile = cloud.createTile(numPoints);
-                    tile.addData_F64x3("xyz", tmp);
+                    // set color data
                     tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
-
-                    if (ria.hasRgb) {
-                        Uint8List rtmp = new Uint8List(numPoints);
-                        Uint8List gtmp = new Uint8List(numPoints);
-                        Uint8List btmp = new Uint8List(numPoints);
-                        var rdata = ria.dimensionMap["Red"];
-                        var gdata = ria.dimensionMap["Green"];
-                        var bdata = ria.dimensionMap["Blue"];
-                        int byteIndex = rdata.byteOffset;
-                        for (int i=0; i<numPoints; i++) {
-                            rtmp[i] = rdata.getter(bytes, byteIndex);
-                            gtmp[i] = gdata.getter(bytes, byteIndex);
-                            btmp[i] = bdata.getter(bytes, byteIndex);
-                            byteIndex += ria.pointSizeInBytes;
-                        }
-                        tile.addData_U8("Red", rtmp);
-                        tile.addData_U8("Green", gtmp);
-                        tile.addData_U8("Blue", btmp);
-                    }
 
                     tile.updateBounds();
                     tile.updateShape();
