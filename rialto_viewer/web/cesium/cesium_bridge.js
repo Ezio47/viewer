@@ -288,21 +288,32 @@ var CesiumBridge = function (element) {
         primitives.remove(prim);
     }
 
+    // taken from Cartesian3.fromDegreesArrayHeights
+    this.Cartesian3_fromDegreesArrayHeights_inplace = function(coordinates, ellipsoid) {
+        if (coordinates.length % 3 !== 0) {
+            throw new DeveloperError('positions length must be a multiple of 3.');
+        }
+
+        for (var i = 0; i < coordinates.length; i+=3) {
+            var lon = Cesium.Math.toRadians(coordinates[i]);
+            var lat = Cesium.Math.toRadians(coordinates[i+1]);
+            var alt = coordinates[i+2];
+
+            var result = Cesium.Cartesian3.fromRadians(lon, lat, alt, ellipsoid);
+
+            coordinates[i] = result.x;
+            coordinates[i+1] = result.y;
+            coordinates[i+2] = result.z;
+        }
+    };
 
     this.createCloud = function(cnt, pointBuffer, colorBuffer) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
 
-        var f64_ = new Float64Array(pointBuffer, 0, cnt*3);
+        var f64 = new Float64Array(pointBuffer, 0, cnt*3);
 
-        var carts = Cesium.Cartesian3.fromDegreesArrayHeights(f64_);
-
-        var f64 = new Float64Array(cnt*3);
-        for (var i = 0; i<cnt; i++) {
-            f64[i*3+0] = carts[i].x;
-            f64[i*3+1] = carts[i].y;
-            f64[i*3+2] = carts[i].z;
-        }
+        this.Cartesian3_fromDegreesArrayHeights_inplace(f64);
 
         var u8 = new Uint8Array(colorBuffer, 0, cnt*4);
 

@@ -56,16 +56,6 @@ class CesiumBridge {
         _bridge.callMethod('setUpdater', [f]);
     }
 
-    dynamic createFloat64Array(int len, Float32List data) {
-        //return new JsObject(context['Float64Array'], [len, data]);
-        var a = _bridge.callMethod('create64', [len, data.buffer]);
-        return a;
-    }
-
-    dynamic createUint8Array(int len) {
-        return new JsObject(context['Uint8Array'], [len]);
-    }
-
     static bool _isValidLatLon(Cartographic3 v) {
         final lonOk = (v.longitude >= -180.0 && v.longitude <= 180.0);
         if (!lonOk) return false;
