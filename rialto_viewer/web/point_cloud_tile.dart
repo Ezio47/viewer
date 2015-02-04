@@ -16,14 +16,15 @@ class PointCloudTile {
     CloudShape shape;
 
     PointCloudTile(PointCloud this.cloud, List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
-        //log("making tile $id with $numPointsInTile");
+        log("making tile $id with $numPointsInTile");
         bbox = new CartographicBbox.empty();
         data = new Map<String, TypedData>();
     }
 
     void updateShape() {
-        var xyz = data["xyz"];
-        if (xyz == null) return;
+        var x = data["X"];
+        var y = data["Y"];
+        var z = data["Z"];
 
         var rgba = data["rgba"];
         if (rgba == null) return;
@@ -32,7 +33,7 @@ class PointCloudTile {
             shape.remove();
         }
 
-        shape = new CloudShape(xyz, rgba);
+        shape = new CloudShape(x, y, z, rgba);
         shape.name = "{pointCloud.webpath}-$id";
     }
 
@@ -57,6 +58,7 @@ class PointCloudTile {
     void addData_generic(String dim, List d) {
         assert(dimensionNames.contains(dim));
         TypedData td = d as TypedData;
+        assert(d.length == numPointsInTile);
         data[dim] = td;
     }
 
@@ -94,12 +96,16 @@ class PointCloudTile {
     }
 
     void updateBounds() {
-        assert(data["xyz"] is Float64List);
-        Float64List d = data["xyz"];
+        assert(data["X"] is Float64List);
+        assert(data["Y"] is Float64List);
+        assert(data["Z"] is Float64List);
+        Float64List xlist = data["X"];
+        Float64List ylist = data["Y"];
+        Float64List zlist = data["Z"];
         for (int i = 0; i < numPointsInTile; i++) {
-            double x = d[i * 3];
-            double y = d[i * 3 + 1];
-            double z = d[i * 3 + 2];
+            double x = xlist[i];
+            double y = ylist[i];
+            double z = zlist[i];
             bbox.unionWith3(x, y, z);
         }
     }

@@ -65,12 +65,4 @@ class PointCloud {
             }
         });
     }
-
-    bool get hasXyz {
-        return dimensionNames.contains("xyz");
-    }
-
-    bool get hasRgba {
-        return dimensionNames.contains("rgba");
-    }
 }

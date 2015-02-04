@@ -64,15 +64,16 @@ class PointCloudColorizer {
             return newColors;
         }
 
-        assert(tile.data["xyz"] is Float64List);
-        Float64List positions = tile.data["xyz"];
+        //Float64List positionsX = tile.data["X"];
+        //Float64List positionsY = tile.data["Y"];
+        Float64List positionsZ = tile.data["Z"];
 
         final List<_Stop> stops = _Ramps.list[_rampName];
 
         final double zLen = zmax - zmin;
 
         for (int i = 0; i < tile.numPointsInTile; i++) {
-            double z = positions[i * 3 + 2];
+            double z = positionsZ[i];
 
             if (z < zmin) {
                 assert(zmin - z >= 0.0000001);

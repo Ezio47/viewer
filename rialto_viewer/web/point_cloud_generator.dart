@@ -30,7 +30,7 @@ class PointCloudGenerator {
 
         final int numPoints = 10000;
 
-        var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
+        var cloud = new PointCloud(webpath, displayName, ["X", "Y", "Z", "rgba"]);
 
         final lon = -77.62549459934235;
         final lat = 38.833895271724664;
@@ -81,7 +81,9 @@ class PointCloudGenerator {
             }
 
             var tile = cloud.createTile(numPointsInTile);
-            tile.addData_F64x3_from3("xyz", positionsX, positionsY, positionsZ);
+            tile.addData_generic("X", positionsX);
+            tile.addData_generic("Y", positionsY);
+            tile.addData_generic("Z", positionsZ);
             tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             tile.updateBounds();
             tile.updateShape();
@@ -97,7 +99,7 @@ class PointCloudGenerator {
 
         int numPoints = terrain.valuesX.length;
 
-        var cloud = new PointCloud(webpath, displayName, ["xyz", "rgba"]);
+        var cloud = new PointCloud(webpath, displayName, ["X", "Y", "Z", "rgba"]);
 
         final int idealNumPointsInTile = 1024 * 64;
         final int numTiles = (numPoints.toDouble() / idealNumPointsInTile.toDouble()).ceil();
@@ -117,7 +119,9 @@ class PointCloudGenerator {
             }
 
             var thisTile = cloud.createTile(numPointsInTile);
-            thisTile.addData_F64x3_from3("xyz", positionsX, positionsY, positionsZ);
+            thisTile.addData_generic("X", positionsX);
+            thisTile.addData_generic("Y", positionsY);
+            thisTile.addData_generic("Z", positionsZ);
             thisTile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
             thisTile.updateBounds();
             thisTile.updateShape();

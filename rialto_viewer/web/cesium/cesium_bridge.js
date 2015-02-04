@@ -289,37 +289,41 @@ var CesiumBridge = function (element) {
     }
 
     // taken from Cartesian3.fromDegreesArrayHeights
-    this.Cartesian3_fromDegreesArrayHeights_inplace = function(coordinates, ellipsoid) {
-        if (coordinates.length % 3 !== 0) {
-            throw new DeveloperError('positions length must be a multiple of 3.');
-        }
+    this.Cartesian3_fromDegreesArrayHeights_merge = function(x, y, z, ellipsoid) {
 
-        for (var i = 0; i < coordinates.length; i+=3) {
-            var lon = Cesium.Math.toRadians(coordinates[i]);
-            var lat = Cesium.Math.toRadians(coordinates[i+1]);
-            var alt = coordinates[i+2];
+        var numPoints = x.length;
+        var xyz = new Float64Array(numPoints * 3);
+
+        for (var i = 0; i < numPoints; i++) {
+            var lon = Cesium.Math.toRadians(x[i]);
+            var lat = Cesium.Math.toRadians(y[i]);
+            var alt = z[i];
 
             var result = Cesium.Cartesian3.fromRadians(lon, lat, alt, ellipsoid);
 
-            coordinates[i] = result.x;
-            coordinates[i+1] = result.y;
-            coordinates[i+2] = result.z;
+            xyz[i*3] = result.x;
+            xyz[i*3+1] = result.y;
+            xyz[i*3+2] = result.z;
         }
+
+        return xyz;
     };
 
-    this.createCloud = function(cnt, pointBuffer, colorBuffer) {
+    this.createCloud = function(cnt, pointBufferX, pointBufferY, pointBufferZ, colorBuffer) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
 
-        var f64 = new Float64Array(pointBuffer, 0, cnt*3);
+        var x = new Float64Array(pointBufferX, 0, cnt);
+        var y = new Float64Array(pointBufferY, 0, cnt);
+        var z = new Float64Array(pointBufferZ, 0, cnt);
 
-        this.Cartesian3_fromDegreesArrayHeights_inplace(f64);
+        var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z);
 
         var u8 = new Uint8Array(colorBuffer, 0, cnt*4);
 
         var pointInstance = new Cesium.GeometryInstance({
             geometry : new Cesium.PointGeometry({
-                positionsTypedArray: f64,
+                positionsTypedArray: xyz,
                 colorsTypedArray: u8
             }),
             id : 'point'

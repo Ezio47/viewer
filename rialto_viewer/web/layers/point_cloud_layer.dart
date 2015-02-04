@@ -47,27 +47,29 @@ class PointCloudLayer extends Layer {
                 assert(ria.dimensions[2].name == "Z");
 
                 var dimlist = ria.dimensionMap.keys.toList();
-                dimlist.add("xyz");
                 dimlist.add("rgba");
-                dimlist.remove("X");
-                dimlist.remove("Y");
-                dimlist.remove("Z");
 
                 cloud = new PointCloud(path, name, dimlist);
 
                 var handler = (ByteBuffer buf, int numBytes) {
 
-                    int numPoints = numBytes ~/ pointSize;
-                    assert(numPoints * pointSize == numBytes);
+                    int numPointsInTile = numBytes ~/ pointSize;
+                    assert(numPointsInTile * pointSize == numBytes);
 
                     final int numDims = ria.dimensions.length;
                     List dims = ria.dimensions;
 
                     ByteData bytes = buf.asByteData();
 
+                    // for each dim, add a new data array for this tile to use
+                    for (int j = 0; j < numDims; j++) {
+                        RiaDimension dim = dims[j];
+                        dim.reset(numPointsInTile);
+                    }
+
                     // read the data into the array inside each RiaDim
                     int index = 0;
-                    for (int i = 0; i < numPoints; i++) {
+                    for (int i = 0; i < numPointsInTile; i++) {
                         for (int j = 0; j < numDims; j++) {
                             RiaDimension dim = dims[j];
                             dim.setter(bytes, index, i);
@@ -75,33 +77,14 @@ class PointCloudLayer extends Layer {
                         }
                     }
 
-                    var tile = cloud.createTile(numPoints);
+                    var tile = cloud.createTile(numPointsInTile);
 
-                    // now move the data from RiaDim into the tile
-                    // skip X, Y, and Z since we'll add those as a special "xyz"
+                    // now make the tile point to the RiaDims' array stores
                     for (int j = 0; j < numDims; j++) {
                         RiaDimension dim = dims[j];
-                        if (dim.name == "X" || dim.name == "Y" || dim.name == "Z") continue;
                         List list = dim.list;
                         tile.addData_generic(dim.name, list);
                     }
-
-                    // gather x,y,z into one array
-                    Float64List xyz = new Float64List(numPoints * 3);
-                    var xlist = dims[0].list;
-                    var ylist = dims[1].list;
-                    var zlist = dims[2].list;
-                    for (int i = 0; i < numPoints; i++) {
-
-                        double x = xlist[i];
-                        double y = ylist[i];
-                        double z = zlist[i];
-
-                        xyz[i * 3] = x;
-                        xyz[i * 3 + 1] = y;
-                        xyz[i * 3 + 2] = z;
-                    }
-                    tile.addData_F64x3("xyz", xyz);
 
                     // set color data
                     tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
