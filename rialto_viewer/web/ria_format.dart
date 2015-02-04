@@ -113,6 +113,8 @@ class RiaDimension {
 class RiaFormat {
     List<RiaDimension> dimensions;
     Map<String, RiaDimension> dimensionMap;
+    Map<String, double> minimums;
+    Map<String, double> maximums;
 
     int numPoints;
 
@@ -132,6 +134,8 @@ class RiaFormat {
 
         dimensions = new List<RiaDimension>();
         dimensionMap = new Map<String, RiaDimension>();
+        minimums = new Map<String, double>();
+        maximums = new Map<String, double>();
 
         int byteOffset = 0;
         for (int dim = 0; dim < numDims; dim++) {
@@ -158,6 +162,8 @@ class RiaFormat {
             var dim = new RiaDimension(dimType, name, min, max);
             dimensions.add(dim);
             dimensionMap[name] = dim;
+            minimums[name] = min;
+            maximums[name] = max;
 
             dim.byteOffset = byteOffset;
             byteOffset += dim.sizeInBytes;

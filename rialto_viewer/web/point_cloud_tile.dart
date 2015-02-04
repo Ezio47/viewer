@@ -14,11 +14,23 @@ class PointCloudTile {
     Map<String, TypedData> data;
     CartographicBbox bbox;
     CloudShape shape;
+    Map<String, double> minimums;
+    Map<String, double> maximums;
+    int numDims;
 
     PointCloudTile(PointCloud this.cloud, List<String> this.dimensionNames, int this.numPointsInTile, int this.id) {
         log("making tile $id with $numPointsInTile");
         bbox = new CartographicBbox.empty();
         data = new Map<String, TypedData>();
+
+        numDims = dimensionNames.length;
+
+        minimums = new Map<String, double>();
+        maximums = new Map<String, double>();
+        dimensionNames.forEach((s) {
+            minimums[s] = double.MAX_FINITE;
+            maximums[s] = -double.MAX_FINITE;
+        });
     }
 
     void updateShape() {
@@ -96,17 +108,21 @@ class PointCloudTile {
     }
 
     void updateBounds() {
-        assert(data["X"] is Float64List);
-        assert(data["Y"] is Float64List);
-        assert(data["Z"] is Float64List);
-        Float64List xlist = data["X"];
-        Float64List ylist = data["Y"];
-        Float64List zlist = data["Z"];
-        for (int i = 0; i < numPointsInTile; i++) {
-            double x = xlist[i];
-            double y = ylist[i];
-            double z = zlist[i];
-            bbox.unionWith3(x, y, z);
-        }
+
+        dimensionNames.forEach((dim) {
+            List list = data[dim] as List;
+            double lo = double.MAX_FINITE;
+            double hi = -double.MAX_FINITE;
+            for (int i = 0; i < numPointsInTile; i++) {
+                final double v = list[i].toDouble();
+                lo = min(lo, v);
+                hi = max(hi, v);
+            }
+            minimums[dim] = lo;
+            maximums[dim] = hi;
+        });
+
+        bbox.unionWith3(minimums["X"], minimums["Y"], minimums["Z"]);
+        bbox.unionWith3(maximums["X"], maximums["Y"], maximums["Z"]);
     }
 }

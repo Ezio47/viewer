@@ -9,11 +9,11 @@ class PointCloudColorizer {
 
     PointCloudColorizer();
 
-    void colorizeTile(PointCloudTile tile) {
+    void colorizeTile(PointCloudTile tile, String dimension) {
 
         PointCloud cloud = tile.cloud;
 
-        _execute(tile, cloud.bbox.minimum.height, cloud.bbox.maximum.height);
+        _execute(tile, tile.data[dimension] as List, cloud.minimums[dimension], cloud.maximums[dimension]);
 
         tile.updateBounds();
         tile.updateShape();
@@ -34,16 +34,18 @@ class PointCloudColorizer {
         _rampName = name;
     }
 
-    void _execute(PointCloudTile tile, double zmin, double zmax) {
+    void _execute(PointCloudTile tile, List sourceDimension, double zmin, double zmax) {
         if (rampName == null || rampName.isEmpty) {
             throw new StateError("color ramp is null");
         }
 
-        var rgba = tile.data["rgba"] as List;
+        var rgba = tile.data["rgba"];
+        assert(rgba is Uint8List);
 
         if (rampName == "native") {
             log(tile.data.keys);
             if (!tile.data.containsKey("Red") || !tile.data.containsKey("Green") || !tile.data.containsKey("Blue")) {
+                Hub.error("Native colorization not supported for point clouds without RGB data");
                 return null;
             }
             var rlist = tile.data["Red"];
@@ -62,14 +64,20 @@ class PointCloudColorizer {
             return rgba;
         }
 
-        Float64List positionsZ = tile.data["Z"];
-
         final List<_Stop> stops = _Ramps.list[_rampName];
 
         final double zLen = zmax - zmin;
 
+        assert(zmin != double.NAN);
+        assert(zmin != double.INFINITY);
+        assert(zmax != double.NAN);
+        assert(zmax != double.INFINITY);
+
         for (int i = 0; i < tile.numPointsInTile; i++) {
-            double z = positionsZ[i];
+            double z = sourceDimension[i].toDouble();
+
+            assert(z != double.NAN);
+            assert(z != double.INFINITY);
 
             if (z < zmin) {
                 assert(zmin - z >= 0.0000001);
@@ -79,9 +87,12 @@ class PointCloudColorizer {
                 z = zmax;
             }
 
-            double scaledZ = (z - zmin) / zLen;
+            double scaledZ = (zLen == 0.0) ? 0.0 : (z - zmin) / zLen;
 
             // TODO: clip, due to FP math (and above)
+            if (!(scaledZ >= -0.00000001 && scaledZ <= 1.00000001)) {
+                log(scaledZ);
+            }
             assert(scaledZ >= -0.00000001 && scaledZ <= 1.00000001);
             if (scaledZ < 0.0) scaledZ = 0.0;
             if (scaledZ > 1.0) scaledZ = 1.0;

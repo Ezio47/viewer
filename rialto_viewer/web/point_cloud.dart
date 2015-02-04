@@ -17,6 +17,8 @@ class PointCloud {
     List<String> dimensionNames;
     int numPoints;
     int tileId = 0;
+    Map<String, double> minimums;
+    Map<String, double> maximums;
 
     PointCloud(String this.webpath, String this.displayName, List<String> names)
             : numPoints = 0 {
@@ -26,6 +28,13 @@ class PointCloud {
         bbox = new CartographicBbox.empty();
 
         tiles = new List<PointCloudTile>();
+
+        minimums = new Map<String, double>();
+        maximums = new Map<String, double>();
+        dimensionNames.forEach((s) {
+            minimums[s] = double.MAX_FINITE;
+            maximums[s] = -double.MAX_FINITE;
+        });
     }
 
     void changeVisibility(bool v) {
@@ -53,6 +62,12 @@ class PointCloud {
     }
 
     void updateBoundsForTile(PointCloudTile tile) {
+
+        dimensionNames.forEach((dim) {
+            minimums[dim] = min(minimums[dim], tile.minimums[dim]);
+            maximums[dim] = max(maximums[dim], tile.maximums[dim]);
+        });
+
         bbox.unionWith(tile.bbox);
 
         log("Bounds: $bbox");
@@ -60,8 +75,9 @@ class PointCloud {
 
     Future colorizeAsync(PointCloudColorizer colorizer) {
         return new Future(() {
+            String dimension = "Z";
             for (var tile in tiles) {
-                colorizer.colorizeTile(tile);
+                colorizer.colorizeTile(tile, dimension);
             }
         });
     }
