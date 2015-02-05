@@ -9,8 +9,37 @@ part of rialto.viewer;
 class CesiumBridge {
     JsObject _bridge;
 
+    Map map = new Map();
+
     CesiumBridge(String elementName) {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
+
+        var mycb = (a, b, c, west, south, east, north) {
+            log("$a $b $c - $west $south $east $north");
+            var key = "$a $b $c";
+
+            if (map.containsKey(key)) {
+                return map[key];
+            }
+
+            north = north.toDouble();
+            south = south.toDouble();
+            east = east.toDouble();
+            west = west.toDouble();
+
+            var s = south + (north - south) / 2.0;
+            var w = west + (east - west) / 2.0;
+
+            var center = new Cartographic3(w, s, 0.0);
+            var point = new Cartographic3(west, south, 0.0);
+            var p = createRectangle(point, center, 0.0, 0.0, 1.0);
+
+            map[key] = p;
+
+            return p;
+        };
+
+        _bridge.callMethod('doTileProvider', [mycb]);
     }
 
     dynamic addGeoJson(String url) {
@@ -124,14 +153,15 @@ class CesiumBridge {
         return prim;
     }
 
-    dynamic createCloud(int numPoints, Float64List xArray, Float64List yArray, Float64List zArray, Uint8List rgbaArray) {
+    dynamic createCloud(int numPoints, Float64List xArray, Float64List yArray, Float64List zArray,
+            Uint8List rgbaArray) {
         assert(numPoints >= 0);
         assert(xArray.length == numPoints);
         assert(rgbaArray.length == numPoints * 4);
 
-        //var prim = _bridge.callMethod('createCloud', [numPoints, xArray.buffer, yArray.buffer, zArray.buffer, rgbaArray.buffer]);
-        var prim = _bridge.callMethod('createCloud', [numPoints, xArray, yArray, zArray, rgbaArray]);
 
+                //var prim = _bridge.callMethod('createCloud', [numPoints, xArray.buffer, yArray.buffer, zArray.buffer, rgbaArray.buffer]);
+        var prim = _bridge.callMethod('createCloud', [numPoints, xArray, yArray, zArray, rgbaArray]);
         return prim;
     }
 

@@ -2,6 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
+
 var CesiumBridge = function (element) {
     Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
@@ -17,6 +18,15 @@ var CesiumBridge = function (element) {
 
     this.viewer = new Cesium.Viewer(element, options);
 
+
+    this.doTileProvider = function(mycb) {
+        var viewer = this.viewer;
+        var scene = viewer.scene;
+        var primitives = scene.primitives;
+        primitives.add(new Cesium.QuadtreePrimitive({
+            tileProvider : new DemoTileProvider(mycb)
+        }));
+    }
 
     this.addGeoJson = function(url) {
         var viewer = this.viewer;
