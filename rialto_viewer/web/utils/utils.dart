@@ -29,6 +29,15 @@ class Key {
 
 
 class Utils {
+
+    // Uint64 not supported in dart2js
+    static int ByteData_getUint64(ByteData buf, int index, Endianness e) {
+        assert(e == Endianness.LITTLE_ENDIAN);
+        var lo = buf.getUint32(index, e);
+        var hi = buf.getUint32(index + 4, e);
+        return lo | (hi << 32);
+    }
+
     static String toString_Vector3(Vector3 v, [int prec = 2]) {
         var s = Utils.toString_double3(v.x, v.y, v.z, prec);
         return s;

@@ -70,15 +70,8 @@ class RiaDimension {
                 g = (ByteData buf, int bufIndex) => buf.getInt32(bufIndex, endian);
                 break;
             case Unsigned64:
-                e = (numPoints) => lists.add(new Uint64List(numPoints));
-                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getUint64(bufIndex, endian);
-                g = (ByteData buf, int bufIndex) => buf.getUint64(bufIndex, endian);
-                break;
             case Signed64:
-                e = (numPoints) => lists.add(new Int64List(numPoints));
-                f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getInt64(bufIndex, endian);
-                g = (ByteData buf, int bufIndex) => buf.getInt64(bufIndex, endian);
-                break;
+                throw new ArgumentError("64-bit ints not supported under dart2js");
             case Float:
                 e = (numPoints) => lists.add(new Float32List(numPoints));
                 f = (ByteData buf, int bufIndex, int index) => list[index] = buf.getFloat32(bufIndex, endian);
@@ -126,7 +119,7 @@ class RiaFormat {
         int version = buf.getUint8(index);
         index += 1;
 
-        numPoints = buf.getUint64(index, Endianness.LITTLE_ENDIAN);
+        numPoints = Utils.ByteData_getUint64(buf, index, Endianness.LITTLE_ENDIAN);
         index += 8;
 
         int numDims = buf.getUint8(index);
@@ -168,7 +161,6 @@ class RiaFormat {
             dim.byteOffset = byteOffset;
             byteOffset += dim.sizeInBytes;
         }
-        //assert(index == buf.lengthInBytes);
     }
 
     bool get hasRgb =>
