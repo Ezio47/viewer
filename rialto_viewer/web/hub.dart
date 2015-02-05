@@ -5,7 +5,11 @@
 part of rialto.viewer;
 
 void log(obj) {
-    window.console.log(obj.toString());
+    if (obj == null) {
+        window.console.log("** null passed to log() **");
+    } else {
+        window.console.log(obj.toString());
+    }
 }
 
 
