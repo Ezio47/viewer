@@ -38,8 +38,8 @@ camera:
 display:
     bbox: true
     colorize:
-        ramp: Spectral
-        dimension: z
+        ramp: Blues
+        dimension: GpsTime
 
 # wps:
 #    proxy: http://localhost:12347

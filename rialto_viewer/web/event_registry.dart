@@ -38,6 +38,7 @@ class EventRegistry {
 
     SignalFunctions<LayerData> AddLayer = new SignalFunctions<LayerData>();
     SignalFunctions<Layer> AddLayerCompleted = new SignalFunctions<Layer>();
+    SignalFunctions<Layer> AddAllLayersCompleted = new SignalFunctions<Layer>();
     SignalFunctions<String> RemoveLayer = new SignalFunctions<String>();
     SignalFunctions<String> RemoveLayerCompleted = new SignalFunctions<String>();
     SignalFunctions RemoveAllLayers = new SignalFunctions();

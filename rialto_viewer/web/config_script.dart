@@ -20,24 +20,20 @@ class ConfigScript {
         });
 
         f.then((s) {
-            _hub.events.RemoveAllLayersCompleted.subscribe0(() {
-                _execute(s);
-            });
 
-            _hub.events.RemoveAllLayers.fire0();
+            _executeFirst(s).then((ok) {
+               if (ok) {
+                   _executeSecond(s);
+               }
+            });
         });
 
         Hub.root.events.LoadScriptCompleted.fire(url);
     }
 
-    void _execute(String json) {
+    void _executeSecond(String json) {
 
         Map commands = loadYaml(json);
-
-        if (commands.containsKey("layers")) {
-            // do this first, since other things like colorize depend on it
-            _doCommand_layers(commands["layers"]);
-        }
 
         for (String command in commands.keys) {
 
@@ -46,7 +42,7 @@ class ConfigScript {
 
             switch (command) {
                 case "layers":
-                    // already handled
+                    // already handled in executeFirst()
                     break;
                 case "camera":
                     _doCommand_camera(data);
@@ -62,6 +58,22 @@ class ConfigScript {
                     return;
             }
         }
+    }
+
+    Future<bool> _executeFirst(String json) {
+        var c = new Completer<bool>();
+        Map commands = loadYaml(json);
+
+        if (commands.containsKey("layers")) {
+            // do this first, since other things like colorize depend on it
+            _doCommand_layers(commands["layers"]).then((ok) {
+                c.complete(ok);
+            });
+        } else {
+            c.complete(true);
+        }
+
+        return c.future;
     }
 
     void _doCommand_wps(Map data) {
@@ -114,9 +126,21 @@ class ConfigScript {
         }
     }
 
-    void _doCommand_layers(Map layers) {
+    Future<bool> _doCommand_layers(Map layers) {
+        int count = 0;
+        var c = new Completer<bool>();
+
+        _hub.events.AddLayerCompleted.subscribe((layer) {
+            ++count;
+            if (count == layers.length) {
+                c.complete(true);
+            }
+        });
+
         for (var name in layers.keys) {
             _hub.events.AddLayer.fire(new LayerData(name, layers[name]));
         }
+
+        return c.future;
     }
 }
