@@ -309,22 +309,27 @@ var CesiumBridge = function (element) {
         return xyz;
     };
 
-    this.createCloud = function(cnt, pointBufferX, pointBufferY, pointBufferZ, colorBuffer) {
+    // x,y,z as F64 arrays
+    // rgba as U8 array
+    this.createCloud = function(cnt, xArray, yArray, zArray, rgbaArray) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
 
-        var x = new Float64Array(pointBufferX, 0, cnt);
-        var y = new Float64Array(pointBufferY, 0, cnt);
-        var z = new Float64Array(pointBufferZ, 0, cnt);
+        //var x = xArray;
+        //var y = yArray;
+        //var z = zArray;
+        //var rgba = rgbaArray;
+        var x = new Float64Array(xArray, 0, cnt);
+        var y = new Float64Array(yArray, 0, cnt);
+        var z = new Float64Array(zArray, 0, cnt);
+        var rgba = new Uint8Array(rgbaArray, 0, cnt*4);
 
         var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z);
-
-        var u8 = new Uint8Array(colorBuffer, 0, cnt*4);
 
         var pointInstance = new Cesium.GeometryInstance({
             geometry : new Cesium.PointGeometry({
                 positionsTypedArray: xyz,
-                colorsTypedArray: u8
+                colorsTypedArray: rgba
             }),
             id : 'point'
         });
