@@ -17,20 +17,119 @@
 #include <sys/stat.h>
 #include "Tile.hpp"
 
-const int MAXLEVEL = 14;
-const int SIZ = 64;
-
-static int tileCount = 0;
 
 
 
-
-TileWriter::TileWriter()
+TileWriter::TileWriter(int maxLevel) :
+    m_maxLevel(maxLevel)
 {
-    m_root0 = new Tile(0, 0, 0, NULL);
-    m_root1 = new Tile(0, 1, 0, NULL);
+    Rectangle rect(90.0, -90.0, 180.0, -180.0);
+    m_scheme = new TilingScheme(rect, 2, 1);
+    
+    const int xMax = m_scheme->getNumberOfXTilesAtLevel(maxLevel);
+    const int yMax = m_scheme->getNumberOfXTilesAtLevel(maxLevel);
+    m_storage = new CloudBuffer(maxLevel, xMax, yMax);
+    
+    return;
 }
 
+
+TileWriter::~TileWriter()
+{
+    delete m_scheme;
+    delete m_storage;
+}
+
+
+void TileWriter::build(const pdal::PointBufferSet& pointBuffers)
+{
+    seed(pointBuffers);
+    
+    for (int parentLevel = m_maxLevel-1; parentLevel != 0; parentLevel--)
+    {
+        generateLevel(parentLevel);
+    }
+}
+
+
+void TileWriter::seed(const pdal::PointBufferSet& pointBuffers)
+{
+    for (auto pi = pointBuffers.begin(); pi != pointBuffers.end(); ++pi)
+    {
+        const pdal::PointBufferPtr pointBuffer = *pi;
+        seed(pointBuffer);
+    }
+}
+
+    
+void TileWriter::seed(const pdal::PointBufferPtr& buf)
+{
+    const int xMax = m_scheme->getNumberOfXTilesAtLevel(m_maxLevel);
+    const int yMax = m_scheme->getNumberOfXTilesAtLevel(m_maxLevel);
+        
+    for (pdal::PointId idx = 0; idx < buf->size(); ++idx)
+    {
+        pdal::Dimension::Id::Enum xdim = pdal::Dimension::Id::Enum::X;
+        pdal::Dimension::Id::Enum ydim = pdal::Dimension::Id::Enum::Y;
+        pdal::Dimension::Id::Enum zdim = pdal::Dimension::Id::Enum::Z;
+        
+        double lon = buf->getFieldAs<double>(xdim, idx);
+        double lat = buf->getFieldAs<double>(ydim, idx);
+        double h = buf->getFieldAs<double>(zdim, idx);
+    
+        int tx, ty;
+        bool ok = m_scheme->positionToTileXY(lon, lat, m_maxLevel, tx, ty);
+        assert(ok);
+        
+        Tile* tile = m_storage->add(m_maxLevel, tx, ty);
+        tile->add(lon, lat, h);
+    }
+}
+
+
+void TileWriter::generateLevel(int level, int tx, int ty, Tile& srcTile)
+{
+    std::vector<Point>& vec = srcTile.vec();
+    const int len = vec.size();
+        
+    for (int i = 0; i < len; i++) { 
+    
+        const double lon = vec[i].x;
+        const double lat = vec[i].y;
+        const double height = vec[i].z;
+        
+        int tx, ty;
+        bool ok = m_scheme->positionToTileXY(lon, lat, level, tx, ty);
+        assert(ok);
+        
+        Tile* dstTile = m_storage->add(level, tx, ty);
+        dstTile->add(lon, lat, height);
+    }
+}
+
+
+void TileWriter::generateLevel(int parentLevel)
+{
+    const int childLevel = parentLevel - 1;
+    
+    const int xMax = m_scheme->getNumberOfXTilesAtLevel(childLevel);
+    const int yMax = m_scheme->getNumberOfXTilesAtLevel(childLevel);
+    
+    for (int x = 0; x < xMax; x++) {
+        for (int y = 0; y < yMax; y++) {
+        
+            Tile* srcTile = m_storage->get(childLevel, x, y);
+            if (!srcTile) continue;
+         
+            generateLevel(parentLevel, x, y, *srcTile);
+        }
+    }
+}
+
+
+
+
+#if 0
 
 void TileWriter::goBuffers(const pdal::PointBufferSet& bufs) {
     for (auto pi = bufs.begin(); pi != bufs.end(); ++pi)
@@ -112,3 +211,4 @@ void TileWriter::write(const std::string& prefix) const {
     m_root0->write(prefix);
     m_root1->write(prefix);
 }
+#endif

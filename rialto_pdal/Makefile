@@ -4,7 +4,7 @@ PDAL_LIB=/Users/$(USER)/work/dev/build/pdal/lib
 CC=g++
 LD=g++
 
-CFLAGS=-g -std=c++11 -ferror-limit=3 \
+CFLAGS=-g -std=c++11 -ferror-limit=2 \
 -isystem $(PDAL_INC) -I $(PDAL_INC) \
 -isystem /usr/local/include \
 -I /usr/local/include
@@ -21,7 +21,7 @@ all: las2tiles las2info las2ria
 clean:
 	rm -f las2tiles las2info las2ria *.o
 
-OBJS=TileWriter.o Tile.o PdalBridge.o TilingScheme.o
+OBJS=TileWriter.o Tile.o PdalBridge.o TilingScheme.o Rectangle.o Buffer.o
 
 las2tiles : las2tiles.o $(OBJS)
 	g++ -o $@ $^ $(CFLAGS) $(LIBS)

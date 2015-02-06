@@ -1,3 +1,9 @@
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
+#ifndef TILE_HPP
+#define TILE_HPP
 
 #include <pdal/Writer.hpp>
 #include <pdal/FileUtils.hpp>
@@ -9,6 +15,55 @@
 
 #include <zlib.h>
 
+
+class Point
+{
+public:
+    Point(double x_, double y_, double z_) :
+        x(x_),
+        y(y_),
+        z(z_)
+    { }
+    
+    Point(const Point& r) :
+        x(r.x),
+        y(r.y),
+        z(r.z)
+    { }
+    
+    double x;
+    double y;
+    double z;
+    
+    Point& operator=(const Point& r)
+    {
+      x = r.x;
+      y = r.y;
+      z = r.z;
+      return *this;
+    }
+};
+
+
+class Tile
+{
+public:
+    Tile(int level, int x, int y);
+    ~Tile();
+    
+    std::vector<Point>& vec() { return m_points; }
+    
+    void add(double x, double y, double z);
+    
+private:
+    int m_level, m_x, m_y;
+    std::vector<Point> m_points;
+};
+
+#endif
+
+
+#if 0
 class Tile {
 public:
     enum Quadrant {
@@ -60,3 +115,4 @@ private:
     int m_colNum, m_rowNum;
     int m_numCols, m_numRows;
 };
+#endif

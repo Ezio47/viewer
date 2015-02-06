@@ -233,10 +233,8 @@ boost::uint64_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, 
 
 void PdalBridge::writeTiles() {
     const pdal::PointBufferSet& bufs = m_manager->buffers();
-    TileWriter* tw = new TileWriter();
-    tw->goBuffers(bufs);
-
-    tw->write("./tmp");
+    TileWriter* tw = new TileWriter(10);
+    tw->build(bufs);
 }
 
 

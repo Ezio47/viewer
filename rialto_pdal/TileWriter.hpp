@@ -1,3 +1,9 @@
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
+#ifndef TILEWRITER_HPP
+#define TILEWRITER_HPP
 
 #include <pdal/Writer.hpp>
 #include <pdal/FileUtils.hpp>
@@ -9,22 +15,31 @@
 
 #include <zlib.h>
 
-class Tile;
+#include "TilingScheme.hpp"
+#include "Tile.hpp"
+#include "Buffer.hpp"
+
 
 class TileWriter
 {
 public:
-    TileWriter();
+    TileWriter(int level);
+    ~TileWriter();
 
-    void goBuffers(const pdal::PointBufferSet& bufs);
-    void goBuffer(const pdal::PointBufferPtr& buf);
-    
-    Tile* m_root0;
-    Tile* m_root1;
-    
-    void write(const std::string& prefix) const;
+    void build(const pdal::PointBufferSet& pointBuffers);
     
 private:
+    void seed(const pdal::PointBufferSet& pointBuffers);
+    void seed(const pdal::PointBufferPtr& buf);
+    void generateLevel(int level, int tx, int ty, Tile& srcTile);
+    void generateLevel(int parentLevel);
+
+    TilingScheme* m_scheme;
+    int m_maxLevel;
+    CloudBuffer* m_storage;
+    
     TileWriter& operator=(const TileWriter&); // not implemented
     TileWriter(const TileWriter&); // not implemented
 };
+
+#endif

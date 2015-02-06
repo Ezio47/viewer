@@ -16,11 +16,28 @@
 
 #include <sys/stat.h>
 
-const int MAXLEVEL = 14;
-const int SIZ = 64;
 
-static int tileCount = 0;
+Tile::Tile(int level, int x, int y) :
+    m_level(level),
+    m_x(x),
+    m_y(y)
+{
+}
 
+
+Tile::~Tile()
+{
+}
+
+
+void Tile::add(double x, double y, double z)
+{
+    Point p(x,y,z);
+    m_points.push_back(p);
+}
+
+
+#if 0
 
 Tile::Tile(int level, int colNum, int rowNum, Tile* parent) {
     m_level = level;
@@ -423,3 +440,4 @@ void Tile::getMinMax(double& xmin, double& ymin, double& xmax, double& ymax) con
         if (m_ymax > ymax) ymax = m_ymax;
     }    
 }
+#endif
