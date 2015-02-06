@@ -5,6 +5,158 @@
 #include "TilingScheme.hpp"
 
 
+class Buffer {
+public:
+    Buffer(int l, int x, int y) :
+      level(l), tileX(x), tileY(y) {
+        return;
+    }
+
+    virtual void add(int l, int x, int y, char* data) = 0;
+
+protected:
+    int level;
+    int tileX;
+    int tileY;
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+// all the points in one tile
+class TileBuffer : public Buffer
+{
+public:
+    TileBuffer(int l, int x, int y) : Buffer(l, x, y)
+    {
+        assert(l != -1);
+        assert(x != -1);
+        assert(y != -1);
+        return;
+    }
+
+    void add(int l, int x, int y, char* data)
+    {
+        assert(l == level);
+        assert(x == tileX);
+        assert(y == tileY);
+
+        vec.push_back(data);
+    }
+
+private:
+    // all the points of (a col of a row of a level)
+    std::vector<char*> vec; // points
+};
+
+
+//////////////////////////////////////////////////////////////////
+
+
+// all the cols of (a row of a level)
+class RowsBuffer : public Buffer
+{
+public:
+    RowsBuffer(int l, int x, int y) : Buffer(l, x, y)
+    {
+        assert(l != -1);
+        assert(x != -1);
+        assert(y == -1);
+        return;
+    }
+
+    void add(int l, int x, int y, char* data)
+    {
+        assert(l == level);
+        assert(x == tileX);
+        assert(-1 == tileY);
+
+        TileBuffer* tile = map[y];
+        if (!tile) {
+            map.insert( std::pair<int,TileBuffer*>(x, new TileBuffer(l, x, y)) );
+            tile = map[y];
+        }
+        tile->add(l, x, y, data);
+    }
+
+private:
+    // all the cols of (a row of a level)
+    std::map<int, TileBuffer*> map;   // col -> (tile buffer)
+};
+
+
+/////////////////////////////////////////////////////////////////
+
+
+// all the rows of a level
+class LevelBuffer : public Buffer {
+public:
+    LevelBuffer(int l, int x, int y) : Buffer(l, x, y)
+    {
+        assert(l != -1);
+        assert(x == -1);
+        assert(y == -1);
+    }
+
+    void add(int l, int x, int y, char* data)
+    {
+        assert(l == level);
+        assert(-1 == tileX);
+        assert(-1 == tileY);
+
+        RowsBuffer* rows = map[x];
+        if (!rows) {
+            map.insert( std::pair<int, RowsBuffer*>(x, new RowsBuffer(l, x, -1)) );
+            rows = map[x];
+        }
+        rows->add(l, x, y, data);
+    }
+
+private:
+    // all the rows of (a level)
+    std::map<int, RowsBuffer*> map;    // row -> (row buffer)
+};
+
+
+//////////////////////////////////////////////////////////////////
+
+
+// all the levels
+class Storage : public Buffer
+{
+public:
+    Storage(int l, int x, int y) : Buffer(l, x, y)
+    {
+        assert(l == -1);
+        assert(x == -1);
+        assert(y == -1);
+    }
+
+    void add(int l, int x, int y, char* data)
+    {
+        assert(-1 == level);
+        assert(-1 == tileX);
+        assert(-1 == tileY);
+
+        LevelBuffer* level = map[l];
+        if (!level) {
+            map.insert( std::pair<int,LevelBuffer*>(x, new LevelBuffer(l, -1, -1)) );
+            level = map[l];
+        }
+        level->add(l, x, y, data);
+    }
+
+private:
+    // all the levels
+    std::map<int, LevelBuffer*> map;    // level -> (level buffer)
+
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
 TilingScheme::TilingScheme(Rectangle& rectangle,
                            boost::uint32_t numberOfLevelZeroTilesX,       // 2
                            boost::uint32_t numberOfLevelZeroTilesY)       // 1
