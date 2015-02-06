@@ -76,7 +76,7 @@ Tile* RowsBuffer::add(int l, int x, int y)
     if (search != map.end()) {
         tile = search->second;
     } else {
-        tile = new Tile(l, x, y); 
+      //  tile = new Tile(l, x, y); 
         map.emplace(x, tile);
     }
     

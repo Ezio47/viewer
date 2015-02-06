@@ -16,13 +16,29 @@
 
 #include <sys/stat.h>
 
+const int NW = 0;
+const int NE = 1;
+const int SE = 2;
+const int SW = 3;
 
-Tile::Tile(int level, int x, int y) :
+
+Tile::Tile(int level, int x, int y, TilingScheme* tilingScheme, int maxLevel) :
     m_level(level),
     m_tileX(x),
-    m_tileY(y)
+    m_tileY(y),
+    m_tilingScheme(tilingScheme),
+    parent(NULL),
+    m_maxLevel(maxLevel)
 {
     printf("created tb (%d,%d,%d)\n", m_level, m_tileY, m_tileX);
+    
+    rect = m_tilingScheme->tileXYToNativeRectangle(x, y, level);
+    
+    m_children = new Tile*[4];
+    m_children[0] = NULL;
+    m_children[1] = NULL;
+    m_children[2] = NULL;
+    m_children[3] = NULL;
 }
 
 
@@ -30,11 +46,61 @@ Tile::~Tile()
 {
 }
 
+int Tile::whichChild(double x, double y) const
+{
+    double mx = rect.west + (rect.west - rect.east) / 2.0;
+    double my = rect.north + (rect.north - rect.south) / 2.0;
+
+    if (x <= mx) {
+        if (y < my) {
+            return NW;
+        } else {
+            return NE;
+        }
+    } else {
+        if (y < my) {
+            return SE;
+        } else {
+            return SW;
+        }
+    }    
+}
+
 
 void Tile::add(double x, double y, double z)
 {
     Point p(x,y,z);
     m_points.push_back(p);
+    
+    int v = whichChild(x,y);
+    
+    if (m_level > m_maxLevel) return;
+
+    Tile* t = m_children[v];
+    if (t == NULL)
+    {
+        switch (v) {
+        case NW:
+            t = new Tile(m_level+1, x*2, y*2, m_tilingScheme, m_maxLevel);
+            break;
+        case NE:
+            t = new Tile(m_level+1, x*2+1, y*2, m_tilingScheme, m_maxLevel);
+            break;
+        case SE:
+            t = new Tile(m_level+1, x*2+1, y*2+1, m_tilingScheme, m_maxLevel);
+            break;
+        case SW:
+            t = new Tile(m_level+1, x*2, y*2+1, m_tilingScheme, m_maxLevel);
+            break;
+        default:
+            assert(0);
+            break;
+        }
+        
+        m_children[v] = t;
+    }
+
+    t->add(x, y, z);
 }
 
 

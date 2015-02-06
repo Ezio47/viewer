@@ -28,6 +28,9 @@ TileWriter::TileWriter(int maxLevel) :
     
     m_storage = new CloudBuffer();
     
+    m_root0 = new Tile(0, 0, 0, m_scheme, 14);
+    m_root1 = new Tile(0, 1, 0, m_scheme, 14);
+    
     return;
 }
 
@@ -36,6 +39,8 @@ TileWriter::~TileWriter()
 {
     delete m_scheme;
     delete m_storage;
+    delete m_root0;
+    delete m_root1;
 }
 
 
@@ -64,10 +69,7 @@ void TileWriter::seed(const pdal::PointBufferSet& pointBuffers)
 
     
 void TileWriter::seed(const pdal::PointBufferPtr& buf)
-{
-    const int xMax = m_scheme->getNumberOfXTilesAtLevel(m_maxLevel);
-    const int yMax = m_scheme->getNumberOfXTilesAtLevel(m_maxLevel);
-        
+{        
     for (pdal::PointId idx = 0; idx < buf->size(); ++idx)
     {
         pdal::Dimension::Id::Enum xdim = pdal::Dimension::Id::Enum::X;
@@ -78,16 +80,12 @@ void TileWriter::seed(const pdal::PointBufferPtr& buf)
         double lat = buf->getFieldAs<double>(ydim, idx);
         double h = buf->getFieldAs<double>(zdim, idx);
     
-        int tx, ty;
-        bool ok = m_scheme->positionToTileXY(lon, lat, m_maxLevel, tx, ty);
-        assert(ok);
-        
-        Tile* tile = m_storage->add(m_maxLevel, tx, ty);
-        tile->add(lon, lat, h);
+        if (lon < 0) {
+            m_root0->add(lon, lat, h);
+        } else {
+            m_root1->add(lon, lat, h);
+        }
     }
-
-    m_storage->dump(0);
-    printf("seeding done\n");
 }
 
 
@@ -98,6 +96,13 @@ void TileWriter::populateParentOfChildTile(int parentLevel, Tile& childTile)
 
     m_storage->dump(0);
 
+    int tx = childTile.m_tileX / 2;
+    int ty = childTile.m_tileY / 2;
+    //bool ok = m_scheme->positionToTileXY(lon, lat, parentLevel, tx, ty);
+    //assert(ok);
+        
+    Tile* parentTile = m_storage->add(parentLevel, tx, ty);
+ 
     std::vector<Point>& vec = childTile.vec();
     const int len = vec.size();
         
@@ -107,11 +112,6 @@ void TileWriter::populateParentOfChildTile(int parentLevel, Tile& childTile)
         const double lat = vec[i].y;
         const double height = vec[i].z;
         
-        int tx, ty;
-        bool ok = m_scheme->positionToTileXY(lon, lat, parentLevel, tx, ty);
-        assert(ok);
-        
-        Tile* parentTile = m_storage->add(parentLevel, tx, ty);
         parentTile->add(lon, lat, height);
     }
     

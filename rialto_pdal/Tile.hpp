@@ -15,6 +15,9 @@
 
 #include <zlib.h>
 
+#include "Rectangle.hpp"
+#include "TilingScheme.hpp"
+
 
 class Point
 {
@@ -48,7 +51,7 @@ public:
 class Tile
 {
 public:
-    Tile(int level, int x, int y);
+    Tile(int level, int x, int y, TilingScheme* scheme, int maxLevel);
     ~Tile();
     
     std::vector<Point>& vec() { return m_points; }
@@ -57,8 +60,16 @@ public:
     
     void dump(int indent);
     
+    int whichChild(double x, double y) const;
+
     int m_level, m_tileX, m_tileY;
     std::vector<Point> m_points;
+    
+    Tile* parent;
+    Tile** m_children;
+    Rectangle rect;
+    TilingScheme* m_tilingScheme;
+    int m_maxLevel;
 };
 
 #endif

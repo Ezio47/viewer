@@ -24,7 +24,6 @@ public:
     virtual Tile* add(int l, int x, int y) = 0;
     virtual void dump(int indent) = 0;
 
-protected:
     int level;
     int tileX;
     int tileY;

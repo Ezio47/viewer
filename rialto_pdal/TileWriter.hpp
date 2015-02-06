@@ -34,6 +34,9 @@ private:
     void populateParentOfChildTile(int level, Tile& srcTile);
     void generateLevel(int parentLevel);
 
+    Tile* m_root0;
+    Tile* m_root1;
+    
     TilingScheme* m_scheme;
     int m_maxLevel;
     CloudBuffer* m_storage;
