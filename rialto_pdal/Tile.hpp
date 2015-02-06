@@ -55,8 +55,10 @@ public:
     
     void add(double x, double y, double z);
     
+    void dump(int indent);
+    
 private:
-    int m_level, m_x, m_y;
+    int m_level, m_tileX, m_tileY;
     std::vector<Point> m_points;
 };
 

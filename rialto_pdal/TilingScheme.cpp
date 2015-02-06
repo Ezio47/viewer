@@ -64,16 +64,16 @@ Rectangle TilingScheme::tileXYToNativeRectangle(int x, int y, int level) const
 
 Rectangle TilingScheme::tileXYToRectangle(int x, int y, int level) const
 {
-    int xTiles = getNumberOfXTilesAtLevel(level);
-    int yTiles = getNumberOfYTilesAtLevel(level);
+    double xTiles = getNumberOfXTilesAtLevel(level);
+    double yTiles = getNumberOfYTilesAtLevel(level);
 
-    int xTileWidth = _rectangle.width() / xTiles;
-    int west = x * xTileWidth + _rectangle.west;
-    int east = (x + 1) * xTileWidth + _rectangle.west;
+    double xTileWidth = _rectangle.width() / xTiles;
+    double west = x * xTileWidth + _rectangle.west;
+    double east = (x + 1.0) * xTileWidth + _rectangle.west;
 
-    int yTileHeight = _rectangle.height() / yTiles;
-    int north = _rectangle.north - y * yTileHeight;
-    int south = _rectangle.north - (y + 1) * yTileHeight;
+    double yTileHeight = _rectangle.height() / yTiles;
+    double north = _rectangle.north - y * yTileHeight;
+    double south = _rectangle.north - (y + 1.0) * yTileHeight;
 
     Rectangle result(west, south, east, north);
     return result;
@@ -91,11 +91,11 @@ Rectangle TilingScheme::tileXYToRectangle(int x, int y, int level) const
         return false;
     }
 
-    int xTiles = getNumberOfXTilesAtLevel(level);
-    int yTiles = getNumberOfYTilesAtLevel(level);
+    double xTiles = getNumberOfXTilesAtLevel(level);
+    double yTiles = getNumberOfYTilesAtLevel(level);
 
-    int xTileWidth = _rectangle.width() / xTiles;
-    int yTileHeight = _rectangle.height() / yTiles;
+    double xTileWidth = _rectangle.width() / xTiles;
+    double yTileHeight = _rectangle.height() / yTiles;
 
     if (_rectangle.east < _rectangle.west) {
         xPosition += PI * 2.0;

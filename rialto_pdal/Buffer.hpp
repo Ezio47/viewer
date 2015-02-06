@@ -22,6 +22,7 @@ public:
     
     virtual Tile* get(int l, int x, int y) = 0;
     virtual Tile* add(int l, int x, int y) = 0;
+    virtual void dump(int indent) = 0;
 
 protected:
     int level;
@@ -37,11 +38,12 @@ protected:
 class RowsBuffer : public Buffer
 {
 public:
-    RowsBuffer(int l, int x, int y);
+    RowsBuffer(int l, int y);
     virtual ~RowsBuffer();
     
-    Tile* get(int l, int x, int y);
-    Tile* add(int l, int x, int y);
+    virtual Tile* get(int l, int x, int y);
+    virtual Tile* add(int l, int x, int y);
+    virtual void dump(int indent);
 
 private:
     // all the cols of (a row of a level)
@@ -55,11 +57,12 @@ private:
 // all the rows of a level
 class LevelBuffer : public Buffer {
 public:
-    LevelBuffer(int l, int x, int y);
+    LevelBuffer(int l);
     virtual ~LevelBuffer();
     
-    Tile* get(int l, int x, int y);
-    Tile* add(int l, int x, int y);
+    virtual Tile* get(int l, int x, int y);
+    virtual Tile* add(int l, int x, int y);
+    virtual void dump(int indent);
 
 private:
     // all the rows of (a level)
@@ -74,11 +77,12 @@ private:
 class CloudBuffer : public Buffer
 {
 public:
-    CloudBuffer(int l, int x, int y);
+    CloudBuffer();
     virtual ~CloudBuffer();
     
-    Tile* get(int l, int x, int y);
-    Tile* add(int l, int x, int y);
+    virtual Tile* get(int l, int x, int y);
+    virtual Tile* add(int l, int x, int y);
+    virtual void dump(int indent);
 
 private:
     // all the levels of the cloud

@@ -28,7 +28,7 @@ TileWriter::TileWriter(int maxLevel) :
     
     const int xMax = m_scheme->getNumberOfXTilesAtLevel(maxLevel);
     const int yMax = m_scheme->getNumberOfXTilesAtLevel(maxLevel);
-    m_storage = new CloudBuffer(maxLevel, xMax, yMax);
+    m_storage = new CloudBuffer();
     
     return;
 }
@@ -45,10 +45,12 @@ void TileWriter::build(const pdal::PointBufferSet& pointBuffers)
 {
     seed(pointBuffers);
     
-    for (int parentLevel = m_maxLevel-1; parentLevel != 0; parentLevel--)
+    for (int parentLevel = m_maxLevel - 1; parentLevel != 0; parentLevel--)
     {
         generateLevel(parentLevel);
     }
+    
+    m_storage->dump(0);
 }
 
 
@@ -105,12 +107,14 @@ void TileWriter::generateLevel(int level, int tx, int ty, Tile& srcTile)
         Tile* dstTile = m_storage->add(level, tx, ty);
         dstTile->add(lon, lat, height);
     }
+    
+    m_storage->dump(0);
 }
 
 
 void TileWriter::generateLevel(int parentLevel)
 {
-    const int childLevel = parentLevel - 1;
+    const int childLevel = parentLevel + 1;
     
     const int xMax = m_scheme->getNumberOfXTilesAtLevel(childLevel);
     const int yMax = m_scheme->getNumberOfXTilesAtLevel(childLevel);
