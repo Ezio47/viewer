@@ -31,7 +31,7 @@ public:
 private:
     void seed(const pdal::PointBufferSet& pointBuffers);
     void seed(const pdal::PointBufferPtr& buf);
-    void generateLevel(int level, int tx, int ty, Tile& srcTile);
+    void populateParentOfChildTile(int level, Tile& srcTile);
     void generateLevel(int parentLevel);
 
     TilingScheme* m_scheme;

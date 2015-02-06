@@ -48,6 +48,11 @@ public:
 private:
     // all the cols of (a row of a level)
     std::map<int, Tile*> map;   // col -> (tile buffer)
+
+    int lastLevel;
+    int lastTileX;
+    int lastTileY;
+    Tile* lastTile;
 };
 
 

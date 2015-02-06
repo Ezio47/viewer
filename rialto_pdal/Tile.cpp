@@ -22,7 +22,7 @@ Tile::Tile(int level, int x, int y) :
     m_tileX(x),
     m_tileY(y)
 {
-    printf("created t (%d,%d,%d)\n", m_level, m_tileX, m_tileY);
+    printf("created tb (%d,%d,%d)\n", m_level, m_tileY, m_tileX);
 }
 
 
@@ -41,7 +41,7 @@ void Tile::add(double x, double y, double z)
 void Tile::dump(int indent)
 {
     for (int i=0; i<indent; i++) printf(" ");
-    printf("t (%d,%d,%d): %lu\n", m_level, m_tileX, m_tileY, m_points.size());
+    printf("> tb (%d,%d,%d): %lu\n", m_level, m_tileY, m_tileX, m_points.size());
 }
 
 

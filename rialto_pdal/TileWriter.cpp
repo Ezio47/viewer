@@ -21,13 +21,11 @@
 
 
 TileWriter::TileWriter(int maxLevel) :
-    m_maxLevel(maxLevel)
+    m_maxLevel(14)
 {
     Rectangle rect(90.0, -90.0, 180.0, -180.0);
     m_scheme = new TilingScheme(rect, 2, 1);
     
-    const int xMax = m_scheme->getNumberOfXTilesAtLevel(maxLevel);
-    const int yMax = m_scheme->getNumberOfXTilesAtLevel(maxLevel);
     m_storage = new CloudBuffer();
     
     return;
@@ -50,6 +48,7 @@ void TileWriter::build(const pdal::PointBufferSet& pointBuffers)
         generateLevel(parentLevel);
     }
     
+    printf("DONE\n");
     m_storage->dump(0);
 }
 
@@ -86,12 +85,20 @@ void TileWriter::seed(const pdal::PointBufferPtr& buf)
         Tile* tile = m_storage->add(m_maxLevel, tx, ty);
         tile->add(lon, lat, h);
     }
+
+    m_storage->dump(0);
+    printf("seeding done\n");
 }
 
 
-void TileWriter::generateLevel(int level, int tx, int ty, Tile& srcTile)
-{
-    std::vector<Point>& vec = srcTile.vec();
+void TileWriter::populateParentOfChildTile(int parentLevel, Tile& childTile)
+{    
+    printf("populating parent level %d from child (%d,%d,%d)\n",
+           parentLevel, childTile.m_level, childTile.m_tileY, childTile.m_tileX);
+
+    m_storage->dump(0);
+
+    std::vector<Point>& vec = childTile.vec();
     const int len = vec.size();
         
     for (int i = 0; i < len; i++) { 
@@ -101,11 +108,11 @@ void TileWriter::generateLevel(int level, int tx, int ty, Tile& srcTile)
         const double height = vec[i].z;
         
         int tx, ty;
-        bool ok = m_scheme->positionToTileXY(lon, lat, level, tx, ty);
+        bool ok = m_scheme->positionToTileXY(lon, lat, parentLevel, tx, ty);
         assert(ok);
         
-        Tile* dstTile = m_storage->add(level, tx, ty);
-        dstTile->add(lon, lat, height);
+        Tile* parentTile = m_storage->add(parentLevel, tx, ty);
+        parentTile->add(lon, lat, height);
     }
     
     m_storage->dump(0);
@@ -115,6 +122,8 @@ void TileWriter::generateLevel(int level, int tx, int ty, Tile& srcTile)
 void TileWriter::generateLevel(int parentLevel)
 {
     const int childLevel = parentLevel + 1;
+ 
+    printf("generating parent level %d from child level %d\n", parentLevel, childLevel);
     
     const int xMax = m_scheme->getNumberOfXTilesAtLevel(childLevel);
     const int yMax = m_scheme->getNumberOfXTilesAtLevel(childLevel);
@@ -122,10 +131,13 @@ void TileWriter::generateLevel(int parentLevel)
     for (int x = 0; x < xMax; x++) {
         for (int y = 0; y < yMax; y++) {
         
-            Tile* srcTile = m_storage->get(childLevel, x, y);
-            if (!srcTile) continue;
+            Tile* childTile = m_storage->get(childLevel, x, y);
+            if (!childTile) {
+                //printf("-- skipping missing tile (%d,%d,%d)\n", childLevel, y, x);
+                continue;
+            }
          
-            generateLevel(parentLevel, x, y, *srcTile);
+            populateParentOfChildTile(parentLevel, *childTile);
         }
     }
 }

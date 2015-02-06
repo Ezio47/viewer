@@ -18,11 +18,14 @@ Buffer::~Buffer()
 /////////////////////////////////////////////////////////////////
 
 
-RowsBuffer::RowsBuffer(int l, int y) : Buffer(l, -1, y)
+RowsBuffer::RowsBuffer(int l, int y) : Buffer(l, -1, y),
+    lastLevel(-1),
+    lastTileX(-1),
+    lastTileY(-1)
 {
     assert(l != -1);
     assert(y != -1);
-    printf("created rb (%d,%d,%d)\n", level, tileX, tileY);
+    printf("created rb (%d,%d)\n", level, tileY);
     return;
 }
 
@@ -37,10 +40,23 @@ Tile* RowsBuffer::get(int l, int x, int y)
     assert(-1 == tileX);
     assert(y == tileY);
 
-    Tile* tile = map[x];
-    if (!tile) return NULL;
+    if (lastLevel == l && lastTileX == x && lastTileY == y) {
+    printf("hit");
+        return lastTile;
+    }
 
-    return tile;
+    auto search = map.find(x);
+    if (search == map.end()) {
+        return NULL;
+    }
+    Tile* v = search->second;
+    
+    lastLevel = l;
+    lastTileX = x;
+    lastTileY = y;
+    lastTile = v;
+    
+    return v;
 }
 
 
@@ -50,6 +66,11 @@ Tile* RowsBuffer::add(int l, int x, int y)
     assert(-1 == tileX);
     assert(y == tileY);
 
+    if (lastLevel == l && lastTileX == x && lastTileY == y) {
+    printf("hit");
+        return lastTile;
+    }
+    
     Tile* tile = NULL;
     auto search = map.find(x);
     if (search != map.end()) {
@@ -58,6 +79,12 @@ Tile* RowsBuffer::add(int l, int x, int y)
         tile = new Tile(l, x, y); 
         map.emplace(x, tile);
     }
+    
+    lastLevel = l;
+    lastTileX = x;
+    lastTileY = y;
+    lastTile = tile;
+    
     return tile;
 }
 
@@ -65,7 +92,7 @@ Tile* RowsBuffer::add(int l, int x, int y)
 void RowsBuffer::dump(int indent)
 {
     for (int i=0; i<indent; i++) printf(" ");
-    printf("rb(%d,%d,%d)\n", level, tileX, tileY);
+    printf("> rb (%d,%d)\n", level, tileY);
 
     auto it = map.begin();
     while (it != map.end()) {
@@ -82,7 +109,7 @@ void RowsBuffer::dump(int indent)
 LevelBuffer::LevelBuffer(int l) : Buffer(l, -1, -1)
 {
     assert(l != -1);
-    printf("created lb (%d,%d,%d)\n", level, tileX, tileY);
+    printf("created lb (%d)\n", level);
 }
 
 
@@ -97,10 +124,12 @@ Tile* LevelBuffer::get(int l, int x, int y)
     assert(-1 == tileX);
     assert(-1 == tileY);
 
-    RowsBuffer* rows = map[y];
-    if (!rows) return NULL;
-
-    return rows->get(l, x, y);
+    auto search = map.find(y);
+    if (search == map.end()) {
+        return NULL;
+    }
+    RowsBuffer* v = search->second;
+    return v->get(l, x, y);
 }
 
 
@@ -125,7 +154,7 @@ Tile* LevelBuffer::add(int l, int x, int y)
 void LevelBuffer::dump(int indent)
 {
     for (int i=0; i<indent; i++) printf(" ");
-    printf("lb (%d,%d,%d)\n", level, tileX, tileY);
+    printf("> lb (%d)\n", level);
 
     auto it = map.begin();
     while (it != map.end()) {
@@ -141,7 +170,7 @@ void LevelBuffer::dump(int indent)
 
 CloudBuffer::CloudBuffer() : Buffer(-1, -1, -1)
 {
-    printf("created cb (%d,%d,%d)\n", level, tileX, tileY);
+    printf("created cb ()\n");
 }
 
 
@@ -156,10 +185,12 @@ Tile* CloudBuffer::get(int l, int x, int y)
     assert(-1 == tileX);
     assert(-1 == tileY);
 
-    LevelBuffer* levelBuffer = map[l];
-    if (!levelBuffer) return NULL;
-
-    return levelBuffer->get(l, x, y);
+    auto search = map.find(l);
+    if (search == map.end()) {
+        return NULL;
+    }
+    LevelBuffer* levels = search->second;
+    return levels->get(l, x, y);
 }
 
 
@@ -184,7 +215,7 @@ Tile* CloudBuffer::add(int l, int x, int y)
 void CloudBuffer::dump(int indent)
 {
     for (int i=0; i<indent; i++) printf(" ");
-    printf("cb (%d,%d,%d)\n", level, tileX, tileY);
+    printf("> cb ()\n");
      
     auto it = map.begin();
     auto e = map.end();

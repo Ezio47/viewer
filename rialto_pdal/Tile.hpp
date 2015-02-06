@@ -57,7 +57,6 @@ public:
     
     void dump(int indent);
     
-private:
     int m_level, m_tileX, m_tileY;
     std::vector<Point> m_points;
 };
