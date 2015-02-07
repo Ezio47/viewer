@@ -23,17 +23,34 @@ Tile::Tile(int level, int tx, int ty, Rectangle r, int maxLevel) :
     m_tileY(ty),
     rect(r),
     parent(NULL),
-    m_maxLevel(maxLevel)
+    m_maxLevel(maxLevel),
+    m_skip(0)
 {    
-    printf("created tb (l=%d, tx=%d, ty=%d)  --  w%f s%f e%f n%f\n",
-        m_level, m_tileX, m_tileY,
-        rect.west, rect.south, rect.east, rect.north);
+    //printf("created tb (l=%d, tx=%d, ty=%d) (slip%d)  --  w%f s%f e%f n%f\n",
+      //  m_level, m_tileX, m_tileY, m_skip,
+        //rect.west, rect.south, rect.east, rect.north);
     
     m_children = new Tile*[4];
     m_children[0] = NULL;
     m_children[1] = NULL;
     m_children[2] = NULL;
     m_children[3] = NULL;
+    
+    // level N+1 has 1/4 the points of level N
+    //
+    // level 3: skip 1
+    // level 2: skip 4
+    // level 1: skip 16
+    // level 0: skip 256
+    
+    // max=3, max-level=u
+    // 3-3=0  skip 1   4^0
+    // 3-2=1  skip 4    4^1
+    // 3-1=2  skip 16    4^2
+    // 3-0=3  skip 64    4^3
+    // 
+    m_skip = pow(4, (m_maxLevel - m_level));
+    //printf("level=%d  skip=%d\n", m_level, m_skip);
 }
 
 
@@ -45,13 +62,16 @@ Tile::~Tile()
 }
 
 
-void Tile::add(double lon, double lat, double height)
+void Tile::add(int pointNumber, double lon, double lat, double height)
 {
     assert(rect.contains(lon, lat));
     
-    Point p(lon, lat, height);
-    m_points.push_back(p);
-    
+    //printf("-- -- %d %d %d\n", pointNumber, m_skip, pointNumber % m_skip == 0);
+    if (pointNumber % m_skip == 0) {
+        Point p(lon, lat, height);
+        m_points.push_back(p);
+    }
+        
     if (m_level == m_maxLevel) return;
 
     Quad q = rect.getQuadrantOf(lon, lat);
@@ -80,7 +100,7 @@ void Tile::add(double lon, double lat, double height)
         m_children[q] = t;
     }
 
-    t->add(lon, lat, height);
+    t->add(pointNumber, lon, lat, height);
 }
 
 
@@ -143,41 +163,44 @@ void Tile::write(gzFile fp) const {
     boost::uint8_t lw = 0;
     gzwrite(fp, &lw, 1);
 }
+#endif
 
-
-bool Tile::exists(const char* path) {
+static bool exists(const char* path) {
     struct stat st;
     if(stat(path,&st) == 0)
         return true;
     return false;
 }
 
-void Tile::write(const std::string& prefix) const {
+
+void Tile::write(const char* prefix) const {
     //assert(dirExists("/tmp"));
     //assert(dirExists("/tmp/x"));
     //assert(!dirExists("/tmp/y"));
     
     char buf[1024];
 
-    sprintf(buf, "%s/%d", prefix.c_str(), m_level);
+    assert(exists(prefix));
+    
+    sprintf(buf, "%s/%d", prefix, m_level);
     if (!exists(buf)) {
         mkdir(buf, 0777);
     }
     
-    sprintf(buf, "%s/%d/%d", prefix.c_str(), m_level, m_colNum);
+    sprintf(buf, "%s/%d/%d", prefix, m_level, m_tileX);
     if (!exists(buf)) {
         mkdir(buf, 0777);
     }
     
-    sprintf(buf, "%s/%d/%d/%d.terrain", prefix.c_str(), m_level, m_colNum, m_rowNum);
+    sprintf(buf, "%s/%d/%d/%d.terrain", prefix, m_level, m_tileX, m_tileY);
     
-    printf("--> %s\n", buf);
+    //printf("--> %s\n", buf);
     
-    //FILE* fp = fopen(buf, "wb");
-    gzFile fp = gzopen(buf, "wb");
-    write(fp);
-    //fclose(fp);
-    gzclose(fp);
+    FILE* fp = fopen(buf, "wb");
+    //gzFile fp = gzopen(buf, "wb");
+    //write(fp);
+    fclose(fp);
+    //gzclose(fp);
     
     if (m_children) {
         for (int i=0; i<4; i++) {
@@ -187,5 +210,3 @@ void Tile::write(const std::string& prefix) const {
         }
     }
 }
-
-#endif

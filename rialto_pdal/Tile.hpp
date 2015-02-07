@@ -55,11 +55,13 @@ public:
     
     std::vector<Point>& vec() { return m_points; }
     
-    void add(double lon, double lat, double height);
+    void add(int pointNumber, double lon, double lat, double height);
     
     void dump(int indent) const;
     
     void stats(int* numPointsPerLevel, int* numTilesPerLevel) const;
+    
+    void write(const char* prefix) const;
     
     int m_level, m_tileX, m_tileY;
     std::vector<Point> m_points;
@@ -68,6 +70,7 @@ public:
     Tile** m_children;
     Rectangle rect;
     int m_maxLevel;
+    int m_skip;
 };
 
 #endif

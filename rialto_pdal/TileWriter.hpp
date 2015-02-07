@@ -27,7 +27,7 @@ public:
     void seed(const pdal::PointBufferSet& pointBuffers);
     
 private:
-    void seed(const pdal::PointBufferPtr& buf);
+    void seed(const pdal::PointBufferPtr& buf, int& pointNumber);
     
     Tile* m_root0;
     Tile* m_root1;

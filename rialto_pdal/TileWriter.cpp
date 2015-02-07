@@ -41,11 +41,13 @@ TileWriter::~TileWriter()
 
 void TileWriter::seed(const pdal::PointBufferSet& pointBuffers)
 {
-
+    int pointNumber = 0;
+    
+    assert(pointBuffers.size() == 1);
     for (auto pi = pointBuffers.begin(); pi != pointBuffers.end(); ++pi)
     {
         const pdal::PointBufferPtr pointBuffer = *pi;
-        seed(pointBuffer);
+        seed(pointBuffer, pointNumber);
     }
     
     int numTilesPerLevel[32];
@@ -62,10 +64,13 @@ void TileWriter::seed(const pdal::PointBufferSet& pointBuffers)
     for (int i=0; i<=m_maxLevel; i++) {
         printf("L%d: tiles=%d points=%d\n", i, numTilesPerLevel[i], numPointsPerLevel[i]);
     }
+    
+    m_root0->write("/tmp/tiles");
+    m_root1->write("/tmp/tiles");
 }
 
     
-void TileWriter::seed(const pdal::PointBufferPtr& buf)
+void TileWriter::seed(const pdal::PointBufferPtr& buf, int& pointNumber)
 {        
     for (pdal::PointId idx = 0; idx < buf->size(); ++idx)
     {
@@ -78,9 +83,11 @@ void TileWriter::seed(const pdal::PointBufferPtr& buf)
         double h = buf->getFieldAs<double>(zdim, idx);
     
         if (lon < 0) {
-            m_root0->add(lon, lat, h);
+            m_root0->add(pointNumber, lon, lat, h);
         } else {
-            m_root1->add(lon, lat, h);
+            m_root1->add(pointNumber, lon, lat, h);
         }
+        
+        ++pointNumber;
     }
 }
