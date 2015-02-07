@@ -25,7 +25,7 @@ public:
 
     std::string getWkt() const;
 
-    void writeTiles();
+    void writeTiles(int maxLevel);
 
     boost::uint64_t writeRia(const char* name, boost::uint64_t targetPointCount, bool xyzOnly);
 

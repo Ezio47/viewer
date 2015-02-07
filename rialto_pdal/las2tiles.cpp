@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     PdalBridge pdal;
     
-    pdal.open("autzen.las");//argv[1]);
+    pdal.open(argv[1]);
     
     boost::uint64_t numPoints = pdal.getNumPoints();
     printf("num points: %lld\n", numPoints);
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     printf("WKT: %s\n", wkt.c_str());
 #endif
 
-    pdal.writeTiles();
+    pdal.writeTiles(20);
     
     pdal.close();
     

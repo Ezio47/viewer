@@ -21,7 +21,7 @@ all: las2tiles las2info las2ria
 clean:
 	rm -f las2tiles las2info las2ria *.o
 
-OBJS=TileWriter.o Tile.o PdalBridge.o TilingScheme.o Rectangle.o Buffer.o
+OBJS=TileWriter.o Tile.o PdalBridge.o Rectangle.o
 
 las2tiles : las2tiles.o $(OBJS)
 	g++ -o $@ $^ $(CFLAGS) $(LIBS)

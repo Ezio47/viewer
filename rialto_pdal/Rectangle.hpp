@@ -9,6 +9,11 @@
 #include <boost/math/constants/constants.hpp>
 
 
+enum Quad {
+    QuadSW=0, QuadNW=1, QuadSE=2, QuadNE=3,
+};
+
+
 class Rectangle {
 public:
     double north, south, east, west;
@@ -22,7 +27,7 @@ public:
       return;
     }
 
-    Rectangle(double n, double s, double e, double w) :
+    Rectangle(double w, double s, double e, double n) :
       north(n),
       south(s),
       east(e),
@@ -49,45 +54,38 @@ public:
       return *this;
     }
 
-    double width() const {
-      static const double PI = boost::math::constants::pi<double>();
-      double e = east;
-        if (east < west) {
-            e += 2.0 * PI;
-        }
-        return e - west;
+    Quad getQuadrantOf(double lon, double lat) {
+        double midx = (west + east)/2.0;
+        double midy = (south + north)/2.0;
+        
+        // NW=1  NE=3
+        // SW=0  SE=2
+        int lowX = (lon <= midx);
+        int lowY = (lat <= midy);
+        
+        if (lowX && lowY) return QuadSW;
+        if (lowX && !lowY) return QuadNW;
+        if (!lowX && lowY) return QuadSE;
+        if (!lowX && !lowY) return QuadNE;
+         assert(0);
     }
+    
+    Rectangle getQuadrantRect(Quad q) {
+        double midx = (west + east)/2.0;
+        double midy = (south + north)/2.0;
 
-    double height() const {
-        return north - south;
+        // w s e n
+        if (q == QuadSW) return Rectangle(west, south, midx, midy);
+        if (q == QuadNW) return Rectangle(west, midy, midx, north);
+        if (q == QuadSE) return Rectangle(midx, south, east, midy);
+        if (q == QuadNE) return Rectangle(midx, midy, east, north);
+        assert(false);
     }
-
-    static bool equalsEpsilon(double left, double right, double relativeEpsilon)
-    {
-        double absoluteEpsilon = relativeEpsilon;
-
-        double absDiff = abs(left - right);
-
-        return absDiff <= absoluteEpsilon || absDiff <= relativeEpsilon * fmax(abs(left), abs(right));
-    }
-
+            
     bool contains(double lon, double lat) const
     {
-        static const double PI = boost::math::constants::pi<double>();
-        static const double EPS14 = 0.00000000000001;
-
-        double e = east;
-        if (east < west) {
-            e += PI * 2.0;
-            if (lon < 0.0) {
-                lon += 2.0 * PI;
-            }
-        }
-
-        return (lon > west || equalsEpsilon(lon, west, EPS14)) &&
-               (lon < e || equalsEpsilon(lon, e, EPS14)) &&
-               lat >= south &&
-               lat <= north;
+        return (lon >= west) && (lon <= east) &&
+               (lat >= south) && (lat <= north);
     }
 };
 

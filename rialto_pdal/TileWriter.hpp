@@ -15,9 +15,7 @@
 
 #include <zlib.h>
 
-#include "TilingScheme.hpp"
 #include "Tile.hpp"
-#include "Buffer.hpp"
 
 
 class TileWriter
@@ -26,20 +24,15 @@ public:
     TileWriter(int level);
     ~TileWriter();
 
-    void build(const pdal::PointBufferSet& pointBuffers);
+    void seed(const pdal::PointBufferSet& pointBuffers);
     
 private:
-    void seed(const pdal::PointBufferSet& pointBuffers);
     void seed(const pdal::PointBufferPtr& buf);
-    void populateParentOfChildTile(int level, Tile& srcTile);
-    void generateLevel(int parentLevel);
-
+    
     Tile* m_root0;
     Tile* m_root1;
     
-    TilingScheme* m_scheme;
     int m_maxLevel;
-    CloudBuffer* m_storage;
     
     TileWriter& operator=(const TileWriter&); // not implemented
     TileWriter(const TileWriter&); // not implemented
