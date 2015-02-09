@@ -26,14 +26,14 @@ class WebSocketReader {
         _client.close();
     }
 
-    Future<ByteData> readAll(String webpath, {int maxsize: 4096}) {
+    Future<ByteData> readAll(String webpath) {
 
         Completer c = new Completer<ByteData>();
 
         WebSocket ws = new WebSocket(_server + "/points/");
         assert(ws != null);
 
-        var buf = new ByteData(maxsize);
+        ByteData buf;
         int bufIndex = 0;
 
         ws.onOpen.listen((_) {
@@ -44,11 +44,54 @@ class WebSocketReader {
             ws.onMessage.listen((MessageEvent e) {
                 ByteBuffer bytes = e.data;
                 ByteData src = bytes.asByteData();
+                if (buf == null) {
+                    buf = new ByteData(src.lengthInBytes);
+                    bufIndex = 0;
+                } else {
+                    var tmp = new ByteData(buf.lengthInBytes + src.lengthInBytes);
+                    for (int i = 0; i < buf.lengthInBytes; i++) {
+                        tmp.setUint8(i, buf.getUint8(i));
+                    }
+                    bufIndex = buf.lengthInBytes;
+                    buf = tmp;
+                }
                 for (int i = 0; i < src.lengthInBytes; i++) {
                     final v = src.getUint8(i);
                     buf.setUint8(bufIndex, v);
                     ++bufIndex;
                 }
+            });
+            ws.onClose.listen((_) {
+                c.complete(buf);
+                log("done");
+            });
+            ws.onError.listen((e) {
+                Hub.error("error reading socket: $e");
+            });
+        });
+
+        return c.future;
+    }
+
+    Future<String> readAllText(String webpath) {
+
+        Completer c = new Completer<String>();
+
+        WebSocket ws = new WebSocket(_server + "/points/");
+        assert(ws != null);
+
+        var buf = "";
+
+        ws.onOpen.listen((_) {
+            log("socket opened");
+
+            ws.send(webpath); // {+file}
+            ws.binaryType = "arraybuffer";
+            ws.onMessage.listen((MessageEvent e) {
+                ByteBuffer bytes = e.data;
+                ByteData src = bytes.asByteData();
+                var json = UTF8.decoder.convert(bytes.asUint8List());
+                buf += json;
             });
             ws.onClose.listen((_) {
                 c.complete(buf);

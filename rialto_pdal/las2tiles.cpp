@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
     
     tileWriter->build();
     
+    tileWriter->dump();
+
     char* dir = new char[strlen(argv[3])+1];
     strcpy(dir, argv[3]);
     tileWriter->write(dir);

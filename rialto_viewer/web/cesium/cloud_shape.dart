@@ -22,7 +22,7 @@ class CloudShape extends Shape {
 
         isSelectable = true;
 
-        _primitive = _createCesiumObject();
+        primitive = _createCesiumObject();
     }
 
     @override

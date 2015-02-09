@@ -1,19 +1,27 @@
 layers:
-    serp:
-        type: pointcloud
+    tiledserp:
+        type: tiledpointcloud
         server: ws://localhost:12346
-        path: /serp-100K.ria
+        path: /tiledserp
         numBytes: 10            # optional, default=0
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
 
-    a_poly:
-        type: vector
-        server: http://localhost:12345
-        path: /poly.json
-        numBytes: 10            # optional, default=0
-        description: "foor bar yow"  # optional, default=""
-        visible: true       # optional, default=true
+#    serp:
+#        type: pointcloud
+#        server: ws://localhost:12346
+#        path: /serp-100K.ria
+#        numBytes: 10            # optional, default=0
+#        description: "foor bar yow"  # optional, default=""
+#        visible: true       # optional, default=true
+
+#    a_poly:
+#        type: vector
+#        server: http://localhost:12345
+#        path: /poly.json
+#        numBytes: 10            # optional, default=0
+#        description: "foor bar yow"  # optional, default=""
+#        visible: true       # optional, default=true
 
 #    a_point:
 #        type: vector

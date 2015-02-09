@@ -31,7 +31,7 @@ TileWriter::TileWriter(const PdalBridge& pdal, int maxLevel) :
     Rectangle r00(-180, -90, 0, 90);
     Rectangle r10(0, -90, 180, 90);
     m_root0 = new Tile(0, 0, 0, r00, m_maxLevel, m_pdal);
-    m_root1 = new Tile(0, 0, 1, r10, m_maxLevel, m_pdal);   
+    m_root1 = new Tile(0, 1, 0, r10, m_maxLevel, m_pdal);   
     
     m_bytesPerPoint = 0;
     std::vector<pdal::Dimension::Id::Enum> dimIds = m_pdal.getDimIds();
@@ -71,6 +71,7 @@ void TileWriter::build()
 char* TileWriter::getPointData(const pdal::PointBufferPtr& buf, int& pointNumber)
 {
     char* p = new char[m_bytesPerPoint];
+    char* q = p;
     
     std::vector<pdal::Dimension::Id::Enum> dimIds = m_pdal.getDimIds();
     boost::uint32_t numDims = dimIds.size();
@@ -82,13 +83,13 @@ char* TileWriter::getPointData(const pdal::PointBufferPtr& buf, int& pointNumber
         pdal::Dimension::Type::Enum type = m_pdal.getDimType(id);
         size_t size = pdal::Dimension::size(type);
         
-        buf->getRawField(id, pointNumber, p);
+        buf->getRawField(id, pointNumber, q);
         
-        p += size;
+        q += size;
     }
 
     return p;
-}    
+}
 
 
 void TileWriter::build(const pdal::PointBufferPtr& buf, int& pointNumber)
@@ -119,13 +120,17 @@ void TileWriter::dump() const
     boost::uint32_t numTilesPerLevel[32];
     boost::uint64_t numPointsPerLevel[32];
     
-    for (int i=0; i<32; i++) {
+    for (int i=0; i<=m_maxLevel; i++) {
         numTilesPerLevel[i] = 0;
         numPointsPerLevel[i] = 0;
     }
 
     m_root0->collectStats(numTilesPerLevel, numPointsPerLevel);
     m_root1->collectStats(numTilesPerLevel, numPointsPerLevel);
+    
+    for (int i=0; i<=m_maxLevel; i++) {
+        printf("L%d: %d tiles, %llu points\n", i, numTilesPerLevel[i], numPointsPerLevel[i]);
+    }
 }
 
 
@@ -160,43 +165,43 @@ void TileWriter::writeHeader(const char* dir) const
     fprintf(fp, "{\n");
     fprintf(fp, "    \"version\": 2,\n");
    
-    fprintf(fp, "    \"tilebbox\": [%f, %f, %f, %f, %f, %f],\n",
+    fprintf(fp, "    \"tilebbox\": [%f, %f, %f, %f],\n",
             m_rectangle.west,
             m_rectangle.south,
-            -DBL_MAX,
             m_rectangle.east,
-            m_rectangle.north,
-            DBL_MAX);
+            m_rectangle.north);
 
     fprintf(fp, "    \"numTilesX\": %d,\n", m_numTilesX);
     fprintf(fp, "    \"numTilesY\": %d,\n", m_numTilesY);
     
-    fprintf(fp, "    \"databbox\": [%f, %f, %f, %f, %f, %f],\n",
-            xminBbox, yminBbox, yminBbox,
-            xmaxBbox, ymaxBbox, zmaxBbox);
+    fprintf(fp, "    \"databbox\": [%f, %f, %f, %f],\n",
+            xminBbox, yminBbox, xmaxBbox, ymaxBbox);
 
     fprintf(fp, "    \"numPoints\": %llu,\n", m_pdal.getNumPoints());
         
     std::vector<pdal::Dimension::Id::Enum> dimIds = m_pdal.getDimIds();
     const size_t numDims = dimIds.size();
-    fprintf(fp, "    \"dimensions\": {,\n");
+    fprintf(fp, "    \"dimensions\": [\n");
 
     for (int i=0; i<numDims; i++) {
         const pdal::Dimension::Id::Enum id = dimIds[i];
         
         const pdal::Dimension::Type::Enum dataType = m_pdal.getDimType(id);
+        const char *dataTypeName = pdal::Dimension::interpretationName(dataType).c_str();
         const char *name = pdal::Dimension::name(id).c_str();
         double min, mean, max;
         m_pdal.getStats(id, min, mean, max);
 
-        fprintf(fp, "        \"datatype\": %d,\n", dataType);
-        fprintf(fp, "        \"name\": \"%s\",\n", name);
-        fprintf(fp, "        \"min\": \"%f\",\n", min);
-        fprintf(fp, "        \"mean\": \"%f\",\n", mean);
-        fprintf(fp, "        \"max\": \"%f\",\n", max);
-        fprintf(fp, "    }\n");
+        fprintf(fp, "        {\n");
+        fprintf(fp, "            \"datatype\": \"%s\",\n", dataTypeName);
+        fprintf(fp, "            \"name\": \"%s\",\n", name);
+        fprintf(fp, "            \"min\": %f,\n", min);
+        fprintf(fp, "            \"mean\": %f,\n", mean);
+        fprintf(fp, "            \"max\": %f\n", max);
+        fprintf(fp, "        }%s\n", i==numDims-1 ? "" : ",");
     }
-    fprintf(fp, "    }\n");
+    fprintf(fp, "    ]\n");
+    fprintf(fp, "}\n");
     
     fclose(fp);
     

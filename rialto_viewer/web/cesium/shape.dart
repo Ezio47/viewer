@@ -15,7 +15,7 @@ abstract class Shape {
     bool isSelectable;
     int id;
 
-    var _primitive;
+    var primitive;
 
     Shape(String this.name) {
         _hub = Hub.root;
@@ -28,14 +28,14 @@ abstract class Shape {
 
     static int getNewId() => _ids++;
 
-    bool get isVisible => _hub.cesium.isPrimitiveVisible(_primitive);
+    bool get isVisible => _hub.cesium.isPrimitiveVisible(primitive);
 
-    set isVisible(bool value) => _hub.cesium.setPrimitiveVisible(_primitive, value);
+    set isVisible(bool value) => _hub.cesium.setPrimitiveVisible(primitive, value);
 
     // result goes into _primitive
     dynamic _createCesiumObject();
 
     void remove() {
-        _hub.cesium.remove(_primitive);
+        _hub.cesium.remove(primitive);
     }
 }

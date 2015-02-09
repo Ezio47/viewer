@@ -19,6 +19,19 @@ class RiaDimension {
     static const int Float = 0x404;
     static const int Double = 0x408;
 
+    static Map<String, int> typemap = {
+        "uint8_t": Unsigned8,
+        "int8_t": Signed8,
+        "uint16_t": Unsigned16,
+        "int16_t": Signed16,
+        "uint32_t": Unsigned32,
+        "int32_t": Signed32,
+        "uint64_t": Unsigned64,
+        "int64_t": Signed64,
+        "float" : Float,
+        "double": Double
+    };
+
     final int type;
     final String name;
     final double min;
@@ -163,8 +176,39 @@ class RiaFormat {
         }
     }
 
-    bool get hasRgb =>
-            (dimensionMap.containsKey("Red") && dimensionMap.containsKey("Green") && dimensionMap.containsKey("Blue"));
+    readHeaderJson(String json) {
+        Map mydata = JSON.decode(json);
+
+        int version = mydata["version"];
+        numPoints = mydata["numPoints"];
+
+        int numDims = mydata["dimensions"].length;
+
+        dimensions = new List<RiaDimension>();
+        dimensionMap = new Map<String, RiaDimension>();
+        minimums = new Map<String, double>();
+        maximums = new Map<String, double>();
+
+        int byteOffset = 0;
+        List mydimlist = mydata["dimensions"];
+        for (int dimidx = 0; dimidx < numDims; dimidx++) {
+            Map mydim = mydimlist[dimidx];
+
+            int dimType = RiaDimension.typemap[mydim["datatype"]];
+            String name = mydim["name"];
+            double min = mydim["min"];
+            double max = mydim["max"];
+
+            var riadim = new RiaDimension(dimType, name, min, max);
+            dimensions.add(riadim);
+            dimensionMap[name] = riadim;
+            minimums[name] = min;
+            maximums[name] = max;
+
+            riadim.byteOffset = byteOffset;
+            byteOffset += riadim.sizeInBytes;
+        }
+    }
 
     int get pointSizeInBytes {
         int sum = 0;

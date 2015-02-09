@@ -111,6 +111,9 @@ class LayerManager {
             case "pointcloud":
                 layer = new PointCloudLayer(name, map);
                 break;
+            case "tiledpointcloud":
+                layer = new TiledPointCloudLayer(name, map);
+                break;
             default:
                 Hub.error("invalid layer type in script: $type");
                 return null;

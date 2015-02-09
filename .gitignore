@@ -42,3 +42,5 @@ rialto_pdal/las2tiles
 *.riahdr
 
 *.las
+
+data/tiledserp/header.json

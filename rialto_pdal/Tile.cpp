@@ -26,15 +26,10 @@ Tile::Tile(boost::uint32_t level, boost::uint32_t tx, boost::uint32_t ty, Rectan
     m_skip(0),
     m_pdal(pdal)
 {    
-    //printf("created tb (l=%d, tx=%d, ty=%d) (slip%d)  --  w%f s%f e%f n%f\n",
-      //  m_level, m_tileX, m_tileY, m_skip,
-        //rect.west, rect.south, rect.east, rect.north);
+    //printf("created tb (l=%d, tx=%d, ty=%d) (slip%llu)  --  w%f s%f e%f n%f\n",
+           //m_level, m_tileX, m_tileY, m_skip, rect.west, rect.south, rect.east, rect.north);
     
-    m_children = new Tile*[4];
-    m_children[0] = NULL;
-    m_children[1] = NULL;
-    m_children[2] = NULL;
-    m_children[3] = NULL;
+    m_children = NULL;
     
     // level N+1 has 1/4 the points of level N
     //
@@ -56,16 +51,19 @@ Tile::Tile(boost::uint32_t level, boost::uint32_t tx, boost::uint32_t ty, Rectan
 
 Tile::~Tile()
 {
-    for (int i=0; i<m_points.size(); i++) {
-        char* p = m_points[i];
-        delete[] p;
-    }
-
-    for (int i=0; i<4; i++) {
-        if (m_children[i]) {
-            delete m_children[i];
+    if (m_children == NULL) {
+        for (int i=0; i<m_points.size(); i++) {
+            char* p = m_points[i];
+            delete[] p;
+         } 
+    } else {    
+        for (int i=0; i<4; i++) {
+            if (m_children[i]) {
+                delete m_children[i];
+             }
          }
-     }
+         delete[] m_children;
+    }
 }
 
 
@@ -80,33 +78,41 @@ void Tile::add(boost::uint64_t pointNumber, char* p, double lon, double lat)
         
     if (m_level == m_maxLevel) return;
 
-    Quad q = rect.getQuadrantOf(lon, lat);
-   // printf("which=%d\n", q);
+    if (!m_children) {
+        m_children = new Tile*[4];
+        m_children[0] = NULL;
+        m_children[1] = NULL;
+        m_children[2] = NULL;
+        m_children[3] = NULL;
+    }
     
-    Tile* t = m_children[q];
-    if (t == NULL)
+    Quad q = rect.getQuadrantOf(lon, lat);
+    // printf("which=%d\n", q);
+    
+    Tile* child = m_children[q];
+    if (child == NULL)
     {
         Rectangle r = rect.getQuadrantRect(q);
         switch (q) {
         case QuadSW:
-            t = new Tile(m_level+1, m_tileX*2, m_tileY*2, r, m_maxLevel, m_pdal);
+            child = new Tile(m_level+1, m_tileX*2, m_tileY*2, r, m_maxLevel, m_pdal);
             break;
         case QuadNW:
-            t = new Tile(m_level+1, m_tileX*2+1, m_tileY*2, r, m_maxLevel, m_pdal);
+            child = new Tile(m_level+1, m_tileX*2+1, m_tileY*2, r, m_maxLevel, m_pdal);
             break;
         case QuadSE:
-            t = new Tile(m_level+1, m_tileX*2, m_tileY*2+1, r, m_maxLevel, m_pdal);
+            child = new Tile(m_level+1, m_tileX*2, m_tileY*2+1, r, m_maxLevel, m_pdal);
             break;
         case QuadNE:
-            t = new Tile(m_level+1, m_tileX*2+1, m_tileY*2+1, r, m_maxLevel, m_pdal);
+            child = new Tile(m_level+1, m_tileX*2+1, m_tileY*2+1, r, m_maxLevel, m_pdal);
             break;
         default:
             assert(0);
         }
-        m_children[q] = t;
+        m_children[q] = child;
     }
 
-    t->add(pointNumber, p, lon, lat);
+    child->add(pointNumber, p, lon, lat);
 }
 
 
@@ -129,7 +135,7 @@ void Tile::collectStats(boost::uint32_t* numTilesPerLevel, boost::uint64_t* numP
     ++numTilesPerLevel[m_level];
     
     for (int i=0; i<4; i++) {
-        if (m_children[i]) {
+        if (m_children && m_children[i]) {
             m_children[i]->collectStats(numTilesPerLevel, numPointsPerLevel);
         }
     }
@@ -165,7 +171,7 @@ void Tile::write(const char* prefix) const
     
     sprintf(filename, "%s/%d/%d/%d.ria", prefix, m_level, m_tileX, m_tileY);
     
-    //printf("--> %s\n", buf);
+    printf("--> %s\n", filename);
     
     FILE* fp = fopen(filename, "wb");
     //gzFile fp = gzopen(filename, "wb");
