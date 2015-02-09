@@ -17,14 +17,14 @@
 #include <sys/stat.h>
 
 
-Tile::Tile(int level, int tx, int ty, Rectangle r, int maxLevel) :
+Tile::Tile(boost::uint32_t level, boost::uint32_t tx, boost::uint32_t ty, Rectangle r, boost::uint32_t maxLevel, const PdalBridge& pdal) :
     m_level(level),
     m_tileX(tx),
     m_tileY(ty),
     rect(r),
-    parent(NULL),
     m_maxLevel(maxLevel),
-    m_skip(0)
+    m_skip(0),
+    m_pdal(pdal)
 {    
     //printf("created tb (l=%d, tx=%d, ty=%d) (slip%d)  --  w%f s%f e%f n%f\n",
       //  m_level, m_tileX, m_tileY, m_skip,
@@ -56,19 +56,25 @@ Tile::Tile(int level, int tx, int ty, Rectangle r, int maxLevel) :
 
 Tile::~Tile()
 {
-    for (int i=0; i<4; i++)
-        if (m_children[i])
+    for (int i=0; i<m_points.size(); i++) {
+        char* p = m_points[i];
+        delete[] p;
+    }
+
+    for (int i=0; i<4; i++) {
+        if (m_children[i]) {
             delete m_children[i];
+         }
+     }
 }
 
 
-void Tile::add(int pointNumber, double lon, double lat, double height)
+void Tile::add(boost::uint64_t pointNumber, char* p, double lon, double lat)
 {
     assert(rect.contains(lon, lat));
     
     //printf("-- -- %d %d %d\n", pointNumber, m_skip, pointNumber % m_skip == 0);
     if (pointNumber % m_skip == 0) {
-        Point p(lon, lat, height);
         m_points.push_back(p);
     }
         
@@ -83,16 +89,16 @@ void Tile::add(int pointNumber, double lon, double lat, double height)
         Rectangle r = rect.getQuadrantRect(q);
         switch (q) {
         case QuadSW:
-            t = new Tile(m_level+1, m_tileX*2, m_tileY*2, r, m_maxLevel);
+            t = new Tile(m_level+1, m_tileX*2, m_tileY*2, r, m_maxLevel, m_pdal);
             break;
         case QuadNW:
-            t = new Tile(m_level+1, m_tileX*2+1, m_tileY*2, r, m_maxLevel);
+            t = new Tile(m_level+1, m_tileX*2+1, m_tileY*2, r, m_maxLevel, m_pdal);
             break;
         case QuadSE:
-            t = new Tile(m_level+1, m_tileX*2, m_tileY*2+1, r, m_maxLevel);
+            t = new Tile(m_level+1, m_tileX*2, m_tileY*2+1, r, m_maxLevel, m_pdal);
             break;
         case QuadNE:
-            t = new Tile(m_level+1, m_tileX*2+1, m_tileY*2+1, r, m_maxLevel);
+            t = new Tile(m_level+1, m_tileX*2+1, m_tileY*2+1, r, m_maxLevel, m_pdal);
             break;
         default:
             assert(0);
@@ -100,7 +106,7 @@ void Tile::add(int pointNumber, double lon, double lat, double height)
         m_children[q] = t;
     }
 
-    t->add(pointNumber, lon, lat, height);
+    t->add(pointNumber, p, lon, lat);
 }
 
 
@@ -117,53 +123,18 @@ void Tile::dump(int indent) const
 }
 
 
-void Tile::stats(int* numPointsPerLevel, int* numTilesPerLevel) const {
+void Tile::collectStats(boost::uint32_t* numTilesPerLevel, boost::uint64_t* numPointsPerLevel) const {
 
     numPointsPerLevel[m_level] += m_points.size();
     ++numTilesPerLevel[m_level];
     
-    for (int i=0; i<4; i++)
-        if (m_children[i]) 
-            m_children[i]->stats(numPointsPerLevel, numTilesPerLevel);
-}
-
-#if 0
-
-
-void Tile::write(gzFile fp) const {
-    assert(fp);
-    
-    for (int y=0; y<SIZ + 1; y++) {
-        for (int x=0; x<SIZ + 1; x++) {
-            
-            // TODO: do the edge condition later
-            int xx = (x < SIZ) ? x : x - 1;
-            int yy = (y < SIZ) ? y : y - 1;
-
-            int idx = yy*SIZ + xx;
-            double z = m_data[idx];
-
-            boost::uint16_t height = convert(z);
-            height = boost::uint16_t(1000.0 + 50000.0 * (double)(xx+yy)/(double)(SIZ+SIZ));
-            gzwrite(fp, &height, 2);
+    for (int i=0; i<4; i++) {
+        if (m_children[i]) {
+            m_children[i]->collectStats(numTilesPerLevel, numPointsPerLevel);
         }
     }
-    
-    // child mask
-    boost::uint8_t mask = 0x0;
-    if (m_children) {
-        if (m_children[0]) mask += 1; // sw
-        if (m_children[1]) mask += 2; // se
-        if (m_children[2]) mask += 8; // nw
-        if (m_children[3]) mask += 4; // ne
-    }
-    gzwrite(fp, &mask, 1);
-
-    // land-or-water byte
-    boost::uint8_t lw = 0;
-    gzwrite(fp, &lw, 1);
 }
-#endif
+
 
 static bool exists(const char* path) {
     struct stat st;
@@ -173,32 +144,46 @@ static bool exists(const char* path) {
 }
 
 
-void Tile::write(const char* prefix) const {
-    //assert(dirExists("/tmp"));
-    //assert(dirExists("/tmp/x"));
-    //assert(!dirExists("/tmp/y"));
-    
-    char buf[1024];
+void Tile::write(const char* prefix) const
+{
+    char* filename = new char[strlen(prefix) + 1024];
 
-    assert(exists(prefix));
-    
-    sprintf(buf, "%s/%d", prefix, m_level);
-    if (!exists(buf)) {
-        mkdir(buf, 0777);
+    sprintf(filename, "%s", prefix);
+    if (!exists(filename)) {
+        mkdir(filename, 0777);
     }
     
-    sprintf(buf, "%s/%d/%d", prefix, m_level, m_tileX);
-    if (!exists(buf)) {
-        mkdir(buf, 0777);
+    sprintf(filename, "%s/%d", prefix, m_level);
+    if (!exists(filename)) {
+        mkdir(filename, 0777);
     }
     
-    sprintf(buf, "%s/%d/%d/%d.terrain", prefix, m_level, m_tileX, m_tileY);
+    sprintf(filename, "%s/%d/%d", prefix, m_level, m_tileX);
+    if (!exists(filename)) {
+        mkdir(filename, 0777);
+    }
+    
+    sprintf(filename, "%s/%d/%d/%d.ria", prefix, m_level, m_tileX, m_tileY);
     
     //printf("--> %s\n", buf);
     
-    FILE* fp = fopen(buf, "wb");
-    //gzFile fp = gzopen(buf, "wb");
-    //write(fp);
+    FILE* fp = fopen(filename, "wb");
+    //gzFile fp = gzopen(filename, "wb");
+    
+    writeData(fp);
+    
+    // child mask
+    boost::uint8_t mask = 0x0;
+    if (m_children) {
+        if (m_children[QuadSW]) mask += 1;
+        if (m_children[QuadSE]) mask += 2;
+        if (m_children[QuadNE]) mask += 4;
+        if (m_children[QuadNW]) mask += 8;
+    }
+    //gzwrite(fp, &mask, 1);
+    fwrite(&mask, 1, 1, fp);
+    
+    
     fclose(fp);
     //gzclose(fp);
     
@@ -207,6 +192,34 @@ void Tile::write(const char* prefix) const {
             if (m_children[i]) {
                 m_children[i]->write(prefix);
             }
+        }
+    }
+    
+    fclose(fp);
+    
+    delete[] filename;
+}
+
+
+void Tile::writeData(FILE* fp) const
+{
+    std::vector<pdal::Dimension::Id::Enum> dimIds = m_pdal.getDimIds();
+    boost::uint32_t numDims = dimIds.size();
+
+    for (int i=0; i<m_points.size(); i++)
+    {
+        char* p = m_points[i];
+
+        for (int i=0; i<numDims; i++) {
+
+            const pdal::Dimension::Id::Enum id = dimIds[i];
+        
+            pdal::Dimension::Type::Enum type = m_pdal.getDimType(id);
+            size_t size = pdal::Dimension::size(type);
+         
+            fwrite(p, size, 1, fp);
+            
+            p += size;
         }
     }
 }

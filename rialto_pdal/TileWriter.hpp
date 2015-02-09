@@ -15,20 +15,32 @@
 
 #include <zlib.h>
 
+#include "PdalBridge.hpp"
 #include "Tile.hpp"
 
 
 class TileWriter
 {
 public:
-    TileWriter(int level);
+    TileWriter(const PdalBridge& pdal, int maxLevel);
     ~TileWriter();
 
-    void seed(const pdal::PointBufferSet& pointBuffers);
+    void build();
+    void write(const char* dir) const;
+    
+    void dump() const;
     
 private:
-    void seed(const pdal::PointBufferPtr& buf, int& pointNumber);
+    void build(const pdal::PointBufferPtr& buf, int& pointNumber);
+    char* getPointData(const pdal::PointBufferPtr& buf, int& pointNumber);
+    void writeHeader(const char* dir) const;
     
+    const PdalBridge& m_pdal;
+    int m_bytesPerPoint;
+    
+    int m_numTilesX;
+    int m_numTilesY;
+    Rectangle m_rectangle;
     Tile* m_root0;
     Tile* m_root1;
     

@@ -1,3 +1,8 @@
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
+
 #include "PdalBridge.hpp"
 #include <pdal/StatsFilter.hpp>
 
@@ -77,6 +82,12 @@ void PdalBridge::close()
     }
 
     return;
+}
+
+
+const pdal::PointBufferSet& PdalBridge::buffers() const
+{
+    return m_manager->buffers();
 }
 
 
@@ -228,13 +239,6 @@ boost::uint64_t PdalBridge::writeRia(FILE* fp, const pdal::PointBufferPtr& buf, 
     }
 
     return numWritten;
-}
-
-
-void PdalBridge::writeTiles(int maxLevel) {
-    const pdal::PointBufferSet& bufs = m_manager->buffers();
-    TileWriter* tw = new TileWriter(maxLevel);
-    tw->seed(bufs);
 }
 
 

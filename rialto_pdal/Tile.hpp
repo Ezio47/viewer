@@ -15,62 +15,38 @@
 
 #include <zlib.h>
 
+#include "PdalBridge.hpp"
 #include "Rectangle.hpp"
 
-
-class Point
-{
-public:
-    Point(double x_, double y_, double z_) :
-        x(x_),
-        y(y_),
-        z(z_)
-    { }
-    
-    Point(const Point& r) :
-        x(r.x),
-        y(r.y),
-        z(r.z)
-    { }
-    
-    double x;
-    double y;
-    double z;
-    
-    Point& operator=(const Point& r)
-    {
-      x = r.x;
-      y = r.y;
-      z = r.z;
-      return *this;
-    }
-};
 
 
 class Tile
 {
 public:    
-    Tile(int level, int tx, int ty, Rectangle r, int maxLevel);
+    Tile(boost::uint32_t level, boost::uint32_t tx, boost::uint32_t ty, Rectangle r, boost::uint32_t maxLevel, const PdalBridge& pdal);
     ~Tile();
     
-    std::vector<Point>& vec() { return m_points; }
+    std::vector<char*>& points() { return m_points; }
+    boost::uint64_t numPoints() const { return m_points.size(); }
     
-    void add(int pointNumber, double lon, double lat, double height);
+    void add(boost::uint64_t pointNumber, char* data, double lon, double lat);
     
     void dump(int indent) const;
     
-    void stats(int* numPointsPerLevel, int* numTilesPerLevel) const;
+    void collectStats(boost::uint32_t* numTilesPerLevel, boost::uint64_t* numPointsPerLevel) const;
     
-    void write(const char* prefix) const;
+    void write(const char* dir) const;
+    void writeData(FILE*) const;
     
-    int m_level, m_tileX, m_tileY;
-    std::vector<Point> m_points;
+ private:
+    boost::uint32_t m_level, m_tileX, m_tileY;
+    std::vector<char*> m_points;
     
-    Tile* parent;
     Tile** m_children;
     Rectangle rect;
-    int m_maxLevel;
-    int m_skip;
+    boost::uint32_t m_maxLevel;
+    boost::uint64_t m_skip;
+    const PdalBridge& m_pdal;
 };
 
 #endif

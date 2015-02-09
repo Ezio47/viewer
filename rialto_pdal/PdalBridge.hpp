@@ -1,5 +1,11 @@
+// Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.
+// This file may only be used under the MIT-style
+// license found in the accompanying LICENSE.txt file.
+
+#ifndef PDALBRIDGE_HPP
+#define PDALBRIDGE_HPP
+
 #include <pdal/PipelineManager.hpp>
-#include "TileWriter.hpp"
 
 class PdalBridge
 {
@@ -25,10 +31,10 @@ public:
 
     std::string getWkt() const;
 
-    void writeTiles(int maxLevel);
-
     boost::uint64_t writeRia(const char* name, boost::uint64_t targetPointCount, bool xyzOnly);
 
+    const pdal::PointBufferSet& buffers() const;
+    
 private:
     void writeRiaHeader(FILE* fp, bool xyzOnly, boost::uint64_t numWritten);
     boost::uint64_t writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, bool xyzOnly);
@@ -47,3 +53,5 @@ private:
 
     pdal::Dimension::IdList m_dimensionIds;
 };
+
+#endif
