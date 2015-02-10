@@ -171,7 +171,7 @@ void Tile::write(const char* prefix) const
     
     sprintf(filename, "%s/%d/%d/%d.ria", prefix, m_level, m_tileX, m_tileY);
     
-    printf("--> %s\n", filename);
+    //printf("--> %s\n", filename);
     
     FILE* fp = fopen(filename, "wb");
     //gzFile fp = gzopen(filename, "wb");

@@ -6,12 +6,15 @@
 // based on DemoTileProvider from
 // https://github.com/AnalyticalGraphicsInc/cesium/blob/master/Specs/Sandcastle/QuadtreePrimitive.html
 
+var bouncer = function(f,a) {
+    f(a);
+}
 
 var DemoTileProvider = function DemoTileProvider(cb) {
     this._quadtree = undefined;
     this._tilingScheme = new Cesium.GeographicTilingScheme();
     this._errorEvent = new Cesium.Event();
-    this.callback = cb;
+    this.tileCreatorCallback = cb;
     this._levelZeroMaximumError = Cesium.QuadtreeTileProvider.computeDefaultLevelZeroMaximumGeometricError(this._tilingScheme);
 };
 
@@ -59,15 +62,18 @@ DemoTileProvider.prototype.getLevelMaximumGeometricError = function(level) {
 DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
 
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
-        //console.log(tile.level + " " + tile.x + " " + tile.y);
+        console.log("START: " + tile.level + " " + tile.x + " " + tile.y);
 
         var west = Cesium.Math.toDegrees(tile.rectangle.west);
         var south = Cesium.Math.toDegrees(tile.rectangle.south);
         var east = Cesium.Math.toDegrees(tile.rectangle.east);
         var north = Cesium.Math.toDegrees(tile.rectangle.north);
 
-        var p = this.callback(tile.level, tile.x, tile.y,
-                              west, south, east, north);
+        var mycb = function(v) {
+            console.log("bounced");
+        }
+
+        this.tileCreatorCallback(tile.level, tile.x, tile.y);
 
         tile.data = {
             primitive : undefined,
@@ -78,7 +84,7 @@ DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
                 }
             }
         };
-        var color = Cesium.Color.fromBytes(255, 0, 0, 255);
+        var color = Cesium.Color.fromBytes(0, 0, 255, 255);
         tile.data.primitive = new Cesium.Primitive({
             geometryInstances : new Cesium.GeometryInstance({
                 geometry : new Cesium.RectangleOutlineGeometry({

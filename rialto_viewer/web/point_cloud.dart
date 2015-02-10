@@ -43,13 +43,9 @@ class PointCloud {
         }
     }
 
-    PointCloudTile createTile(int numPointsInTile, [int level=0, int tileX=0, int tileY=0, int childMask=0]) {
-        var tile = new PointCloudTile(this, dimensionNames, numPointsInTile, tileId++, level, tileX, tileY, childMask);
-        tiles.add(tile);
-
-        numPoints += numPointsInTile;
-
-        return tile;
+    dynamic createTile(v) {
+        assert(false);
+        return null;
     }
 
     void updateAllBounds() {

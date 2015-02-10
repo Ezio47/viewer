@@ -20,9 +20,15 @@ class PointCloudTile {
     int tileLevel, tileX, tileY;
     int childMask;
 
-    PointCloudTile(PointCloud this.cloud, List<String> this.dimensionNames, int this.numPointsInTile, int this.id, [int
-            this.tileLevel = 0, int this.tileX = 0, int this.tileY = 0, int this.childMask = 0]) {
-        log("making tile $id with $numPointsInTile");
+    String key;
+
+    PointCloudTile(PointCloud this.cloud, int this.tileLevel, int this.tileX, int this.tileY) {
+        key = "$tileLevel $tileX $tileY";
+
+        log("making tile $key");
+
+        dimensionNames = cloud.dimensionNames;
+
         bbox = new CartographicBbox.empty();
         data = new Map<String, TypedData>();
 
