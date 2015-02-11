@@ -16,22 +16,20 @@ var assert = function(b, s) {
     if (!b) console.log("***** ERROR: " + s);
 }
 
-var DemoTileProvider = function DemoTileProvider(ppath, creatorCallback, getterCallback, stateGetterCallback) {
+var DemoTileProvider = function DemoTileProvider(ppath, creatorCallback, getterCallback) {
     this._quadtree = undefined;
     this._tilingScheme = new Cesium.GeographicTilingScheme();
     this._errorEvent = new Cesium.Event();
     this._tileCreatorCallback = creatorCallback;
     this._tileGetterCallback = getterCallback;
-    this._tileStateGetterCallback = stateGetterCallback;
     this._path = ppath;
     this._levelZeroMaximumError = Cesium.QuadtreeTileProvider.computeDefaultLevelZeroMaximumGeometricError(this._tilingScheme);
 
     this._root000 = createTile(0, 0, 0);
     var url000 = this._path + "/0/0/0.ria";
-    //loadTileData(this._root000, url000);
+
     this._root010 = createTile(0, 1, 0);
     var url010 = this._path + "/0/1/0.ria";
-    //loadTileData(this._root010, url010);
 };
 
 
@@ -388,43 +386,18 @@ DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING) {
         //console.log("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);// + "(" + tile.data.primitive.ready + ")");
 
-        var pp = null;
+        var t = lookupTile(tile.level, tile.x, tile.y);
+        assert(t != null);
 
-        var st = this._tileStateGetterCallback(tile.level, tile.x, tile.y);
-        if (st == 1) {
-            // tile does not exist on disk
-            //console.log("--> 1");
+        assert(t.state == tsLOADED);
+
+        if (tile.data.primitive == null) {
+            tile.data.primitive = this._tileGetterCallback(tile.level, tile.x, tile.y);
             if (tile.data.primitive == null) {
-                tile.data.primitive = makeRect(tile.rectangle);
-            }
-
-        } else if (st == 2) {
-            // tile exists, but is empty and so will never have a primitive
-            //console.log("--> 2");
-            if (tile.data.primitive == null) {
-                tile.data.primitive = makeRect(tile.rectangle);
-            }
-
-        } else if (st == 3) {
-            // tile exists and has points, but primitive not yet built
-            //console.log("--> 3");
-
-            if (tile.data.primitive == null) {
-                tile.data.primitive = this._tileGetterCallback(tile.level, tile.x, tile.y);
-            }
-            return;
-
-        } else {
-            // tile exists has (or will have) a primitive
-            //console.log("--> 4");
-
-            if (st != 4) {
-                console.log("ERROR: bad tile state");
+                // tile w/ no data in it
+                tile.state = Cesium.QuadtreeTileLoadState.DONE;
+                tile.renderable = false;
                 return;
-            }
-
-            if (tile.data.primitive == null) {
-                tile.data.primitive = this._tileGetterCallback(tile.level, tile.x, tile.y);
             }
         }
 

@@ -19,12 +19,12 @@ var CesiumBridge = function (element) {
     this.viewer = new Cesium.Viewer(element, options);
 
 
-    this.doTileProvider = function(path, creatorCallback, getterCallback, stateGetterCallback) {
+    this.doTileProvider = function(path, creatorCallback, getterCallback) {
         var viewer = this.viewer;
         var scene = viewer.scene;
         var primitives = scene.primitives;
         primitives.add(new Cesium.QuadtreePrimitive({
-            tileProvider : new DemoTileProvider(path, creatorCallback, getterCallback, stateGetterCallback)
+            tileProvider : new DemoTileProvider(path, creatorCallback, getterCallback)
         }));
     }
 
