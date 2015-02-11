@@ -50,9 +50,7 @@ class TiledPointCloudLayer extends Layer {
             }
 
             // TODO: does the datatype matter anymore?
-            if (_ria.dimensions[0].type != RiaDimension.Double ||
-                    _ria.dimensions[1].type != RiaDimension.Double ||
-                    _ria.dimensions[2].type != RiaDimension.Double) {
+            if (_ria.dimensions[0].type != RiaDimension.Double || _ria.dimensions[1].type != RiaDimension.Double || _ria.dimensions[2].type != RiaDimension.Double) {
                 Hub.error("point cloud does not have X, Y, Z dimensions as F64 datatype");
                 c.complete(false);
                 return;
@@ -66,7 +64,7 @@ class TiledPointCloudLayer extends Layer {
             tileState["0 0 0"] = CREATABLE;
             tileState["0 1 0"] = CREATABLE;
 
-            _hub.cesium.createTileProvider(_tileGetterHandler);
+            _hub.cesium.createTileProvider(_tileCreatorFunc, _tileGetterFunc, _tileStateGetterFunc);
 
             assert(cloud != null);
 
@@ -137,19 +135,18 @@ class TiledPointCloudLayer extends Layer {
             ++index;
             assert(index == numBytes);
 
-            if (tile.numPointsInTile == 0) {
-                return null;
-            }
+            if (tile.numPointsInTile != 0) {
 
-            // now make the tile point to the RiaDims' array stores
-            for (int j = 0; j < numDims; j++) {
-                RiaDimension dim = dims[j];
-                List list = dim.list;
-                tile.addData_generic(dim.name, list);
-            }
+                // now make the tile point to the RiaDims' array stores
+                for (int j = 0; j < numDims; j++) {
+                    RiaDimension dim = dims[j];
+                    List list = dim.list;
+                    tile.addData_generic(dim.name, list);
+                }
 
-            // set color data
-            tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
+                // set color data
+                tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
+            }
 
             tile.updateBounds();
             cloud.updateBoundsForTile(tile);
@@ -169,10 +166,15 @@ class TiledPointCloudLayer extends Layer {
         final x = tile.tileX;
         final y = tile.tileY;
 
-        var swKey = "${level+1} ${x*2} ${y*2}";
-        var nwKey = "${level+1} ${x*2+1} ${y*2}";
-        var seKey = "${level+1} ${x*2} ${y*2+1}";
-        var neKey = "${level+1} ${x*2+1} ${y*2+1}";
+        if (level == 3) {
+            int a = 0;
+            int b = 0;
+        }
+
+        var swKey = "${level+1} ${x*2} ${y*2+1}";
+        var nwKey = "${level+1} ${x*2} ${y*2}";
+        var seKey = "${level+1} ${x*2+1} ${y*2+1}";
+        var neKey = "${level+1} ${x*2+1} ${y*2}";
 
         bool swPresent = (mask & 1 == 1);
         bool sePresent = (mask & 2 == 2);
@@ -189,9 +191,13 @@ class TiledPointCloudLayer extends Layer {
     Future<dynamic> renderTheTile(PointCloudTile tile) {
         var c = new Completer<dynamic>();
 
-        tile.updateShape();
-
-        var p = tile.shape.primitive;
+        var p;
+        if (tile.numPointsInTile == 0) {
+            p = null;
+        } else {
+            tile.updateShape();
+            p = tile.shape.primitive;
+        }
 
         c.complete(p);
 
@@ -203,20 +209,74 @@ class TiledPointCloudLayer extends Layer {
         return c.future;
     }
 
+
     // called from Js: given a tile key...
-    //   - make the tile, if needed
-    //   - make a primitive and return it
-    void _tileGetterHandler(int tileLevel, int tileX, int tileY) {
+    int _tileStateGetterFunc(int tileLevel, int tileX, int tileY) {
+
         final key = "$tileLevel $tileX $tileY";
 
-        log("getter request: $key");
+        //log("state getter request: $key");
 
-        bool loadme = false;
+        if (!tileState.containsKey(key)) {
+            // ????
+//            assert(false);
+            return 1;
+        }
+
+        assert(tileState.containsKey(key));
+        final int state = tileState[key];
+
+        if (state == CREATABLE) {
+            return 3;
+        }
+
+        if (state == CREATED) {
+            return 3;
+        }
+
+        if (state == LOADED) {
+            return 3;
+        }
+
+        if (state == RENDERED) {
+            var p = tilePrimitives[key];
+            if (p == null) return 2;
+            assert(p != null);
+            return 4;
+        }
+
+        if (state == NODATA) {
+            // do nothing
+            return 1;
+        }
+
+        assert(false);
+        return 0;
+    }
+
+    // called from Js: given a tile key...
+    dynamic _tileGetterFunc(int tileLevel, int tileX, int tileY) {
+        final key = "$tileLevel $tileX $tileY";
+        if (tileState.containsKey(key)) {
+            if (tileState[key] == RENDERED) {
+                return tilePrimitives[key];
+            }
+        }
+        return null;
+    }
+
+    // called from Js: given a tile key...
+    //   - make the tile, if needed
+    void _tileCreatorFunc(int tileLevel, int tileX, int tileY) {
+        final key = "$tileLevel $tileX $tileY";
+
+        log("creator request: $key");
 
         ///////////context.callMethod("bouncer", [cb, p]);
 
         if (!tileState.containsKey(key)) {
             // ????
+//            assert(false);
             return;
         }
 
@@ -225,12 +285,12 @@ class TiledPointCloudLayer extends Layer {
 
         if (state == CREATABLE) {
             createTheTile(tileLevel, tileX, tileY).then((tile) {
-                 loadTheTile(tile).then((ok) {
+                loadTheTile(tile).then((ok) {
                     renderTheTile(tile).then((p) {
                         //
                     });
-                 });
-             });
+                });
+            });
             return;
         }
 
@@ -253,25 +313,7 @@ class TiledPointCloudLayer extends Layer {
         }
 
         assert(false);
-    }
-
-    dynamic renderTheRect(PointCloudTile tile)
-    {
-        /*
-        north = north.toDouble();
-        south = south.toDouble();
-        east = east.toDouble();
-        west = west.toDouble();
-
-        var s = south + (north - south) / 2.0;
-        var w = west + (east - west) / 2.0;
-
-        var center = new Cartographic3(w, s, 0.0);
-        var point = new Cartographic3(west, south, 0.0);
-        var p = _hub.cesium.createRectangle(point, center, 0.0, 0.0, 1.0);
-        return p;
-         */
-        return null;
+        return;
     }
 
     @override
@@ -335,18 +377,14 @@ class PointCloudLayer extends Layer {
                 final int pointSize = _ria.pointSizeInBytes;
 
                 // TODO: too conservative? the presence of X,Y,Z should be enough (not array index)
-                if (_ria.dimensions[0].name != "X" ||
-                        _ria.dimensions[1].name != "Y" ||
-                        _ria.dimensions[2].name != "Z") {
+                if (_ria.dimensions[0].name != "X" || _ria.dimensions[1].name != "Y" || _ria.dimensions[2].name != "Z") {
                     Hub.error("point cloud does not have required X, Y, Z dimensions");
                     c.complete(false);
                     return;
                 }
 
                 // TODO: does the datatype matter anymore?
-                if (_ria.dimensions[0].type != RiaDimension.Double ||
-                        _ria.dimensions[1].type != RiaDimension.Double ||
-                        _ria.dimensions[2].type != RiaDimension.Double) {
+                if (_ria.dimensions[0].type != RiaDimension.Double || _ria.dimensions[1].type != RiaDimension.Double || _ria.dimensions[2].type != RiaDimension.Double) {
                     Hub.error("point cloud does not have X, Y, Z dimensions as F64 datatype");
                     c.complete(false);
                     return;

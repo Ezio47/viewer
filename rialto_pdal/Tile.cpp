@@ -95,16 +95,16 @@ void Tile::add(boost::uint64_t pointNumber, char* p, double lon, double lat)
         Rectangle r = rect.getQuadrantRect(q);
         switch (q) {
         case QuadSW:
-            child = new Tile(m_level+1, m_tileX*2, m_tileY*2, r, m_maxLevel, m_pdal);
-            break;
-        case QuadNW:
-            child = new Tile(m_level+1, m_tileX*2+1, m_tileY*2, r, m_maxLevel, m_pdal);
-            break;
-        case QuadSE:
             child = new Tile(m_level+1, m_tileX*2, m_tileY*2+1, r, m_maxLevel, m_pdal);
             break;
-        case QuadNE:
+        case QuadNW:
+            child = new Tile(m_level+1, m_tileX*2, m_tileY*2, r, m_maxLevel, m_pdal);
+            break;
+        case QuadSE:
             child = new Tile(m_level+1, m_tileX*2+1, m_tileY*2+1, r, m_maxLevel, m_pdal);
+            break;
+        case QuadNE:
+            child = new Tile(m_level+1, m_tileX*2+1, m_tileY*2, r, m_maxLevel, m_pdal);
             break;
         default:
             assert(0);

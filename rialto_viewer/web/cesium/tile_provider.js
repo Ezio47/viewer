@@ -10,11 +10,13 @@ var bouncer = function(f,a) {
     f(a);
 }
 
-var DemoTileProvider = function DemoTileProvider(cb) {
+var DemoTileProvider = function DemoTileProvider(creatorCallback, getterCallback, stateGetterCallback) {
     this._quadtree = undefined;
     this._tilingScheme = new Cesium.GeographicTilingScheme();
     this._errorEvent = new Cesium.Event();
-    this.tileCreatorCallback = cb;
+    this._tileCreatorCallback = creatorCallback;
+    this._tileGetterCallback = getterCallback;
+    this._tileStateGetterCallback = stateGetterCallback;
     this._levelZeroMaximumError = Cesium.QuadtreeTileProvider.computeDefaultLevelZeroMaximumGeometricError(this._tilingScheme);
 };
 
@@ -59,6 +61,26 @@ DemoTileProvider.prototype.getLevelMaximumGeometricError = function(level) {
 };
 
 
+var makeRect = function(rect) {
+        var color = Cesium.Color.fromBytes(0, 0, 255, 255);
+        var p = new Cesium.Primitive({
+            geometryInstances : new Cesium.GeometryInstance({
+                geometry : new Cesium.RectangleOutlineGeometry({
+                    rectangle : rect
+                }),
+                attributes : {
+                    color : Cesium.ColorGeometryInstanceAttribute.fromColor(color)
+                }
+            }),
+            appearance : new Cesium.PerInstanceColorAppearance({
+                flat : true
+            })
+        });
+
+        return p;
+}
+
+
 DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
 
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
@@ -69,11 +91,9 @@ DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
         var east = Cesium.Math.toDegrees(tile.rectangle.east);
         var north = Cesium.Math.toDegrees(tile.rectangle.north);
 
-        var mycb = function(v) {
-            console.log("bounced");
+        if (tile.level == 1) {
+            console.log("# " + west + " " + south + " " + east + " " + north);
         }
-
-        this.tileCreatorCallback(tile.level, tile.x, tile.y);
 
         tile.data = {
             primitive : undefined,
@@ -84,32 +104,65 @@ DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
                 }
             }
         };
-        var color = Cesium.Color.fromBytes(0, 0, 255, 255);
-        tile.data.primitive = new Cesium.Primitive({
-            geometryInstances : new Cesium.GeometryInstance({
-                geometry : new Cesium.RectangleOutlineGeometry({
-                    rectangle : tile.rectangle
-                }),
-                attributes : {
-                    color : Cesium.ColorGeometryInstanceAttribute.fromColor(color)
-                }
-            }),
-            appearance : new Cesium.PerInstanceColorAppearance({
-                flat : true
-            })
-        });
-        //tile.data.primitive = p;
+
+        tile.data.primitive = null;
 
         tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
         tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
         Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
+
+        this._tileCreatorCallback(tile.level, tile.x, tile.y);
+
         tile.state = Cesium.QuadtreeTileLoadState.LOADING;
     }
+
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING) {
-        tile.data.primitive.update(context, frameState, []);
-        if (tile.data.primitive.ready) {
-            tile.state = Cesium.QuadtreeTileLoadState.DONE;
-            tile.renderable = true;
+        console.log("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);// + "(" + tile.data.primitive.ready + ")");
+
+        var pp = null;
+
+        var st = this._tileStateGetterCallback(tile.level, tile.x, tile.y);
+        if (st == 1) {
+            // tile does not exist on disk
+            console.log("--> 1");
+            if (tile.data.primitive == null) {
+                tile.data.primitive = makeRect(tile.rectangle);
+            }
+
+        } else if (st == 2) {
+            // tile exists, but is empty and so will never have a primitive
+            console.log("--> 2");
+            if (tile.data.primitive == null) {
+                tile.data.primitive = makeRect(tile.rectangle);
+            }
+
+        } else if (st == 3) {
+            // tile exists and has points, but primitive not yet built
+            console.log("--> 3");
+            return;
+
+        } else {
+            // tile exists and has (or will have) a primitive
+            console.log("--> 4");
+
+            if (st != 4) {
+                console.log("ERROR: bad tile state");
+                return;
+            }
+
+            if (tile.data.primitive == null) {
+                tile.data.primitive = this._tileGetterCallback(tile.level, tile.x, tile.y);
+            }
+        }
+
+        if (tile.data.primitive != null) {
+            tile.data.primitive.update(context, frameState, []);
+            //console.log("LOADINGy: " + tile.level + " " + tile.x + " " + tile.y + "(" + tile.data.primitive.ready + ")");
+            if (tile.data.primitive.ready) {
+                //console.log("LOADINGz: " + tile.level + " " + tile.x + " " + tile.y);
+                tile.state = Cesium.QuadtreeTileLoadState.DONE;
+                tile.renderable = true;
+            }
         }
     }
 };
