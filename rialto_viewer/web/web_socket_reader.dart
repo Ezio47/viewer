@@ -37,7 +37,7 @@ class WebSocketReader {
         int bufIndex = 0;
 
         ws.onOpen.listen((_) {
-            log("socket opened");
+            //log("listening on socket");
 
             ws.send(webpath); // {+file}
             ws.binaryType = "arraybuffer";
@@ -63,7 +63,7 @@ class WebSocketReader {
             });
             ws.onClose.listen((_) {
                 c.complete(buf);
-                log("done");
+                //log("done");
             });
             ws.onError.listen((e) {
                 Hub.error("error reading socket: $e");

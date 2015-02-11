@@ -20,6 +20,7 @@ class TiledPointCloudLayer extends Layer {
     static const int NODATA = 5;
 
     Map tileState = new Map<String, int>();
+    Map tileObjects = new Map<String, PointCloudTile>();
     Map tilePrimitives = new Map<String, dynamic>();
 
     TiledPointCloudLayer(String name, Map map)
@@ -88,10 +89,11 @@ class TiledPointCloudLayer extends Layer {
         var tile = new PointCloudTile(cloud, tileLevel, tileX, tileY);
 
         tileState[tile.key] = CREATED;
+        tileObjects[tile.key] = tile;
 
         c.complete(tile);
 
-        log("created tile ${tile.key}");
+        //log("created tile ${tile.key}");
 
         return c.future;
     }
@@ -166,11 +168,6 @@ class TiledPointCloudLayer extends Layer {
         final x = tile.tileX;
         final y = tile.tileY;
 
-        if (level == 3) {
-            int a = 0;
-            int b = 0;
-        }
-
         var swKey = "${level+1} ${x*2} ${y*2+1}";
         var nwKey = "${level+1} ${x*2} ${y*2}";
         var seKey = "${level+1} ${x*2+1} ${y*2+1}";
@@ -185,10 +182,19 @@ class TiledPointCloudLayer extends Layer {
         tileState[seKey] = sePresent ? CREATABLE : NODATA;
         tileState[neKey] = nePresent ? CREATABLE : NODATA;
         tileState[nwKey] = nwPresent ? CREATABLE : NODATA;
+
+        if (level == 1) {
+            int a = 0;
+            int b = 0;
+        }
     }
 
 
-    Future<dynamic> renderTheTile(PointCloudTile tile) {
+    Future<dynamic> renderTheTile(int tileLevel, int tileX, int tileY) {
+
+        final key = "$tileLevel $tileX $tileY";
+        var tile = tileObjects[key];
+
         var c = new Completer<dynamic>();
 
         var p;
@@ -218,8 +224,7 @@ class TiledPointCloudLayer extends Layer {
         //log("state getter request: $key");
 
         if (!tileState.containsKey(key)) {
-            // ????
-//            assert(false);
+            //assert(false);
             return 1;
         }
 
@@ -261,6 +266,11 @@ class TiledPointCloudLayer extends Layer {
             if (tileState[key] == RENDERED) {
                 return tilePrimitives[key];
             }
+            if (tileState[key] == LOADED) {
+                renderTheTile(tileLevel, tileX, tileY);
+                return null;
+            }
+
         }
         return null;
     }
@@ -270,13 +280,10 @@ class TiledPointCloudLayer extends Layer {
     void _tileCreatorFunc(int tileLevel, int tileX, int tileY) {
         final key = "$tileLevel $tileX $tileY";
 
-        log("creator request: $key");
-
-        ///////////context.callMethod("bouncer", [cb, p]);
+        //log("creator request: $key");
 
         if (!tileState.containsKey(key)) {
-            // ????
-//            assert(false);
+            //assert(false);
             return;
         }
 
@@ -286,9 +293,7 @@ class TiledPointCloudLayer extends Layer {
         if (state == CREATABLE) {
             createTheTile(tileLevel, tileX, tileY).then((tile) {
                 loadTheTile(tile).then((ok) {
-                    renderTheTile(tile).then((p) {
-                        //
-                    });
+                   //
                 });
             });
             return;
@@ -299,11 +304,15 @@ class TiledPointCloudLayer extends Layer {
         }
 
         if (state == LOADED) {
+            //renderTheTile(tileLevel, tileX, tileY);
             return;
         }
         if (state == RENDERED) {
             var p = tilePrimitives[key];
             assert(p != null);
+
+            tilePrimitives[key] = null;
+            tileState[key] = LOADED;
             return;
         }
 

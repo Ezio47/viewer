@@ -84,20 +84,17 @@ var makeRect = function(rect) {
 DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
 
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
-        console.log("START: " + tile.level + " " + tile.x + " " + tile.y);
+        //console.log("START: " + tile.level + " " + tile.x + " " + tile.y);
 
         var west = Cesium.Math.toDegrees(tile.rectangle.west);
         var south = Cesium.Math.toDegrees(tile.rectangle.south);
         var east = Cesium.Math.toDegrees(tile.rectangle.east);
         var north = Cesium.Math.toDegrees(tile.rectangle.north);
 
-        if (tile.level == 1) {
-            console.log("# " + west + " " + south + " " + east + " " + north);
-        }
-
         tile.data = {
             primitive : undefined,
             freeResources : function() {
+                return;
                 if (Cesium.defined(this.primitive)) {
                     this.primitive.destroy();
                     this.primitive = undefined;
@@ -117,33 +114,37 @@ DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
     }
 
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING) {
-        console.log("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);// + "(" + tile.data.primitive.ready + ")");
+        //console.log("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);// + "(" + tile.data.primitive.ready + ")");
 
         var pp = null;
 
         var st = this._tileStateGetterCallback(tile.level, tile.x, tile.y);
         if (st == 1) {
             // tile does not exist on disk
-            console.log("--> 1");
+            //console.log("--> 1");
             if (tile.data.primitive == null) {
                 tile.data.primitive = makeRect(tile.rectangle);
             }
 
         } else if (st == 2) {
             // tile exists, but is empty and so will never have a primitive
-            console.log("--> 2");
+            //console.log("--> 2");
             if (tile.data.primitive == null) {
                 tile.data.primitive = makeRect(tile.rectangle);
             }
 
         } else if (st == 3) {
             // tile exists and has points, but primitive not yet built
-            console.log("--> 3");
+            //console.log("--> 3");
+
+            if (tile.data.primitive == null) {
+                tile.data.primitive = this._tileGetterCallback(tile.level, tile.x, tile.y);
+            }
             return;
 
         } else {
             // tile exists and has (or will have) a primitive
-            console.log("--> 4");
+            //console.log("--> 4");
 
             if (st != 4) {
                 console.log("ERROR: bad tile state");

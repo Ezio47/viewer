@@ -44,3 +44,5 @@ rialto_pdal/las2tiles
 *.las
 
 data/tiledserp/header.json
+
+data/tiledcamp/header.json
