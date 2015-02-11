@@ -20,19 +20,34 @@
 
 
 
-TileWriter::TileWriter(const PdalBridge& pdal, int maxLevel) :
+TileWriter::TileWriter(const PdalBridge& pdal, bool global, int maxLevel) :
     m_pdal(pdal),
     m_maxLevel(maxLevel),
-    m_numTilesX(2),
-    m_numTilesY(1)
+    m_global(global)
 {    
-    m_rectangle = Rectangle(-180, -90, 180, 90);
+    if (global) {
+        m_numTilesX = 2;
+        m_numTilesY = 1;
     
-    Rectangle r00(-180, -90, 0, 90);
-    Rectangle r10(0, -90, 180, 90);
-    m_root0 = new Tile(0, 0, 0, r00, m_maxLevel, m_pdal);
-    m_root1 = new Tile(0, 1, 0, r10, m_maxLevel, m_pdal);   
-    
+        m_rectangle = Rectangle(-180, -90, 180, 90);
+
+        Rectangle r00(-180, -90, 0, 90);
+        Rectangle r10(0, -90, 180, 90);
+        m_roots = new Tile*[2];
+        m_roots[0] = new Tile(0, 0, 0, r00, m_maxLevel, m_pdal);
+        m_roots[1] = new Tile(0, 1, 0, r10, m_maxLevel, m_pdal);   
+    } else {
+        m_numTilesX = 1;
+        m_numTilesY = 1;
+
+        double west, south, east, north;
+        pdal.getRect(west, south, east, north);
+        m_rectangle = Rectangle(west, south, east, north);
+        
+        m_roots = new Tile*[1];
+        m_roots[0] = new Tile(0, 0, 0, m_rectangle, m_maxLevel, m_pdal);        
+    }
+        
     m_bytesPerPoint = 0;
     std::vector<pdal::Dimension::Id::Enum> dimIds = m_pdal.getDimIds();
     for (int i=0; i<dimIds.size(); i++) {
@@ -48,8 +63,13 @@ TileWriter::TileWriter(const PdalBridge& pdal, int maxLevel) :
 
 TileWriter::~TileWriter()
 {
-    delete m_root0;
-    delete m_root1;
+    if (m_global) {
+        delete m_roots[0];
+        delete m_roots[1];
+    } else {
+        delete m_roots[0];
+    }
+    delete[] m_roots;
 }
 
 
@@ -98,18 +118,21 @@ void TileWriter::build(const pdal::PointBufferPtr& buf, int& pointNumber)
     {
         char* p = getPointData(buf, pointNumber);
     
-    
         pdal::Dimension::Id::Enum xdim = pdal::Dimension::Id::Enum::X;
         pdal::Dimension::Id::Enum ydim = pdal::Dimension::Id::Enum::Y;        
         double lon = buf->getFieldAs<double>(xdim, idx);
         double lat = buf->getFieldAs<double>(ydim, idx);
     
-        if (lon < 0) {
-            m_root0->add(pointNumber, p, lon, lat);
+        if (m_global) {
+            if (lon < 0) {
+                m_roots[0]->add(pointNumber, p, lon, lat);
+            } else {
+                m_roots[1]->add(pointNumber, p, lon, lat);
+            }
         } else {
-            m_root1->add(pointNumber, p, lon, lat);
+            m_roots[0]->add(pointNumber, p, lon, lat);
         }
-        
+                
         ++pointNumber;
     }
 }
@@ -124,9 +147,13 @@ void TileWriter::dump() const
         numTilesPerLevel[i] = 0;
         numPointsPerLevel[i] = 0;
     }
-
-    m_root0->collectStats(numTilesPerLevel, numPointsPerLevel);
-    m_root1->collectStats(numTilesPerLevel, numPointsPerLevel);
+    
+    if (m_global) {
+        m_roots[0]->collectStats(numTilesPerLevel, numPointsPerLevel);
+        m_roots[1]->collectStats(numTilesPerLevel, numPointsPerLevel);
+    } else {
+        m_roots[0]->collectStats(numTilesPerLevel, numPointsPerLevel);
+    }
     
     for (int i=0; i<=m_maxLevel; i++) {
         printf("L%d: %d tiles, %llu points\n", i, numTilesPerLevel[i], numPointsPerLevel[i]);
@@ -136,9 +163,13 @@ void TileWriter::dump() const
 
 void TileWriter::write(const char* dir) const
 {
-    m_root0->write(dir);
-    m_root1->write(dir);
-        
+    if (m_global) {
+        m_roots[0]->write(dir);
+        m_roots[1]->write(dir);
+    } else {
+        m_roots[0]->write(dir);
+    }
+    
     writeHeader(dir);                 
 }
 
@@ -163,7 +194,7 @@ void TileWriter::writeHeader(const char* dir) const
     m_pdal.getStats(pdal::Dimension::Id::Enum::Z, zminBbox, zmeanBbox, zmaxBbox);
 
     fprintf(fp, "{\n");
-    fprintf(fp, "    \"version\": 2,\n");
+    fprintf(fp, "    \"version\": 3,\n");
    
     fprintf(fp, "    \"tilebbox\": [%f, %f, %f, %f],\n",
             m_rectangle.west,

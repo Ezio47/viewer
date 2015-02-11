@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-class TiledPointCloudLayer extends Layer {
+class PointCloudLayer extends Layer {
     PointCloud cloud;
     PointCloudColorizer _colorizer;
     RiaFormat _ria;
@@ -23,7 +23,7 @@ class TiledPointCloudLayer extends Layer {
     Map tileObjects = new Map<String, PointCloudTile>();
     Map tilePrimitives = new Map<String, dynamic>();
 
-    TiledPointCloudLayer(String name, Map map)
+    PointCloudLayer(String name, Map map)
             : super(name, map) {
         log("New tiled pointcloud layer: $name .. $server .. $path");
     }
@@ -62,8 +62,12 @@ class TiledPointCloudLayer extends Layer {
 
             cloud = new PointCloud(path, name, dimlist);
 
-            tileState["0 0 0"] = CREATABLE;
-            tileState["0 1 0"] = CREATABLE;
+            for (int x=0; x<_ria.numTilesXAt0; x++) {
+                for (int y=0; y<_ria.numTilesYAt0; y++) {
+                    String key = "0 $x $y";
+                    tileState[key] = CREATABLE;
+                }
+            }
 
             _hub.cesium.createTileProvider(_tileCreatorFunc, _tileGetterFunc, _tileStateGetterFunc);
 
@@ -82,11 +86,11 @@ class TiledPointCloudLayer extends Layer {
     }
 
 
-    Future<PointCloudTile> createTheTile(int tileLevel, int tileX, int tileY) {
+    Future<PointCloudTile> createTheTile(int tileLevel, int tileX, int tileY, double west, double south, double east, double north) {
 
         var c = new Completer<PointCloudTile>();
 
-        var tile = new PointCloudTile(cloud, tileLevel, tileX, tileY);
+        var tile = new PointCloudTile(cloud, tileLevel, tileX, tileY, west, south, east, north);
 
         tileState[tile.key] = CREATED;
         tileObjects[tile.key] = tile;
@@ -277,7 +281,7 @@ class TiledPointCloudLayer extends Layer {
 
     // called from Js: given a tile key...
     //   - make the tile, if needed
-    void _tileCreatorFunc(int tileLevel, int tileX, int tileY) {
+    void _tileCreatorFunc(int tileLevel, int tileX, int tileY, num west, num south, num east, num north) {
         final key = "$tileLevel $tileX $tileY";
 
         //log("creator request: $key");
@@ -291,7 +295,7 @@ class TiledPointCloudLayer extends Layer {
         final int state = tileState[key];
 
         if (state == CREATABLE) {
-            createTheTile(tileLevel, tileX, tileY).then((tile) {
+            createTheTile(tileLevel, tileX, tileY, west.toDouble(), south.toDouble(), east.toDouble(), north.toDouble()).then((tile) {
                 loadTheTile(tile).then((ok) {
                    //
                 });
@@ -323,145 +327,6 @@ class TiledPointCloudLayer extends Layer {
 
         assert(false);
         return;
-    }
-
-    @override
-    void changeVisibility(bool v) {
-        cloud.changeVisibility(v);
-        isVisible = v;
-    }
-
-    Future colorizeAsync(ColorizeLayersData data) {
-        return new Future(() {
-            _colorizer.ramp = data.ramp;
-            _colorizer.dimension = data.dimension;
-            _colorizer.colorize();
-        });
-    }
-}
-
-
-
-class PointCloudLayer extends Layer {
-    PointCloud cloud;
-    PointCloudColorizer _colorizer;
-    RiaFormat _ria;
-
-    static const int _pointsPerTile = 1024 * 10;
-
-    PointCloudLayer(String name, Map map)
-            : super(name, map) {
-        log("New pointcloud layer: $name .. $server .. $path");
-    }
-
-    @override
-    Future<bool> load() {
-        Completer c = new Completer();
-
-        var whenReady = () {
-            assert(cloud != null);
-
-            cloud.changeVisibility(isVisible);
-
-            bbox = new CartographicBbox.copy(cloud.bbox);
-
-            _colorizer = new PointCloudColorizer(cloud);
-
-            c.complete(true);
-        };
-
-        if (server == "http://www.example.com") {
-            cloud = PointCloudGenerator.generate(path, name);
-            whenReady();
-        } else {
-
-            var comms = new WebSocketReader(server);
-
-            _ria = new RiaFormat();
-
-            comms.readAll(path + "hdr").then((ByteData buf) {
-
-                _ria.readHeader(buf);
-                log(_ria);
-                final int pointSize = _ria.pointSizeInBytes;
-
-                // TODO: too conservative? the presence of X,Y,Z should be enough (not array index)
-                if (_ria.dimensions[0].name != "X" || _ria.dimensions[1].name != "Y" || _ria.dimensions[2].name != "Z") {
-                    Hub.error("point cloud does not have required X, Y, Z dimensions");
-                    c.complete(false);
-                    return;
-                }
-
-                // TODO: does the datatype matter anymore?
-                if (_ria.dimensions[0].type != RiaDimension.Double || _ria.dimensions[1].type != RiaDimension.Double || _ria.dimensions[2].type != RiaDimension.Double) {
-                    Hub.error("point cloud does not have X, Y, Z dimensions as F64 datatype");
-                    c.complete(false);
-                    return;
-                }
-
-                var dimlist = _ria.dimensionMap.keys.toList();
-                dimlist.add("rgba");
-
-                cloud = new PointCloud(path, name, dimlist);
-
-                final int numBytes = pointSize * _pointsPerTile;
-                comms.readChunked(path, numBytes, _createTile).then((bool ok) {
-                    if (!ok) {
-                        c.complete(false);
-                        return;
-                    }
-                    whenReady();
-                });
-            });
-        }
-
-        return c.future;
-    }
-
-    void _createTile(ByteData buf) {
-        final int pointSize = _ria.pointSizeInBytes;
-
-        final int numBytes = buf.lengthInBytes;
-
-        int numPointsInTile = numBytes ~/ pointSize;
-        assert(numPointsInTile * pointSize == numBytes);
-
-        final int numDims = _ria.dimensions.length;
-        List dims = _ria.dimensions;
-
-        ByteData bytes = buf;
-
-        // for each dim, add a new data array for this tile to use
-        for (int j = 0; j < numDims; j++) {
-            RiaDimension dim = dims[j];
-            dim.reset(numPointsInTile);
-        }
-
-        // read the data into the array inside each RiaDim
-        int index = 0;
-        for (int i = 0; i < numPointsInTile; i++) {
-            for (int j = 0; j < numDims; j++) {
-                RiaDimension dim = dims[j];
-                dim.setter(bytes, index, i);
-                index += dim.sizeInBytes;
-            }
-        }
-
-        var tile = cloud.createTile(numPointsInTile);
-
-        // now make the tile point to the RiaDims' array stores
-        for (int j = 0; j < numDims; j++) {
-            RiaDimension dim = dims[j];
-            List list = dim.list;
-            tile.addData_generic(dim.name, list);
-        }
-
-        // set color data
-        tile.addData_U8x4_fromConstant("rgba", 255, 255, 255, 255);
-
-        tile.updateBounds();
-        tile.updateShape();
-        cloud.updateBoundsForTile(tile);
     }
 
     @override

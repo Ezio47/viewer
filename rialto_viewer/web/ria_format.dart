@@ -28,7 +28,7 @@ class RiaDimension {
         "int32_t": Signed32,
         "uint64_t": Unsigned64,
         "int64_t": Signed64,
-        "float" : Float,
+        "float": Float,
         "double": Double
     };
 
@@ -121,66 +121,34 @@ class RiaFormat {
     Map<String, RiaDimension> dimensionMap;
     Map<String, double> minimums;
     Map<String, double> maximums;
+    int numTilesXAt0, numTilesYAt0;
+    double dataBboxWest, dataBboxSouth, dataBboxEast, dataBboxNorth;
+    double tileBboxWest, tileBboxSouth, tileBboxEast, tileBboxNorth;
 
     int numPoints;
 
     RiaFormat();
 
-    void readHeader(ByteData buf) {
-        int index = 0;
-
-        int version = buf.getUint8(index);
-        index += 1;
-
-        numPoints = Utils.ByteData_getUint64(buf, index, Endianness.LITTLE_ENDIAN);
-        index += 8;
-
-        int numDims = buf.getUint8(index);
-        index += 1;
-
-        dimensions = new List<RiaDimension>();
-        dimensionMap = new Map<String, RiaDimension>();
-        minimums = new Map<String, double>();
-        maximums = new Map<String, double>();
-
-        int byteOffset = 0;
-        for (int dim = 0; dim < numDims; dim++) {
-            int dimType = buf.getUint16(index, Endianness.LITTLE_ENDIAN);
-            index += 2;
-
-            int nameLen = buf.getUint8(index);
-            index += 1;
-
-            var chars = new List<int>();
-            for (int i = 0; i < nameLen; i++) {
-                int c = buf.getUint8(index);
-                index += 1;
-                chars.add(c);
-            }
-            String name = UTF8.decode(chars);
-
-            double min = buf.getFloat64(index, Endianness.LITTLE_ENDIAN);
-            index += 8;
-
-            double max = buf.getFloat64(index, Endianness.LITTLE_ENDIAN);
-            index += 8;
-
-            var dim = new RiaDimension(dimType, name, min, max);
-            dimensions.add(dim);
-            dimensionMap[name] = dim;
-            minimums[name] = min;
-            maximums[name] = max;
-
-            dim.byteOffset = byteOffset;
-            byteOffset += dim.sizeInBytes;
-        }
-    }
-
     readHeaderJson(String json) {
         Map mydata = JSON.decode(json);
 
         int version = mydata["version"];
+        assert(version == 3);
+
         numPoints = mydata["numPoints"];
+
+        numTilesXAt0 = mydata["numTilesX"];
+        numTilesYAt0 = mydata["numTilesY"];
+
+        dataBboxWest = mydata["databbox"][0];
+        dataBboxSouth = mydata["databbox"][1];
+        dataBboxEast = mydata["databbox"][2];
+        dataBboxNorth = mydata["databbox"][3];
+
+        tileBboxWest = mydata["tilebbox"][0];
+        tileBboxSouth = mydata["tilebbox"][1];
+        tileBboxEast = mydata["tilebbox"][2];
+        tileBboxNorth = mydata["tilebbox"][3];
 
         int numDims = mydata["dimensions"].length;
 

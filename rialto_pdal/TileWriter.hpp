@@ -22,7 +22,7 @@
 class TileWriter
 {
 public:
-    TileWriter(const PdalBridge& pdal, int maxLevel);
+    TileWriter(const PdalBridge& pdal, bool global, int maxLevel);
     ~TileWriter();
 
     void build();
@@ -41,9 +41,9 @@ private:
     int m_numTilesX;
     int m_numTilesY;
     Rectangle m_rectangle;
-    Tile* m_root0;
-    Tile* m_root1;
-    
+    Tile** m_roots;
+    bool m_global;
+        
     int m_maxLevel;
     
     TileWriter& operator=(const TileWriter&); // not implemented

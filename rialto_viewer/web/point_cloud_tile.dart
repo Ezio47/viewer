@@ -19,10 +19,14 @@ class PointCloudTile {
     int numDims;
     int tileLevel, tileX, tileY;
     int childMask;
+    double tileBboxWest, tileBboxSouth, tileBboxEast, tileBboxNorth;
+
 
     String key;
 
-    PointCloudTile(PointCloud this.cloud, int this.tileLevel, int this.tileX, int this.tileY) {
+    PointCloudTile(PointCloud this.cloud, int this.tileLevel, int this.tileX, int this.tileY,
+            double this.tileBboxWest, double this.tileBboxSouth, double this.tileBboxEast, double this.tileBboxNorth) {
+
         key = "$tileLevel $tileX $tileY";
 
         log("making tile $key");

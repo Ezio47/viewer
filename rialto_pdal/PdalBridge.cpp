@@ -85,6 +85,20 @@ void PdalBridge::close()
 }
 
 
+void PdalBridge::getRect(double& west, double& south, double& east, double& north) const
+{
+    double min, mean, max;
+    
+    getStats(pdal::Dimension::Id::Enum::X, min, mean, max);
+    west = min;
+    east = max;
+    
+    getStats(pdal::Dimension::Id::Enum::Y, min, mean, max);
+    south = min;
+    north = max;
+}
+
+
 const pdal::PointBufferSet& PdalBridge::buffers() const
 {
     return m_manager->buffers();

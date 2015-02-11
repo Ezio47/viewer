@@ -108,7 +108,7 @@ DemoTileProvider.prototype.loadTile = function(context, frameState, tile) {
         tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
         Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
 
-        this._tileCreatorCallback(tile.level, tile.x, tile.y);
+        this._tileCreatorCallback(tile.level, tile.x, tile.y, west, south, east, north);
 
         tile.state = Cesium.QuadtreeTileLoadState.LOADING;
     }
