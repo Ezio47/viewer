@@ -2,7 +2,7 @@ layers:
     tiledserp:
         type: pointcloud   # always tiled
         server: ws://localhost:12346
-        path: /tiledserp0
+        path: /tiledserp18
         numBytes: 10            # optional, default=0
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true

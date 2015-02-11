@@ -29,7 +29,7 @@ class PointCloudTile {
 
         key = "$tileLevel $tileX $tileY";
 
-        log("making tile $key");
+        //log("making tile $key");
 
         dimensionNames = cloud.dimensionNames;
 

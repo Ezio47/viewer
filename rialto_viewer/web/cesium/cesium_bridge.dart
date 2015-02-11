@@ -13,8 +13,8 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    void createTileProvider(creatorCallback, getterCallback, stateGetterCallback) {
-        _bridge.callMethod('doTileProvider', [creatorCallback, getterCallback, stateGetterCallback]);
+    void createTileProvider(path, creatorCallback, getterCallback, stateGetterCallback) {
+        _bridge.callMethod('doTileProvider', [path, creatorCallback, getterCallback, stateGetterCallback]);
     }
 
     dynamic addGeoJson(String url) {

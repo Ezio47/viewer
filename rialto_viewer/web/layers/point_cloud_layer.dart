@@ -69,7 +69,8 @@ class PointCloudLayer extends Layer {
                 }
             }
 
-            _hub.cesium.createTileProvider(_tileCreatorFunc, _tileGetterFunc, _tileStateGetterFunc);
+            var httppath = server.replaceAll("ws:", "http:").replaceAll("12346","12345") + path;
+            _hub.cesium.createTileProvider(httppath, _tileCreatorFunc, _tileGetterFunc, _tileStateGetterFunc);
 
             assert(cloud != null);
 
@@ -159,7 +160,7 @@ class PointCloudLayer extends Layer {
 
             tileState[tile.key] = LOADED;
 
-            log("loaded tile ${tile.key}");
+            //log("loaded tile ${tile.key}");
 
             c.complete(true);
         });
@@ -214,7 +215,7 @@ class PointCloudLayer extends Layer {
         tileState[tile.key] = RENDERED;
         tilePrimitives[tile.key] = p;
 
-        log("rendered tile ${tile.key}");
+        //log("rendered tile ${tile.key}");
 
         return c.future;
     }
@@ -281,7 +282,7 @@ class PointCloudLayer extends Layer {
 
     // called from Js: given a tile key...
     //   - make the tile, if needed
-    void _tileCreatorFunc(int tileLevel, int tileX, int tileY, num west, num south, num east, num north) {
+    void _tileCreatorFunc(int tileLevel, int tileX, int tileY, num west, num south, num east, num north, var blob) {
         final key = "$tileLevel $tileX $tileY";
 
         //log("creator request: $key");
