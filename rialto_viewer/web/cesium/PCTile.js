@@ -105,10 +105,10 @@ PCTile.prototype.addTileData = function(buffer) {
 };
 
 
-
-
-PCTile.prototype.loadTileData = function(provider, url) {
+PCTile.prototype.loadTileData = function() {
     //console.log("loading " + this.level + this.x + this.y);
+
+    var url = this._tree.getUrl(this);
 
     assert(this.state == tsNOTLOADED, 2);
     this.state = tsLOADING;

@@ -25,11 +25,9 @@ class PointCloudLayer extends Layer {
     Future<bool> load() {
         Completer c = new Completer();
 
-        comms = new WebSocketReader(server);
-
         _ria = new RiaFormat();
 
-        comms.readAllText(path + "/header.json").then((String json) {
+        Comms.httpGet(server + path + "/header.json").then((String json) {
 
             _ria.readHeaderJson(json);
 
@@ -55,8 +53,7 @@ class PointCloudLayer extends Layer {
 
             cloud = new PointCloud(path, name, dimlist);
 
-            var httppath = server.replaceAll("ws:", "http:").replaceAll("12346", "12345") + path;
-            _hub.cesium.createTileProvider(httppath, _tileCreatorFunc, _tileGetterFunc);
+            _hub.cesium.createTileProvider(server + path, _tileCreatorFunc, _tileGetterFunc);
 
             assert(cloud != null);
 
