@@ -6,15 +6,16 @@
 "use strict";
 
 
-var PCTileTree = function PCTileTree(urlPath) {
+var PCTileTree = function PCTileTree(urlPath, provider) {
     this._urlPath = urlPath;
+    this.header = provider.header;
+    this.provider = provider;
     this._tiles = undefined;
 };
 
 
 PCTileTree.prototype.getUrl = function(pcTile) {
     var url = this._urlPath + "/" + pcTile.level + "/" + pcTile.x + "/" + pcTile.y + ".ria";
-    console.log("------------" + url);
     return url;
 };
 

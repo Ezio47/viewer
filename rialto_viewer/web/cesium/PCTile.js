@@ -24,12 +24,14 @@ var qNW = 23;
 
 var PCTile = function PCTile(tree, level, x, y) {
     this._tree = tree;
+    this._header = tree.header;
 
     this._level = level;
     this._x = x;
     this._y = y;
 
     this.buffer = null;
+
     this.state = tsNOTLOADED;
 
     this.swState = csUNKNOWN;
@@ -61,6 +63,97 @@ Object.defineProperties(PCTile.prototype, {
         }
     }
 });
+
+
+PCTile.prototype._makeFromStridedSlice = function(dataview, datatype, offset, stride, len) {
+
+    var dst = undefined;
+
+    switch (datatype) {
+        case "uint8_t":
+            dst = new Uint8Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getUint8(dvIndex);
+            }
+            break;
+        case "int8_t":
+            dst = new Int8Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getInt8(dvIndex);
+            }
+            break;
+        case "uint16_t":
+            dst = new Uint16Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getUint16(dvIndex);
+            }
+            break;
+        case "int16_t":
+            dst = new Int16Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getInt16(dvIndex);
+            }
+            break;
+        case "uint32_t":
+            dst = new Uint32Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getUint32(dvIndex);
+            }
+            break;
+        case "int32_t":
+            dst = new Int32Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getInt32(dvIndex);
+            }
+            break;
+        case "uint64_t":
+            dst = new Uint64Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getUint64(dvIndex);
+            }
+            break;
+        case "int64_t":
+            dst = new Int64Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getInt64(dvIndex);
+            }
+            break;
+        case "float":
+            dst = new Float32Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getFloat32(dvIndex);
+            }
+            break;
+        case "double":
+            dst = new Float64Array(len);
+            for (var dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex++, dvIndex += stride) {
+                dst[dstIndex] = dataview.getFloat64(dvIndex);
+            }
+            break;
+
+        default:
+            break;
+    }
+    return dst;
+};
+
+
+PCTile.prototype._setDimArrays = function(buffer, bufferLength) {
+    var dims = this._header.dimensions;
+    var dataview = new DataView(buffer);
+    var numPoints = bufferLength / this._tree.provider.pointSizeInBytes;
+    console.log("num points in tile: " + numPoints);
+
+    for (var i=0; i<dims.length; i++) {
+        var datatype = dims[i].datatype;
+        var offset = dims[i].offset;
+        var stride = this._tree.provider.pointSizeInBytes;
+        var name = dims[i].name;
+
+        var v = this._makeFromStridedSlice(dataview, datatype, offset, stride, numPoints);
+        dims[i].data = v;
+    }
+};
 
 
 PCTile.prototype.addTileData = function(buffer) {
@@ -102,6 +195,8 @@ PCTile.prototype.addTileData = function(buffer) {
     }
 
     this.buffer = buffer;
+
+    this._setDimArrays(buffer, bytes.length-1);
 };
 
 

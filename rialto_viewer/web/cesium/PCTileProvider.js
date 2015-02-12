@@ -21,12 +21,17 @@ var PCTileProvider = function PCTileProvider(urlPath, creatorCallback, getterCal
     this._tileGetterCallback = getterCallback;
     this._levelZeroMaximumError = Cesium.QuadtreeTileProvider.computeDefaultLevelZeroMaximumGeometricError(this._tilingScheme);
 
-    this._tiletree = new PCTileTree(urlPath);
+    this._urlPath = urlPath;
+    this.header = undefined;
+    this._ready = false;
+    this.pointSizeInBytes = undefined;
 
-    this._root000 = this._tiletree.createTile(0, 0, 0);
+    this._tiletree = null;
+    this._root000 = null;
+    this._root010 = null;
 
-    this._root010 = this._tiletree.createTile(0, 1, 0);
-};
+    this.readHeader();
+ };
 
 
 Object.defineProperties(PCTileProvider.prototype, {
@@ -40,7 +45,8 @@ Object.defineProperties(PCTileProvider.prototype, {
     },
     ready : {
         get : function() {
-            return true;
+            console.log("ready check" + this._ready);
+            return this._ready;
         }
     },
     tilingScheme : {
@@ -54,6 +60,70 @@ Object.defineProperties(PCTileProvider.prototype, {
         }
     }
 });
+
+
+PCTileProvider.prototype._computePointSize = function() {
+    var dims = this.header.dimensions;
+    var tot = 0;
+
+    for (var i=0; i<dims.length; i++) {
+
+        dims[i].offset = tot;
+
+        switch (dims[i].datatype) {
+
+        case "uint8_t":
+        case "int8_t":
+            tot += 1;
+            break;
+        case "uint16_t":
+        case "int16_t":
+            tot += 2;
+            break;
+        case "uint32_t":
+        case "int32_t":
+            tot += 4;
+            break;
+        case "uint64_t":
+        case "int64_t":
+            tot += 8;
+            break;
+        case "float":
+            tot += 4;
+            break;
+        case "double":
+            tot += 8;
+            break;
+        default:
+            assert(false);
+        }
+    }
+
+    return tot;
+};
+
+
+PCTileProvider.prototype.readHeader = function() {
+
+    var provider = this;
+
+    var url = this._urlPath + "/header.json";
+
+    Cesium.loadJson(url).then(function(json) {
+        provider.header = json;
+        provider._ready = true;
+        provider.pointSizeInBytes = provider._computePointSize();
+        console.log("point size: " + provider.pointSizeInBytes);
+
+        provider._tiletree = new PCTileTree(provider._urlPath, provider);
+
+        provider._root000 = provider._tiletree.createTile(0, 0, 0);
+        provider._root010 = provider._tiletree.createTile(0, 1, 0);
+
+    }).otherwise(function(err) {
+        console.log("FAIL getting json: " + url);
+    });
+};
 
 
 PCTileProvider.prototype.beginUpdate = function(context, frameState, commandList) {

@@ -11,16 +11,9 @@ class ConfigScript {
     ConfigScript(String url) {
         _hub = Hub.root;
 
-        Http.Client client = new BHttp.BrowserClient();
-
-        Future<String> f = client.get(url).then((response) {
-            return response.body;
-        }).catchError((e) {
-            Hub.error("error getting script: $e");
-        });
+        var f = Comms.httpGet(url);
 
         f.then((s) {
-
             _executeFirst(s).then((ok) {
                if (ok) {
                    _executeSecond(s);
