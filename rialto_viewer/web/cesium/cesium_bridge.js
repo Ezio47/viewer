@@ -24,7 +24,7 @@ var CesiumBridge = function (element) {
         var scene = viewer.scene;
         var primitives = scene.primitives;
         primitives.add(new Cesium.QuadtreePrimitive({
-            tileProvider : new DemoTileProvider(path, creatorCallback, getterCallback)
+            tileProvider : new PCTileProvider(path, creatorCallback, getterCallback)
         }));
     }
 

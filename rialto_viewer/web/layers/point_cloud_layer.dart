@@ -84,8 +84,9 @@ class PointCloudLayer extends Layer {
         return tile;
     }
 
-    void loadTheTile(PointCloudTile tile, ByteBuffer buffer) {
+    void loadTheTile(PointCloudTile tile, var buffer) {
 
+        //var ByteBuffer buffer
         ByteData bytes = new ByteData.view(buffer);
 
         final int pointSize = _ria.pointSizeInBytes;
