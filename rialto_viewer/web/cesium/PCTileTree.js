@@ -3,10 +3,9 @@
 // license found in the accompanying LICENSE.txt file.
 
 
-"use strict";
-
-
 var PCTileTree = function PCTileTree(urlPath, provider) {
+    "use strict";
+
     this._urlPath = urlPath;
     this.header = provider.header;
     this.provider = provider;
@@ -14,22 +13,37 @@ var PCTileTree = function PCTileTree(urlPath, provider) {
 };
 
 
-PCTileTree.prototype.getUrl = function(pcTile) {
+PCTileTree.prototype.getUrl = function (pcTile) {
+    "use strict";
+
     var url = this._urlPath + "/" + pcTile.level + "/" + pcTile.x + "/" + pcTile.y + ".ria";
     return url;
 };
 
 
-PCTileTree.prototype.lookupTile = function(level, x, y, z) {
-    if (this._tiles == undefined) return null;
-    if (this._tiles[level] == undefined) return null;
-    if (this._tiles[level][x] == undefined) return null;
-    if (this._tiles[level][x][y] == undefined) return null;
+PCTileTree.prototype.lookupTile = function (level, x, y) {
+    "use strict";
+
+    if (this._tiles == undefined) {
+        return null;
+    }
+    if (this._tiles[level] == undefined) {
+        return null;
+    }
+    if (this._tiles[level][x] == undefined) {
+        return null;
+    }
+    if (this._tiles[level][x][y] == undefined) {
+        return null;
+    }
+
     return this._tiles[level][x][y];
 };
 
 
-PCTileTree.prototype.createTile = function(level, x, y) {
+PCTileTree.prototype.createTile = function (level, x, y) {
+    "use strict";
+
     //console.log("creating " + level + x + y);
 
     if (this._tiles == undefined) {
@@ -53,30 +67,45 @@ PCTileTree.prototype.createTile = function(level, x, y) {
 };
 
 
-PCTileTree.prototype.computeQuadrantOf = function(x, y) {
+PCTileTree.prototype.computeQuadrantOf = function (x, y) {
+    "use strict";
+
     var lowX = ((x % 2) == 0);
     var lowY = ((y % 2) == 0);
 
-    if (lowX && lowY) return qNW;
-    if (!lowX && lowY) return qNE;
-    if (lowX && !lowY) return qSW;
-    if (!lowX && !lowY) return qSE;
+    if (lowX && lowY) {
+        return qNW;
+    }
+    if (!lowX && lowY) {
+        return qNE;
+    }
+    if (lowX && !lowY) {
+        return qSW;
+    }
+    if (!lowX && !lowY) {
+        return qSE;
+    }
+
     assert(false, 1);
 };
 
 
-PCTileTree.prototype.getXYAtLevel = function(r, l, x, y) {
+PCTileTree.prototype.getXYAtLevel = function (r, l, x, y) {
+    "use strict";
+
     while (r != l) {
         l = l - 1;
-        x = (x - (x%2)) / 2;
-        y = (y - (y%2)) / 2;
+        x = (x - (x % 2)) / 2;
+        y = (y - (y % 2)) / 2;
     }
-    return [l,x,y];
+    return [l, x, y];
 };
 
 
 // returns a cs state
-PCTileTree.prototype.getTileState = function(root, level, x, y) {
+PCTileTree.prototype.getTileState = function (root, level, x, y) {
+    "use strict";
+
     assert(root != undefined, 3);
     assert(root != null, 4);
 
@@ -98,7 +127,7 @@ PCTileTree.prototype.getTileState = function(root, level, x, y) {
 
     assert(root.state == tsLOADED, 8);
 
-    var rxy = this.getXYAtLevel(root.level+1, level, x, y);
+    var rxy = this.getXYAtLevel(root.level + 1, level, x, y);
     //console.log("   rxy=" + rxy[0] + rxy[1] + rxy[2]);
     var q = this.computeQuadrantOf(rxy[1], rxy[2]);
     //console.log("   q=" + q);

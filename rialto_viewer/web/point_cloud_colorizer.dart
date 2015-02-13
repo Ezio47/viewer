@@ -14,6 +14,11 @@ class PointCloudColorizer {
     PointCloudColorizer(PointCloud this._cloud);
 
     void colorize() {
+
+        return;
+
+
+
         String thisRamp = ramp;
         if (thisRamp == null || thisRamp.isEmpty) {
             thisRamp = _defaultRamp;
@@ -49,6 +54,8 @@ class PointCloudColorizer {
             // leave as-is
             return;
         }
+
+        return;
 
         if (!_cloud.dimensionNames.contains(name)) {
             Hub.error("invalid colorization dimension: $name");

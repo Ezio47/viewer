@@ -19,12 +19,12 @@ var CesiumBridge = function (element) {
     this.viewer = new Cesium.Viewer(element, options);
 
 
-    this.doTileProvider = function(path, creatorCallback, getterCallback) {
+    this.doTileProvider = function(path) {
         var viewer = this.viewer;
         var scene = viewer.scene;
         var primitives = scene.primitives;
         primitives.add(new Cesium.QuadtreePrimitive({
-            tileProvider : new PCTileProvider(path, creatorCallback, getterCallback)
+            tileProvider : new PCTileProvider(path)
         }));
     }
 
@@ -297,62 +297,6 @@ var CesiumBridge = function (element) {
         var primitives = scene.primitives;
         primitives.remove(prim);
     }
-
-    // taken from Cartesian3.fromDegreesArrayHeights
-    this.Cartesian3_fromDegreesArrayHeights_merge = function(x, y, z, ellipsoid) {
-
-        var numPoints = x.length;
-        var xyz = new Float64Array(numPoints * 3);
-
-        for (var i = 0; i < numPoints; i++) {
-            var lon = Cesium.Math.toRadians(x[i]);
-            var lat = Cesium.Math.toRadians(y[i]);
-            var alt = z[i];
-
-            var result = Cesium.Cartesian3.fromRadians(lon, lat, alt, ellipsoid);
-
-            xyz[i*3] = result.x;
-            xyz[i*3+1] = result.y;
-            xyz[i*3+2] = result.z;
-        }
-
-        return xyz;
-    };
-
-    // x,y,z as F64 arrays
-    // rgba as U8 array
-    this.createCloud = function(cnt, xArray, yArray, zArray, rgbaArray) {
-        var scene = this.viewer.scene;
-        var primitives = scene.primitives;
-
-        //var x = xArray;
-        //var y = yArray;
-        //var z = zArray;
-        //var rgba = rgbaArray;
-        var x = new Float64Array(xArray, 0, cnt);
-        var y = new Float64Array(yArray, 0, cnt);
-        var z = new Float64Array(zArray, 0, cnt);
-        var rgba = new Uint8Array(rgbaArray, 0, cnt*4);
-
-        var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z);
-
-        var pointInstance = new Cesium.GeometryInstance({
-            geometry : new Cesium.PointGeometry({
-                positionsTypedArray: xyz,
-                colorsTypedArray: rgba
-            }),
-            id : 'point'
-        });
-
-        var prim = new Cesium.Primitive({
-            geometryInstances : [pointInstance],
-            appearance : new Cesium.PointAppearance()
-        });
-        primitives.add(prim);
-
-        return prim;
-    }
-
 
     this._createLineInstance = function(x0, y0, z0, x1, y1, z1, color) {
       var p1 = Cesium.Cartesian3.fromDegrees(x0, y0, z0);
