@@ -106,7 +106,7 @@ PCTileProvider.prototype._computePointSize = function () {
             tot += 8;
             break;
         default:
-            assert(false);
+            assert(false, 73);
         }
     }
 
@@ -291,7 +291,7 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
             return;
         }
 
-        assert(pcTile.state == tsLOADED);
+        assert(pcTile.state == tsLOADED, 74);
 
         tile.data.primitive = pcTile.primitive;
 
@@ -303,7 +303,7 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
             return;
         }
 
-        assert(tile.data.primitive != null);
+        assert(tile.data.primitive != null, 72);
 
         //tile.data.primitive = this._makeRect(tile.rectangle);
 

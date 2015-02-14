@@ -90,63 +90,63 @@ PCTile.prototype._makeFromStridedSlice = function (dataview, datatype, offset, s
     case "uint16_t":
         dst = new Uint16Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getUint16(dvIndex);
+            dst[dstIndex] = dataview.getUint16(dvIndex, true);
         }
         break;
     case "int16_t":
         dst = new Int16Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getInt16(dvIndex);
+            dst[dstIndex] = dataview.getInt16(dvIndex, true);
         }
         break;
     case "uint32_t":
         dst = new Uint32Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getUint32(dvIndex);
+            dst[dstIndex] = dataview.getUint32(dvIndex, true);
         }
         break;
     case "int32_t":
         dst = new Int32Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getInt32(dvIndex);
+            dst[dstIndex] = dataview.getInt32(dvIndex, true);
         }
         break;
     case "uint64_t":
         dst = new Uint64Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getUint64(dvIndex);
+            dst[dstIndex] = dataview.getUint64(dvIndex, true);
         }
         break;
     case "int64_t":
         dst = new Int64Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getInt64(dvIndex);
+            dst[dstIndex] = dataview.getInt64(dvIndex, true);
         }
         break;
     case "float":
         dst = new Float32Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getFloat32(dvIndex);
+            dst[dstIndex] = dataview.getFloat32(dvIndex, true);
         }
         break;
     case "double":
         dst = new Float64Array(len);
         for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
-            dst[dstIndex] = dataview.getFloat64(dvIndex);
+            dst[dstIndex] = dataview.getFloat64(dvIndex, true);
         }
         break;
     default:
+        assert(false, 70);
         break;
     }
     return dst;
 };
 
 
-PCTile.prototype._setDimArrays = function (buffer, bufferLength) {
+PCTile.prototype._setDimArrays = function (dataview, numBytes) {
     "use strict";
 
-    var dims = this._header.dimensions,
-        dataview = new DataView(buffer);
+    var headerDims = this._header.dimensions;
     var i;
     var datatype,
         offset,
@@ -154,23 +154,30 @@ PCTile.prototype._setDimArrays = function (buffer, bufferLength) {
         name,
         v;
 
-    this.numPoints = bufferLength / this._tree.provider.pointSizeInBytes;
+    if (numBytes == 0) {
+        this.numPoints = 0;
+    } else {
+        this.numPoints = numBytes / this._tree.provider.pointSizeInBytes;
+        //console.log(this.numPoints + "  " + numBytes + "  " + this._tree.provider.pointSizeInBytes);
+        assert(this.numPoints * this._tree.provider.pointSizeInBytes == numBytes, 71);
+    }
+    this.dimensions = [];
 
-    this.dimensions = {};
+    //console.log("num points in tile: " + this.numPoints);
 
-//    console.log("num points in tile: " + this.numPoints);
-
-    for (i = 0; i < dims.length; i += 1) {
-        datatype = dims[i].datatype;
-        offset = dims[i].offset;
-        name = dims[i].name;
+    for (i = 0; i < headerDims.length; i += 1) {
+        datatype = headerDims[i].datatype;
+        offset = headerDims[i].offset;
+        name = headerDims[i].name;
         stride = this._tree.provider.pointSizeInBytes;
+        //console.log("-" + datatype + offset + name + stride);
 
-        v = this._makeFromStridedSlice(dataview, datatype, offset, stride, this.numPoints);
-        if (this.dimensions[name] == undefined) {
-            this.dimensions[name] = {};
+        if (this.numPoints == 0) {
+            v = null;
+        } else {
+            v = this._makeFromStridedSlice(dataview, datatype, offset, stride, this.numPoints);
         }
-        this.dimensions[name].data = v;
+        this.dimensions.push(v);
     }
 };
 
@@ -187,6 +194,9 @@ PCTile.prototype.addTileData = function (buffer) {
     var bytes = new Uint8Array(buffer);
     var mask = bytes[bytes.length - 1];
     //console.log("mask is " + mask);
+
+    var buflen = bytes.length;
+    //console.log("buflen=" + buflen);
 
     this.sw = null;
     this.se = null;
@@ -216,19 +226,19 @@ PCTile.prototype.addTileData = function (buffer) {
     }
 
     this.buffer = buffer;
-
-    this._setDimArrays(buffer, bytes.length - 1);
+    if (bytes.length > 1) {
+        var dv = new DataView(buffer, 0, buflen - 1);
+        this._setDimArrays(dv, buflen - 1);
+    } else {
+        this._setDimArrays(null, 0);
+    }
 
     var rgba = new Uint8Array(this.numPoints * 4);
     var i;
     for (i = 0; i < this.numPoints * 4; i += 1) {
         rgba[i] = 255;
     }
-
-    if (this.dimensions["rgba"] == undefined) {
-        this.dimensions["rgba"] = {};
-    }
-    this.dimensions["rgba"].data = rgba;
+    this.dimensions.push(rgba);
 };
 
 
@@ -266,8 +276,8 @@ PCTile.prototype.loadTileData = function () {
 PCTile.prototype.Cartesian3_fromDegreesArrayHeights_merge = function (x, y, z, cnt, ellipsoid) {
     "use strict";
 
-    console.log(cnt);
-    console.log(this.numPoints);
+    //console.log(cnt);
+    //console.log(this.numPoints);
     assert(cnt==this.numPoints, 66);
 
     var numPoints = x.length;
@@ -296,28 +306,16 @@ PCTile.prototype.Cartesian3_fromDegreesArrayHeights_merge = function (x, y, z, c
 PCTile.prototype.createPrimitive = function (cnt, dims) {
     "use strict";
 
-    console.log("cnt=" + cnt);
-
-    if (cnt==22 || cnt==28) {
-        for (var i=0; i<cnt; i++) {
-            console.log("X" + i + ": " + dims.X.data[i]);
-            console.log("Y" + i + ": " + dims.Y.data[i]);
-            console.log("Z" + i + ": " + dims.Z.data[i]);
-            dims.X.data[i] = 0.0;
-            dims.Y.data[i] = 0.0;
-            dims.Z.data[i] = 0.0;
-            //dims.rgba.data[i] = 0;
-        }
-    }
+    //console.log("cnt=" + cnt);
 
     if (cnt == 0) {
         return null;
     }
 
-    var x = new Float64Array(dims.X.data, 0, cnt);
-    var y = new Float64Array(dims.Y.data, 0, cnt);
-    var z = new Float64Array(dims.Z.data, 0, cnt);
-    var rgba = dims.rgba.data;
+    var x = dims[0];
+    var y = dims[1];
+    var z = dims[2];
+    var rgba = dims[dims.length-1];
 
     var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z, cnt);
 
