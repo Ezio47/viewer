@@ -16,7 +16,7 @@ var assert = function (b, s) {
 };
 
 
-var PCTileProvider = function PCTileProvider(urlPath) {
+var PCTileProvider = function PCTileProvider(url) {
     "use strict";
 
     this._quadtree = undefined;
@@ -24,7 +24,7 @@ var PCTileProvider = function PCTileProvider(urlPath) {
     this._errorEvent = new Cesium.Event();
     this._levelZeroMaximumError = Cesium.QuadtreeTileProvider.computeDefaultLevelZeroMaximumGeometricError(this._tilingScheme);
 
-    this._urlPath = urlPath;
+    this.url = url;
     this.header = undefined;
     this._ready = false;
     this.pointSizeInBytes = undefined;
@@ -77,37 +77,23 @@ PCTileProvider.prototype._computePointSize = function () {
     var tot = 0;
     var i;
 
+    var sizes = {
+        "uint8_t": 1,
+        "int8_t": 1,
+        "uint16_t": 2,
+        "int16_t": 2,
+        "uint32_t": 4,
+        "int32_t": 4,
+        "uint64_t": 8,
+        "int64_t": 8,
+        "float": 4,
+        "double": 8
+    };
+
     for (i = 0; i < dims.length; i += 1) {
-
         dims[i].offset = tot;
-
-        switch (dims[i].datatype) {
-
-        case "uint8_t":
-        case "int8_t":
-            tot += 1;
-            break;
-        case "uint16_t":
-        case "int16_t":
-            tot += 2;
-            break;
-        case "uint32_t":
-        case "int32_t":
-            tot += 4;
-            break;
-        case "uint64_t":
-        case "int64_t":
-            tot += 8;
-            break;
-        case "float":
-            tot += 4;
-            break;
-        case "double":
-            tot += 8;
-            break;
-        default:
-            assert(false, 73);
-        }
+        assert(sizes[dims[i].datatype] != undefined);
+        tot += sizes[dims[i].datatype];
     }
 
     return tot;
@@ -119,7 +105,7 @@ PCTileProvider.prototype.readHeader = function () {
 
     var provider = this;
 
-    var url = this._urlPath + "/header.json";
+    var url = this.url + "/header.json";
 
     Cesium.loadJson(url).then(function (json) {
         provider.header = json;
@@ -127,10 +113,10 @@ PCTileProvider.prototype.readHeader = function () {
         provider.pointSizeInBytes = provider._computePointSize();
         console.log("point size: " + provider.pointSizeInBytes);
 
-        provider._tiletree = new PCTileTree(provider._urlPath, provider);
+        provider._tiletree = new PCTileTree(provider);
 
-        provider._root000 = provider._tiletree.createTile(0, 0, 0);
-        provider._root010 = provider._tiletree.createTile(0, 1, 0);
+        provider._root000 = provider._tiletree.createPCTile(0, 0, 0);
+        provider._root010 = provider._tiletree.createPCTile(0, 1, 0);
 
     }).otherwise(function () {
         console.log("FAIL getting json: " + url);
@@ -181,44 +167,17 @@ PCTileProvider.prototype._makeRect = function (rect) {
 PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
     "use strict";
 
-    if (false) {
-        tile.data = {
-                    primitive : undefined,
-                    freeResources : function () {
-                        if (Cesium.defined(this.primitive)) {
-                            this.primitive.destroy();
-                            this.primitive = undefined;
-                        }
-                    }
-                };
-
-        tile.data.primitive = null;
-
-        tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
-        tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
-        Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
-
-        tile.data.primitive = this._makeRect(tile.rectangle); //pcTile.primitive;
-        tile.state = Cesium.QuadtreeTileLoadState.DONE;
-        tile.renderable = true;
-        return;
-    }
-
   //  console.log("PRESTART: " + tile.level + " " + tile.x + " " + tile.y);
 
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
 
-        var west = Cesium.Math.toDegrees(tile.rectangle.west);
-        var south = Cesium.Math.toDegrees(tile.rectangle.south);
-        var east = Cesium.Math.toDegrees(tile.rectangle.east);
-        var north = Cesium.Math.toDegrees(tile.rectangle.north);
-
         tile.data = {
             primitive : undefined,
             freeResources : function () {
-                if (Cesium.defined(this.primitive)) {
-                    this.primitive.destroy();
-                    this.primitive = undefined;
+                if (Cesium.defined(this.data) && (this.data != null) &&
+                    Cesium.defined(this.data.primitive) && (this.data.primitive != null)) {
+                    this.data.primitive.destroy();
+                    this.data.primitive = undefined;
                 }
             }
         };
@@ -229,10 +188,11 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
         tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
         Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
 
-        var root = (west < 0) ? this._root000 : this._root010;
-        var pcTileState = this._tiletree.getTileState(root, tile.level, tile.x, tile.y);
+        var west = Cesium.Math.toDegrees(tile.rectangle.west);
+        var rootTile = (west < 0) ? this._root000 : this._root010;
+        var pcTileState = this._tiletree.getTileState(rootTile, tile.level, tile.x, tile.y);
 
-      //  console.log("state " + pcTileState + " for " + tile.level + tile.x + tile.y);
+        // console.log("state " + pcTileState + " for " + tile.level + tile.x + tile.y);
 
         if (pcTileState == csUNKNOWN) {
             // nothing we can do, just wait
@@ -249,45 +209,42 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
 
         assert(pcTileState == csEXISTS, 12);
 
-        var pcTile = this._tiletree.lookupTile(tile.level, tile.x, tile.y);
+        var pcTile = this._tiletree.lookupPCTile(tile);
         if (pcTile == null) {
-            //console.log("and creating");
+            // not created yet, so start making it
             tile.state = Cesium.QuadtreeTileLoadState.LOADING;
-            pcTile = this._tiletree.createTile(tile.level, tile.x, tile.y);
+            pcTile = this._tiletree.PCTile(tile.level, tile.x, tile.y);
             pcTile.loadTileData();
             return;
         }
 
-        // the tile exists...
         if (pcTile.state == tsLOADING) {
-            //console.log("and waiting on loading");
-            // just wait
+            // tile exists, but not ready yet, so just wait
             tile.state = Cesium.QuadtreeTileLoadState.LOADING;
             return;
         }
 
-        // the tile exists...
         if (pcTile.state == tsNOTLOADED) {
-            //console.log("and waiting on notloaded");
+            // tile not even started yet, so just wait
             tile.state = Cesium.QuadtreeTileLoadState.LOADING;
             pcTile.loadTileData();
             return;
         }
 
+        // the tiule exists and is fully ready: drop through to below if-stmt
         assert(pcTile.state == tsLOADED, 13);
-        //console.log("and continuing");
 
         tile.state = Cesium.QuadtreeTileLoadState.LOADING;
     }
 
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING) {
-      //  console.log("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);
+        // console.log("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);
 
-        var pcTile = this._tiletree.lookupTile(tile.level, tile.x, tile.y);
+        var pcTile = this._tiletree.lookupPCTile(tile);
         assert(pcTile != null, 55);
 
         if (pcTile.state != tsLOADED) {
-          //  console.log("not loaded, go around");
+            // not loaded yet, so wait
             return;
         }
 
@@ -296,8 +253,7 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
         tile.data.primitive = pcTile.primitive;
 
         if (tile.data.primitive == null) {
-            // tile w/ no data in it
-            console.log("no data in it");
+            // tile is full loaded -- but is an empty tile (no data in it)
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
             tile.renderable = false;
             return;
@@ -305,16 +261,9 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
 
         assert(tile.data.primitive != null, 72);
 
-        //tile.data.primitive = this._makeRect(tile.rectangle);
-
-        //tile.data.primitive.update(context, frameState, []);
         //console.log("LOADINGy: " + tile.level + " " + tile.x + " " + tile.y + "(" + tile.data.primitive._state + ")");
-        //if (tile.data.primitive.ready) {
-            //console.log("LOADINGz: " + tile.level + " " + tile.x + " " + tile.y);
-            tile.state = Cesium.QuadtreeTileLoadState.DONE;
-            tile.renderable = true;
-        //}
-
+        tile.state = Cesium.QuadtreeTileLoadState.DONE;
+        tile.renderable = true;
     }
 };
 

@@ -3,36 +3,33 @@
 // license found in the accompanying LICENSE.txt file.
 
 
-var PCTileTree = function PCTileTree(urlPath, provider) {
+var PCTileTree = function PCTileTree(provider) {
     "use strict";
 
-    this._urlPath = urlPath;
     this.header = provider.header;
     this.provider = provider;
     this._tiles = undefined;
 };
 
 
-PCTileTree.prototype.getUrl = function (pcTile) {
-    "use strict";
-
-    var url = this._urlPath + "/" + pcTile.level + "/" + pcTile.x + "/" + pcTile.y + ".ria";
-    return url;
-};
-
-
-PCTileTree.prototype.lookupTile = function (level, x, y) {
+PCTileTree.prototype.lookupPCTile = function (tile) {
     "use strict";
 
     if (this._tiles == undefined) {
         return null;
     }
+
+    var level = tile.level;
     if (this._tiles[level] == undefined) {
         return null;
     }
+
+    var x = tile.x;
     if (this._tiles[level][x] == undefined) {
         return null;
     }
+
+    var y = tile.y;
     if (this._tiles[level][x][y] == undefined) {
         return null;
     }
@@ -41,7 +38,7 @@ PCTileTree.prototype.lookupTile = function (level, x, y) {
 };
 
 
-PCTileTree.prototype.createTile = function (level, x, y) {
+PCTileTree.prototype.createPCTile = function (level, x, y) {
     "use strict";
 
     //console.log("creating " + level + x + y);
@@ -55,9 +52,6 @@ PCTileTree.prototype.createTile = function (level, x, y) {
     if (this._tiles[level][x] == undefined) {
         this._tiles[level][x] = {};
     }
-    //if (this._tiles[level][x][y] == undefined) {
-    //    this._tiles[level][x][y] = {};
-    //}
 
     var pcTile = new PCTile(this, level, x, y);
 
@@ -127,23 +121,21 @@ PCTileTree.prototype.getTileState = function (root, level, x, y) {
 
     assert(root.state == tsLOADED, 8);
 
-    var rxy = this.getXYAtLevel(root.level + 1, level, x, y);
-    //console.log("   rxy=" + rxy[0] + rxy[1] + rxy[2]);
-    var q = this.computeQuadrantOf(rxy[1], rxy[2]);
-    //console.log("   q=" + q);
+    var xyzRoot = this.getXYAtLevel(root.level + 1, level, x, y);
+    var quadrant = this.computeQuadrantOf(xyzRoot[1], xyzRoot[2]);
 
     var childState;
     var child;
-    if (q == qSW) {
+    if (quadrant == qSW) {
         childState = root.swState;
         child = root.sw;
-    } else if (q == qSE) {
+    } else if (quadrant == qSE) {
         childState = root.seState;
         child = root.se;
-    } else if (q == qNW) {
+    } else if (quadrant == qNW) {
         childState = root.nwState;
         child = root.nw;
-    } else if (q == qNE) {
+    } else if (quadrant == qNE) {
         childState = root.neState;
         child = root.ne;
     } else {

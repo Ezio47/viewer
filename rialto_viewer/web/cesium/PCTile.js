@@ -44,6 +44,10 @@ var PCTile = function PCTile(tree, level, x, y) {
     this.ne = undefined;
 
     this.primitive = undefined;
+
+    this.url = this._tree.provider.url + "/" + level + "/" + x + "/" + y + ".ria";
+
+    this.dimensions = undefined; // list of arrays of dimension data
 };
 
 
@@ -69,7 +73,9 @@ Object.defineProperties(PCTile.prototype, {
 });
 
 
-PCTile.prototype._makeFromStridedSlice = function (dataview, datatype, offset, stride, len) {
+// Dataview is an array-of-structs: x0, y0, z0, t0, x1, y1, ...
+// Create an array of all the elements from one of the struct fields
+PCTile.prototype._extractDimensionArray = function (dataview, datatype, offset, stride, len) {
     "use strict";
 
     var dst, dstIndex, dvIndex;
@@ -143,7 +149,7 @@ PCTile.prototype._makeFromStridedSlice = function (dataview, datatype, offset, s
 };
 
 
-PCTile.prototype._setDimArrays = function (dataview, numBytes) {
+PCTile.prototype._buildDimensionArrays = function (dataview, numBytes) {
     "use strict";
 
     var headerDims = this._header.dimensions;
@@ -158,9 +164,9 @@ PCTile.prototype._setDimArrays = function (dataview, numBytes) {
         this.numPoints = 0;
     } else {
         this.numPoints = numBytes / this._tree.provider.pointSizeInBytes;
-        //console.log(this.numPoints + "  " + numBytes + "  " + this._tree.provider.pointSizeInBytes);
         assert(this.numPoints * this._tree.provider.pointSizeInBytes == numBytes, 71);
     }
+
     this.dimensions = [];
 
     //console.log("num points in tile: " + this.numPoints);
@@ -170,16 +176,51 @@ PCTile.prototype._setDimArrays = function (dataview, numBytes) {
         offset = headerDims[i].offset;
         name = headerDims[i].name;
         stride = this._tree.provider.pointSizeInBytes;
-        //console.log("-" + datatype + offset + name + stride);
 
         if (this.numPoints == 0) {
             v = null;
         } else {
-            v = this._makeFromStridedSlice(dataview, datatype, offset, stride, this.numPoints);
+            v = this._extractDimensionArray(dataview, datatype, offset, stride, this.numPoints);
         }
         this.dimensions.push(v);
     }
 };
+
+
+PCTile.prototype._makeChildren = function (mask) {
+    //console.log("mask is " + mask);
+
+    this.sw = null;
+    this.se = null;
+    this.nw = null;
+    this.ne = null;
+
+    this.swState = csDOESNOTEXIST;
+    this.seState = csDOESNOTEXIST;
+    this.nwState = csDOESNOTEXIST;
+    this.neState = csDOESNOTEXIST;
+
+    var level = this.level;
+    var x = this.x;
+    var y = this.y;
+
+    if ((mask & 1) == 1) {
+        this.sw = this._tree.createPCTile(level + 1, 2 * x, 2 * y + 1);
+        this.swState = csEXISTS;
+    }
+    if ((mask & 2) == 2) {
+        this.se = this._tree.createPCTile(level + 1, 2 * x + 1, 2 * y + 1);
+        this.seState = csEXISTS;
+    }
+    if ((mask & 4) == 4) {
+        this.ne = this._tree.createPCTile(level + 1, 2 * x + 1, 2 * y);
+        this.neState = csEXISTS;
+    }
+    if ((mask & 8) == 8) {
+        this.nw = this._tree.createPCTile(level + 1, 2 * x, 2 * y);
+        this.nwState = csEXISTS;
+    }
+}
 
 
 PCTile.prototype.addTileData = function (buffer) {
@@ -192,53 +233,26 @@ PCTile.prototype.addTileData = function (buffer) {
     var y = this.y;
 
     var bytes = new Uint8Array(buffer);
-    var mask = bytes[bytes.length - 1];
-    //console.log("mask is " + mask);
-
     var buflen = bytes.length;
     //console.log("buflen=" + buflen);
 
-    this.sw = null;
-    this.se = null;
-    this.nw = null;
-    this.ne = null;
-
-    this.swState = csDOESNOTEXIST;
-    this.seState = csDOESNOTEXIST;
-    this.nwState = csDOESNOTEXIST;
-    this.neState = csDOESNOTEXIST;
-
-    if ((mask & 1) == 1) {
-        this.sw = this._tree.createTile(level + 1, 2 * x, 2 * y + 1);
-        this.swState = csEXISTS;
-    }
-    if ((mask & 2) == 2) {
-        this.se = this._tree.createTile(level + 1, 2 * x + 1, 2 * y + 1);
-        this.seState = csEXISTS;
-    }
-    if ((mask & 4) == 4) {
-        this.ne = this._tree.createTile(level + 1, 2 * x + 1, 2 * y);
-        this.neState = csEXISTS;
-    }
-    if ((mask & 8) == 8) {
-        this.nw = this._tree.createTile(level + 1, 2 * x, 2 * y);
-        this.nwState = csEXISTS;
-    }
-
-    this.buffer = buffer;
     if (bytes.length > 1) {
         var dv = new DataView(buffer, 0, buflen - 1);
-        this._setDimArrays(dv, buflen - 1);
+        this._buildDimensionArrays(dv, buflen - 1);
     } else {
-        this._setDimArrays(null, 0);
+        this._buildDimensionArrays(null, 0);
     }
 
+    // this is the array used to colorize each point
     var rgba = new Uint8Array(this.numPoints * 4);
     var i;
     for (i = 0; i < this.numPoints * 4; i += 1) {
         rgba[i] = 255;
     }
     this.dimensions.push(rgba);
+
+    var mask = bytes[bytes.length - 1];
+    this._makeChildren(mask);
 };
 
 
@@ -247,14 +261,12 @@ PCTile.prototype.loadTileData = function () {
 
     //console.log("loading " + this.level + this.x + this.y);
 
-    var url = this._tree.getUrl(this);
-
     assert(this.state == tsNOTLOADED, 2);
     this.state = tsLOADING;
 
     var thisTile = this;
 
-    Cesium.loadBlob(url).then(function (blob) {
+    Cesium.loadBlob(this.url).then(function (blob) {
         //console.log("got blob:" + blob.size);
 
         var reader = new FileReader();
@@ -267,7 +279,7 @@ PCTile.prototype.loadTileData = function () {
         reader.readAsArrayBuffer(blob);
 
     }).otherwise(function () {
-        //console.log("FAIL getting blob: " + url);
+        //console.log("FAIL getting blob: " + this.url);
     });
 };
 
@@ -276,11 +288,8 @@ PCTile.prototype.loadTileData = function () {
 PCTile.prototype.Cartesian3_fromDegreesArrayHeights_merge = function (x, y, z, cnt, ellipsoid) {
     "use strict";
 
-    //console.log(cnt);
-    //console.log(this.numPoints);
     assert(cnt==this.numPoints, 66);
 
-    var numPoints = x.length;
     var xyz = new Float64Array(cnt * 3);
 
     var i;
@@ -306,21 +315,17 @@ PCTile.prototype.Cartesian3_fromDegreesArrayHeights_merge = function (x, y, z, c
 PCTile.prototype.createPrimitive = function (cnt, dims) {
     "use strict";
 
-    //console.log("cnt=" + cnt);
-
     if (cnt == 0) {
         return null;
     }
 
+    // TODO: assumes x,y,z are first and rgba is last
     var x = dims[0];
     var y = dims[1];
     var z = dims[2];
     var rgba = dims[dims.length-1];
 
     var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z, cnt);
-
-    //console.log("xyz.len=" + xyz.length);
-    //console.log("rgba.len=" + rgba.length);
 
     assert(this.numPoints == cnt, 39);
     assert(xyz.length == cnt * 3, 40);
