@@ -32,8 +32,6 @@ var PCTileProvider = function PCTileProvider(url) {
     this._tiletree = null;
     this._root000 = null;
     this._root010 = null;
-
-    this.readHeader();
 };
 
 
@@ -51,7 +49,7 @@ Object.defineProperties(PCTileProvider.prototype, {
     ready : {
         get : function () {
             "use strict";
-            console.log("ready check" + this._ready);
+            //console.log("ready check" + this._ready);
             return this._ready;
         }
     },
@@ -100,12 +98,15 @@ PCTileProvider.prototype._computePointSize = function () {
 };
 
 
-PCTileProvider.prototype.readHeader = function () {
+// returns a promise<provider>
+PCTileProvider.prototype.readHeaderAsync = function () {
     "use strict";
 
     var provider = this;
 
     var url = this.url + "/header.json";
+
+    var deferred = Cesium.when.defer();
 
     Cesium.loadJson(url).then(function (json) {
         provider.header = json;
@@ -117,10 +118,14 @@ PCTileProvider.prototype.readHeader = function () {
 
         provider._root000 = provider._tiletree.createPCTile(0, 0, 0);
         provider._root010 = provider._tiletree.createPCTile(0, 1, 0);
-console.log("header read");
+
+        deferred.resolve(provider);
+
     }).otherwise(function () {
         console.log("FAIL getting json: " + url);
     });
+
+    return deferred.promise;
 };
 
 

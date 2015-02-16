@@ -13,14 +13,18 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    Future<dynamic> createTileProvider(String url) {
+    Future<dynamic> createTileProviderAsync(String url) {
         var c = new Completer<dynamic>();
 
         var cb = (obj) { c.complete(obj); };
 
-        _bridge.callMethod('createTileProvider', [cb, url]);
+        _bridge.callMethod('createTileProviderAsync', [url, cb]);
 
         return c.future;
+    }
+
+    dynamic getNumPointsFromProvider(var provider) {
+        return _bridge.callMethod('getNumPointsFromProvider', [provider]);
     }
 
     dynamic getTileBboxFromProvider(var provider) {

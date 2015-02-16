@@ -33,7 +33,7 @@ class InfoVM extends DialogVM {
             maxz = layer.bbox.maximum.height;
 
             if (layer is PointCloudLayer) {
-                numPoints = layer.cloud.numPoints;
+                numPoints = layer.numPoints;
             }
         }
 

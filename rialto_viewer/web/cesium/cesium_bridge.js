@@ -19,24 +19,51 @@ var CesiumBridge = function (element) {
     this.viewer = new Cesium.Viewer(element, options);
 
 
-    this.createTileProvider = function(cb, url) {
-        var viewer = this.viewer;
-        var scene = viewer.scene;
-        var primitives = scene.primitives;
+    // returns a promise<provider>
+    this._createTileProvider2Async = function(urlarg) {
+        var deferred = Cesium.when.defer();
 
-        var provider = new PCTileProvider(url);
+        var provider = new PCTileProvider(urlarg);
 
-        primitives.add(new Cesium.QuadtreePrimitive({
-            tileProvider : provider
-        }));
+        provider.readHeaderAsync().then(function(provider) {
+            deferred.resolve(provider);
+        }).otherwise(function (error) {
+            console.log("ERROR8");
+        });
 
-        cb(provider);
+        return deferred.promise;
+    }
 
-        return;
+    // returns nothing, but sets the completer<promise>
+    this.createTileProviderAsync = function(urlarg, completer) {
+
+        var thisthis = this;
+
+        this._createTileProvider2Async(urlarg).then(function(provider) {
+
+            var viewer = thisthis.viewer;
+            var scene = viewer.scene;
+            var primitives = scene.primitives;
+
+            primitives.add(new Cesium.QuadtreePrimitive({
+                tileProvider : provider
+            }));
+
+            completer(provider);
+            return;
+
+        }).otherwise(function (error) {
+            console.log(error);
+            assert(false, 100);
+        });
+    }
+
+    this.getNumPointsFromProvider = function (provider) {
+        var n = provider.header.numPoints;
+        return n;
     }
 
     this.getTileBboxFromProvider = function (provider) {
-    console.log("d" + provider.header);
         var b = provider.header.tilebbox;
         return b;
     }

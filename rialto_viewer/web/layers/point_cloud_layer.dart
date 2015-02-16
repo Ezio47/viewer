@@ -7,8 +7,8 @@ part of rialto.viewer;
 
 class PointCloudLayer extends Layer {
     PointCloudColorizer _colorizer;
-    CartographicBbox bbox;
     var _provider;
+    int numPoints;
 
     PointCloudLayer(String name, Map map)
             : super(name, map) {
@@ -19,13 +19,20 @@ class PointCloudLayer extends Layer {
     Future<bool> load() {
         Completer c = new Completer();
 
-        _hub.cesium.createTileProvider(server + path).then((provider) {
-           // _provider = provider;
+        _hub.cesium.createTileProviderAsync(server + path).then((provider) {
+            _provider = provider;
 
-        //    _colorizer = new PointCloudColorizer(_provider);
+            _colorizer = new PointCloudColorizer(_provider);
 
-          //  var list = _hub.cesium.getTileBboxFromProvider(_provider);
-          //  var mmm = _hub.cesium.getStatsFromProvider(_provider, "X");
+            numPoints = _hub.cesium.getNumPointsFromProvider(_provider);
+
+            var list = _hub.cesium.getTileBboxFromProvider(_provider);
+
+            var xStats = _hub.cesium.getStatsFromProvider(_provider, "X");
+            var yStats = _hub.cesium.getStatsFromProvider(_provider, "Y");
+            var zStats = _hub.cesium.getStatsFromProvider(_provider, "Z");
+
+            bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
 
             c.complete(true);
         });
