@@ -13,8 +13,22 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    void createTileProvider(path) {
-        _bridge.callMethod('doTileProvider', [path]);
+    Future<dynamic> createTileProvider(String url) {
+        var c = new Completer<dynamic>();
+
+        var cb = (obj) { c.complete(obj); };
+
+        _bridge.callMethod('createTileProvider', [cb, url]);
+
+        return c.future;
+    }
+
+    dynamic getTileBboxFromProvider(var provider) {
+        return _bridge.callMethod('getTileBboxFromProvider', [provider]);
+    }
+
+    dynamic getStatsFromProvider(var provider, var dimName) {
+        return _bridge.callMethod('getStatsFromProvider', [provider, dimName]);
     }
 
     dynamic addGeoJson(String url) {

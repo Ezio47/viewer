@@ -19,13 +19,38 @@ var CesiumBridge = function (element) {
     this.viewer = new Cesium.Viewer(element, options);
 
 
-    this.doTileProvider = function(path) {
+    this.createTileProvider = function(cb, url) {
         var viewer = this.viewer;
         var scene = viewer.scene;
         var primitives = scene.primitives;
+
+        var provider = new PCTileProvider(url);
+
         primitives.add(new Cesium.QuadtreePrimitive({
-            tileProvider : new PCTileProvider(path)
+            tileProvider : provider
         }));
+
+        cb(provider);
+
+        return;
+    }
+
+    this.getTileBboxFromProvider = function (provider) {
+    console.log("d" + provider.header);
+        var b = provider.header.tilebbox;
+        return b;
+    }
+
+    this.getStatsFromProvider = function (provider, dimName) {
+        var dims = provider.header.dimensions;
+        for (var i=0; i<dims.length; i++) {
+            if (dims[i].name == dimName) {
+                var list = [dims[i].min, dims[i].mean, dims[i].max];
+                return list;
+            }
+        }
+
+        return null;
     }
 
     this.addGeoJson = function(url) {

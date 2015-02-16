@@ -117,7 +117,7 @@ PCTileProvider.prototype.readHeader = function () {
 
         provider._root000 = provider._tiletree.createPCTile(0, 0, 0);
         provider._root010 = provider._tiletree.createPCTile(0, 1, 0);
-
+console.log("header read");
     }).otherwise(function () {
         console.log("FAIL getting json: " + url);
     });

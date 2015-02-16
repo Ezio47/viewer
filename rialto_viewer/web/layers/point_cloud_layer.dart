@@ -6,36 +6,29 @@ part of rialto.viewer;
 
 
 class PointCloudLayer extends Layer {
-    PointCloud cloud;
     PointCloudColorizer _colorizer;
-
-    static const int _pointsPerTile = 1024 * 10;
-
-    Map tileObjects = new Map<String, PointCloudTile>();
-    Map tilePrimitives = new Map<String, dynamic>();
+    CartographicBbox bbox;
+    var _provider;
 
     PointCloudLayer(String name, Map map)
             : super(name, map) {
-        log("New tiled pointcloud layer: $name .. $server .. $path");
+        log("New pointcloud layer: $name .. $server .. $path");
     }
 
     @override
     Future<bool> load() {
         Completer c = new Completer();
 
-        cloud = new PointCloud(path, name);
+        _hub.cesium.createTileProvider(server + path).then((provider) {
+           // _provider = provider;
 
-        _hub.cesium.createTileProvider(server + path);
+        //    _colorizer = new PointCloudColorizer(_provider);
 
-        assert(cloud != null);
+          //  var list = _hub.cesium.getTileBboxFromProvider(_provider);
+          //  var mmm = _hub.cesium.getStatsFromProvider(_provider, "X");
 
-        cloud.changeVisibility(isVisible);
-
-        bbox = new CartographicBbox.copy(cloud.bbox);
-
-        _colorizer = new PointCloudColorizer(cloud);
-
-        c.complete(true);
+            c.complete(true);
+        });
 
         return c.future;
     }
@@ -43,15 +36,15 @@ class PointCloudLayer extends Layer {
 
     @override
     void changeVisibility(bool v) {
-        cloud.changeVisibility(v);
+        //      cloud.changeVisibility(v);
         isVisible = v;
     }
 
     Future colorizeAsync(ColorizeLayersData data) {
         return new Future(() {
-            _colorizer.ramp = data.ramp;
-            _colorizer.dimension = data.dimension;
-            _colorizer.colorize();
+//            _colorizer.ramp = data.ramp;
+            //          _colorizer.dimension = data.dimension;
+            //        _colorizer.colorize();
         });
     }
 }

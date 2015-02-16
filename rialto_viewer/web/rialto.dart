@@ -26,8 +26,6 @@ part 'config_script.dart';
 part 'layer_manager.dart';
 part 'measurement_controller.dart';
 part 'mode_controller.dart';
-part 'point_cloud.dart';
-part 'point_cloud_tile.dart';
 part 'selection_controller.dart';
 part 'view_controller.dart';
 part 'ogc/wps.dart';

@@ -167,7 +167,7 @@ PCTile.prototype._buildDimensionArrays = function (dataview, numBytes) {
         assert(this.numPoints * this._tree.provider.pointSizeInBytes == numBytes, 71);
     }
 
-    this.dimensions = [];
+    this.dimensions = {};
 
     //console.log("num points in tile: " + this.numPoints);
 
@@ -182,8 +182,16 @@ PCTile.prototype._buildDimensionArrays = function (dataview, numBytes) {
         } else {
             v = this._extractDimensionArray(dataview, datatype, offset, stride, this.numPoints);
         }
-        this.dimensions.push(v);
+        this.dimensions[name] = v;
     }
+
+   // this is the array used to colorize each point
+    var rgba = new Uint8Array(this.numPoints * 4);
+    for (i = 0; i < this.numPoints * 4; i += 1) {
+        rgba[i] = 255;
+    }
+    name = "rgba";
+    this.dimensions[name] = rgba;
 };
 
 
@@ -242,14 +250,6 @@ PCTile.prototype.addTileData = function (buffer) {
     } else {
         this._buildDimensionArrays(null, 0);
     }
-
-    // this is the array used to colorize each point
-    var rgba = new Uint8Array(this.numPoints * 4);
-    var i;
-    for (i = 0; i < this.numPoints * 4; i += 1) {
-        rgba[i] = 255;
-    }
-    this.dimensions.push(rgba);
 
     var mask = bytes[bytes.length - 1];
     this._makeChildren(mask);
@@ -319,11 +319,10 @@ PCTile.prototype.createPrimitive = function (cnt, dims) {
         return null;
     }
 
-    // TODO: assumes x,y,z are first and rgba is last
-    var x = dims[0];
-    var y = dims[1];
-    var z = dims[2];
-    var rgba = dims[dims.length-1];
+    var x = dims["X"];
+    var y = dims["Y"];
+    var z = dims["Z"];
+    var rgba = dims["rgba"];
 
     var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z, cnt);
 

@@ -7,11 +7,11 @@ part of rialto.viewer;
 class PointCloudColorizer {
     String _ramp;
     String _dimension;
-    PointCloud _cloud;
+    var _provider;
     static const _defaultRamp = "Spectral";
     static const _defaultDimension = "Z";
 
-    PointCloudColorizer(PointCloud this._cloud);
+    PointCloudColorizer(var this._provider);
 
     void colorize() {
 
