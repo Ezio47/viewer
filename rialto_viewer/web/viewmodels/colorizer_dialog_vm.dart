@@ -16,7 +16,7 @@ class ColorizerDialogVM extends DialogVM {
 
         _listbox = new ListBoxVM<String>("colorizerDialog_items");
 
-        var names = PointCloudColorizer.names;
+        var names = _hub.cesium.getColorRampNames();
         names.forEach((s) => _listbox.add(s));
     }
 

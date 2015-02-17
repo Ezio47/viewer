@@ -273,6 +273,7 @@ PCTile.prototype.loadTileData = function () {
         reader.addEventListener("loadend", function () {
             var arraybuffer = reader.result;
             thisTile.addTileData(arraybuffer);
+            thisTile.colorize();
             thisTile.primitive = thisTile.createPrimitive(thisTile.numPoints, thisTile.dimensions);
             thisTile.state = tsLOADED;
         });
@@ -344,4 +345,25 @@ PCTile.prototype.createPrimitive = function (cnt, dims) {
     });
 
     return prim;
+};
+
+
+PCTile.prototype.colorize = function () {
+    var provider = this._tree.provider;
+
+    var headerDims = provider.header.dimensions;
+    var min, max;
+    for (var i=0; i<headerDims.length; i++) {
+        if (headerDims[i].name == provider.colorizeDimension) {
+            min = headerDims[i].min;
+            max = headerDims[i].max;
+            break;
+        }
+    }
+
+    var dataArray = this.dimensions[provider.colorizeDimension];
+    var rgba = "rgba";
+    var rgbaArray = this.dimensions[rgba];
+
+    doColorize(provider.rampName, dataArray, this.numPoints, min, max, rgbaArray);
 };

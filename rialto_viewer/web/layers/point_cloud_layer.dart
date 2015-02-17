@@ -6,7 +6,6 @@ part of rialto.viewer;
 
 
 class PointCloudLayer extends Layer {
-    PointCloudColorizer _colorizer;
     var _provider;
     int numPoints;
 
@@ -21,8 +20,6 @@ class PointCloudLayer extends Layer {
 
         _hub.cesium.createTileProviderAsync(server + path).then((provider) {
             _provider = provider;
-
-            _colorizer = new PointCloudColorizer(_provider);
 
             numPoints = _hub.cesium.getNumPointsFromProvider(_provider);
 

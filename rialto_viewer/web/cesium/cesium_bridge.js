@@ -58,6 +58,17 @@ var CesiumBridge = function (element) {
         });
     }
 
+    this.getDimensionNamesFromProvider = function (provider) {
+        var ret = [];
+
+        var dims = provider.header.dimensions;
+        for (var i=0; i<dims.length; i++) {
+            ret.push(dims[i].name);
+        }
+
+        return ret;
+    }
+
     this.getNumPointsFromProvider = function (provider) {
         var n = provider.header.numPoints;
         return n;
@@ -78,6 +89,11 @@ var CesiumBridge = function (element) {
         }
 
         return null;
+    }
+
+    this.getColorRampNames = function () {
+        var keys = Object.keys(colorRamps);
+        return keys;
     }
 
     this.addGeoJson = function(url) {
@@ -426,33 +442,5 @@ var CesiumBridge = function (element) {
         } else {
             return null;
         }
-    }
-
-
-    this.createLabel = function(text, x, y, z) {
-       ///// scene.primitives.removeAll();
-        var labels = scene.primitives.add(new Cesium.LabelCollection());
-        labels.add({
-             position : Cesium.Cartesian3.fromDegrees(-75.10, 39.57),
-             text     : 'Philadelphia'
-        });
-
-        var ellipsoid = this.viewer.scene.globe.ellipsoid;
-        var labels = scene.primitives.add(new Cesium.LabelCollection());
-        label = labels.add();
-        label.fillColor = Cesium.Color.VIOLET;
-        label.show = true;
-        label.text = "My house!";
-        label.position = new Cartesian3(x,y,z);
-    }
-
-    this.create64 = function(len, buf) {
-        var f32 = new Float32Array(buf);
-        var f64 = new Float64Array(len);
-        for (var i=0; i<len; i++) {
-            //console.log(f32[i]);
-            f64[i] = f32[i];
-        }
-        return f64;
     }
 }

@@ -23,6 +23,14 @@ class CesiumBridge {
         return c.future;
     }
 
+    dynamic getDimensionNamesFromProvider(var provider) {
+        return _bridge.callMethod('getDimensionNamesFromProvider', [provider]);
+    }
+
+    dynamic getColorRampNames() {
+        return _bridge.callMethod('getColorRampNames', []);
+    }
+
     dynamic getNumPointsFromProvider(var provider) {
         return _bridge.callMethod('getNumPointsFromProvider', [provider]);
     }

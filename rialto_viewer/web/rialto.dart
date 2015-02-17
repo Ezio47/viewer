@@ -18,7 +18,6 @@ import 'package:yaml/yaml.dart';
 import 'package:xml/xml.dart' as Xml;
 
 part 'annotation_controller.dart';
-part 'point_cloud_colorizer.dart';
 part 'comms.dart';
 part 'hub.dart';
 part 'event_registry.dart';
@@ -35,7 +34,6 @@ part 'cesium/annotation_shape.dart';
 part 'cesium/bbox_shape.dart';
 part 'cesium/camera.dart';
 part 'cesium/cesium_bridge.dart';
-part 'cesium/cloud_shape.dart';
 part 'cesium/measurement_shape.dart';
 part 'cesium/shape.dart';
 part 'cesium/viewshed_shape.dart';

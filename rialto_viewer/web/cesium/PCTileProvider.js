@@ -29,6 +29,9 @@ var PCTileProvider = function PCTileProvider(url) {
     this._ready = false;
     this.pointSizeInBytes = undefined;
 
+    this.rampName = "Spectral";
+    this.colorizeDimension = "Z";
+
     this._tiletree = null;
     this._root000 = null;
     this._root010 = null;
@@ -66,6 +69,14 @@ Object.defineProperties(PCTileProvider.prototype, {
         }
     }
 });
+
+
+PCTileProvider.prototype.setColorization = function (rampName, dimensionName) {
+    "use strict";
+
+    this.rampName = rampName;
+    this.colorizeDimension = dimensionName;
+};
 
 
 PCTileProvider.prototype._computePointSize = function () {
