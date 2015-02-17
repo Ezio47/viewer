@@ -88,6 +88,18 @@ class ConfigScript {
             log(doc);
         });
 
+        var params = {"alpha": "17", "beta": "11"};
+
+        wps.executeProcessAsync("groovy:wpshello", params).then((OgcDocument doc) {
+            assert(doc is Ogc_ExecuteResponse);
+            Ogc_ExecuteResponse resp = doc;
+            var status = resp.status.processSucceeded;
+            assert(status != null);
+            Ogc_DataType datatype = resp.processOutputs.outputData[0].data;
+            Ogc_LiteralOutput literalOutput = datatype.literalData;
+            log(doc);
+        });
+
         _hub.wps = wps;
     }
 

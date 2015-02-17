@@ -4,8 +4,8 @@ title = 'GeoScriptHello'
 description = 'Hello World using GeoScript'
 
 inputs = [
-    geom: [name: 'geom', description: 'first value', type: Double.class],
-	distance: [name: 'distance', description: 'second value', type: Double.class]
+    alpha: [name: 'alpha', description: 'first value', type: Double.class],
+	beta: [name: 'beta', description: 'second value', type: Double.class]
 ]
 
 outputs = [
@@ -13,5 +13,5 @@ outputs = [
 ]
 
 def run(input) {
-	[result: input.geom + input.distance]
+	[result: input.alpha + input.beta]
 }

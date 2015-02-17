@@ -121,7 +121,7 @@ class OgcDocument {
     }
 
     void _errorElement(Xml.XmlElement e) {
-        log("element not yet unhandled: $e");
+        log("element not yet handled: $e");
         assert(false);
     }
 
@@ -286,10 +286,7 @@ class Ogc_ProcessDescription extends OgcDocument {
 
 
     @override String toString() {
-        return "[ProcessDescription]" +
-                "Identifier: $identifier\n" +
-                "Title: $title\n" +
-                processOutputs.toString();
+        return "[ProcessDescription]" + "Identifier: $identifier\n" + "Title: $title\n" + processOutputs.toString();
     }
 }
 
@@ -410,6 +407,7 @@ class Ogc_OutputDescription extends OgcDocument {
 
 
 // table 37
+// also known as "LiteralData" ???
 class Ogc_LiteralOutput extends OgcDocument {
     String datatype;
 
@@ -454,7 +452,7 @@ class Ogc_ExecuteResponse extends OgcDocument {
         _registerAttributes({
             "service": (attr) => service = attr.value,
             "version": (attr) => version = attr.value,
-            "lang": _errorAttribute,
+            "lang": _ignoreAttribute,
             "statusLocation": (attr) => statusLocation = attr.value,
             "serviceInstance": (attr) => serviceInstance = attr.value,
         });
@@ -468,7 +466,6 @@ class Ogc_ExecuteResponse extends OgcDocument {
 }
 
 
-
 // table 55
 class Ogc_Status extends OgcDocument {
     String creationTime;
@@ -476,7 +473,7 @@ class Ogc_Status extends OgcDocument {
     String processStarted;
     String processPaused;
     String processSucceeded;
-    Ogc_ExceptionReport processFailed;
+    Ogc_ProcessFailed processFailed;
 
     Ogc_Status(Xml.XmlElement element)
             : super(element) {
@@ -486,7 +483,7 @@ class Ogc_Status extends OgcDocument {
             "ProcessStarted": (e) => processStarted = e.text, // TODO: percent completed
             "ProcessPaused": (e) => processPaused = e.text,
             "ProcessSucceeded": (e) => processSucceeded = e.text,
-            "ProcessFailed": (e) => processFailed = new Ogc_ExceptionReport(e)
+            "ProcessFailed": (e) => processFailed = new Ogc_ProcessFailed(e)
         });
 
         _registerAttributes({
@@ -495,9 +492,28 @@ class Ogc_Status extends OgcDocument {
 
     }
 
-
     @override String toString() {
         return "[Status]\n";
+    }
+}
+
+
+class Ogc_ProcessFailed extends OgcDocument {
+    Ogc_ExceptionReport exceptionReport;
+
+    Ogc_ProcessFailed(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "ExceptionReport": (e) => exceptionReport = new Ogc_ExceptionReport(e)
+        });
+
+        _registerAttributes({
+        });
+    }
+
+    @override String toString() {
+        return "[ProcessFailed]\n";
     }
 }
 
@@ -527,7 +543,8 @@ class Ogc_OutputData extends OgcDocument {
     String title;
     String abstract;
     Ogc_OutputReference outputReference;
-    String data;
+    ////////////Ogc_DataType data;
+    Ogc_LiteralOutput literalOutput;
 
     Ogc_OutputData(Xml.XmlElement element)
             : super(element) {
@@ -536,10 +553,15 @@ class Ogc_OutputData extends OgcDocument {
             "Identifier": (e) => identifier = e.text,
             "Title": (e) => title = e.text,
             "Abstract": (e) => abstract = e.text,
+
             "Reference": (e) => outputReference = new Ogc_OutputReference(e),
-            "Data": _errorElement,
-            "ComplexOutput": _ignoreElement,
-            "LiteralOutput": _ignoreElement
+
+            /////////////////"Data": (e) => data = new Ogc_DataType(e),
+
+            // table 46
+            "ComplexOutput": _errorElement,
+            "LiteralOutput": (e) => literalOutput =  new Ogc_LiteralOutput(e),
+            "BoundingBoxOutput": _errorElement,
         });
     }
 
@@ -548,6 +570,27 @@ class Ogc_OutputData extends OgcDocument {
     }
 }
 
+/*
+// table 46
+class Ogc_DataType extends OgcDocument {
+    Ogc_LiteralOutput literalData;
+
+    Ogc_DataType(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "ComplexData": _ignoreElement,
+            "LiteralData": (e) => literalData = new Ogc_LiteralOutput(e),
+            "BoundingBoxData": _ignoreElement,
+        });
+    }
+
+
+    @override String toString() {
+        return "[OutputReference]\n";
+    }
+}
+*/
 
 // table 61
 class Ogc_OutputReference extends OgcDocument {

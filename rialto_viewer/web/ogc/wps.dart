@@ -88,7 +88,9 @@ class WpsService extends OwsService {
                 assert(ret is Ogc_ProcessDescriptions);
                 desc = ret.descriptions.where((d) => d.identifier == processIdentifier);
 
-                if (desc == null || desc.isEmpty || desc.length > 1) Hub.error("error parsing process description response document");
+                if (desc == null ||
+                        desc.isEmpty ||
+                        desc.length > 1) Hub.error("error parsing process description response document");
 
                 c.complete(desc.first);
             }
@@ -97,10 +99,13 @@ class WpsService extends OwsService {
         return c.future;
     }
 
-    Future<OgcDocument> executeProcessAsync(String processName, List<String> params) {
+    Future<OgcDocument> executeProcessAsync(String processName, Map<String, String> params) {
         var c = new Completer<OgcDocument>();
 
-        _doServerRequest("Execute", ["identifier=$processName"]).then((Xml.XmlDocument doc) {
+        String identifier = "Identifier=$processName";
+        String dataInputs = "DataInputs=alpha=17;beta=11";
+
+        _doServerRequest("Execute", [identifier, dataInputs]).then((Xml.XmlDocument doc) {
             var resp = OgcDocument.parse(doc);
             if (resp == null) Hub.error("error parsing execute response document");
             c.complete(resp);
@@ -112,7 +117,12 @@ class WpsService extends OwsService {
     void getViewshedAsync(double observerLon, double observerLat, double radius) {
         var c = new Completer<OgcDocument>();
 
-        var params = ["observerLon=$observerLon", "observerLat=$observerLat", "radius=$radius"];
+        var params = {
+            "observerLon": observerLon.toString(),
+            "observerLat": observerLat.toString(),
+            "radius": radius.toString()
+        }
+        ;
         executeProcessAsync("Viewshed", params).then((OgcDocument doc) {
             if (doc is Ogc_ExceptionReport) {
                 log("viewshed returned exception report");
