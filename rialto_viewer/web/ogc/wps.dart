@@ -74,20 +74,24 @@ class WpsService extends OwsService {
         return c.future;
     }
 
-    Future<OgcDocument> getProcessDescriptionAsync(String processName) {
+    Future<OgcDocument> getProcessDescriptionAsync(String processIdentifier) {
         var c = new Completer<OgcDocument>();
 
-        _doServerRequest("DescribeProcess", ["identifier=$processName"]).then((Xml.XmlDocument doc) {
+        _doServerRequest("DescribeProcess", ["identifier=$processIdentifier"]).then((Xml.XmlDocument doc) {
             var ret = OgcDocument.parse(doc);
             var desc;
 
-            if (ret is OgcDocument_ProcessDescriptions) {
-                desc = ret.descriptions[processName];
+            if (ret is Ogc_ExceptionReport) {
+                log("exception report!");
+                c.complete(ret);
             } else {
-                desc = ret;
+                assert(ret is Ogc_ProcessDescriptions);
+                desc = ret.descriptions.where((d) => d.identifier == processIdentifier);
+
+                if (desc == null || desc.isEmpty || desc.length > 1) Hub.error("error parsing process description response document");
+
+                c.complete(desc.first);
             }
-            if (desc == null) Hub.error("error parsing process description response document");
-            c.complete(desc);
         });
 
         return c.future;
@@ -110,7 +114,7 @@ class WpsService extends OwsService {
 
         var params = ["observerLon=$observerLon", "observerLat=$observerLat", "radius=$radius"];
         executeProcessAsync("Viewshed", params).then((OgcDocument doc) {
-            if (doc is OgcDocument_ExceptionReport) {
+            if (doc is Ogc_ExceptionReport) {
                 log("viewshed returned exception report");
             }
             log(doc);

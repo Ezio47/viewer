@@ -11,6 +11,8 @@ class ConfigScript {
     ConfigScript(String url) {
         _hub = Hub.root;
 
+        //OgcDocumentTests.test();
+
         var f = Comms.httpGet(url);
 
         f.then((s) {
@@ -77,12 +79,14 @@ class ConfigScript {
         wps.open();
 
         wps.getCapabilitiesAsync().then((OgcDocument doc) {
-            assert(doc is OgcDocument_Capabilities);
+            assert(doc is Ogc_Capabilities);
+            //log(doc);
+        });
+
+        wps.getProcessDescriptionAsync("groovy:wpshello").then((OgcDocument doc) {
+            assert(doc is Ogc_ProcessDescription);
             log(doc);
         });
-        //wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is OgcDocument_WpsProcessDescription); });
-        //wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is OgcDocument_ExceptionReport); });
-        //wps.close();
 
         _hub.wps = wps;
     }
