@@ -31,8 +31,8 @@ class OgcDocumentTests {
 
         var wps = new WpsService("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService", proxy: "http://localhost:12347");
         wps.open();
-        wps.getCapabilitiesAsync().then((doc) { assert(doc is OgcDocument_WpsCapabilities); });
-        wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is OgcDocument_WpsProcessDescription); });
+        wps.getCapabilitiesAsync().then((doc) { assert(doc is OgcDocument_Capabilities); });
+        wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is OgcDocument_ProcessDescription); });
         wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is OgcDocument_ExceptionReport); });
         wps.close();
     }

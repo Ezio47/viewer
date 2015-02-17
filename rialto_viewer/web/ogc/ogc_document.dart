@@ -11,26 +11,33 @@ part of rialto.viewer;
 
 typedef void _ParseFunction(Xml.XmlElement e);
 
+
 class OgcDocument {
+
     Xml.XmlElement element;
     String type;
 
-    OgcDocument(Xml.XmlElement this.element, [String this.type]) {
-        assert(type == null || element.name.local == type);
+
+    OgcDocument(Xml.XmlElement this.element, String this.type) {
+        assert(type != null);
+        log(element.name.local);
+        log(type);
+        assert(element.name.local == type);
     }
+
 
     static OgcDocument parse(Xml.XmlDocument document) {
         for (var node in document.children) {
             if (node is Xml.XmlElement) {
                 switch (node.name.local) {
                     case "Capabilities":
-                        return new OgcDocument_WpsCapabilities(node);
+                        return new OgcDocument_Capabilities(node);
                     case "ExceptionReport":
                         return new OgcDocument_ExceptionReport(node);
                     case "ProcessDescriptions":
-                        return new OgcDocument_WpsProcessDescriptions(node);
+                        return new OgcDocument_ProcessDescriptions(node);
                     case "ExecuteResponse":
-                        return new OgcDocument_WpsExecuteResponse(node);
+                        return new OgcDocument_ExecuteResponse(node);
                     default:
                         _unsupported(node);
                         break;
@@ -41,12 +48,15 @@ class OgcDocument {
         return null;
     }
 
+
     static Xml.XmlElement _getElement(List<Xml.XmlNode> nodes, String name) {
         var element = nodes.firstWhere((node) => _nameIs(node, name));
         return element;
     }
 
+
     static bool _nameIs(Xml.XmlNode node, String name) => (node is Xml.XmlElement && node.name.local == name);
+
 
     void _parseElements(_ParseFunction parser) {
         for (var node in element.children) {
@@ -56,41 +66,133 @@ class OgcDocument {
         }
     }
 
+
     @override
     String toString() {
-        return "type: $type";
+        return "[$type]";
     }
+
 
     static void _unsupported(Xml.XmlElement element) {
         log("Element type ${element.name.local} not supported");
     }
 }
 
+
 class OgcDocument_OwsServiceIdentification extends OgcDocument {
-    OgcDocument_OwsServiceIdentification(Xml.XmlElement element) : super(element, "ServiceIdentification");
+
+    OgcDocument_OwsServiceIdentification(Xml.XmlElement element)
+            : super(element, "ServiceIdentification");
+
+
+    @override String toString() {
+        return "[ServiceIdentification]\n";
+    }
 }
 
+
 class OgcDocument_OwsServiceProvider extends OgcDocument {
-    OgcDocument_OwsServiceProvider(Xml.XmlElement element) : super(element, "ServiceProvider");
+
+    OgcDocument_OwsServiceProvider(Xml.XmlElement element)
+            : super(element, "ServiceProvider");
+
+
+    @override String toString() {
+        return "[ServiceProvider]\n";
+    }
 }
 
 
 class OgcDocument_OwsOperationsMetadata extends OgcDocument {
-    OgcDocument_OwsOperationsMetadata(Xml.XmlElement element) : super(element, "OperationsMetadata");
+
+    OgcDocument_OwsOperationsMetadata(Xml.XmlElement element)
+            : super(element, "OperationsMetadata");
+
+
+    @override String toString() {
+        return "[OperationsMetadata]\n";
+    }
 }
 
 
-class OgcDocument_WpsProcessOfferings extends OgcDocument {
-    OgcDocument_WpsProcessOfferings(Xml.XmlElement element) : super(element, "ProcessOfferings");
+class OgcDocument_Process extends OgcDocument {
+
+    String identifier;
+    String title;
+    String abstract;
+
+
+    OgcDocument_Process(Xml.XmlElement element)
+            : super(element, "Process") {
+        _parseElements((element) {
+            switch (element.name.local) {
+                case "Identifier":
+                    identifier = element.text;
+                    break;
+                case "Title":
+                    title = element.text;
+                    break;
+                case "Abstract":
+                    abstract = element.text;
+                    break;
+                default:
+                    OgcDocument._unsupported(element);
+                    break;
+            }
+        });
+    }
+
+
+    @override String toString() {
+        return "[Process]\n" + "  Identifier: $identifier\n" + "  Title: $title\n";
+    }
 }
+
+
+class OgcDocument_ProcessOfferings extends OgcDocument {
+
+    List<OgcDocument_Process> processes = new List<OgcDocument_Process>();
+
+
+    OgcDocument_ProcessOfferings(Xml.XmlElement element)
+            : super(element, "ProcessOfferings") {
+        _parseElements((element) {
+            switch (element.name.local) {
+                case "Process":
+                    processes.add(new OgcDocument_Process(element));
+                    break;
+
+                default:
+                    OgcDocument._unsupported(element);
+                    break;
+            }
+        });
+    }
+
+
+    @override String toString() {
+        String s = "[ProcessOfferings]\n";
+        processes.forEach((p) => s += p.toString());
+        return s;
+    }
+}
+
 
 class OgcDocument_Exception extends OgcDocument {
+
     OgcDocument_Exception(Xml.XmlElement element) : super(element, "Exception");
+
+
+    @override String toString() {
+        return "[Exception]\n";
+    }
 }
 
 
-class OgcDocument_WpsExecuteResponse extends OgcDocument {
-    OgcDocument_WpsExecuteResponse(Xml.XmlElement element) : super(element, "ExcuteResponse") {
+class OgcDocument_ExecuteResponse extends OgcDocument {
+
+    OgcDocument_ExecuteResponse(Xml.XmlElement element)
+            : super(element, "ExecuteResponse") {
         _parseElements((element) {
             switch (element.name.local) {
                 default:
@@ -99,16 +201,24 @@ class OgcDocument_WpsExecuteResponse extends OgcDocument {
             }
         });
     }
+
+
+    @override String toString() {
+        return "[ExecuteResponse]\n";
+    }
 }
 
 
-class OgcDocument_WpsCapabilities extends OgcDocument {
+class OgcDocument_Capabilities extends OgcDocument {
+
     OgcDocument_OwsServiceIdentification serviceIdentification;
     OgcDocument_OwsServiceProvider serviceProvider;
     OgcDocument_OwsOperationsMetadata operationsMetadata;
-    OgcDocument_WpsProcessOfferings processOfferings;
+    OgcDocument_ProcessOfferings processOfferings;
 
-    OgcDocument_WpsCapabilities(Xml.XmlElement element) : super(element, "Capabilities") {
+
+    OgcDocument_Capabilities(Xml.XmlElement element)
+            : super(element, "Capabilities") {
         _parseElements((element) {
             switch (element.name.local) {
                 case "ServiceIdentification":
@@ -121,7 +231,7 @@ class OgcDocument_WpsCapabilities extends OgcDocument {
                     operationsMetadata = new OgcDocument_OwsOperationsMetadata(element);
                     break;
                 case "ProcessOfferings":
-                    processOfferings = new OgcDocument_WpsProcessOfferings(element);
+                    processOfferings = new OgcDocument_ProcessOfferings(element);
                     break;
                 case "Languages":
                     break;
@@ -130,6 +240,15 @@ class OgcDocument_WpsCapabilities extends OgcDocument {
                     break;
             }
         });
+    }
+
+
+    @override String toString() {
+        return "[Capabilities]\n" +
+                serviceIdentification.toString() +
+                serviceProvider.toString() +
+                operationsMetadata.toString() +
+                processOfferings.toString();
     }
 }
 
@@ -158,8 +277,9 @@ class OgcDocument_Input extends OgcDocument {
         });
     }
 
+
     @override String toString() {
-        return super.toString() + "\nIdentifier: $identifier";
+        return "[Input]\n" + "Identifier: $identifier\n" + "Title: $title\n";
     }
 }
 
@@ -188,15 +308,19 @@ class OgcDocument_Output extends OgcDocument {
         });
     }
 
+
     @override String toString() {
-        return super.toString() + "\nIdentifier: $identifier";
+        return "[Output]\n" + "Identifier: $identifier\n";
     }
 }
 
+
 class OgcDocument_DataInputs extends OgcDocument {
+
     List<OgcDocument_Input> inputs = new List<OgcDocument_Input>();
 
-    OgcDocument_DataInputs(Xml.XmlElement element) : super(element, "DataInputs") {
+    OgcDocument_DataInputs(Xml.XmlElement element)
+            : super(element, "DataInputs") {
         _parseElements((element) {
             switch (element.name.local) {
                 case "Input":
@@ -208,12 +332,19 @@ class OgcDocument_DataInputs extends OgcDocument {
             }
         });
     }
+
+    @override String toString() {
+        return "[Output]\n" + inputs.map((i) => i.toString()).join();
+    }
 }
 
+
 class OgcDocument_ProcessOutputs extends OgcDocument {
+
     List<OgcDocument_Output> outputs = new List<OgcDocument_Output>();
 
-    OgcDocument_ProcessOutputs(Xml.XmlElement element) : super(element, "ProcessOutputs") {
+    OgcDocument_ProcessOutputs(Xml.XmlElement element)
+            : super(element, "ProcessOutputs") {
         _parseElements((element) {
             switch (element.name.local) {
                 case "Output":
@@ -225,16 +356,22 @@ class OgcDocument_ProcessOutputs extends OgcDocument {
             }
         });
     }
+
+    @override String toString() {
+        return "[Output]\n" + outputs.map((i) => i.toString()).join();
+    }
 }
 
 
-class OgcDocument_WpsProcessDescription extends OgcDocument {
+class OgcDocument_ProcessDescription extends OgcDocument {
+
     String identifier;
     String title;
     OgcDocument_DataInputs dataInputs;
     OgcDocument_ProcessOutputs processOutputs;
 
-    OgcDocument_WpsProcessDescription(Xml.XmlElement element) : super(element, "ProcessDescription") {
+    OgcDocument_ProcessDescription(Xml.XmlElement element)
+            : super(element, "ProcessDescription") {
         _parseElements((element) {
             switch (element.name.local) {
                 case "Identifier":
@@ -260,15 +397,22 @@ class OgcDocument_WpsProcessDescription extends OgcDocument {
         });
     }
 
+
     @override String toString() {
-        return super.toString() + "\nIdentifier: $identifier\nTitle: $title";
+        return "[ProcessDescription]" +
+                "Identifier: $identifier\n" +
+                "Title: $title\n" +
+                dataInputs.toString() +
+                processOutputs.toString();
     }
 }
 
 class OgcDocument_ExceptionReport extends OgcDocument {
+
     List<OgcDocument_Exception> exceptions = new List<OgcDocument_Exception>();
 
-    OgcDocument_ExceptionReport(Xml.XmlElement element) : super(element, "ExceptionReport") {
+    OgcDocument_ExceptionReport(Xml.XmlElement element)
+            : super(element, "ExceptionReport") {
         _parseElements((element) {
             switch (element.name.local) {
                 case "Exception":
@@ -280,22 +424,31 @@ class OgcDocument_ExceptionReport extends OgcDocument {
             }
         });
     }
+
+    @override String toString() {
+        return "[ExceptionReport]\n" + exceptions.map((i) => i.toString()).join();
+    }
 }
 
-class OgcDocument_WpsProcessDescriptions extends OgcDocument {
-    Map<String, OgcDocument_WpsProcessDescription> descriptions = new Map<String, OgcDocument_WpsProcessDescription>();
 
-    OgcDocument_WpsProcessDescriptions(Xml.XmlElement element) : super(element, "ProcessDescriptions") {
+class OgcDocument_ProcessDescriptions extends OgcDocument {
+    List<OgcDocument_ProcessDescription> descriptions = new List<OgcDocument_ProcessDescription>();
+
+    OgcDocument_ProcessDescriptions(Xml.XmlElement element)
+            : super(element, "ProcessDescriptions") {
         _parseElements((element) {
             switch (element.name.local) {
                 case "ProcessDescription":
-                    var description = new OgcDocument_WpsProcessDescription(element);
-                    descriptions[description.identifier] = description;
+                    descriptions.add(new OgcDocument_ProcessDescription(element));
                     break;
                 default:
                     OgcDocument._unsupported(element);
                     break;
             }
         });
+    }
+
+    @override String toString() {
+        return "[ProcessDescriptions]\n" + descriptions.map((i) => i.toString()).join();
     }
 }

@@ -70,12 +70,20 @@ class ConfigScript {
     }
 
     void _doCommand_wps(Map data) {
-        var proxy = YamlUtils.getRequiredSettingAsString(data, "proxy");
+        var proxy = YamlUtils.getOptionalSettingAsString(data, "proxy");
         var server = YamlUtils.getRequiredSettingAsString(data, "server");
         var description = YamlUtils.getOptionalSettingAsString(data, "description");
         var wps = new WpsService(server, proxy: proxy, description: description);
         wps.open();
+
+        wps.getCapabilitiesAsync().then((OgcDocument doc) {
+            assert(doc is OgcDocument_Capabilities);
+            log(doc);
+        });
+        //wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is OgcDocument_WpsProcessDescription); });
+        //wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is OgcDocument_ExceptionReport); });
         //wps.close();
+
         _hub.wps = wps;
     }
 

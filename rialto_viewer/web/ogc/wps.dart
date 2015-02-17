@@ -81,7 +81,7 @@ class WpsService extends OwsService {
             var ret = OgcDocument.parse(doc);
             var desc;
 
-            if (ret is OgcDocument_WpsProcessDescriptions) {
+            if (ret is OgcDocument_ProcessDescriptions) {
                 desc = ret.descriptions[processName];
             } else {
                 desc = ret;
