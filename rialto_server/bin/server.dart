@@ -2,29 +2,20 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-library rialto.server;
-
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
 import 'package:args/args.dart';
-import 'package:shelf/shelf.dart';
-import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'package:shelf_route/shelf_route.dart' as shelf_route;
-import 'package:shelf_exception_response/exception_response.dart';
-
-part 'file_server.dart';
-part 'proxy_server.dart';
 
 
-abstract class Server {
-    final String type;
-    String dir;
+class Server {
     String server;
     int port;
+    String rootDir;
 
-    Function _handlerGET;
+    static const FILE = '/file';
+    static const PROXY = '/proxy';
 
     final headers = {
         // "Content-Type": "application/json",
@@ -33,26 +24,141 @@ abstract class Server {
         "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
     };
 
-    Server(String this.type, String this.server, int this.port, String this.dir);
+    Server(String this.server, int this.port, String this.rootDir);
 
     void run() {
-        var router = shelf_route.router()..get('/{+file}', _handlerGET, middleware: logRequests());
+        log("Starting server for $server:$port");
 
-        var httpHandler =
-                const Pipeline().addMiddleware(logRequests()).addMiddleware(exceptionResponse()).addHandler(router.handler);
+        HttpServer.bind(server, port).then((server) {
+            server.listen(_handler);
+        });
+    }
 
-        Future<HttpServer> fserver = shelf_io.serve(httpHandler, server, port).then((s) {
-            print('$type server started at http://${s.address.host}:${s.port}');
-            shelf_route.printRoutes(router);
+    void log(Object o) {
+        DateTime now = new DateTime.now();
+        if (o is HttpRequest) {
+            print("REQUEST:  $now  ${o.method}  ${o.uri}");
+        } else if (o is HttpResponse) {
+            print("RESPONSE:  $now  ${o.statusCode}");
+        } else {
+            print("$now  $o");
+        }
+        print(o);
+    }
+
+    void fail(HttpRequest request) {
+        request.response.statusCode = HttpStatus.NOT_FOUND;
+        request.response.write("[${HttpStatus.NOT_FOUND}] Not found.");
+        request.response.close();
+    }
+
+    void _handler(HttpRequest request) {
+        log(request);
+
+        _handlerInner(request);
+
+        log(request.response);
+    }
+
+    void _handlerInner(HttpRequest request) {
+
+        if (request.method != 'GET') {
+            fail(request);
+            return;
+        }
+
+        String path = request.uri.path;
+
+        if (path.startsWith(FILE)) {
+            _fileHandler(request, path.substring(FILE.length));
+            return;
+        }
+
+        if (path == PROXY) {
+            String query = request.uri.queryParameters["xyzzy"];
+            query = Uri.decodeComponent(query);
+            Uri uri = Uri.parse(query);
+            _proxyHandler(request, uri);
+            return;
+        }
+
+        fail(request);
+    }
+
+    void _fileHandler(HttpRequest request, String path) {
+
+        var filename = rootDir + path;
+
+        File file = null;
+
+        try {
+            file = new File(filename);
+        } catch (e) {
+            //log("Unable to open file: $filename");
+            //log("Exception: $e");
+            fail(request);
+            return;
+        }
+
+        if (!file.existsSync()) {
+            log("Unable to read file: $filename");
+            fail(request);
+            return;
+        }
+
+        Stream<List<int>> s = null;
+        try {
+            file.openRead().listen((data) {
+                request.response.statusCode = HttpStatus.OK;
+                request.response.add(data);
+                //request.response.close();
+                //log("added ${data.length} bytes");
+            }, onDone: () {
+                //request.response.statusCode = HttpStatus.OK;
+                request.response.close();
+                //log("file sent ok");
+            }, onError: ((s) {
+                //log("error reading file: $s");
+                fail(request);
+            }));
+        } catch (e) {
+            //log("Unable to read file: $filename");
+            fail(request);
+            return;
+        }
+
+        return;
+    }
+
+    void _proxyHandler(HttpRequest request, Uri uri) {
+        //log("proxy request for: $uri");
+
+        getter(uri).then((s) {
+            headers.forEach((k, v) => request.response.headers.set(k, v));
+            request.response.statusCode = HttpStatus.OK;
+            request.response.write(s);
+            request.response.close();
+        });
+    }
+
+    Future<String> getter(uri) {
+        var c = new Completer<String>();
+
+        var cli = new HttpClient();
+
+        cli.getUrl(uri).then((HttpClientRequest request) => request.close()).then((HttpClientResponse response) {
+            response.transform(UTF8.decoder).listen((contents) {
+                c.complete(contents);
+            });
         });
 
+        return c.future;
     }
 }
 
 
 void main(List<String> args) {
     var parser = new ArgParser()
-            ..addOption('mode', abbr: 'm', allowed: ['file', 'proxy'])
             ..addOption('server', abbr: 's', defaultsTo: 'localhost')
             ..addOption('port', abbr: 'p', defaultsTo: '12345')
             ..addOption('dir', abbr: 'd', defaultsTo: '.');
@@ -72,29 +178,17 @@ void main(List<String> args) {
         usage(e);
     }
 
-    final mode = results['mode'];
     final server = results['server'];
     final port = int.parse(results['port'], onError: ((s) {
         usage(s);
     }));
     final dir = results['dir'];
 
-    if (results['mode'] == null) {
-        usage('--mode required');
-    }
+    String r = "http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=GetCapabilities&Service=WPS";
+    r = Uri.encodeComponent(r);
+    print(r);
 
-    Server s;
-
-    switch (results['mode']) {
-        case 'file':
-            s = new FileServer(server, port, dir);
-            break;
-        case 'proxy':
-            s = new ProxyServer(server, port, dir);
-            break;
-        default:
-            usage("invalid mode");
-    }
+    Server s = new Server(server, port, dir);
 
     s.run();
 }
