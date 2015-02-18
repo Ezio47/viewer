@@ -72,6 +72,8 @@ class ConfigScript {
     }
 
     void _doCommand_wps(Map data) {
+        //OgcDocumentTests.test();
+
         var proxy = YamlUtils.getOptionalSettingAsString(data, "proxy");
         var server = YamlUtils.getRequiredSettingAsString(data, "server");
         var description = YamlUtils.getOptionalSettingAsString(data, "description");
@@ -85,7 +87,7 @@ class ConfigScript {
 
         wps.getProcessDescriptionAsync("groovy:wpshello").then((OgcDocument doc) {
             assert(doc is Ogc_ProcessDescription);
-            log(doc);
+            //log(doc);
         });
 
         var params = {"alpha": "17", "beta": "11"};
@@ -96,8 +98,8 @@ class ConfigScript {
             var status = resp.status.processSucceeded;
             assert(status != null);
             Ogc_DataType datatype = resp.processOutputs.outputData[0].data;
-            Ogc_LiteralOutput literalOutput = datatype.literalData;
-            log(doc);
+            Ogc_LiteralData48 literalData = datatype.literalData;
+            log(literalData);
         });
 
         _hub.wps = wps;

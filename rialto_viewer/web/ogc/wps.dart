@@ -32,15 +32,15 @@ class OwsService {
         Completer c = new Completer<Xml.XmlDocument>();
 
         String wps = Uri.encodeFull(server + operation);
-        log("wps server request: $operation");
 
         var url = wps;
 
         if (proxy != null) {
             var magic = "/x?q=";
             url = proxy + magic + '"' + wps + '"';
-            log(url);
         }
+
+        log("wps server request: $url");
 
         var f = _client.get(url).then((response) {
             String s = response.body;
