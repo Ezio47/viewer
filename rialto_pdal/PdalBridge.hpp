@@ -31,16 +31,11 @@ public:
 
     std::string getWkt() const;
 
-    boost::uint64_t writeRia(const char* name, boost::uint64_t targetPointCount, bool xyzOnly);
-
     const pdal::PointBufferSet& buffers() const;
    
     void getRect(double& west, double& south, double& east, double& north) const;
    
 private:
-    void writeRiaHeader(FILE* fp, bool xyzOnly, boost::uint64_t numWritten);
-    boost::uint64_t writeRia(FILE* fp, const pdal::PointBufferPtr& buf, boost::uint64_t skip, bool xyzOnly);
-
     std::vector<char*> m_keys;
     std::vector<char*> m_values;
 
