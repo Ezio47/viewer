@@ -11,13 +11,10 @@ import 'dart:convert';
 import 'package:args/args.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'package:shelf_web_socket/shelf_web_socket.dart';
 import 'package:shelf_route/shelf_route.dart' as shelf_route;
 import 'package:shelf_exception_response/exception_response.dart';
 
-
-part 'main_server.dart';
-part 'point_server.dart';
+part 'file_server.dart';
 part 'proxy_server.dart';
 
 
@@ -55,7 +52,7 @@ abstract class Server {
 
 void main(List<String> args) {
     var parser = new ArgParser()
-            ..addOption('mode', abbr: 'm', allowed: ['main', 'points', 'proxy'])
+            ..addOption('mode', abbr: 'm', allowed: ['file', 'proxy'])
             ..addOption('server', abbr: 's', defaultsTo: 'localhost')
             ..addOption('port', abbr: 'p', defaultsTo: '12345')
             ..addOption('dir', abbr: 'd', defaultsTo: '.');
@@ -89,11 +86,8 @@ void main(List<String> args) {
     Server s;
 
     switch (results['mode']) {
-        case 'main':
-            s = new MainServer(server, port, dir);
-            break;
-        case 'points':
-            s = new PointServer(server, port, dir);
+        case 'file':
+            s = new FileServer(server, port, dir);
             break;
         case 'proxy':
             s = new ProxyServer(server, port, dir);
