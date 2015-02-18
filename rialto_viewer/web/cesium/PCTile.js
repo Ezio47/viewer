@@ -142,7 +142,7 @@ PCTile.prototype._extractDimensionArray = function (dataview, datatype, offset, 
         }
         break;
     default:
-        assert(false, 70);
+        myassert(false, 70);
         break;
     }
     return dst;
@@ -164,12 +164,12 @@ PCTile.prototype._buildDimensionArrays = function (dataview, numBytes) {
         this.numPoints = 0;
     } else {
         this.numPoints = numBytes / this._tree.provider.pointSizeInBytes;
-        assert(this.numPoints * this._tree.provider.pointSizeInBytes == numBytes, 71);
+        myassert(this.numPoints * this._tree.provider.pointSizeInBytes == numBytes, 71);
     }
 
     this.dimensions = {};
 
-    //console.log("num points in tile: " + this.numPoints);
+    //mylog("num points in tile: " + this.numPoints);
 
     for (i = 0; i < headerDims.length; i += 1) {
         datatype = headerDims[i].datatype;
@@ -196,7 +196,7 @@ PCTile.prototype._buildDimensionArrays = function (dataview, numBytes) {
 
 
 PCTile.prototype._makeChildren = function (mask) {
-    //console.log("mask is " + mask);
+    //mylog("mask is " + mask);
 
     this.sw = null;
     this.se = null;
@@ -234,7 +234,7 @@ PCTile.prototype._makeChildren = function (mask) {
 PCTile.prototype.addTileData = function (buffer) {
     "use strict";
 
-    //console.log("addding " + t.level + t.x + t.y);
+    //mylog("addding " + t.level + t.x + t.y);
 
     var level = this.level;
     var x = this.x;
@@ -242,7 +242,7 @@ PCTile.prototype.addTileData = function (buffer) {
 
     var bytes = new Uint8Array(buffer);
     var buflen = bytes.length;
-    //console.log("buflen=" + buflen);
+    //mylog("buflen=" + buflen);
 
     if (bytes.length > 1) {
         var dv = new DataView(buffer, 0, buflen - 1);
@@ -259,15 +259,15 @@ PCTile.prototype.addTileData = function (buffer) {
 PCTile.prototype.loadTileData = function () {
     "use strict";
 
-    //console.log("loading " + this.level + this.x + this.y);
+    //mylog("loading " + this.level + this.x + this.y);
 
-    assert(this.state == tsNOTLOADED, 2);
+    myassert(this.state == tsNOTLOADED, 2);
     this.state = tsLOADING;
 
     var thisTile = this;
 
     Cesium.loadBlob(this.url).then(function (blob) {
-        //console.log("got blob:" + blob.size);
+        //mylog("got blob:" + blob.size);
 
         var reader = new FileReader();
         reader.addEventListener("loadend", function () {
@@ -280,7 +280,7 @@ PCTile.prototype.loadTileData = function () {
         reader.readAsArrayBuffer(blob);
 
     }).otherwise(function () {
-        //console.log("FAIL getting blob: " + this.url);
+        myerror("Failed to read point cloud tile: " + this.url);
     });
 };
 
@@ -289,7 +289,7 @@ PCTile.prototype.loadTileData = function () {
 PCTile.prototype.Cartesian3_fromDegreesArrayHeights_merge = function (x, y, z, cnt, ellipsoid) {
     "use strict";
 
-    assert(cnt==this.numPoints, 66);
+    myassert(cnt==this.numPoints, 66);
 
     var xyz = new Float64Array(cnt * 3);
 
@@ -327,9 +327,9 @@ PCTile.prototype.createPrimitive = function (cnt, dims) {
 
     var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z, cnt);
 
-    assert(this.numPoints == cnt, 39);
-    assert(xyz.length == cnt * 3, 40);
-    assert(rgba.length == cnt * 4, 41);
+    myassert(this.numPoints == cnt, 39);
+    myassert(xyz.length == cnt * 3, 40);
+    myassert(rgba.length == cnt * 4, 41);
 
     var pointInstance = new Cesium.GeometryInstance({
         geometry : new Cesium.PointGeometry({

@@ -28,7 +28,7 @@ var CesiumBridge = function (element) {
         provider.readHeaderAsync().then(function(provider) {
             deferred.resolve(provider);
         }).otherwise(function (error) {
-            console.log("ERROR8");
+            myerror("Unable to read point cloud header: " + urlarg, error);
         });
 
         return deferred.promise;
@@ -53,8 +53,7 @@ var CesiumBridge = function (element) {
             return;
 
         }).otherwise(function (error) {
-            console.log(error);
-            assert(false, 100);
+            myerror("Unable to create point cloud tile provider", error);
         });
     }
 
@@ -171,9 +170,9 @@ var CesiumBridge = function (element) {
     }
 
     this.setPrimitiveVisible = function(primitive, value) {
-        //console.log("was " + primitive.show);
+        //mylog("was " + primitive.show);
         primitive.show = value;
-        //console.log("now " + primitive.show);
+        //mylog("now " + primitive.show);
     }
 
     this.setUpdater = function(f) {
@@ -205,8 +204,8 @@ var CesiumBridge = function (element) {
         var eyeCartesian = ellipsoid.cartographicToCartesian(eyeCartographic);
         var targetCartesian = ellipsoid.cartographicToCartesian(targetCartographic);
 
-        //console.log("eye cartesian: " + eyeCartesian.x + ", " + eyeCartesian.y + ", " + eyeCartesian.z);
-        //console.log("target cartesian: " + targetCartesian.x + ", " + targetCartesian.y + ", " + targetCartesian.z);
+        //mylog("eye cartesian: " + eyeCartesian.x + ", " + eyeCartesian.y + ", " + eyeCartesian.z);
+        //mylog("target cartesian: " + targetCartesian.x + ", " + targetCartesian.y + ", " + targetCartesian.z);
 
         var up = new Cesium.Cartesian3(upX, upY, upZ);
 

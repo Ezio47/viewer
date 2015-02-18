@@ -42,24 +42,15 @@ var _interpolateColorRamp = function (z, startRange, endRange, startColor, endCo
     'use strict';
 
     var scale = (z - startRange) / (endRange - startRange);
-    assert(scale >= 0.0 && scale <= 1.0);
+    myassert(scale >= 0.0 && scale <= 1.0);
 
     var r = scale * (endColor[0] - startColor[0]) + startColor[0];
     var g = scale * (endColor[1] - startColor[1]) + startColor[1];
     var b = scale * (endColor[2] - startColor[2]) + startColor[2];
-    assert(r >= 0.0 && r <= 255.0);
-    assert(g >= 0.0 && g <= 255.0);
-    assert(b >= 0.0 && b <= 255.0);
+    myassert(r >= 0.0 && r <= 255.0);
+    myassert(g >= 0.0 && g <= 255.0);
+    myassert(b >= 0.0 && b <= 255.0);
 
-    //final int ri = r.toInt();
-    //final int gi = g.toInt();
-    //final int bi = b.toInt();
-
-    //assert(ri >= 0.0 && ri <= 255);
-    //assert(gi >= 0.0 && gi <= 255);
-    //assert(bi >= 0.0 && bi <= 255);
-
-    //return new _Color(ri, gi, bi);
     return [r, g, b];
 };
 
@@ -72,9 +63,9 @@ var _interpolateColorRamp = function (z, startRange, endRange, startColor, endCo
 var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray) {
     'use strict';
 
-    assert(rampName != "native");
+    myassert(rampName != "native");
     /*if (ramp == "native") {
-        log(tile.data.keys);
+        mylog(tile.data.keys);
         if (!tile.data.containsKey("Red") || !tile.data.containsKey("Green") || !tile.data.containsKey("Blue")) {
             Hub.error("Native colorization not supported for point clouds without RGB data");
             return null;
@@ -82,9 +73,9 @@ var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray
         var rlist = tile.data["Red"];
         var glist = tile.data["Green"];
         var blist = tile.data["Blue"];
-        assert(rlist is Uint8List);
-        assert(glist is Uint8List);
-        assert(blist is Uint8List);
+        myassert(rlist is Uint8List);
+        myassert(glist is Uint8List);
+        myassert(blist is Uint8List);
 
         for (int i = 0; i < tile.numPointsInTile; i++) {
             rgba[i * 4 + 0] = rlist[i];
@@ -99,11 +90,6 @@ var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray
 
     var zLen = zmax - zmin;
 
-    //assert(zmin != double.NAN);
-    //assert(zmin != double.INFINITY);
-    //assert(zmax != double.NAN);
-    //assert(zmax != double.INFINITY);
-
     var i;
     var z;
     var scaledZ;
@@ -114,14 +100,11 @@ var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray
     for (i = 0; i < numPoints; i += 1) {
         z = dataArray[i];
 
-        //assert(z != double.NAN);
-        //assert(z != double.INFINITY);
-
         if (z < zmin) {
-            assert(zmin - z >= 0.0000001);
+            myassert(zmin - z >= 0.0000001);
             z = zmin;
         } else if (z > zmax) {
-            assert(z - zmax >= 0.0000001);
+            myassert(z - zmax >= 0.0000001);
             z = zmax;
         }
 
@@ -129,9 +112,9 @@ var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray
 
         // TODO: clip, due to FP math (and above)
         if (!(scaledZ >= -0.00000001 && scaledZ <= 1.00000001)) {
-            console.log(scaledZ);
+            mylog(scaledZ);
         }
-        assert(scaledZ >= -0.00000001 && scaledZ <= 1.00000001);
+        myassert(scaledZ >= -0.00000001 && scaledZ <= 1.00000001);
         if (scaledZ < 0.0) {
             scaledZ = 0.0;
         }
@@ -139,9 +122,9 @@ var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray
             scaledZ = 1.0;
         }
 
-        assert(stops.length >= 2);
-        assert(stops[0][0] == 0.0);
-        assert(stops[stops.length - 1][0] == 1.0);
+        myassert(stops.length >= 2);
+        myassert(stops[0][0] == 0.0);
+        myassert(stops[stops.length - 1][0] == 1.0);
 
         startRange = stops[0][0];
 
@@ -157,11 +140,11 @@ var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray
 
             startRange = endRange;
         }
-        assert(result != null);
+        myassert(result != null);
 
-        assert(result[0] >= 0 && result[0] <= 255);
-        assert(result[1] >= 0 && result[1] <= 255);
-        assert(result[2] >= 0 && result[2] <= 255);
+        myassert(result[0] >= 0 && result[0] <= 255);
+        myassert(result[1] >= 0 && result[1] <= 255);
+        myassert(result[2] >= 0 && result[2] <= 255);
         rgbaArray[i * 4] = result[0];
         rgbaArray[i * 4 + 1] = result[1];
         rgbaArray[i * 4 + 2] = result[2];

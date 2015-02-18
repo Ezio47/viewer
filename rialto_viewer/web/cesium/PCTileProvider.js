@@ -6,16 +6,6 @@
 // based on DemoTileProvider from
 // https://github.com/AnalyticalGraphicsInc/cesium/blob/master/Specs/Sandcastle/QuadtreePrimitive.html
 
-
-var assert = function (b, s) {
-    "use strict";
-
-    if (!b) {
-        console.log("***** ERROR: " + s);
-    }
-};
-
-
 var PCTileProvider = function PCTileProvider(url) {
     "use strict";
 
@@ -52,7 +42,7 @@ Object.defineProperties(PCTileProvider.prototype, {
     ready : {
         get : function () {
             "use strict";
-            //console.log("ready check" + this._ready);
+            //mylog("ready check" + this._ready);
             return this._ready;
         }
     },
@@ -101,7 +91,7 @@ PCTileProvider.prototype._computePointSize = function () {
 
     for (i = 0; i < dims.length; i += 1) {
         dims[i].offset = tot;
-        assert(sizes[dims[i].datatype] != undefined);
+        myassert(sizes[dims[i].datatype] != undefined);
         tot += sizes[dims[i].datatype];
     }
 
@@ -123,7 +113,7 @@ PCTileProvider.prototype.readHeaderAsync = function () {
         provider.header = json;
         provider._ready = true;
         provider.pointSizeInBytes = provider._computePointSize();
-        console.log("point size: " + provider.pointSizeInBytes);
+        //mylog("point size: " + provider.pointSizeInBytes);
 
         provider._tiletree = new PCTileTree(provider);
 
@@ -133,7 +123,7 @@ PCTileProvider.prototype.readHeaderAsync = function () {
         deferred.resolve(provider);
 
     }).otherwise(function () {
-        console.log("FAIL getting json: " + url);
+        myerror("Failed to load JSON: " + url);
     });
 
     return deferred.promise;
@@ -183,7 +173,7 @@ PCTileProvider.prototype._makeRect = function (rect) {
 PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
     "use strict";
 
-  //  console.log("PRESTART: " + tile.level + " " + tile.x + " " + tile.y);
+    //mylog("PRESTART: " + tile.level + " " + tile.x + " " + tile.y);
 
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
 
@@ -208,7 +198,7 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
         var rootTile = (west < 0) ? this._root000 : this._root010;
         var pcTileState = this._tiletree.getTileState(rootTile, tile.level, tile.x, tile.y);
 
-        // console.log("state " + pcTileState + " for " + tile.level + tile.x + tile.y);
+        // mylog("state " + pcTileState + " for " + tile.level + tile.x + tile.y);
 
         if (pcTileState == csUNKNOWN) {
             // nothing we can do, just wait
@@ -223,7 +213,7 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
             return;
         }
 
-        assert(pcTileState == csEXISTS, 12);
+        myassert(pcTileState == csEXISTS, 12);
 
         var pcTile = this._tiletree.lookupPCTile(tile);
         if (pcTile == null) {
@@ -248,23 +238,23 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
         }
 
         // the tiule exists and is fully ready: drop through to below if-stmt
-        assert(pcTile.state == tsLOADED, 13);
+        myassert(pcTile.state == tsLOADED, 13);
 
         tile.state = Cesium.QuadtreeTileLoadState.LOADING;
     }
 
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING) {
-        // console.log("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);
+        // mylog("LOADINGx: " + tile.level + " " + tile.x + " " + tile.y);
 
         var pcTile = this._tiletree.lookupPCTile(tile);
-        assert(pcTile != null, 55);
+        myassert(pcTile != null, 55);
 
         if (pcTile.state != tsLOADED) {
             // not loaded yet, so wait
             return;
         }
 
-        assert(pcTile.state == tsLOADED, 74);
+        myassert(pcTile.state == tsLOADED, 74);
 
         tile.data.primitive = pcTile.primitive;
 
@@ -275,9 +265,9 @@ PCTileProvider.prototype.loadTile = function (context, frameState, tile) {
             return;
         }
 
-        assert(tile.data.primitive != null, 72);
+        myassert(tile.data.primitive != null, 72);
 
-        //console.log("LOADINGy: " + tile.level + " " + tile.x + " " + tile.y + "(" + tile.data.primitive._state + ")");
+        //mylog("LOADINGy: " + tile.level + " " + tile.x + " " + tile.y + "(" + tile.data.primitive._state + ")");
         tile.state = Cesium.QuadtreeTileLoadState.DONE;
         tile.renderable = true;
     }

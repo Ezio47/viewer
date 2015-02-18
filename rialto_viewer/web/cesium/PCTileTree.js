@@ -41,7 +41,7 @@ PCTileTree.prototype.lookupPCTile = function (tile) {
 PCTileTree.prototype.createPCTile = function (level, x, y) {
     "use strict";
 
-    //console.log("creating " + level + x + y);
+    //mylog("creating " + level + x + y);
 
     if (this._tiles == undefined) {
         this._tiles = {};
@@ -80,7 +80,7 @@ PCTileTree.prototype.computeQuadrantOf = function (x, y) {
         return qSE;
     }
 
-    assert(false, 1);
+    myassert(false, 1);
 };
 
 
@@ -100,17 +100,17 @@ PCTileTree.prototype.getXYAtLevel = function (r, l, x, y) {
 PCTileTree.prototype.getTileState = function (root, level, x, y) {
     "use strict";
 
-    assert(root != undefined, 3);
-    assert(root != null, 4);
+    myassert(root != undefined, 3);
+    myassert(root != null, 4);
 
-    //console.log("getstatefromtree: " + level + x + y);
+    //mylog("getstatefromtree: " + level + x + y);
 
     if (level == root.level) {
-        assert(x == root.x, 5);
-        assert(y == root.y, 6);
+        myassert(x == root.x, 5);
+        myassert(y == root.y, 6);
         return csEXISTS;
     }
-    assert(root.level < level, 7);
+    myassert(root.level < level, 7);
 
     if (root.state == tsNOTLOADED) {
         return csUNKNOWN;
@@ -119,7 +119,7 @@ PCTileTree.prototype.getTileState = function (root, level, x, y) {
         return csUNKNOWN;
     }
 
-    assert(root.state == tsLOADED, 8);
+    myassert(root.state == tsLOADED, 8);
 
     var xyzRoot = this.getXYAtLevel(root.level + 1, level, x, y);
     var quadrant = this.computeQuadrantOf(xyzRoot[1], xyzRoot[2]);
@@ -139,15 +139,15 @@ PCTileTree.prototype.getTileState = function (root, level, x, y) {
         childState = root.neState;
         child = root.ne;
     } else {
-        assert(false, 9);
+        myassert(false, 9);
     }
 
     if (childState == csDOESNOTEXIST) {
         return csDOESNOTEXIST;
     }
 
-    assert(childState == csEXISTS, 10);
-    assert(child != null, 11);
+    myassert(childState == csEXISTS, 10);
+    myassert(child != null, 11);
 
     var ret = this.getTileState(child, level, x, y);
     return ret;
