@@ -1,11 +1,11 @@
-#layers:
-#    tiledserp:
-#        type: pointcloud   # always tiled
-#        server: http://localhost:12345
-#        path: /tiledserp18
-#        numBytes: 10            # optional, default=0
-#        description: "foor bar yow"  # optional, default=""
-#        visible: true       # optional, default=true
+layers:
+    tiledserp:
+        type: pointcloud   # always tiled
+        server: http://localhost:12345
+        path: /tiledserp188
+        numBytes: 10            # optional, default=0
+        description: "foor bar yow"  # optional, default=""
+        visible: true       # optional, default=true
 
 #    serp:
 #        type: pointcloud
@@ -49,7 +49,7 @@ display:
         ramp: Blues
         dimension: GpsTime
 
-wps:
-    proxy: http://localhost:12347
-    server: http://localhost:8080/geoserver/ows
-    description: "la la la"
+#wps:
+#    proxy: http://localhost:12347
+#    server: http://localhost:8080/geoserver/ows
+#    description: "la la la"
