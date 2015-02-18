@@ -15,7 +15,7 @@ class Comms {
         client.get(url).then((response) {
             c.complete(response.body);
         }).catchError((e) {
-            Hub.error("error getting script: $e");
+            Hub.error("Unable to load configuration file", exception: e, info: {"Path": e.uri});
         });
 
         return c.future;

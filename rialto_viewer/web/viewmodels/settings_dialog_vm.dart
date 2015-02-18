@@ -92,21 +92,35 @@ class SettingsDialogVM extends DialogVM {
 
         var fov = _fov.getValueAsDouble();
 
-        bool eyeOkay = (eyeLon != null && eyeLat != null && eyeHeight != null);
-        bool targetOkay = (targetLon != null && targetLat != null && targetHeight != null);
-        bool upOkay = (upX != null && upY != null && upZ != null);
-        bool fovOkay = (fov != null);
-
-        if (eyeOkay && targetOkay && upOkay && fovOkay) {
-            Cartographic3 eye = new Cartographic3(eyeLon, eyeLat, eyeHeight);
-            Cartographic3 target = new Cartographic3(targetLon, targetLat, targetHeight);
-            Cartesian3 up = new Cartesian3(upX, upY, upZ);
-
-            var data = new CameraData(eye, target, up, fov);
-            _hub.events.UpdateCamera.fire(data);
-        } else {
-            Hub.error("invalid camera settings");
+        final eyeOkay = (eyeLon != null && eyeLat != null && eyeHeight != null);
+        if (!eyeOkay) {
+            Hub.error("Invalid camera settings (eye position)");
+            return;
         }
+
+        final targetOkay = (targetLon != null && targetLat != null && targetHeight != null);
+        if (!targetOkay) {
+            Hub.error("Invalid camera settings (target position)");
+            return;
+        }
+
+        bool upOkay = (upX != null && upY != null && upZ != null);
+        if (!upOkay) {
+            Hub.error("Invalid camera settings (up direction)");
+            return;
+        }
+        final fovOkay = (fov != null);
+        if (!fovOkay) {
+            Hub.error("Invalid camera settings (fov value)");
+            return;
+        }
+
+        Cartographic3 eye = new Cartographic3(eyeLon, eyeLat, eyeHeight);
+        Cartographic3 target = new Cartographic3(targetLon, targetLat, targetHeight);
+        Cartesian3 up = new Cartesian3(upX, upY, upZ);
+
+        var data = new CameraData(eye, target, up, fov);
+        _hub.events.UpdateCamera.fire(data);
     }
 
     void _performBboxWork() {

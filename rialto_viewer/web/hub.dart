@@ -101,8 +101,24 @@ class Hub {
         data.layer.changeVisibility(data.visible);
     }
 
-    static void error(dynamic s) {
-        window.console.log(s.toString());
-        window.alert(s.toString());
+    static void error(String text, {Map<String, dynamic> info: null, Exception exception: null}) {
+
+        String s = text;
+
+        if (!s.endsWith("\n")) {
+            s += "\n";
+        }
+
+        if (info != null) {
+            info.forEach((k,v) => s+= "$k: $v\n");
+        }
+
+        if (exception != null) {
+            s += 'Exception: $exception\n';
+        }
+
+        window.console.log(s);
+
+        window.alert(s);
     }
 }

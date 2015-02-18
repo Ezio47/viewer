@@ -47,7 +47,9 @@ class OwsService {
             var doc = Xml.parse(s);
             c.complete(doc);
         }).catchError((e) {
-            Hub.error(e);
+            Hub.error("Server request failed", exception: e, info: {
+                "Path": e.uri
+            });
         });
 
         return c.future;
@@ -67,7 +69,9 @@ class WpsService extends OwsService {
 
         _doServerRequest("GetCapabilities").then((Xml.XmlDocument doc) {
             var caps = OgcDocument.parse(doc);
-            if (caps == null) Hub.error("error parsing capabilities response document");
+            if (caps == null) {
+                Hub.error("Error parsing OWS Capabilities response document");
+            }
             c.complete(caps);
         });
 
@@ -88,9 +92,9 @@ class WpsService extends OwsService {
                 assert(ret is Ogc_ProcessDescriptions);
                 desc = ret.descriptions.where((d) => d.identifier == processIdentifier);
 
-                if (desc == null ||
-                        desc.isEmpty ||
-                        desc.length > 1) Hub.error("error parsing process description response document");
+                if (desc == null || desc.isEmpty || desc.length > 1) {
+                    Hub.error("Error parsing OWS Process Description response document");
+                }
 
                 c.complete(desc.first);
             }
@@ -107,7 +111,7 @@ class WpsService extends OwsService {
 
         _doServerRequest("Execute", [identifier, dataInputs]).then((Xml.XmlDocument doc) {
             var resp = OgcDocument.parse(doc);
-            if (resp == null) Hub.error("error parsing execute response document");
+            if (resp == null) Hub.error("Error parsing OWS Execute response document");
             c.complete(resp);
         });
 
@@ -121,8 +125,7 @@ class WpsService extends OwsService {
             "observerLon": observerLon.toString(),
             "observerLat": observerLat.toString(),
             "radius": radius.toString()
-        }
-        ;
+        };
         executeProcessAsync("Viewshed", params).then((OgcDocument doc) {
             if (doc is Ogc_ExceptionReport) {
                 log("viewshed returned exception report");

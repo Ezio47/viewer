@@ -49,7 +49,7 @@ class ConfigScript {
                     _doCommand_wps(data);
                     break;
                 default:
-                    Hub.error("invalid command in script: $command");
+                    Hub.error("Unrecognized command in configuration file", info: {"Command": command});
                     return;
             }
         }

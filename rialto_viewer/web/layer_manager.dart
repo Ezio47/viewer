@@ -112,7 +112,7 @@ class LayerManager {
                 layer = new PointCloudLayer(name, map);
                 break;
             default:
-                Hub.error("invalid layer type in script: $type");
+                Hub.error("Unrecognized layer type in configuration file", info: {"Layer type": type});
                 return null;
         }
 
