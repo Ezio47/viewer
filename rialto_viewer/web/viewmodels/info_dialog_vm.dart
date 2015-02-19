@@ -9,9 +9,7 @@ class InfoVM extends DialogVM {
     Hub _hub;
     LayerManagerDialogVM _parent;
 
-    InfoVM(String id, LayerManagerDialogVM this._parent) : super(id, hasCancelButton: false) {
-    }
-
+    InfoVM(String id, LayerManagerDialogVM this._parent) : super(id, hasCancelButton: false);
     @override
     void _open() {
         int numPoints;
@@ -37,10 +35,12 @@ class InfoVM extends DialogVM {
             }
         }
 
-        querySelector("#infoDialog_name").text = layer.name;
-        querySelector("#infoDialog_layerType").text = layer.runtimeType.toString();
-        querySelector("#infoDialog_server").text = layer.server;
-        querySelector("#infoDialog_path").text = layer.path;
+        if (layer != null) {
+            querySelector("#infoDialog_name").text = layer.name;
+            querySelector("#infoDialog_layerType").text = layer.runtimeType.toString();
+            querySelector("#infoDialog_server").text = layer.server;
+            querySelector("#infoDialog_path").text = layer.path;
+        }
 
         querySelector("#infoDialog_numPoints").text = numPoints.toString();
 

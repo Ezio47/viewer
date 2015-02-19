@@ -80,7 +80,7 @@ class LayerManagerDialogVM extends DialogVM {
 
     Layer get currentSelection {
         var list = _listbox.getCurrentSelection();
-        if (list == null || list[0] == null) return null;
+        if (list == null || list.isEmpty || list[0] == null) return null;
         return list[0].layer;
     }
 
