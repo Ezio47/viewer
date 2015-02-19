@@ -90,7 +90,7 @@ class Server {
 
         var filename = rootDir + path;
 
-        log("request for $filename");
+        //log("request for $filename");
 
         File file = null;
 
@@ -104,34 +104,18 @@ class Server {
         }
 
         if (!file.existsSync()) {
-            log("Unable to read file: $filename");
+            //log("Unable to read file: $filename");
             fail(request);
             return;
         }
 
-        Stream<List<int>> s = null;
-        var bytes = new List<int>();
-
         request.response.statusCode = HttpStatus.OK;
         request.response.addStream(file.openRead()).then((_) {
-            log("added bytes for $filename");
+            //log("added bytes for $filename");
             request.response.flush().then((_) {
                 request.response.close();
             });
         });
-
-        /*file.openRead().listen((data) {
-            log("added ${data.length} bytes for $filename");
-            bytes.addAll(data);
-        }, onDone: () {
-            request.response.statusCode = HttpStatus.OK;
-            request.response.add(bytes);
-            request.response.close();
-            return;
-        }, onError: ((s) {
-            log("error reading $filename: $s");
-            fail(request);
-        }));*/
 
         return;
     }
