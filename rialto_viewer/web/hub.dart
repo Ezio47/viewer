@@ -96,7 +96,7 @@ class Hub {
 
     void _handleDisplayLayer(DisplayLayerData data) {
         assert(data.layer != null);
-        data.layer.changeVisibility(data.visible);
+        data.layer.visible = data.visible;
     }
 
     static void error(String text, {Map<String, dynamic> info: null, Object object: null}) {

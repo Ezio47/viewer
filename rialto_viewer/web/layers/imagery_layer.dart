@@ -8,4 +8,10 @@ part of rialto.viewer;
 class ImageryLayer extends Layer {
     ImageryLayer(String name, Map map)
             : super(name, map);
+
+    @override
+    Future<bool> load() {
+        var stub = (() {});
+        return new Future(stub);
+    }
 }

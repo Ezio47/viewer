@@ -37,13 +37,6 @@ class PointCloudLayer extends Layer {
         return c.future;
     }
 
-
-    @override
-    void changeVisibility(bool v) {
-        //      cloud.changeVisibility(v);
-        isVisible = v;
-    }
-
     Future colorizeAsync(ColorizeLayersData data) {
         return new Future(() {
 //            _colorizer.ramp = data.ramp;

@@ -6,30 +6,28 @@ part of rialto.viewer;
 
 
 abstract class Layer {
-    Hub _hub;
+    final Hub _hub;
 
-    String name;
-    String server;
-    String path;
-    String description;
-    bool isVisible;
-    CartographicBbox bbox;
+    final String name;
+    final String server;
+    final String path;
+    final String description;
 
-    Layer(String this.name, Map map) {
-        _hub = Hub.root;
+    bool _isVisible;
+    CartographicBbox _bbox;
 
-        server = YamlUtils.getRequiredSettingAsString(map, "server");
-        path = YamlUtils.getRequiredSettingAsString(map, "path");
-        description = YamlUtils.getOptionalSettingAsString(map, "description");
-        isVisible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
-    }
+    Layer(String this.name, Map map)
+            : _hub = Hub.root,
+              server = YamlUtils.getRequiredSettingAsString(map, "server"),
+              path = YamlUtils.getRequiredSettingAsString(map, "path"),
+              description = YamlUtils.getOptionalSettingAsString(map, "description"),
+              _isVisible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
 
-    void changeVisibility(bool v) {
-        isVisible = v;
-    }
+    Future<bool> load();
 
-    Future<bool> load() {
-        var stub = (() {});
-        return new Future(stub);
-    }
+    bool get visible => _isVisible;
+    set visible(bool v) => _isVisible = v;
+
+    CartographicBbox get bbox => _bbox;
+    set bbox(CartographicBbox bbox) => _bbox = bbox;
 }

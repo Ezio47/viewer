@@ -9,5 +9,11 @@ part of rialto.viewer;
 class BaseImageryLayer extends Layer {
     BaseImageryLayer(String name, Map map)
             : super(name, map);
+
+    @override
+    Future<bool> load() {
+        var stub = (() {});
+        return new Future(stub);
+    }
 }
 

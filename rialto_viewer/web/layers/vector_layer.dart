@@ -28,9 +28,4 @@ class VectorLayer extends Layer {
 
         return c.future;
     }
-
-    @override
-    void changeVisibility(bool v) {
-        throw new UnimplementedError("vector layer visibility");
-    }
 }
