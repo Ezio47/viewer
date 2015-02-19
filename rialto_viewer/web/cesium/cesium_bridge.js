@@ -104,15 +104,26 @@ var CesiumBridge = function (element) {
         return keys;
     }
 
+    this.addDataSource = function (dataSource) {
+        this.viewer.dataSources.add(dataSource);
+    }
+
+    this.removeDataSource = function (dataSource) {
+        this.viewer.dataSources.remove(dataSource);
+    }
+
     this.addGeoJson = function(url) {
         var viewer = this.viewer;
         // these are default styling settings, if no simplestyle present
-        var ds = viewer.dataSources.add(Cesium.GeoJsonDataSource.fromUrl(url, {
+        var ds = Cesium.GeoJsonDataSource.fromUrl(url, {
           stroke: Cesium.Color.WHITE,
           fill: Cesium.Color.WHITE,
           strokeWidth: 1,
           markerSymbol: '*'
-        }));
+        });
+
+        viewer.dataSources.add(ds);
+
         return ds;
     }
 

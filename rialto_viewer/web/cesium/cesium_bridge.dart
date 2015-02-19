@@ -47,6 +47,14 @@ class CesiumBridge {
         return _bridge.callMethod('getStatsFromProvider', [provider, dimName]);
     }
 
+    void addDataSource(var dataSource) {
+        _bridge.callMethod('addDataSource', [dataSource]);
+    }
+
+    void removeDataSource(var dataSource) {
+        _bridge.callMethod('removeDataSource', [dataSource]);
+    }
+
     dynamic addGeoJson(String url) {
         return _bridge.callMethod('addGeoJson', [url]);
     }
