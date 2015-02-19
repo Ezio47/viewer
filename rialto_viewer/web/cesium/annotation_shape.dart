@@ -16,7 +16,6 @@ class AnnotationShape extends Shape {
         assert(_point1.longitude <= _point2.longitude);
         assert(_point1.latitude <= _point2.latitude);
         assert(_point1.height == _point2.height);
-        isSelectable = true;
 
         primitive = _createCesiumObject();
     }

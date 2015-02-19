@@ -25,7 +25,6 @@ part 'config_script.dart';
 part 'layer_manager.dart';
 part 'measurement_controller.dart';
 part 'mode_controller.dart';
-part 'selection_controller.dart';
 part 'view_controller.dart';
 part 'ogc/wps.dart';
 part 'viewshed_controller.dart';

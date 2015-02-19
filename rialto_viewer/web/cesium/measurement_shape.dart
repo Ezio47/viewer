@@ -9,7 +9,6 @@ class MeasurementShape extends Shape {
     Cartographic3 _point2;
 
     MeasurementShape(Cartographic3 this._point1, Cartographic3 this._point2) : super("measurement") {
-        isSelectable = true;
         primitive = _createCesiumObject();
     }
 

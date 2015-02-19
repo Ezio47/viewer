@@ -11,8 +11,6 @@ abstract class Shape {
 
     Hub _hub;
     String name;
-    bool isSelected;
-    bool isSelectable;
     int id;
 
     var primitive;
@@ -21,9 +19,6 @@ abstract class Shape {
         _hub = Hub.root;
 
         id = Shape.getNewId();
-
-        isSelected = false;
-        isSelectable = false;
     }
 
     static int getNewId() => _ids++;

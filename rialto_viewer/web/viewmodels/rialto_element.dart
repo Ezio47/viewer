@@ -24,7 +24,6 @@ class RialtoElement  {
         _modalButtons = new ModalButtonsVM({
             querySelector("#viewModeButton"): new ModeData(ModeData.VIEW),
             querySelector("#annotateModeButton"): new ModeData(ModeData.ANNOTATION),
-            querySelector("#selectModeButton"): new ModeData(ModeData.SELECTION),
             querySelector("#measureModeButton"): new ModeData(ModeData.MEASUREMENT),
             querySelector("#viewshedModeButton"): new ModeData(ModeData.VIEWSHED)
         }, querySelector("#viewModeButton"));

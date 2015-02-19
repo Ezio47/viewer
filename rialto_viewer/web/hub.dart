@@ -27,7 +27,6 @@ class Hub {
     ViewController _viewController;
     AnnotationController _annotationController;
     MeasurementController _measurementController;
-    SelectionController _selectionController;
     ViewshedController _viewshedController;
     BboxShape _bboxShape;
     Camera _camera;
@@ -70,7 +69,6 @@ class Hub {
         _viewController = new ViewController();
         _annotationController = new AnnotationController();
         _measurementController = new MeasurementController();
-        _selectionController = new SelectionController();
         _viewshedController = new ViewshedController();
 
         _camera = new Camera();

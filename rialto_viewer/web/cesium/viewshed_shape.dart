@@ -13,8 +13,6 @@ class ViewshedShape extends Shape {
         _point1 = point1;
         _point2 = point2;
 
-        isSelectable = true;
-
         primitive = _createCesiumObject();
     }
 
