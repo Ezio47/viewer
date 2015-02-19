@@ -7,7 +7,7 @@ part of rialto.viewer;
 class RialtoElement  {
     Hub _hub;
     SpanElement _mouseCoords;
-    InitScriptDialogVM _IniScriptDialog;
+    InitScriptDialogVM _initScriptDialog;
     LayerManagerDialogVM _layerManager;
     SettingsDialogVM _advancedSettings;
     ModalButtonsVM _modalButtons;
@@ -28,7 +28,7 @@ class RialtoElement  {
             querySelector("#viewshedModeButton"): new ModeData(ModeData.VIEWSHED)
         }, querySelector("#viewModeButton"));
 
-        _IniScriptDialog = new InitScriptDialogVM("initScriptDialog");
+        _initScriptDialog = new InitScriptDialogVM("initScriptDialog");
         _layerManager = new LayerManagerDialogVM("layerManagerDialog");
         _advancedSettings = new SettingsDialogVM("advancedSettingsDialog");
 
