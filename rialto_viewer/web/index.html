@@ -16,12 +16,12 @@
         </style>
         <link rel="stylesheet" href="rialto.css">
 
-<!--        <script src="dialog-polyfill.js"></script>
-        <link rel="stylesheet" type="text/css" href="dialog-polyfill.css"> -->
+        <script src="utils/dialog-polyfill.js"></script>
+        <link rel="stylesheet" type="text/css" href="utils/dialog-polyfill.css">
     </head>
     <body>
 
-        <div id="cesiumContainer">
+    <div id="cesiumContainer">
 
         <!-- TOGGLES PANEL -->
         <div class="main-toggles-position" >
@@ -293,6 +293,12 @@
         </div>
 
     </div>
+
+    <script>
+        //var dialog = document.querySelector('#advancedSettingsDialog');
+        //dialogPolyfill.registerDialog(dialog);
+        //dialog.showModal();
+    </script>
 
     <script src="cesium-build/Cesium/Cesium.js"></script>
     <script src="cesium/myutils.js"></script>
