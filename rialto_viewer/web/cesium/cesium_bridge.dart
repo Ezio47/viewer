@@ -13,14 +13,18 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    Future<dynamic> createTileProviderAsync(String url) {
+    Future<dynamic> createTileProviderAsync(String url, String colorizeRamp, String colorizeDimension, bool visible) {
         var c = new Completer<dynamic>();
 
         var cb = (obj) { c.complete(obj); };
 
-        _bridge.callMethod('createTileProviderAsync', [url, cb]);
+        _bridge.callMethod('createTileProviderAsync', [url, colorizeRamp, colorizeDimension, visible, cb]);
 
         return c.future;
+    }
+
+    void unloadTileProvider(var provider) {
+        return _bridge.callMethod('unloadTileProvider', [provider]);
     }
 
     dynamic getDimensionNamesFromProvider(var provider) {

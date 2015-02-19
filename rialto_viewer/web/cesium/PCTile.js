@@ -361,7 +361,8 @@ PCTile.prototype.colorize = function () {
         }
     }
 
-    var dataArray = this.dimensions[provider.colorizeDimension];
+    var nam = provider.colorizeDimension;
+    var dataArray = this.dimensions[nam];
     var rgba = "rgba";
     var rgbaArray = this.dimensions[rgba];
 

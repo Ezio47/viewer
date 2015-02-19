@@ -8,6 +8,8 @@ part of rialto.viewer;
 class PointCloudLayer extends Layer {
     var _provider;
     int numPoints;
+    String colorizeRamp = "Spectral";
+    String colorizeDimension = "Z";
 
     PointCloudLayer(String name, Map map)
             : super(name, map) {
@@ -18,7 +20,7 @@ class PointCloudLayer extends Layer {
     Future<bool> load() {
         Completer c = new Completer();
 
-        _hub.cesium.createTileProviderAsync(server + path).then((provider) {
+        _hub.cesium.createTileProviderAsync(server + path, colorizeRamp, colorizeDimension, visible).then((provider) {
             _provider = provider;
 
             numPoints = _hub.cesium.getNumPointsFromProvider(_provider);
@@ -37,11 +39,19 @@ class PointCloudLayer extends Layer {
         return c.future;
     }
 
+    @override
+    set visible(bool v) {
+        _visible = v;
+        _hub.cesium.unloadTileProvider(_provider);
+        load();
+    }
+
     Future colorizeAsync(ColorizeLayersData data) {
         return new Future(() {
-//            _colorizer.ramp = data.ramp;
-            //          _colorizer.dimension = data.dimension;
-            //        _colorizer.colorize();
+            _hub.cesium.unloadTileProvider(_provider);
+            colorizeRamp = data.ramp;
+            colorizeDimension = data.dimension;
+            load();
         });
     }
 }

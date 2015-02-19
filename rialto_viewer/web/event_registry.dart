@@ -161,5 +161,5 @@ class WpsRequestData {
 class ColorizeLayersData {
     String ramp;
     String dimension;
-    ColorizeLayersData({String this.ramp: null, String this.dimension: null});
+    ColorizeLayersData(String this.ramp, String this.dimension);
 }

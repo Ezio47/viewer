@@ -43,13 +43,14 @@ class LayerManager {
         if (layer == null) return;
 
         layer.load().then((_) {
-            Future f;
-            if (layer is PointCloudLayer) {
-                f = layer.colorizeAsync(new ColorizeLayersData());
-            } else {
-                f = new Future.sync((){});
-            }
-            f.then((_) => _addLayer(layer));
+            //Future f;
+            //if (layer is PointCloudLayer) {
+            //    f = layer.colorizeAsync(new ColorizeLayersData());
+            //} else {
+            //    f = new Future.sync((){});
+            //}
+            //f.then((_) => _addLayer(layer));
+            _addLayer(layer);
         });
     }
 

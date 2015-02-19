@@ -139,7 +139,7 @@ class ConfigScript {
             String ramp = colorizeData["ramp"];
             assert(colorizeData.containsKey("dimension"));
             String dimName = colorizeData["dimension"];
-            _hub.events.ColorizeLayers.fire(new ColorizeLayersData(ramp: ramp, dimension: dimName));
+            _hub.events.ColorizeLayers.fire(new ColorizeLayersData(ramp, dimName));
         }
     }
 

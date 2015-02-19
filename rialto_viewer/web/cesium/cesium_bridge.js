@@ -20,10 +20,10 @@ var CesiumBridge = function (element) {
 
 
     // returns a promise<provider>
-    this._createTileProvider2Async = function(urlarg) {
+    this._createTileProvider2Async = function(urlarg, colorizeRamp, colorizeDimension, visible) {
         var deferred = Cesium.when.defer();
 
-        var provider = new PCTileProvider(urlarg);
+        var provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
 
         provider.readHeaderAsync().then(function(provider) {
             deferred.resolve(provider);
@@ -35,11 +35,11 @@ var CesiumBridge = function (element) {
     }
 
     // returns nothing, but sets the completer<promise>
-    this.createTileProviderAsync = function(urlarg, completer) {
+    this.createTileProviderAsync = function(urlarg, colorizeRamp, colorizeDimension, visible, completer) {
 
         var thisthis = this;
 
-        this._createTileProvider2Async(urlarg).then(function(provider) {
+        this._createTileProvider2Async(urlarg, colorizeRamp, colorizeDimension, visible).then(function(provider) {
 
             var viewer = thisthis.viewer;
             var scene = viewer.scene;
@@ -55,6 +55,15 @@ var CesiumBridge = function (element) {
         }).otherwise(function (error) {
             myerror("Unable to create point cloud tile provider", error);
         });
+    }
+
+    this.unloadTileProvider = function(provider) {
+
+        var viewer = this.viewer;
+        var scene = viewer.scene;
+        var primitives = scene.primitives;
+
+        primitives.remove(provider.quadtree);
     }
 
     this.getDimensionNamesFromProvider = function (provider) {

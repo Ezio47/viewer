@@ -6,7 +6,7 @@
 // based on DemoTileProvider from
 // https://github.com/AnalyticalGraphicsInc/cesium/blob/master/Specs/Sandcastle/QuadtreePrimitive.html
 
-var PCTileProvider = function PCTileProvider(url) {
+var PCTileProvider = function PCTileProvider(url, colorizeRamp, colorizeDimension, visible) {
     "use strict";
 
     this._quadtree = undefined;
@@ -19,12 +19,14 @@ var PCTileProvider = function PCTileProvider(url) {
     this._ready = false;
     this.pointSizeInBytes = undefined;
 
-    this.rampName = "Spectral";
-    this.colorizeDimension = "Z";
+    this.rampName = colorizeRamp;
+    this.colorizeDimension = colorizeDimension;
 
     this._tiletree = null;
     this._root000 = null;
     this._root010 = null;
+
+    this.visibility = visible;
 };
 
 
@@ -66,6 +68,13 @@ PCTileProvider.prototype.setColorization = function (rampName, dimensionName) {
 
     this.rampName = rampName;
     this.colorizeDimension = dimensionName;
+};
+
+
+PCTileProvider.prototype.setVisibility = function (v) {
+    "use strict";
+
+    this.visibility = v;
 };
 
 
@@ -290,7 +299,9 @@ PCTileProvider.prototype.computeTileVisibility = function (tile, frameState, occ
 PCTileProvider.prototype.showTileThisFrame = function (tile, context, frameState, commandList) {
     "use strict";
 
-    tile.data.primitive.update(context, frameState, commandList);
+    if (this.visibility == true) {
+        tile.data.primitive.update(context, frameState, commandList);
+    }
 };
 
 

@@ -3,15 +3,15 @@
 // license found in the accompanying LICENSE.txt file.
 
 
-var myassert = function (b, s) {
+var myassert = function (condition, message) {
     "use strict";
 
-    if (b) return;
-
-    if (s == undefined) {
-        myerror("Assertion failed.");
-    } else {
-        myerror("Assertion failed: " + s);
+    if (!condition) {
+        message = message || "Assertion failed";
+        if (typeof Error !== "undefined") {
+            throw new Error(message);
+        }
+        throw message; // Fallback
     }
 };
 
@@ -19,15 +19,18 @@ var myassert = function (b, s) {
 var myerror = function (s, t) {
     "use strict";
 
-    mylog("*** ERROR ***");
+    var text = "*** ERROR ***";
 
     if (s != undefined) {
-        mylog(s);
+        text += "\n" + s;
     }
 
     if (t != undefined) {
-        mylog(t);
+        text += "\n" + t;
     }
+
+    mylog(text);
+    //window.alert(text);
 };
 
 

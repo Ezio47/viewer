@@ -13,7 +13,7 @@ abstract class Layer {
     final String path;
     final String description;
 
-    bool _isVisible;
+    bool _visible;
     CartographicBbox _bbox;
 
     Layer(String this.name, Map map)
@@ -21,12 +21,12 @@ abstract class Layer {
               server = YamlUtils.getRequiredSettingAsString(map, "server"),
               path = YamlUtils.getRequiredSettingAsString(map, "path"),
               description = YamlUtils.getOptionalSettingAsString(map, "description"),
-              _isVisible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
+              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
 
     Future<bool> load();
 
-    bool get visible => _isVisible;
-    set visible(bool v) => _isVisible = v;
+    bool get visible => _visible;
+    set visible(bool v) => _visible = v;
 
     CartographicBbox get bbox => _bbox;
     set bbox(CartographicBbox bbox) => _bbox = bbox;
