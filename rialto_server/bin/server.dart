@@ -27,7 +27,7 @@ class Server {
     Server(String this.server, int this.port, String this.rootDir);
 
     void run() {
-        log("Starting server for $server:$port");
+        log("Listening on $server:$port for directory $rootDir");
 
         HttpServer.bind(server, port).then((server) {
             server.listen(_handler);
@@ -37,13 +37,12 @@ class Server {
     void log(Object o) {
         DateTime now = new DateTime.now();
         if (o is HttpRequest) {
-            print("REQUEST:  $now  ${o.method}  ${o.uri}");
+            print("REQU  $now  ${o.method}  ${o.uri}");
         } else if (o is HttpResponse) {
-            print("RESPONSE:  $now  ${o.statusCode}");
+            print("RESP $now  ${o.statusCode}");
         } else {
-            print("$now  $o");
+            print("INFO  $now  $o");
         }
-        print(o);
     }
 
     void fail(HttpRequest request) {
@@ -54,6 +53,8 @@ class Server {
 
     void _handler(HttpRequest request) {
         log(request);
+
+        headers.forEach((k, v) => request.response.headers.set(k, v));
 
         _handlerInner(request);
 
@@ -89,6 +90,8 @@ class Server {
 
         var filename = rootDir + path;
 
+        log("request for $filename");
+
         File file = null;
 
         try {
@@ -107,25 +110,28 @@ class Server {
         }
 
         Stream<List<int>> s = null;
-        try {
-            file.openRead().listen((data) {
-                request.response.statusCode = HttpStatus.OK;
-                request.response.add(data);
-                //request.response.close();
-                //log("added ${data.length} bytes");
-            }, onDone: () {
-                //request.response.statusCode = HttpStatus.OK;
+        var bytes = new List<int>();
+
+        request.response.statusCode = HttpStatus.OK;
+        request.response.addStream(file.openRead()).then((_) {
+            log("added bytes for $filename");
+            request.response.flush().then((_) {
                 request.response.close();
-                //log("file sent ok");
-            }, onError: ((s) {
-                //log("error reading file: $s");
-                fail(request);
-            }));
-        } catch (e) {
-            //log("Unable to read file: $filename");
-            fail(request);
+            });
+        });
+
+        /*file.openRead().listen((data) {
+            log("added ${data.length} bytes for $filename");
+            bytes.addAll(data);
+        }, onDone: () {
+            request.response.statusCode = HttpStatus.OK;
+            request.response.add(bytes);
+            request.response.close();
             return;
-        }
+        }, onError: ((s) {
+            log("error reading $filename: $s");
+            fail(request);
+        }));*/
 
         return;
     }
@@ -134,7 +140,6 @@ class Server {
         //log("proxy request for: $uri");
 
         getter(uri).then((s) {
-            headers.forEach((k, v) => request.response.headers.set(k, v));
             request.response.statusCode = HttpStatus.OK;
             request.response.write(s);
             request.response.close();
@@ -183,10 +188,6 @@ void main(List<String> args) {
         usage(s);
     }));
     final dir = results['dir'];
-
-    String r = "http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=GetCapabilities&Service=WPS";
-    r = Uri.encodeComponent(r);
-    print(r);
 
     Server s = new Server(server, port, dir);
 

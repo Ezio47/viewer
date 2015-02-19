@@ -11,8 +11,6 @@ class ConfigScript {
     ConfigScript(String url) {
         _hub = Hub.root;
 
-        //OgcDocumentTests.test();
-
         var f = Comms.httpGet(url);
 
         f.then((s) {

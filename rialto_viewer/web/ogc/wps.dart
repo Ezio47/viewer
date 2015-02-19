@@ -31,25 +31,25 @@ class OwsService {
 
         Completer c = new Completer<Xml.XmlDocument>();
 
-        String wps = Uri.encodeFull(server + operation);
-
-        var url = wps;
+        String url = Uri.encodeComponent(server + operation);
 
         if (proxy != null) {
-            var magic = "/x?q=";
-            url = proxy + magic + '"' + wps + '"';
+            url = proxy + url;
         }
 
         log("wps server request: $url");
 
         var f = _client.get(url).then((response) {
             String s = response.body;
-            var doc = Xml.parse(s);
-            c.complete(doc);
+            try {
+                var doc = Xml.parse(s);
+                c.complete(doc);
+            } catch (e) {
+                Hub.error("Unable to parse server response", object: e);
+                c.complete(null);
+            }
         }).catchError((e) {
-            Hub.error("Server request failed", exception: e, info: {
-                "Path": e.uri
-            });
+            Hub.error("Server request failed", object: e, info: {});
         });
 
         return c.future;

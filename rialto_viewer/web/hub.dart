@@ -101,7 +101,7 @@ class Hub {
         data.layer.changeVisibility(data.visible);
     }
 
-    static void error(String text, {Map<String, dynamic> info: null, Exception exception: null}) {
+    static void error(String text, {Map<String, dynamic> info: null, Object object: null}) {
 
         String s = text;
 
@@ -113,8 +113,8 @@ class Hub {
             info.forEach((k,v) => s+= "$k: $v\n");
         }
 
-        if (exception != null) {
-            s += 'Exception: $exception\n';
+        if (object != null) {
+            s += 'Details: $object\n';
         }
 
         window.console.log(s);
