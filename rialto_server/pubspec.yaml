@@ -2,8 +2,3 @@ name: rialto_server
 description: A sample command-line application
 dependencies:
   args: any
-  shelf: any
-  shelf_exception_response: any
-  shelf_route: any
-  shelf_web_socket: any
-  watcher: any
