@@ -31,7 +31,7 @@ class ConfigScript {
         for (String command in commands.keys) {
 
             var data = commands[command];
-            log("Script command: $command");
+            //log("Script command: $command");
 
             switch (command) {
                 case "layers":
