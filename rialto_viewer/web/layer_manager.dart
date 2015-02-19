@@ -37,10 +37,16 @@ class LayerManager {
     void _handleAddLayer(LayerData data) {
         final name = data.name;
 
-        assert(!layers.containsKey(name));
+        if (layers.containsKey(name)) {
+            Hub.error("Layer $name already loaded.");
+            return;
+        }
 
         Layer layer = LayerManager._createLayer(name, data.map);
-        if (layer == null) return;
+        if (layer == null) {
+            Hub.error("Unable to load layer $name.");
+            return;
+        }
 
         layer.load().then((_) {
             //Future f;
