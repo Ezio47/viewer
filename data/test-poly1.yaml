@@ -1,0 +1,7 @@
+layers:
+    test_poly:
+        type: vector
+        server: http://localhost:12345
+        path: /file/poly.json
+        description: "foor bar yow"  # optional, default=""
+        visible: true       # optional, default=true

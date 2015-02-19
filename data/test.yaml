@@ -3,39 +3,9 @@ layers:
         type: pointcloud   # always tiled
         server: http://localhost:12345/file
         path: /tiledserp18
-        numBytes: 10            # optional, default=0
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
 
-#    serp:
-#        type: pointcloud
-#        server: ws://localhost:12346
-#        path: /serp-100K.ria
-#        numBytes: 10            # optional, default=0
-#        description: "foor bar yow"  # optional, default=""
-#        visible: true       # optional, default=true
-
-#    a_poly:
-#        type: vector
-#        server: http://localhost:12345
-#        path: /poly.json
-#        numBytes: 10            # optional, default=0
-#        description: "foor bar yow"  # optional, default=""
-#        visible: true       # optional, default=true
-
-#    a_point:
-#        type: vector
-#        server: http://localhost:12345
-#        path: /mpg.json
-#        numBytes: 10            # optional, default=0
-#        description: "foor bar yow"  # optional, default=""
-#        visible: true       # optional, default=true
-
-    #terrain2:
-     #   type: pointcloud
-     #   server: http://www.example.com
-     #   path: /terrain2.dat
-     #  visible: false
 
 camera:
     eye: [-83.43271, 39.02617, 50.0]

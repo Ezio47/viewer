@@ -18,9 +18,9 @@ class InitScriptDialogVM extends DialogVM {
         _listbox = new ListBoxVM<_ScriptItem>("initScriptDialog_files");
         _listbox.setSelectHandler(_selectHandler);
 
-        _listbox.add(new _ScriptItem("http://localhost:12346", "/test.yaml"));
-        _listbox.add(new _ScriptItem("http://localhost:12346", "/test2.yaml"));
-        _listbox.add(new _ScriptItem("http://www.example.com", "/foo.yaml"));
+        _listbox.add(new _ScriptItem("http://localhost:12345", "/file/test.yaml"));
+        _listbox.add(new _ScriptItem("http://localhost:12345", "/file/test-poly1.yaml"));
+        _listbox.add(new _ScriptItem("http://localhost:12345", "/file/test-poly2.yaml"));
     }
 
     @override

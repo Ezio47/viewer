@@ -11,7 +11,6 @@ abstract class Layer {
     String name;
     String server;
     String path;
-    int numBytes;
     String description;
     bool isVisible;
     CartographicBbox bbox;
@@ -21,7 +20,6 @@ abstract class Layer {
 
         server = YamlUtils.getRequiredSettingAsString(map, "server");
         path = YamlUtils.getRequiredSettingAsString(map, "path");
-        numBytes = YamlUtils.getOptionalSettingAsInt(map, "numBytes", 0);
         description = YamlUtils.getOptionalSettingAsString(map, "description");
         isVisible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
     }
