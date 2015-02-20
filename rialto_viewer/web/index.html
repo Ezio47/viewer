@@ -58,13 +58,18 @@
                 <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
                 <div class="uk-dropdown uk-dropdown-small">
                     <ul class="uk-nav uk-nav-dropdown">
-                        <li><a href="#">Item</a></li>
-                        <li><a href="#">Another item</a></li>
-                        <li class="uk-nav-header">Header</li>
-                        <li><a href="#">Item</a></li>
-                        <li><a href="#">Another item</a></li>
+                        <li class="uk-nav-header">Point clouds</li>
+                        <li><a href="#">tiledserp18...</a></li>
+                        <li><a href="#">Add..</a></li>
+                        <li class="uk-nav-header">Vectors</li>
+                        <li><a href="#">poly1...</a></li>
+                        <li><a href="#">Add..</a></li>
+                        <li class="uk-nav-header">Base Imagery</li>
+                        <li><a href="#">Add..</a></li>
+                        <li class="uk-nav-header">Base Terrain</li>
+                        <li><a href="#">Add..</a></li>
                         <li class="uk-nav-divider"></li>
-                        <li><a href="#">Separated item</a></li>
+                        <li><a href="#">Load config...</a></li>
                     </ul>
                 </div>
             </div>
@@ -76,13 +81,9 @@
                 <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
                 <div class="uk-dropdown uk-dropdown-small">
                     <ul class="uk-nav uk-nav-dropdown">
-                        <li><a href="#">Item</a></li>
-                        <li><a href="#">Another item</a></li>
-                        <li class="uk-nav-header">Header</li>
-                        <li><a href="#">Item</a></li>
-                        <li><a href="#">Another item</a></li>
-                        <li class="uk-nav-divider"></li>
-                        <li><a href="#">Separated item</a></li>
+                        <li><a href="#">Annotate</a></li>
+                        <li><a href="#">Measure</a></li>
+                        <li><a href="#">Viewshed</a></li>
                     </ul>
                 </div>
             </div>
@@ -94,20 +95,12 @@
                 <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
                 <div class="uk-dropdown uk-dropdown-small">
                     <ul class="uk-nav uk-nav-dropdown">
-                        <li><a href="#">Item</a></li>
-                        <li><a href="#">Another item</a></li>
-                        <li class="uk-nav-header">Header</li>
-                        <li><a href="#">Item</a></li>
-                        <li><a href="#">Another item</a></li>
-                        <li class="uk-nav-divider"></li>
-                        <li><a href="#">Separated item</a></li>
+                        <li><a href="#">Colorization...</a></li>
+                        <li><a href="#">Camera...</a></li>
                     </ul>
                 </div>
             </div>
         </div>
-
-
-
 
 
         <!-- TOGGLES PANEL -->
@@ -134,6 +127,9 @@
             <div>
                 <span id="textMouseCoords" class="status-span"></span>
                 <button id="aboutDialog_open" class="uk-button" type="button">About...</button>
+
+                <!-- This is a button toggling the modal -->
+                <button class="uk-button" data-uk-modal="{target:'#my-id'}">About!</button>
             </div>
         </div>
 
@@ -375,7 +371,7 @@
         Copyright © RadiantBlue 2014-2015.
         </div>
 
-        <div id="creditContainer"></div>
+<!--        <div id="creditContainer"></div> -->
 
         <div>
             <button id="aboutDialog_okay">Okay</button>
@@ -385,11 +381,39 @@
     </dialog>
 
 
-    <script>
-        //var dialog = document.querySelector('#initScriptDialog');
-        //dialogPolyfill.registerDialog(dialog);
-        //dialog.showModal();
-    </script>
+    <!-- The new About box model -->
+    <div id="my-id" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <div class="uk-modal-header">
+            Header
+            </div>
+
+            <div>
+                Copyright © RadiantBlue 2014-2015.
+                <img src="radiantblue-logo.png">
+
+                <hr>
+
+                <div>
+                    WebGL provided by <a href="http://www.cesiumjs.org">Cesium</a>.
+                    <div id="creditContainer" class="uk-text-small uk-text-muted"></div>
+                </div>
+                <div>
+                    CSS provided by <a href="http://www.getuikit.com">uikit</a>.
+                    <img src="uikit-logo.png">
+                </div>
+                <div>
+                    Javascript by <a href="http://www.dartlang.org">Dart</a>.
+                    <img src="dart-logo.png">
+                </div>
+
+            </div>
+
+            <div class="uk-modal-footer uk-text-right">
+                <button class="uk-button uk-modal-close">Close</button>
+            </div>
+          </div>
+    </div>
 
     <script src="cesium-build/Cesium/Cesium.js"></script>
     <script src="utils/js_bridge.js"></script>
