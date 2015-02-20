@@ -35,6 +35,7 @@ class EventRegistry {
     SignalFunctions<ColorizeLayersData> ColorizeLayers = new SignalFunctions<ColorizeLayersData>();
 
     SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
+    SignalFunctions<ViewModeData> SetViewMode = new SignalFunctions<ViewModeData>();
 
     SignalFunctions<LayerData> AddLayer = new SignalFunctions<LayerData>();
     SignalFunctions<Layer> AddLayerCompleted = new SignalFunctions<Layer>();
@@ -167,4 +168,21 @@ class ColorizeLayersData {
     String ramp;
     String dimension;
     ColorizeLayersData(String this.ramp, String this.dimension);
+}
+
+class ViewModeData {
+    static const int MODE_2D = 0;
+    static const int MODE_25D = 1;
+    static const int MODE_3D = 2;
+
+    final int mode;
+
+    ViewModeData(int this.mode);
+
+    static String name(int m) {
+        if (m == ViewModeData.MODE_2D) return "2D";
+        if (m == ViewModeData.MODE_25D) return "2.5D";
+        if (m == ViewModeData.MODE_3D) return "3D";
+        throw new ArgumentError("bad view mode value");
+    }
 }

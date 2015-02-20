@@ -7,16 +7,28 @@ var CesiumBridge = function (element) {
     Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
     var options = {
-        timeline: false,
-        geocoder: false,
-        animation: false,
-        sceneMode : Cesium.SceneMode.SCENE3D,
-        fullscreenButton: false,
         creditContainer: "creditContainer"
     };
 
 
-    this.viewer = new Cesium.Viewer(element, options);
+    this.viewer = new Cesium.CesiumWidget(element, options);
+
+    // 0=3D, 1=2.5D, 2=2D
+    this.setViewMode = function(m) {
+
+        var scene = this.viewer.scene;
+        var sec = 0.5;
+
+        if (m == 0) {
+            scene.morphTo2D(sec);
+        } else if (m == 1) {
+            scene.morphToColumbusView(sec);
+        } else if (m == 2) {
+            scene.morphTo3D(sec);
+        } else {
+            myassert(false, "bad scene mode value");
+        }
+    }
 
 
     // returns a promise<provider>

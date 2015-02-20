@@ -64,6 +64,8 @@ class Hub {
         // onKeyUp...
         // onResize...
 
+        events.SetViewMode.subscribe(_handleSetViewMode);
+
         events.DisplayBbox.subscribe(_handleDisplayBbox);
 
         events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
@@ -86,6 +88,10 @@ class Hub {
         if (box.isValid) {
             _bboxShape = new BboxShape(box.minimum, box.maximum);
         }
+    }
+
+    void _handleSetViewMode(ViewModeData mode) {
+        cesium.setViewMode(mode.mode);
     }
 
     void _handleLoadScript(String url) {

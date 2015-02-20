@@ -13,6 +13,8 @@ class RialtoElement  {
     ModalButtonsVM _modalButtons;
     AboutVM _about;
 
+    int viewMode = ViewModeData.MODE_3D;
+
     RialtoElement() {
         _hub = Hub.root;
 
@@ -20,6 +22,14 @@ class RialtoElement  {
 
         querySelector("#homeWorldButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.WORLDVIEW_MODE)));
         querySelector("#homeDataButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.DATAVIEW_MODE)));
+
+        var modeButton = querySelector("#modeButton");
+        modeButton.text = viewModeString;
+        modeButton.onClick.listen((ev) {
+            viewMode = (viewMode + 1) % 3;
+            modeButton.text = viewModeString;
+            _hub.events.SetViewMode.fire(new ViewModeData(viewMode));
+        });
 
         _modalButtons = new ModalButtonsVM({
             querySelector("#viewModeButton"): new ModeData(ModeData.VIEW),
@@ -36,6 +46,8 @@ class RialtoElement  {
 
         _hub.events.MouseMove.subscribe(_updateCoords);
     }
+
+    String get viewModeString => "Mode / ${ViewModeData.name(viewMode)}";
 
     void _updateCoords(MouseData d) {
         var v = _hub.cesium.getMouseCoordinates(d.x, d.y);

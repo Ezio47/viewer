@@ -13,6 +13,11 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    void setViewMode(int m) {
+        _bridge.callMethod('setViewMode', [m]);
+    }
+
+
     Future<dynamic> createTileProviderAsync(String url, String colorizeRamp, String colorizeDimension, bool visible) {
         var c = new Completer<dynamic>();
 
