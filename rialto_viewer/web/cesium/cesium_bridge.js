@@ -448,6 +448,7 @@ var CesiumBridge = function (element) {
     }
 
 
+    // returns triplet of cartographic degrees as doubles
     this.getMouseCoords = function(windowX, windowY) {
         var pt2 = new Cesium.Cartesian2(windowX, windowY);
         var ellipsoid = this.viewer.scene.globe.ellipsoid;

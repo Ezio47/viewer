@@ -112,7 +112,7 @@ class CesiumBridge {
         return true;
     }
 
-    Cartographic3 getMouseCoordinates(int windowX, int windowY) {
+    Cartographic3 getMouseCoordinates(double windowX, double windowY) {
         var xyz = _bridge.callMethod('getMouseCoords', [windowX, windowY]);
         if (xyz == null) return null;
         double x = xyz[0].toDouble();

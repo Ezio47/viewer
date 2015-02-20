@@ -56,10 +56,10 @@ class Hub {
 
         var rialtoElement = new RialtoElement();
 
-        cesium.onMouseMove((x, y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
-        cesium.onMouseDown((x, y, b) => events.MouseDown.fire(new MouseData.fromXyb(x, y, b)));
-        cesium.onMouseUp((x, y, b) => events.MouseUp.fire(new MouseData.fromXyb(x, y, b)));
-        cesium.onMouseWheel((d) => events.MouseWheel.fire(new WheelData.fromD(d.toDouble())));
+        cesium.onMouseMove((num x, num y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
+        cesium.onMouseDown((num x, num y, int b) => events.MouseDown.fire(new MouseData.fromXyb(x, y, b)));
+        cesium.onMouseUp((num x, num y, int b) => events.MouseUp.fire(new MouseData.fromXyb(x, y, b)));
+        cesium.onMouseWheel((num d) => events.MouseWheel.fire(new WheelData.fromD(d)));
         // onKeyDown...
         // onKeyUp...
         // onResize...

@@ -55,22 +55,27 @@ class EventRegistry {
 }
 
 class MouseData {
-    int x;
-    int y;
-    bool altKey;
-    int button; // 0==left, 1==middle, 2==right
-    CanvasElement canvas;
+    final double x;
+    final double y;
+    final bool altKey;
+    final int button; // 0==left, 1==middle, 2==right
 
-    MouseData(MouseEvent ev) {
-        altKey = ev.altKey;
-        button = ev.button;
-        x = ev.client.x;
-        y = ev.client.y;
-    }
+    MouseData(MouseEvent ev):
+        altKey = ev.altKey,
+        button = ev.button,
+        x = ev.client.x.toDouble(),
+        y = ev.client.y.toDouble();
 
-    MouseData.fromXy(int this.x, int this.y);
+    MouseData.fromXy(num nx, num ny) :
+        altKey = null,
+        button = null,
+        x = nx.toDouble(),
+        y = ny.toDouble();
 
-    MouseData.fromXyb(int this.x, int this.y, int this.button);
+    MouseData.fromXyb(num nx, num ny, int this.button):
+        altKey = null,
+        x = nx.toDouble(),
+        y = ny.toDouble();
 }
 
 class WheelData {
