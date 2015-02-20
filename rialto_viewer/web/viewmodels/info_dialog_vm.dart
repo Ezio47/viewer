@@ -11,7 +11,7 @@ class InfoVM extends DialogVM {
 
     InfoVM(String id, LayerManagerDialogVM this._parent) : super(id, hasCancelButton: false);
     @override
-    void _open() {
+    void _show() {
         int numPoints;
         double minx, miny, minz;
         double maxx, maxy, maxz;

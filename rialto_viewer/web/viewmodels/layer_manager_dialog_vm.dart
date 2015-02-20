@@ -32,7 +32,7 @@ class LayerManagerDialogVM extends DialogVM {
     }
 
     @override
-    void _open() {
+    void _show() {
         _listbox.clear();
 
         var names = _layers.keys.toList();

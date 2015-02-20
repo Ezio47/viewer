@@ -22,7 +22,7 @@ abstract class DialogVM extends ViewModel {
 
         var openButton = querySelector(openButtonId);
         assert(openButton != null);
-        openButton.onClick.listen((ev) => open());
+        openButton.onClick.listen((ev) => show());
 
         var okayButton = querySelector(okayButtonId);
         assert(okayButton != null);
@@ -39,9 +39,9 @@ abstract class DialogVM extends ViewModel {
     String get okayButtonId => id + "_okay";
     String get cancelButtonId => id + "_cancel";
 
-    void open() {
+    void show() {
         _hub.js.showModalDialog(_dialogProxy);
-        _open();
+        _show();
     }
 
     void close(bool okay) {
@@ -50,6 +50,7 @@ abstract class DialogVM extends ViewModel {
         return;
     }
 
-    void _open();
+    // derived dialogs implement these
+    void _show();
     void _close(bool okay);
 }

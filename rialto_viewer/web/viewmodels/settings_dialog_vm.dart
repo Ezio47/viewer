@@ -44,7 +44,7 @@ class SettingsDialogVM extends DialogVM {
     }
 
     @override
-    void _open() {
+    void _show() {
         _eyeLon.clearState();
         _eyeLat.clearState();
         _eyeHeight.clearState();

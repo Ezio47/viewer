@@ -24,7 +24,7 @@ class InitScriptDialogVM extends DialogVM {
     }
 
     @override
-    void _open() {}
+    void _show() {}
 
     @override
     void _close(bool okay) {
