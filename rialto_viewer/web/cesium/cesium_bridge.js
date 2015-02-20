@@ -13,6 +13,9 @@ var CesiumBridge = function (element) {
 
     this.viewer = new Cesium.CesiumWidget(element, options);
 
+    this.viewer.creditContainer.className = "";
+
+
     // 0=3D, 1=2.5D, 2=2D
     this.setViewMode = function(m) {
 
