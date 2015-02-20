@@ -182,8 +182,24 @@ class CesiumBridge {
         _bridge.callMethod('removePrimitive', [primitive]);
     }
 
-    dynamic createLabel(String text, Vector3 point) {
-
-        return _bridge.callMethod('createLabel', [text, point.x, point.y, point.z]);
+    void makePolyfillDialog(String dialogId) {
+        assert(dialogId.startsWith("#"));
+        _bridge.callMethod('makePolyfillDialog', [dialogId]);
+    }
+    void showDialog(String dialogId) {
+        assert(dialogId.startsWith("#"));
+        _bridge.callMethod('showDialog', [dialogId]);
+    }
+    void showModalDialog(String dialogId) {
+        assert(dialogId.startsWith("#"));
+        _bridge.callMethod('showModalDialog', [dialogId]);
+    }
+    void closeDialog(String dialogId, String value) {
+        assert(dialogId.startsWith("#"));
+        _bridge.callMethod('closeDialog', [dialogId, value]);
+    }
+    dynamic getDialogReturnValue(String dialogId) {
+        assert(dialogId.startsWith("#"));
+        return _bridge.callMethod('getDialogReturnValue', [dialogId]);
     }
 }

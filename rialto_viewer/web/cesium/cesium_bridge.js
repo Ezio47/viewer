@@ -462,4 +462,50 @@ var CesiumBridge = function (element) {
             return null;
         }
     }
+
+    this.makePolyfillDialog = function (dialogId) {
+        'use strict';
+
+        var dialog = document.querySelector(dialogId);
+        myassert(dialog);
+
+        dialogPolyfill.registerDialog(dialog);
+        //dialog.showModal();
+    }
+
+    this.showDialog = function (dialogId) {
+        'use strict';
+
+        var dialog = document.querySelector(dialogId);
+        myassert(dialog);
+
+        dialog.show();
+    }
+
+    this.showModalDialog = function (dialogId) {
+        'use strict';
+
+        var dialog = document.querySelector(dialogId);
+        myassert(dialog);
+
+        dialog.showModal();
+    }
+
+    this.closeDialog = function (dialogId, ret) {
+        'use strict';
+
+        var dialog = document.querySelector(dialogId);
+        myassert(dialog);
+
+        dialog.close(ret);
+    }
+
+    this.getDialogReturnValue = function (dialogId) {
+        'use strict';
+
+        var dialog = document.querySelector(dialogId);
+        myassert(dialog);
+
+        return dialog.returnValue;
+    }
 }

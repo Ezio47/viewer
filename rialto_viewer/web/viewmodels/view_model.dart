@@ -15,4 +15,6 @@ abstract class ViewModel {
         _element = querySelector("#" + _id);
         assert(_element != null);
     }
+
+    String get id => _id;
 }

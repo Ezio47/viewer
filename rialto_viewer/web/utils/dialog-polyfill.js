@@ -6,7 +6,8 @@
 //     var dialog = document.querySelector('#mydialog');
 //     dialogPolyfill.registerDialog(dialog);
 //     dialog.showModal();
-//  </script>
+//   </script>
+// see also http://demo.agektmr.com/dialog/
 
 var dialogPolyfill = (function() {
 

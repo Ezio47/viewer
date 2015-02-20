@@ -40,251 +40,6 @@
             </div>
         </div>
 
-        <dialog id="initScriptDialog">
-            <div>
-                <b>Init Script Dialog</b>
-                <hr>
-            </div>
-
-            <div>
-                <select multiple="multiple" id="initScriptDialog_files">
-                </select>
-            </div>
-
-            <div>
-                <label for="initScriptDialog_serverName">Server:</label>
-                <input id="initScriptDialog_serverName" type="text" class="input-textbox-style">
-            </div>
-            <div>
-                <label for="initScriptDialog_scriptName">Script:</label>
-                <input id="initScriptDialog_scriptName" type="text" class="input-textbox-style">
-
-                <hr>
-            </div>
-
-            <div>
-                <button id="initScriptDialog_okay">Okay</button>
-                <button id="initScriptDialog_cancel">Cancel</button>
-            </div>
-        </dialog>
-
-
-        <dialog id="layerManagerDialog">
-            <div>
-                <b>Layer Manager Dialog</b>
-                <hr>
-            </div>
-
-            <div>
-                <select multiple="multiple" id="layerManagerDialog_layers">
-                </select>
-            </div>
-
-            <div>
-                <button id="colorizerDialog_open">Colorizer...</button>
-                <button id="infoDialog_open">Info...</button>
-                <label for="infoDialog_layerVisible">Visible</label>
-                <input id="infoDialog_layerVisible" type="checkbox" class="padright">
-                <hr>
-            </div>
-
-            <div>
-                <button id="layerManagerDialog_okay">Okay</button>
-                <button id="layerManagerDialog_cancel">Cancel</button>
-            </div>
-
-        </dialog>
-
-
-        <dialog id="advancedSettingsDialog">
-            <div>
-                <b>Advanced Settings Dialog</b>
-                <hr>
-            </div>
-
-            <div>
-                <table>
-                <tbody>
-                    <tr>
-                    <td>
-                        <span>Bbox enabled</span>
-                    </td>
-                    <td>
-                        <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
-                    </td>
-                    </tr>
-                </tbody>
-                </table>
-                <hr>
-            </div>
-
-            <div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td><i>Camera eye point</i></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="advancedSettingsDialog_eyeLon">Lon:</label>
-                                <input id="advancedSettingsDialog_eyeLon" type="text">
-                            </td>
-                            <td>
-                                <label for="advancedSettingsDialog_eyeLat">Lat:</label>
-                                <input id="advancedSettingsDialog_eyeLat" type="text">
-                            </td>
-                            <td>
-                                <label for="advancedSettingsDialog_eyeHeight">Height (km):</label>
-                                <input id="advancedSettingsDialog_eyeHeight" type="text">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i>Camera target point</i></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="advancedSettingsDialog_targetLon">Lon:</label>
-                                <input id="advancedSettingsDialog_targetLon" type="text">
-                            </td>
-                            <td>
-                                <label for="advancedSettingsDialog_targetLat">Lat:</label>
-                                <input id="advancedSettingsDialog_targetLat" type="text">
-                            </td>
-                            <td>
-                                <label for="advancedSettingsDialog_targetHeight">Height (km):</label>
-                                <input id="advancedSettingsDialog_targetHeight" type="text">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i>Camera up direction</i></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="advancedSettingsDialog_upX">X:</label>
-                                <input id="advancedSettingsDialog_upX" type="text">
-                            </td>
-                            <td>
-                                <label for="advancedSettingsDialog_upY">Y:</label>
-                                <input id="advancedSettingsDialog_upY" type="text">
-                            </td>
-                            <td>
-                                <label for="advancedSettingsDialog_upZ">Z:</label>
-                                <input id="advancedSettingsDialog_upZ" type="text">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i>Camera FOV</i></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label for="advancedSettingsDialog_fov">Degrees:</label>
-                                <input id="advancedSettingsDialog_fov" type="text">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <hr>
-            </div>
-
-            <div>
-                <button id="advancedSettingsDialog_okay">Okay</button>
-                <button id="advancedSettingsDialog_cancel">Cancel</button>
-            </div>
-        </dialog>
-
-
-        <dialog id="colorizerDialog">
-            <div>
-                <b>Colorizer Dialog</b>
-                <hr>
-            </div>
-
-            <div>
-                <select id="colorizerDialog_items">
-                </select>
-            </div>
-
-            <div>
-                <button id="colorizerDialog_okay">Okay</button>
-                <button id="colorizerDialog_cancel">Cancel</button>
-                <hr>
-            </div>
-        </dialog>
-
-
-        <dialog id="infoDialog">
-            <div>
-                <b>Layer Info</b>
-                <hr>
-            </div>
-
-            <div>
-                <table>
-                    <tr>
-                        <td>Name:</td>
-                        <td id="infoDialog_name"></td>
-                    </tr>
-                    <tr>
-                        <td>Layer Type:</td>
-                        <td id="infoDialog_layerType"></td>
-                    </tr>
-                    <tr>
-                        <td>Server:</td>
-                        <td id="infoDialog_server"></td>
-                    </tr>
-                    <tr>
-                        <td>Path:</td>
-                        <td id="infoDialog_path"></td>
-                    </tr>
-                    <tr>
-                        <td>Points:</td>
-                        <td id="infoDialog_numPoints"></td>
-                    </tr>
-                    <tr>
-                        <td>X:</td>
-                        <td id="infoDialog_minX"></td>
-                        <td id="infoDialog_maxX"></td>
-                    </tr>
-                    <tr>
-                        <td>Y:</td>
-                        <td id="infoDialog_minY"></td>
-                        <td id="infoDialog_maxY"></td>
-                    </tr>
-                    <tr>
-                        <td>Z:</td>
-                        <td id="infoDialog_minZ"></td>
-                        <td id="infoDialog_maxZ"></td>
-                    </tr>
-                </table>
-            </div>
-
-            <div>
-                <button id="infoDialog_okay">Okay</button>
-                <hr>
-            </div>
-        </dialog>
-
-
-        <dialog id="aboutDialog">
-            <div>
-                <b>About Dialog</b>
-                <hr>
-            </div>
-
-            <div>
-            Copyright © RadiantBlue 2014-2015.
-            </div>
-
-            <div id="creditContainer"></div>
-
-            <div>
-                <button id="aboutDialog_okay">Okay</button>
-                <button id="aboutDialog_cancel">Cancel</button>
-                <hr>
-            </div>
-        </dialog>
-
-
         <div class="status-panel-style status-panel-position">
             <div>
                 <span id="textMouseCoords" class="status-span"></span>
@@ -294,8 +49,254 @@
 
     </div>
 
+
+    <dialog id="initScriptDialog">
+        <div>
+            <b>Init Script Dialog</b>
+            <hr>
+        </div>
+
+        <div>
+            <select multiple="multiple" id="initScriptDialog_files">
+            </select>
+        </div>
+
+        <div>
+            <label for="initScriptDialog_serverName">Server:</label>
+            <input id="initScriptDialog_serverName" type="text" class="input-textbox-style">
+        </div>
+        <div>
+            <label for="initScriptDialog_scriptName">Script:</label>
+            <input id="initScriptDialog_scriptName" type="text" class="input-textbox-style">
+
+            <hr>
+        </div>
+
+        <div>
+            <button id="initScriptDialog_okay">Okay</button>
+            <button id="initScriptDialog_cancel">Cancel</button>
+        </div>
+    </dialog>
+
+
+    <dialog id="layerManagerDialog">
+        <div>
+            <b>Layer Manager Dialog</b>
+            <hr>
+        </div>
+
+        <div>
+            <select multiple="multiple" id="layerManagerDialog_layers">
+            </select>
+        </div>
+
+        <div>
+            <button id="colorizerDialog_open">Colorizer...</button>
+            <button id="infoDialog_open">Info...</button>
+            <label for="infoDialog_layerVisible">Visible</label>
+            <input id="infoDialog_layerVisible" type="checkbox" class="padright">
+            <hr>
+        </div>
+
+        <div>
+            <button id="layerManagerDialog_okay">Okay</button>
+            <button id="layerManagerDialog_cancel">Cancel</button>
+        </div>
+
+    </dialog>
+
+
+    <dialog id="advancedSettingsDialog">
+        <div>
+            <b>Advanced Settings Dialog</b>
+            <hr>
+        </div>
+
+        <div>
+            <table>
+            <tbody>
+                <tr>
+                <td>
+                    <span>Bbox enabled</span>
+                </td>
+                <td>
+                    <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
+                </td>
+                </tr>
+            </tbody>
+            </table>
+            <hr>
+        </div>
+
+        <div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><i>Camera eye point</i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="advancedSettingsDialog_eyeLon">Lon:</label>
+                            <input id="advancedSettingsDialog_eyeLon" type="text">
+                        </td>
+                        <td>
+                            <label for="advancedSettingsDialog_eyeLat">Lat:</label>
+                            <input id="advancedSettingsDialog_eyeLat" type="text">
+                        </td>
+                        <td>
+                            <label for="advancedSettingsDialog_eyeHeight">Height (km):</label>
+                            <input id="advancedSettingsDialog_eyeHeight" type="text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i>Camera target point</i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="advancedSettingsDialog_targetLon">Lon:</label>
+                            <input id="advancedSettingsDialog_targetLon" type="text">
+                        </td>
+                        <td>
+                            <label for="advancedSettingsDialog_targetLat">Lat:</label>
+                            <input id="advancedSettingsDialog_targetLat" type="text">
+                        </td>
+                        <td>
+                            <label for="advancedSettingsDialog_targetHeight">Height (km):</label>
+                            <input id="advancedSettingsDialog_targetHeight" type="text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i>Camera up direction</i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="advancedSettingsDialog_upX">X:</label>
+                            <input id="advancedSettingsDialog_upX" type="text">
+                        </td>
+                        <td>
+                            <label for="advancedSettingsDialog_upY">Y:</label>
+                            <input id="advancedSettingsDialog_upY" type="text">
+                        </td>
+                        <td>
+                            <label for="advancedSettingsDialog_upZ">Z:</label>
+                            <input id="advancedSettingsDialog_upZ" type="text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i>Camera FOV</i></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="advancedSettingsDialog_fov">Degrees:</label>
+                            <input id="advancedSettingsDialog_fov" type="text">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr>
+        </div>
+
+        <div>
+            <button id="advancedSettingsDialog_okay">Okay</button>
+            <button id="advancedSettingsDialog_cancel">Cancel</button>
+        </div>
+    </dialog>
+
+
+    <dialog id="colorizerDialog">
+        <div>
+            <b>Colorizer Dialog</b>
+            <hr>
+        </div>
+
+        <div>
+            <select id="colorizerDialog_items">
+            </select>
+        </div>
+
+        <div>
+            <button id="colorizerDialog_okay">Okay</button>
+            <button id="colorizerDialog_cancel">Cancel</button>
+            <hr>
+        </div>
+    </dialog>
+
+
+    <dialog id="infoDialog">
+        <div>
+            <b>Layer Info</b>
+            <hr>
+        </div>
+
+        <div>
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td id="infoDialog_name"></td>
+                </tr>
+                <tr>
+                    <td>Layer Type:</td>
+                    <td id="infoDialog_layerType"></td>
+                </tr>
+                <tr>
+                    <td>Server:</td>
+                    <td id="infoDialog_server"></td>
+                </tr>
+                <tr>
+                    <td>Path:</td>
+                    <td id="infoDialog_path"></td>
+                </tr>
+                <tr>
+                    <td>Points:</td>
+                    <td id="infoDialog_numPoints"></td>
+                </tr>
+                <tr>
+                    <td>X:</td>
+                    <td id="infoDialog_minX"></td>
+                    <td id="infoDialog_maxX"></td>
+                </tr>
+                <tr>
+                    <td>Y:</td>
+                    <td id="infoDialog_minY"></td>
+                    <td id="infoDialog_maxY"></td>
+                </tr>
+                <tr>
+                    <td>Z:</td>
+                    <td id="infoDialog_minZ"></td>
+                    <td id="infoDialog_maxZ"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <button id="infoDialog_okay">Okay</button>
+            <hr>
+        </div>
+    </dialog>
+
+
+    <dialog id="aboutDialog">
+        <div>
+            <b>About Dialog</b>
+            <hr>
+        </div>
+
+        <div>
+        Copyright © RadiantBlue 2014-2015.
+        </div>
+
+        <div id="creditContainer"></div>
+
+        <div>
+            <button id="aboutDialog_okay">Okay</button>
+            <button id="aboutDialog_cancel">Cancel</button>
+            <hr>
+        </div>
+    </dialog>
+
+
     <script>
-        //var dialog = document.querySelector('#advancedSettingsDialog');
+        //var dialog = document.querySelector('#initScriptDialog');
         //dialogPolyfill.registerDialog(dialog);
         //dialog.showModal();
     </script>
