@@ -1,3 +1,13 @@
+// Copyright (c) 2013 The Chromium Authors. All rights reserved.
+// https://github.com/GoogleChrome/dialog-polyfill
+
+// usage:
+//   <script>
+//     var dialog = document.querySelector('#mydialog');
+//     dialogPolyfill.registerDialog(dialog);
+//     dialog.showModal();
+//  </script>
+
 var dialogPolyfill = (function() {
 
   var supportCustomEvent = window.CustomEvent;
