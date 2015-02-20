@@ -12,28 +12,24 @@ class JsBridge {
         _bridge = new JsObject(context['JsBridge'], []);
     }
 
-    void registerDialog(String dialogId) {
+    dynamic registerDialog(String dialogId) {
         assert(dialogId.startsWith("#"));
-        _bridge.callMethod('registerDialog', [dialogId]);
+        return _bridge.callMethod('registerDialog', [dialogId]);
     }
 
-    void showDialog(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        _bridge.callMethod('showDialog', [dialogId]);
+    void showDialog(dynamic dialog) {
+        _bridge.callMethod('showDialog', [dialog]);
     }
 
-    void showModalDialog(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        _bridge.callMethod('showModalDialog', [dialogId]);
+    void showModalDialog(dynamic dialog) {
+        _bridge.callMethod('showModalDialog', [dialog]);
     }
 
-    void closeDialog(String dialogId, String value) {
-        assert(dialogId.startsWith("#"));
-        _bridge.callMethod('closeDialog', [dialogId, value]);
+    void closeDialog(dynamic dialog, String value) {
+        _bridge.callMethod('closeDialog', [dialog, value]);
     }
 
-    dynamic getDialogReturnValue(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        return _bridge.callMethod('getDialogReturnValue', [dialogId]);
+    dynamic getDialogReturnValue(dynamic dialog) {
+        return _bridge.callMethod('getDialogReturnValue', [dialog]);
     }
 }

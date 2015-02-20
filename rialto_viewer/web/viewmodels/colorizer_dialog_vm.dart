@@ -14,7 +14,7 @@ class ColorizerDialogVM extends DialogVM {
 
         _hub = Hub.root;
 
-        _listbox = new ListBoxVM<String>("colorizerDialog_items");
+        _listbox = new ListBoxVM<String>("#colorizerDialog_items");
 
         var names = _hub.cesium.getColorRampNames();
         names.forEach((s) => _listbox.add(s));

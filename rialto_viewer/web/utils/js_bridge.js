@@ -12,41 +12,31 @@ var JsBridge = function () {
         myassert(dialog);
 
         dialogPolyfill.registerDialog(dialog);
+
+        return dialog;
     }
 
-    this.showDialog = function (dialogId) {
+    this.showDialog = function (dialog) {
         'use strict';
-
-        var dialog = document.querySelector(dialogId);
         myassert(dialog);
-
         dialog.show();
     }
 
-    this.showModalDialog = function (dialogId) {
+    this.showModalDialog = function (dialog) {
         'use strict';
-
-        var dialog = document.querySelector(dialogId);
         myassert(dialog);
-
         dialog.showModal();
     }
 
-    this.closeDialog = function (dialogId, ret) {
+    this.closeDialog = function (dialog, ret) {
         'use strict';
-
-        var dialog = document.querySelector(dialogId);
         myassert(dialog);
-
         dialog.close(ret);
     }
 
-    this.getDialogReturnValue = function (dialogId) {
+    this.getDialogReturnValue = function (dialog) {
         'use strict';
-
-        var dialog = document.querySelector(dialogId);
         myassert(dialog);
-
         return dialog.returnValue;
     }
 }

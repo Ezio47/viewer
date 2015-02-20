@@ -12,10 +12,10 @@ class InitScriptDialogVM extends DialogVM {
 
     InitScriptDialogVM(String id) : super(id) {
 
-        _serverName = new TextInputVM("initScriptDialog_serverName", "");
-        _scriptName = new TextInputVM("initScriptDialog_scriptName", "");
+        _serverName = new TextInputVM("#initScriptDialog_serverName", "");
+        _scriptName = new TextInputVM("#initScriptDialog_scriptName", "");
 
-        _listbox = new ListBoxVM<_ScriptItem>("initScriptDialog_files");
+        _listbox = new ListBoxVM<_ScriptItem>("#initScriptDialog_files");
         _listbox.setSelectHandler(_selectHandler);
 
         _listbox.add(new _ScriptItem("http://localhost:12345", "/file/test.yaml"));

@@ -18,13 +18,13 @@ class LayerManagerDialogVM extends DialogVM {
     LayerManagerDialogVM(String id) : super(id) {
         _hub = Hub.root;
 
-        _listbox = new ListBoxVM<_LayerItem>("layerManagerDialog_layers");
+        _listbox = new ListBoxVM<_LayerItem>("#layerManagerDialog_layers");
         _listbox.setSelectHandler(_selectHandler);
 
-        _colorizer = new ColorizerDialogVM("colorizerDialog");
-        _info = new InfoVM("infoDialog", this);
+        _colorizer = new ColorizerDialogVM("#colorizerDialog");
+        _info = new InfoVM("#infoDialog", this);
 
-        _layerVisible = new CheckBoxVM("infoDialog_layerVisible", false);
+        _layerVisible = new CheckBoxVM("#infoDialog_layerVisible", false);
         _layerVisible.setClickHandler(_layerVisibleHandler);
 
         _hub.events.AddLayerCompleted.subscribe(_handleAddLayerCompleted);

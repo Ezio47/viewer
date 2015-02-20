@@ -28,11 +28,11 @@ class RialtoElement  {
             querySelector("#viewshedModeButton"): new ModeData(ModeData.VIEWSHED)
         }, querySelector("#viewModeButton"));
 
-        _initScriptDialog = new InitScriptDialogVM("initScriptDialog");
-        _layerManager = new LayerManagerDialogVM("layerManagerDialog");
-        _advancedSettings = new SettingsDialogVM("advancedSettingsDialog");
+        _initScriptDialog = new InitScriptDialogVM("#initScriptDialog");
+        _layerManager = new LayerManagerDialogVM("#layerManagerDialog");
+        _advancedSettings = new SettingsDialogVM("#advancedSettingsDialog");
 
-        _about = new AboutVM("aboutDialog");
+        _about = new AboutVM("#aboutDialog");
 
         _hub.events.MouseMove.subscribe(_updateCoords);
     }

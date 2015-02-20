@@ -6,15 +6,15 @@ part of rialto.viewer;
 
 
 abstract class ViewModel {
-    String _id;
+    final String id;
     Element _element;
 
-    ViewModel(String this._id) {
-        assert(!_id.startsWith("#"));
+    ViewModel(String this.id) {
+        assert(id.startsWith("#"));
 
-        _element = querySelector("#" + _id);
-        assert(_element != null);
+        _element = querySelector(id);
+        if (_element == null) {
+            throw new ArgumentError("HTML element with id=$id not found");
+        }
     }
-
-    String get id => _id;
 }

@@ -7,6 +7,7 @@ part of rialto.viewer;
 abstract class DialogVM extends ViewModel {
     bool _hasCancelButton;
     HtmlElement _dialogElement;
+    var _dialogProxy;
     Hub _hub;
 
     DialogVM(String id, {bool hasCancelButton: true}): super(id),
@@ -14,36 +15,38 @@ abstract class DialogVM extends ViewModel {
 
         _hub = Hub.root;
 
-        _hub.js.registerDialog("#" + id);
+        _dialogProxy = _hub.js.registerDialog(id);
 
         _dialogElement = _element;
         assert(_dialogElement != null);
-        assert(_dialogElement is DialogElement);
-        log(_dialogElement.runtimeType);
 
-        var openButton = querySelector("#" + _id + "_open");
+        var openButton = querySelector(openButtonId);
         assert(openButton != null);
         openButton.onClick.listen((ev) => open());
 
-        var okayButton = querySelector("#" + _id + "_okay");
+        var okayButton = querySelector(okayButtonId);
         assert(okayButton != null);
         okayButton.onClick.listen((e) => close(true));
 
         if (_hasCancelButton) {
-            var cancelButton = querySelector("#" + _id + "_cancel");
+            var cancelButton = querySelector(cancelButtonId);
             assert(cancelButton != null);
             cancelButton.onClick.listen((e) => close(false));
         }
     }
 
+    String get openButtonId => id + "_open";
+    String get okayButtonId => id + "_okay";
+    String get cancelButtonId => id + "_cancel";
+
     void open() {
-        _hub.js.showModalDialog("#" + id);
+        _hub.js.showModalDialog(_dialogProxy);
         _open();
     }
 
     void close(bool okay) {
         _close(okay);
-        _hub.js.closeDialog("#" + id, null);
+        _hub.js.closeDialog(_dialogProxy, null);
         return;
     }
 
