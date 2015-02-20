@@ -26,7 +26,6 @@ part 'layer_manager.dart';
 part 'measurement_controller.dart';
 part 'mode_controller.dart';
 part 'view_controller.dart';
-part 'ogc/wps.dart';
 part 'viewshed_controller.dart';
 
 part 'cesium/annotation_shape.dart';
@@ -47,10 +46,12 @@ part 'layers/vector_layer.dart';
 
 part 'ogc/ogc_document.dart';
 part 'ogc/ogc_document_tests.dart';
+part 'ogc/wps.dart';
 
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';
 part 'utils/color.dart';
+part 'utils/js_bridge.dart';
 part 'utils/signal.dart';
 part 'utils/utils.dart';
 part 'utils/yaml_utils.dart';

@@ -14,7 +14,7 @@ abstract class DialogVM extends ViewModel {
 
         _hub = Hub.root;
 
-        _hub.cesium.makePolyfillDialog("#" + id);
+        _hub.js.registerDialog("#" + id);
 
         _dialogElement = _element;
         assert(_dialogElement != null);
@@ -37,15 +37,14 @@ abstract class DialogVM extends ViewModel {
     }
 
     void open() {
-        _hub.cesium.showModalDialog("#" + id);
-  //      _dialogElement.show();
+        _hub.js.showModalDialog("#" + id);
         _open();
     }
 
     void close(bool okay) {
         _close(okay);
-        //_dialogElement.close("");
-        _hub.cesium.closeDialog("#" + id, null);
+        _hub.js.closeDialog("#" + id, null);
+        return;
     }
 
     void _open();

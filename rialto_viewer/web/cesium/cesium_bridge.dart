@@ -181,25 +181,4 @@ class CesiumBridge {
     void remove(dynamic primitive) {
         _bridge.callMethod('removePrimitive', [primitive]);
     }
-
-    void makePolyfillDialog(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        _bridge.callMethod('makePolyfillDialog', [dialogId]);
-    }
-    void showDialog(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        _bridge.callMethod('showDialog', [dialogId]);
-    }
-    void showModalDialog(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        _bridge.callMethod('showModalDialog', [dialogId]);
-    }
-    void closeDialog(String dialogId, String value) {
-        assert(dialogId.startsWith("#"));
-        _bridge.callMethod('closeDialog', [dialogId, value]);
-    }
-    dynamic getDialogReturnValue(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        return _bridge.callMethod('getDialogReturnValue', [dialogId]);
-    }
 }

@@ -21,6 +21,7 @@ class Hub {
     EventRegistry events;
     ModeController modeController;
     CesiumBridge cesium;
+    JsBridge js;
     WpsService wps;
 
     // privates
@@ -44,6 +45,8 @@ class Hub {
     Hub() {
         assert(_root == null);
         _root = this;
+
+        js = new JsBridge();
 
         events = new EventRegistry();
 
