@@ -81,6 +81,7 @@ class MouseData {
 
 class WheelData {
     double delta;
+
     WheelData(WheelEvent event) {
         // (taken from Three.dart's trackball control)
         if (event.deltaY != 0) { // WebKit / Opera / Explorer 9
@@ -89,9 +90,9 @@ class WheelData {
             delta = -event.detail / 3;
         }
     }
-    WheelData.fromD(double d) {
-        delta = d;
-    }
+
+    WheelData.fromD(num d) :
+        delta = d.toDouble();
 }
 
 class KeyboardData {
