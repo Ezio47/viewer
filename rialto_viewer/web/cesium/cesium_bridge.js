@@ -7,13 +7,24 @@ var CesiumBridge = function (element) {
     Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
     var options = {
+        animation: false,
+        baseLayerPicker: false,
+        fullscreenButton: false,
+        geocoder: false,
+        homeButton: false,
+        infoBox: false,
+        sceneModePicker: false,
+        //selectionIndicator: false,
+        timeline: false,
+        navigationHelpButton: false,
+        navigationInstructionsInitiallyVisible: false,
+        sceneMode : Cesium.SceneMode.SCENE3D,
         creditContainer: "creditContainer"
     };
 
+    this.viewer = new Cesium.Viewer(element, options);
 
-    this.viewer = new Cesium.CesiumWidget(element, options);
-
-    this.viewer.creditContainer.className = "";
+    this.viewer.cesiumWidget.creditContainer.className = "";
 
 
     // 0=3D, 1=2.5D, 2=2D
