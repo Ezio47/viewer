@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
     PdalBridge pdal;
     
-    pdal.open(argv[1]);
+    pdal.open(argv[1], true);
     
     boost::uint64_t numPoints = pdal.getNumPoints();
     printf("num points: %lld\n", numPoints);

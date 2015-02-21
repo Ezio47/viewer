@@ -8,7 +8,7 @@ PDAL_LIB=/Users/$(USER)/work/dev/build/pdal/lib
 CC=g++
 LD=g++
 
-CFLAGS=-g -std=c++11 -ferror-limit=2 \
+CFLAGS=-O -std=c++11 -ferror-limit=2 \
 -isystem $(PDAL_INC) -I $(PDAL_INC) \
 -isystem /usr/local/include \
 -I /usr/local/include

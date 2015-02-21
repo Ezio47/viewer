@@ -15,7 +15,8 @@ PdalBridge::PdalBridge(bool debug, boost::uint32_t verbosity) :
     m_verbosity(verbosity),
     m_manager(NULL),
     m_reader(NULL),
-    m_numPoints(0)
+    m_numPoints(0),
+    m_doReproj(true)
 {
 }
 
@@ -26,8 +27,10 @@ PdalBridge::~PdalBridge()
 }
 
 
-void PdalBridge::open(const std::string& fname)
+void PdalBridge::open(const std::string& fname, bool doReproj)
 {
+    m_doReproj = doReproj;
+    
     m_manager = new pdal::PipelineManager();
     if (!m_manager)
     {
@@ -35,25 +38,31 @@ void PdalBridge::open(const std::string& fname)
         throw pdal::pdal_error("Failed to create PDAL pipeline manager.");
     }
 
+    pdal::Stage* stage = NULL;
     {
         m_reader = m_manager->addReader("readers.las");
         pdal::Options opts;
         opts.add("filename", fname);
         m_reader->setOptions(opts);
+        stage = m_reader;
     }
 
-    {
-        m_filter1 = m_manager->addFilter("filters.reprojection", m_reader);
+    if (m_doReproj) {
+        m_reprojFilter = m_manager->addFilter("filters.reprojection", m_reader);
         pdal::Options opts;
 
         const pdal::SpatialReference out_ref(epsg4326_wkt);
         opts.add("out_srs", out_ref.getWKT());
-        m_filter1->setOptions(opts);
+        m_reprojFilter->setOptions(opts);
+        
+        stage = m_reprojFilter;
     }
 
     {
-        m_filter2 = m_manager->addFilter("filters.stats", m_filter1);
+        m_statsFilter = m_manager->addFilter("filters.stats", stage);
         pdal::Options opts;
+        
+        stage = m_statsFilter;
     }
 
     pdal::PointContextRef context = m_manager->context();
@@ -138,7 +147,7 @@ void PdalBridge::getStats(pdal::Dimension::Id::Enum id, double& min, double& mea
     //pdal::PointContextRef context = m_manager->context();
     //dumper(context.metadata());
 
-    const pdal::stats::Summary& summary = ((pdal::StatsFilter*)m_filter2)->getStats(id);
+    const pdal::stats::Summary& summary = ((pdal::StatsFilter*)m_statsFilter)->getStats(id);
     min = summary.minimum();
     mean = summary.average();
     max = summary.maximum();

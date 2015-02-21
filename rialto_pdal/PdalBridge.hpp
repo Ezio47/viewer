@@ -14,7 +14,7 @@ public:
 
     ~PdalBridge();
 
-    void open(const std::string& fname);
+    void open(const std::string& fname, bool doReproj);
 
     void close();
 
@@ -39,12 +39,13 @@ private:
     std::vector<char*> m_keys;
     std::vector<char*> m_values;
 
+    bool m_doReproj;
     bool m_debug;
     boost::uint32_t m_verbosity;
     pdal::PipelineManager* m_manager;
     pdal::Reader* m_reader;
-    pdal::Filter* m_filter1;
-    pdal::Filter* m_filter2;
+    pdal::Filter* m_reprojFilter;
+    pdal::Filter* m_statsFilter;
     pdal::Writer* m_writer;
     boost::uint64_t m_numPoints;
 
