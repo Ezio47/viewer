@@ -16,5 +16,5 @@ class AboutVM extends DialogVM {
     void _show() {}
 
     @override
-    void _close(bool okay) {}
+    void _hide(bool okay) {}
 }

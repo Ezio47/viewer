@@ -21,15 +21,7 @@ class JsBridge {
         _bridge.callMethod('showDialog', [dialog]);
     }
 
-    void showModalDialog(dynamic dialog) {
-        _bridge.callMethod('showModalDialog', [dialog]);
-    }
-
-    void closeDialog(dynamic dialog, String value) {
-        _bridge.callMethod('closeDialog', [dialog, value]);
-    }
-
-    dynamic getDialogReturnValue(dynamic dialog) {
-        return _bridge.callMethod('getDialogReturnValue', [dialog]);
+    void hideDialog(dynamic dialog) {
+        _bridge.callMethod('hideDialog', [dialog]);
     }
 }

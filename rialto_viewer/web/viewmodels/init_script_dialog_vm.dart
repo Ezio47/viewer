@@ -27,7 +27,7 @@ class InitScriptDialogVM extends DialogVM {
     void _show() {}
 
     @override
-    void _close(bool okay) {
+    void _hide(bool okay) {
         if (!okay) return;
 
         var url = _serverName.value + _scriptName.value;

@@ -24,7 +24,7 @@ class ColorizerDialogVM extends DialogVM {
     void _show() {}
 
     @override
-    void _close(bool okay) {
+    void _hide(bool okay) {
         if (!okay) return;
 
         List<String> list = _listbox.getCurrentSelection();

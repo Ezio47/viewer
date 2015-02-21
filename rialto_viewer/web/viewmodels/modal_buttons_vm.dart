@@ -11,9 +11,9 @@ part of rialto.viewer;
 
 class ModalButtonsVM {
     Hub _hub;
-    Map<ButtonElement, ModeData> _map;
+    Map<AnchorElement, ModeData> _map;
 
-    ModalButtonsVM(Map<ButtonElement, ModeData> this._map, ButtonElement first) {
+    ModalButtonsVM(Map<AnchorElement, ModeData> this._map, AnchorElement first) {
         _hub = Hub.root;
 
         _map.keys.forEach((button) {
@@ -27,11 +27,11 @@ class ModalButtonsVM {
         _handleClick(first);
     }
 
-    void _handleClick(ButtonElement b) {
+    void _handleClick(AnchorElement b) {
         // b should be active, the others go inactive
 
         ModeData modeData = null;
-        _map.keys.forEach((ButtonElement button) {
+        _map.keys.forEach((AnchorElement button) {
             if (button == b) {
                 // activate!
                 button.text = button.text.toUpperCase();

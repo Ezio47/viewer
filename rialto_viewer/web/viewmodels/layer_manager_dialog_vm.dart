@@ -47,7 +47,7 @@ class LayerManagerDialogVM extends DialogVM {
     }
 
     @override
-    void _close(bool okay) {}
+    void _hide(bool okay) {}
 
     void _handleAddLayerCompleted(Layer layer) {
         _layers[layer.name] = layer;

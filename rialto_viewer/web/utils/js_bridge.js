@@ -4,40 +4,20 @@
 
 
 var JsBridge = function () {
+    'use strict';
 
+    // dialogId must include leading '#'
     this.registerDialog = function (dialogId) {
-        'use strict';
-
-        var dialog = document.querySelector(dialogId);
-        myassert(dialog);
-
-        dialogPolyfill.registerDialog(dialog);
-
+        var dialog = UIkit.modal(dialogId);
         return dialog;
     }
 
     this.showDialog = function (dialog) {
-        'use strict';
-        myassert(dialog);
         dialog.show();
     }
 
-    this.showModalDialog = function (dialog) {
-        'use strict';
-        myassert(dialog);
-        dialog.showModal();
-    }
-
-    this.closeDialog = function (dialog, ret) {
-        'use strict';
-        myassert(dialog);
-        dialog.close(ret);
-    }
-
-    this.getDialogReturnValue = function (dialog) {
-        'use strict';
-        myassert(dialog);
-        return dialog.returnValue;
+    this.hideDialog = function (dialog, ret) {
+        dialog.hide(ret);
     }
 }
 

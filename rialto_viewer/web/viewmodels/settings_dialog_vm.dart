@@ -60,7 +60,7 @@ class SettingsDialogVM extends DialogVM {
     }
 
     @override
-    void _close(bool okay) {
+    void _hide(bool okay) {
         if (!okay) return;
 
         _performCameraWork();

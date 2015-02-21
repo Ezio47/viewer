@@ -22,408 +22,364 @@
         <script src="3rd-party/uikit/js/uikit.min.js"></script>
         <link rel="stylesheet" type="text/css" href="3rd-party/uikit/css/uikit.gradient.min.css">
     </head>
+
+
     <body>
 
-
-<div class="uk-height-viewport">
-
-
-    <div id="cesiumContainer" ></div>
+        <div class="uk-height-viewport">
 
 
-    <div class="uk-position-top">
+            <div id="cesiumContainer" ></div>
 
 
+            <div class="uk-position-top">
 
-        <div class="uk-button-group">
-            <button class="uk-button">View</button>
-             <div data-uk-dropdown="{mode:'click'}">
-                <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                <div class="uk-dropdown uk-dropdown-small">
-                    <ul class="uk-nav uk-nav-dropdown">
-                        <li><a href="#">Home / world</a></li>
-                        <li><a href="#">Home / data</a></li>
-                        <li class="uk-nav-header">Projection</li>
-                        <li><a href="#">2D</a></li>
-                        <li><a href="#">2.5D</a></li>
-                        <li><a href="#">3D</a></li>
-                    </ul>
+                <div class="uk-button-group">
+                    <button class="uk-button">View</button>
+                     <div data-uk-dropdown="{mode:'click'}">
+                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
+                        <div class="uk-dropdown uk-dropdown-small">
+                            <ul class="uk-nav uk-nav-dropdown">
+                                <li class="uk-active"><a id="homeWorldButton">Home (world)</a></li>
+                                <li class="uk-active"><a id="homeDataButton">Home (data)</a></li>
+                                <li class="uk-nav-header">Projection</li>
+                                <li class="uk-active"><a id="modeButton2D">2D</a></li>
+                                <li class="uk-active"><a id="modeButton25D">2.5D</a></li>
+                                <li class="uk-active"><a id="modeButton3D">3D</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-button-group">
+                    <button class="uk-button">Sources</button>
+                    <div data-uk-dropdown="{mode:'click'}">
+                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
+                        <div class="uk-dropdown uk-dropdown-small">
+                            <ul class="uk-nav uk-nav-dropdown">
+                                <li class="uk-active"><a id="initScriptDialog_open">Load config...</a></li>
+                                <li class="uk-active"><a id="layerManagerDialog_open">Manage layers...</a></li>
+                                <li class="uk-nav-divider"></li>
+                                <li class="uk-nav-header">Point clouds</li>
+                                <li><a href="#">Add..</a></li>
+                                <li class="uk-nav-header">Vectors</li>
+                                <li><a href="#">Add..</a></li>
+                                <li class="uk-nav-header">Base Imagery</li>
+                                <li><a href="#">Add..</a></li>
+                                <li class="uk-nav-header">Base Terrain</li>
+                                <li><a href="#">Add..</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-button-group">
+                    <button class="uk-button">Tools</button>
+                    <div data-uk-dropdown="{mode:'click'}">
+                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
+                        <div class="uk-dropdown uk-dropdown-small">
+                            <ul class="uk-nav uk-nav-dropdown">
+                                <li class="uk-active"><a id="viewModeButton">View</a></li>
+                                <li class="uk-active"><a id="annotateModeButton">Annotate</a></li>
+                                <li class="uk-active"><a id="measureModeButton">Measure</a></li>
+                                <li class="uk-active"><a id="viewshedModeButton">Viewshed</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uk-button-group">
+                    <button class="uk-button">Settings</button>
+                    <div data-uk-dropdown="{mode:'click'}">
+                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
+                        <div class="uk-dropdown uk-dropdown-small">
+                            <ul class="uk-nav uk-nav-dropdown">
+                                <li class="uk-active"><a id="advancedSettingsDialog_open">Advanced...</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- end of TOP section -->
+            </div>
+
+
+            <div class="uk-position-bottom">
+                <div>
+                    <span id="textMouseCoords" class="status-span"></span>
+                    <button id="aboutDialog_open" class="uk-button" data-uk-modal="{target:'#aboutDialog'}">About...</button>
                 </div>
             </div>
+
+        <!-- end of VIEWPORT section -->
         </div>
 
-        <div class="uk-button-group">
-            <button class="uk-button">Sources</button>
-            <div data-uk-dropdown="{mode:'click'}">
-                <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                <div class="uk-dropdown uk-dropdown-small">
-                    <ul class="uk-nav uk-nav-dropdown">
-                        <li class="uk-nav-header">Point clouds</li>
-                        <li><a href="#">tiledserp18...</a></li>
-                        <li><a href="#">Add..</a></li>
-                        <li class="uk-nav-header">Vectors</li>
-                        <li><a href="#">poly1...</a></li>
-                        <li><a href="#">Add..</a></li>
-                        <li class="uk-nav-header">Base Imagery</li>
-                        <li><a href="#">Add..</a></li>
-                        <li class="uk-nav-header">Base Terrain</li>
-                        <li><a href="#">Add..</a></li>
-                        <li class="uk-nav-divider"></li>
-                        <li><a href="#">Load config...</a></li>
-                    </ul>
+
+        <div id="initScriptDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    <b>Init Script Dialog</b>
                 </div>
-            </div>
-        </div>
-
-        <div class="uk-button-group">
-            <button class="uk-button">Tools</button>
-            <div data-uk-dropdown="{mode:'click'}">
-                <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                <div class="uk-dropdown uk-dropdown-small">
-                    <ul class="uk-nav uk-nav-dropdown">
-                        <li><a href="#">Annotate</a></li>
-                        <li><a href="#">Measure</a></li>
-                        <li><a href="#">Viewshed</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="uk-button-group">
-            <button class="uk-button">Settings</button>
-            <div data-uk-dropdown="{mode:'click'}">
-                <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                <div class="uk-dropdown uk-dropdown-small">
-                    <ul class="uk-nav uk-nav-dropdown">
-                        <li><a href="#">Colorization...</a></li>
-                        <li><a href="#">Camera...</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- TOGGLES PANEL -->
-        <div class="main-toggles-position" >
-            <div>
-                <button id="homeWorldButton" class="uk-button" type="button">Home (w)</button>
-                <button id="homeDataButton" class="uk-button" type="button">Home (d)</button>
-                <button id="modeButton" class="uk-button" type="button">Mode</button>
-                <span>...</span>
-                <button id="viewModeButton" class="uk-button" type="button">View</button>
-                <button id="annotateModeButton" class="uk-button" type="button">Annotate</button>
-                <button id="measureModeButton" class="uk-button" type="button">Measure</button>
-                <button id="viewshedModeButton" class="uk-button" type="button">Viewshed</button>
-                <span>...</span>
-                <button id="initScriptDialog_open" class="uk-button" type="button">Script...</button>
-                <button id="layerManagerDialog_open" class="uk-button" type="button">Layers...</button>
-                <button id="advancedSettingsDialog_open" class="uk-button" type="button">Advanced...</button>
-            </div>
-        </div>
-</div>
-
-
-        <div class="uk-position-bottom">
-            <div>
-                <span id="textMouseCoords" class="status-span"></span>
-                <button id="aboutDialog_open" class="uk-button" type="button">About...</button>
-
-                <!-- This is a button toggling the modal -->
-                <button class="uk-button" data-uk-modal="{target:'#my-id'}">About!</button>
-            </div>
-        </div>
-
-    </div>
-
-
-    <dialog id="initScriptDialog">
-        <div>
-            <b>Init Script Dialog</b>
-            <hr>
-        </div>
-
-        <div>
-            <select multiple="multiple" id="initScriptDialog_files">
-            </select>
-        </div>
-
-        <div>
-            <label for="initScriptDialog_serverName">Server:</label>
-            <input id="initScriptDialog_serverName" type="text" class="input-textbox-style">
-        </div>
-        <div>
-            <label for="initScriptDialog_scriptName">Script:</label>
-            <input id="initScriptDialog_scriptName" type="text" class="input-textbox-style">
-
-            <hr>
-        </div>
-
-        <div>
-            <button id="initScriptDialog_okay">Okay</button>
-            <button id="initScriptDialog_cancel">Cancel</button>
-        </div>
-    </dialog>
-
-
-    <dialog id="layerManagerDialog">
-        <div>
-            <b>Layer Manager Dialog</b>
-            <hr>
-        </div>
-
-        <div>
-            <select multiple="multiple" id="layerManagerDialog_layers">
-            </select>
-        </div>
-
-        <div>
-            <button id="colorizerDialog_open">Colorizer...</button>
-            <button id="infoDialog_open">Info...</button>
-            <label for="infoDialog_layerVisible">Visible</label>
-            <input id="infoDialog_layerVisible" type="checkbox" class="padright">
-            <hr>
-        </div>
-
-        <div>
-            <button id="layerManagerDialog_okay">Okay</button>
-            <button id="layerManagerDialog_cancel">Cancel</button>
-        </div>
-
-    </dialog>
-
-
-    <dialog id="advancedSettingsDialog">
-        <div>
-            <b>Advanced Settings Dialog</b>
-            <hr>
-        </div>
-
-        <div>
-            <table>
-            <tbody>
-                <tr>
-                <td>
-                    <span>Bbox enabled</span>
-                </td>
-                <td>
-                    <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
-                </td>
-                </tr>
-            </tbody>
-            </table>
-            <hr>
-        </div>
-
-        <div>
-            <table>
-                <tbody>
-                    <tr>
-                        <td><i>Camera eye point</i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="advancedSettingsDialog_eyeLon">Lon:</label>
-                            <input id="advancedSettingsDialog_eyeLon" type="text">
-                        </td>
-                        <td>
-                            <label for="advancedSettingsDialog_eyeLat">Lat:</label>
-                            <input id="advancedSettingsDialog_eyeLat" type="text">
-                        </td>
-                        <td>
-                            <label for="advancedSettingsDialog_eyeHeight">Height (km):</label>
-                            <input id="advancedSettingsDialog_eyeHeight" type="text">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><i>Camera target point</i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="advancedSettingsDialog_targetLon">Lon:</label>
-                            <input id="advancedSettingsDialog_targetLon" type="text">
-                        </td>
-                        <td>
-                            <label for="advancedSettingsDialog_targetLat">Lat:</label>
-                            <input id="advancedSettingsDialog_targetLat" type="text">
-                        </td>
-                        <td>
-                            <label for="advancedSettingsDialog_targetHeight">Height (km):</label>
-                            <input id="advancedSettingsDialog_targetHeight" type="text">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><i>Camera up direction</i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="advancedSettingsDialog_upX">X:</label>
-                            <input id="advancedSettingsDialog_upX" type="text">
-                        </td>
-                        <td>
-                            <label for="advancedSettingsDialog_upY">Y:</label>
-                            <input id="advancedSettingsDialog_upY" type="text">
-                        </td>
-                        <td>
-                            <label for="advancedSettingsDialog_upZ">Z:</label>
-                            <input id="advancedSettingsDialog_upZ" type="text">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><i>Camera FOV</i></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="advancedSettingsDialog_fov">Degrees:</label>
-                            <input id="advancedSettingsDialog_fov" type="text">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <hr>
-        </div>
-
-        <div>
-            <button id="advancedSettingsDialog_okay">Okay</button>
-            <button id="advancedSettingsDialog_cancel">Cancel</button>
-        </div>
-    </dialog>
-
-
-    <dialog id="colorizerDialog">
-        <div>
-            <b>Colorizer Dialog</b>
-            <hr>
-        </div>
-
-        <div>
-            <select id="colorizerDialog_items">
-            </select>
-        </div>
-
-        <div>
-            <button id="colorizerDialog_okay">Okay</button>
-            <button id="colorizerDialog_cancel">Cancel</button>
-            <hr>
-        </div>
-    </dialog>
-
-
-    <dialog id="infoDialog">
-        <div>
-            <b>Layer Info</b>
-            <hr>
-        </div>
-
-        <div>
-            <table>
-                <tr>
-                    <td>Name:</td>
-                    <td id="infoDialog_name"></td>
-                </tr>
-                <tr>
-                    <td>Layer Type:</td>
-                    <td id="infoDialog_layerType"></td>
-                </tr>
-                <tr>
-                    <td>Server:</td>
-                    <td id="infoDialog_server"></td>
-                </tr>
-                <tr>
-                    <td>Path:</td>
-                    <td id="infoDialog_path"></td>
-                </tr>
-                <tr>
-                    <td>Points:</td>
-                    <td id="infoDialog_numPoints"></td>
-                </tr>
-                <tr>
-                    <td>X:</td>
-                    <td id="infoDialog_minX"></td>
-                    <td id="infoDialog_maxX"></td>
-                </tr>
-                <tr>
-                    <td>Y:</td>
-                    <td id="infoDialog_minY"></td>
-                    <td id="infoDialog_maxY"></td>
-                </tr>
-                <tr>
-                    <td>Z:</td>
-                    <td id="infoDialog_minZ"></td>
-                    <td id="infoDialog_maxZ"></td>
-                </tr>
-            </table>
-        </div>
-
-        <div>
-            <button id="infoDialog_okay">Okay</button>
-            <hr>
-        </div>
-    </dialog>
-
-
-    <dialog id="aboutDialog">
-        <div>
-            <b>About Dialog</b>
-            <hr>
-        </div>
-
-        <div>
-        Copyright © RadiantBlue 2014-2015.
-        </div>
-
-<!--        <div id="creditContainer"></div> -->
-
-        <div>
-            <button id="aboutDialog_okay">Okay</button>
-            <button id="aboutDialog_cancel">Cancel</button>
-            <hr>
-        </div>
-    </dialog>
-
-
-    <!-- The new About box model -->
-    <div id="my-id" class="uk-modal">
-        <div class="uk-modal-dialog">
-            <div class="uk-modal-header">
-            The Rialto Viewer
-            </div>
-
-            <div>
-                Copyright © RadiantBlue 2014-2015.
-                <img src="images/radiantblue-logo.png">
-
-                <hr>
 
                 <div>
-                    WebGL provided by <a href="http://www.cesiumjs.org">Cesium</a> and their partners.
-                    <div id="creditContainer" class="uk-text-small uk-text-muted"></div>
+                    <select multiple="multiple" id="initScriptDialog_files">
+                    </select>
+                </div>
+
+                <div>
+                    <label for="initScriptDialog_serverName">Server:</label>
+                    <input id="initScriptDialog_serverName" type="text" class="input-textbox-style">
                 </div>
                 <div>
-                    CSS provided by <a href="http://www.getuikit.com">uikit</a>.
-                    <img src="images/uikit-logo.png">
+                    <label for="initScriptDialog_scriptName">Script:</label>
+                    <input id="initScriptDialog_scriptName" type="text" class="input-textbox-style">
                 </div>
+
+                 <div class="uk-modal-footer uk-text-right">
+                    <button id="initScriptDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="initScriptDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+           </div>
+        </div>
+
+
+        <div id="layerManagerDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    <b>Layer Manager Dialog</b>
+               </div>
+
                 <div>
-                    Javascript by <a href="http://www.dartlang.org">Dart</a>.
-                    <img src="images/dart-logo.png">
+                    <select multiple="multiple" id="layerManagerDialog_layers">
+                    </select>
                 </div>
 
+                <div>
+                    <button id="colorizerDialog_open">Colorizer...</button>
+                    <button id="infoDialog_open">Info...</button>
+                    <label for="infoDialog_layerVisible">Visible</label>
+                    <input id="infoDialog_layerVisible" type="checkbox" class="padright">
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="layerManagerDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="layerManagerDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
             </div>
 
-            <div class="uk-modal-footer uk-text-right">
-                <button class="uk-button uk-modal-close">Close</button>
+        </div>
+
+
+        <div id="advancedSettingsDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    <b>Advanced Settings Dialog</b>
+                </div>
+
+                <div>
+                    <table>
+                    <tbody>
+                        <tr>
+                        <td>
+                            <span>Bbox enabled</span>
+                        </td>
+                        <td>
+                            <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
+                        </td>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><i>Camera eye point</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_eyeLon">Lon:</label>
+                                    <input id="advancedSettingsDialog_eyeLon" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_eyeLat">Lat:</label>
+                                    <input id="advancedSettingsDialog_eyeLat" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_eyeHeight">Height (km):</label>
+                                    <input id="advancedSettingsDialog_eyeHeight" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera target point</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_targetLon">Lon:</label>
+                                    <input id="advancedSettingsDialog_targetLon" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_targetLat">Lat:</label>
+                                    <input id="advancedSettingsDialog_targetLat" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_targetHeight">Height (km):</label>
+                                    <input id="advancedSettingsDialog_targetHeight" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera up direction</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_upX">X:</label>
+                                    <input id="advancedSettingsDialog_upX" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_upY">Y:</label>
+                                    <input id="advancedSettingsDialog_upY" type="text">
+                                </td>
+                                <td>
+                                    <label for="advancedSettingsDialog_upZ">Z:</label>
+                                    <input id="advancedSettingsDialog_upZ" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera FOV</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="advancedSettingsDialog_fov">Degrees:</label>
+                                    <input id="advancedSettingsDialog_fov" type="text">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="advancedSettingsDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="advancedSettingsDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
             </div>
-          </div>
-    </div>
+        </div>
 
-    <script src="cesium-build/Cesium/Cesium.js"></script>
-    <script src="utils/js_bridge.js"></script>
-    <script src="cesium/cesium_bridge.js"></script>
-    <script src="cesium/PCTile.js"></script>
-    <script src="cesium/PCTileTree.js"></script>
-    <script src="cesium/PCTileProvider.js"></script>
-    <script src="cesium/PCColorizer.js"></script>
-    <script type="application/dart" src="main.dart"></script>
-    <script data-pub-inline src="packages/browser/dart.js"></script>
 
-  </body>
+        <div id="colorizerDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    <b>Colorizer Dialog</b>
+                </div>
+
+                <div>
+                    <select id="colorizerDialog_items">
+                    </select>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="colorizerDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="colorizerDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+         <div id="infoDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    <b>Layer Info</b>
+                </div>
+
+                <div>
+                    <table>
+                        <tr>
+                            <td>Name:</td>
+                            <td id="infoDialog_name"></td>
+                        </tr>
+                        <tr>
+                            <td>Layer Type:</td>
+                            <td id="infoDialog_layerType"></td>
+                        </tr>
+                        <tr>
+                            <td>Server:</td>
+                            <td id="infoDialog_server"></td>
+                        </tr>
+                        <tr>
+                            <td>Path:</td>
+                            <td id="infoDialog_path"></td>
+                        </tr>
+                        <tr>
+                            <td>Points:</td>
+                            <td id="infoDialog_numPoints"></td>
+                        </tr>
+                        <tr>
+                            <td>X:</td>
+                            <td id="infoDialog_minX"></td>
+                            <td id="infoDialog_maxX"></td>
+                        </tr>
+                        <tr>
+                            <td>Y:</td>
+                            <td id="infoDialog_minY"></td>
+                            <td id="infoDialog_maxY"></td>
+                        </tr>
+                        <tr>
+                            <td>Z:</td>
+                            <td id="infoDialog_minZ"></td>
+                            <td id="infoDialog_maxZ"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="infoDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- The new About box model -->
+        <div id="aboutDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    The Rialto Viewer
+                </div>
+
+                <div>
+                    Copyright © RadiantBlue 2014-2015.
+                    <img src="images/radiantblue-logo.png">
+
+                    <hr>
+
+                    <div>
+                        WebGL provided by <a href="http://www.cesiumjs.org">Cesium</a> and their partners.
+                        <div id="creditContainer" class="uk-text-small uk-text-muted"></div>
+                    </div>
+                    <div>
+                        CSS provided by <a href="http://www.getuikit.com">uikit</a>.
+                        <img src="images/uikit-logo.png">
+                    </div>
+                    <div>
+                        Javascript by <a href="http://www.dartlang.org">Dart</a>.
+                        <img src="images/dart-logo.png">
+                    </div>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="aboutDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <script src="cesium-build/Cesium/Cesium.js"></script>
+        <script src="utils/js_bridge.js"></script>
+        <script src="cesium/cesium_bridge.js"></script>
+        <script src="cesium/PCTile.js"></script>
+        <script src="cesium/PCTileTree.js"></script>
+        <script src="cesium/PCTileProvider.js"></script>
+        <script src="cesium/PCColorizer.js"></script>
+        <script type="application/dart" src="main.dart"></script>
+        <script data-pub-inline src="packages/browser/dart.js"></script>
+
+    </body>
 </html>
