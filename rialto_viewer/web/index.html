@@ -15,9 +15,6 @@
             }
         </style>
 
-        <script src="utils/dialog-polyfill.js"></script>
-        <link rel="stylesheet" type="text/css" href="utils/dialog-polyfill.css">
-
         <script src="3rd-party/jquery-2.1.3.min.js"></script>
         <script src="3rd-party/uikit/js/uikit.min.js"></script>
         <link rel="stylesheet" type="text/css" href="3rd-party/uikit/css/uikit.gradient.min.css">
@@ -29,17 +26,17 @@
         <div class="uk-height-viewport">
 
 
-            <div id="cesiumContainer" ></div>
 
+            <nav class="uk-navbar uk-navbar-attached">
 
-            <div class="uk-position-top">
+                <a class="uk-navbar-brand" id="aboutDialog_open" data-uk-modal="{target:'#aboutDialog'}"><em>R</em></a>
 
-                <div class="uk-button-group">
-                    <button class="uk-button">View</button>
-                     <div data-uk-dropdown="{mode:'click'}">
-                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                        <div class="uk-dropdown uk-dropdown-small">
-                            <ul class="uk-nav uk-nav-dropdown">
+                <ul class="uk-navbar-nav">
+
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">View <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
                                 <li class="uk-active"><a id="homeWorldButton">Home (world)</a></li>
                                 <li class="uk-active"><a id="homeDataButton">Home (data)</a></li>
                                 <li class="uk-nav-header">Projection</li>
@@ -48,15 +45,12 @@
                                 <li class="uk-active"><a id="modeButton3D">3D</a></li>
                             </ul>
                         </div>
-                    </div>
-                </div>
+                    </li>
 
-                <div class="uk-button-group">
-                    <button class="uk-button">Sources</button>
-                    <div data-uk-dropdown="{mode:'click'}">
-                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                        <div class="uk-dropdown uk-dropdown-small">
-                            <ul class="uk-nav uk-nav-dropdown">
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">Sources <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
                                 <li class="uk-active"><a id="initScriptDialog_open">Load config...</a></li>
                                 <li class="uk-active"><a id="layerManagerDialog_open">Manage layers...</a></li>
                                 <li class="uk-nav-divider"></li>
@@ -70,46 +64,44 @@
                                 <li><a href="#">Add..</a></li>
                             </ul>
                         </div>
-                    </div>
-                </div>
+                    </li>
 
-                <div class="uk-button-group">
-                    <button class="uk-button">Tools</button>
-                    <div data-uk-dropdown="{mode:'click'}">
-                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                        <div class="uk-dropdown uk-dropdown-small">
-                            <ul class="uk-nav uk-nav-dropdown">
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">Tools <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
                                 <li class="uk-active"><a id="viewModeButton">View</a></li>
                                 <li class="uk-active"><a id="annotateModeButton">Annotate</a></li>
                                 <li class="uk-active"><a id="measureModeButton">Measure</a></li>
                                 <li class="uk-active"><a id="viewshedModeButton">Viewshed</a></li>
                             </ul>
                         </div>
-                    </div>
-                </div>
+                    </li>
 
-                <div class="uk-button-group">
-                    <button class="uk-button">Settings</button>
-                    <div data-uk-dropdown="{mode:'click'}">
-                        <button class="uk-button"><i class="uk-icon-caret-down"></i></button>
-                        <div class="uk-dropdown uk-dropdown-small">
-                            <ul class="uk-nav uk-nav-dropdown">
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">Settings <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
                                 <li class="uk-active"><a id="advancedSettingsDialog_open">Advanced...</a></li>
                             </ul>
                         </div>
-                    </div>
+                    </li>
+
+                </ul>
+
+                <div uk-navbar-content>
+                    <span id="textMouseCoords"></span>
                 </div>
 
-            <!-- end of TOP section -->
-            </div>
+            </nav>
 
 
-            <div class="uk-position-bottom">
-                <div>
-                    <span id="textMouseCoords" class="status-span"></span>
-                    <button id="aboutDialog_open" class="uk-button" data-uk-modal="{target:'#aboutDialog'}">About...</button>
-                </div>
-            </div>
+
+            <div id="cesiumContainer" ></div>
+
+
+
+
 
         <!-- end of VIEWPORT section -->
         </div>
