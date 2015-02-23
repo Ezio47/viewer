@@ -1,0 +1,203 @@
+layers:
+
+# individual scans
+    camp1scan1:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/camp1scan1
+    camp1scan2:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/camp1scan2
+    camp2scan1:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/camp2scan1
+
+    gravelpad:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/gravelpad
+
+    pad2:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/pad2
+    pad3:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/pad3
+    pad4:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/pad4
+
+    plotctr:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/plotctr
+
+    road1:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/road1
+    road2:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/road2
+    road3:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/road3
+    road4:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/road4
+
+    scan10:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan10
+    scan12:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan12
+    scan13:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan13
+    scan14:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan14
+    scan15:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan15
+    scan16:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan16
+    scan17:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan17
+    scan18:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan18
+    scan19:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan19
+    scan1:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan1
+    scan20:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan20
+    scan21:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan21
+    scan22:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan22
+    scan23:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan23
+    scan24:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan24
+    scan25:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan25
+    scan27:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan27
+    scan28:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan28
+    scan29:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan29
+    scan2:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan2
+    scan3:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan3
+    scan4:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan4
+    scan5:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan5
+    scan6:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan6
+    scan7:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan7
+    scan8:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan8
+    scan9:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/scan9
+
+    treeplot2:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/IndividualScans/treeplot2
+
+# bare earth
+    corbin_woods:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/BareEarth/corbin_woods
+
+# tiles
+    corbin_tile_000005:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/Tiles/corbin_tile_000005
+    corbin_tile_000007:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/Tiles/corbin_tile_000007
+    corbin_tile_000009:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/Tiles/corbin_tile_000009
+    corbin_tile_7_000001:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/Tiles/corbin_tile_7_000001
+    corbin_tile_7_000002:
+        type: pointcloud
+        server: http://localhost:12345/file
+        path: /tiles/corbin/Tiles/corbin_tile_7_000002
+
+display:
+    bbox: true
+    colorize:
+        ramp: Spectral
+        dimension: Z

@@ -27,28 +27,12 @@ tmp
 
 *.asc
 
-rialto_pdal/js
 
 rialto_viewer/web/cesium-build
 
 rialto_pdal/las2info
-
 rialto_pdal/las2ria
-
 rialto_pdal/las2tiles
 
-*.ria
+data/tiles
 
-*.riahdr
-
-*.las
-
-data/tiledserp/header.json
-
-data/tiledcamp/header.json
-
-data/tiledserp0/header.json
-
-data/tiledserp18/header.json
-
-data/camp20/header.json
