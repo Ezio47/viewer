@@ -21,8 +21,9 @@ abstract class DialogVM extends ViewModel {
         assert(_dialogElement != null);
 
         var openButton = querySelector(openButtonId);
-        assert(openButton != null);
-        openButton.onClick.listen((ev) => show());
+        if (openButton != null) {
+            openButton.onClick.listen((ev) => show());
+        }
 
         var okayButton = querySelector(okayButtonId);
         assert(okayButton != null);
