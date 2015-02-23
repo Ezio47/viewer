@@ -14,7 +14,7 @@ var CesiumBridge = function (element) {
         homeButton: false,
         infoBox: false,
         sceneModePicker: false,
-        //selectionIndicator: false,
+        selectionIndicator: false,
         timeline: false,
         navigationHelpButton: false,
         navigationInstructionsInitiallyVisible: false,
