@@ -19,7 +19,7 @@ display:
         ramp: Spectral
         dimension: Z
 
-#wps:
-#    proxy: http://localhost:12345/proxy?xyzzy=
-#    server: http://localhost:8080/geoserver/ows
-#    description: "la la la"
+wps:
+    proxy: http://localhost:12345/proxy?xyzzy=
+    server: http://localhost:12348/geoserver/ows
+    description: "la la la"

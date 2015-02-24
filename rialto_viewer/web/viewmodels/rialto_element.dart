@@ -4,7 +4,7 @@
 
 part of rialto.viewer;
 
-class RialtoElement  {
+class RialtoElement {
     Hub _hub;
     SpanElement _mouseCoords;
     InitScriptDialogVM _initScriptDialog;
@@ -15,13 +15,18 @@ class RialtoElement  {
 
     int viewMode = ViewModeData.MODE_3D;
 
+    int _pendingWpsRequests = 0;
+    Element _textWpsPending;
+
     RialtoElement() {
         _hub = Hub.root;
 
-        _mouseCoords = querySelector("#textMouseCoords");
-
-        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.WORLDVIEW_MODE)));
-        querySelector("#homeDataButton").onClick.listen((ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.DATAVIEW_MODE)));
+        querySelector(
+                "#homeWorldButton").onClick.listen(
+                        (ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.WORLDVIEW_MODE)));
+        querySelector(
+                "#homeDataButton").onClick.listen(
+                        (ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.DATAVIEW_MODE)));
 
         var modeButton2D = querySelector("#modeButton2D");
         var modeButton25D = querySelector("#modeButton25D");
@@ -44,7 +49,12 @@ class RialtoElement  {
         _about = new AboutVM("#aboutDialog");
         _aboutCesium = new AboutVM("#aboutCesiumDialog");
 
+        _mouseCoords = querySelector("#textMouseCoords");
         _hub.events.MouseMove.subscribe(_updateCoords);
+
+        _textWpsPending = querySelector("#textWpsPending");
+        _hub.events.WpsRequest.subscribe(_handleWpsRequest);
+        _hub.events.WpsRequestCompleted.subscribe(_handleWpsRequestCompleted);
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name(viewMode)}";
@@ -57,5 +67,21 @@ class RialtoElement  {
         String s = "(${lon.toStringAsFixed(5)}, ${lat.toStringAsFixed(5)})";
         _mouseCoords.text = s;
         return;
+    }
+
+    String get _wpsStatusString => "WPS pending: $_pendingWpsRequests";
+
+    void _handleWpsRequest(WpsRequestData data) {
+        ++_pendingWpsRequests;
+        _textWpsPending.classes.remove("uk-text-muted");
+        _textWpsPending.text = _wpsStatusString;
+    }
+
+    void _handleWpsRequestCompleted(WpsRequestCompletedData data) {
+        --_pendingWpsRequests;
+        if (_pendingWpsRequests == 0) {
+            _textWpsPending.classes.add("uk-text-muted");
+        }
+        _textWpsPending.text = _wpsStatusString;
     }
 }

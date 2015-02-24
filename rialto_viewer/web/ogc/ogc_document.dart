@@ -471,7 +471,7 @@ class Ogc_ExecuteResponse extends OgcDocument {
 
 
     @override String toString() {
-        return "[ExecuteResponse]\n";
+        return "[ExecuteResponse] + $processOutputs\n";
     }
 }
 
@@ -560,7 +560,7 @@ class Ogc_ProcessOutputs59 extends OgcDocument {
 
 
     @override String toString() {
-        return "[ProcessOutputs59]\n";
+        return "[ProcessOutputs59]\n" + outputData.map((i) => i.toString()).join();
     }
 }
 
@@ -588,7 +588,7 @@ class Ogc_OutputData60 extends OgcDocument {
     }
 
     @override String toString() {
-        return "[OutputData60]\n";
+        return "[OutputData60]\nTitle: $title\n$data";
     }
 }
 
@@ -609,7 +609,10 @@ class Ogc_DataType extends OgcDocument {
 
 
     @override String toString() {
-        return "[DataType]\n";
+        if (literalData == null) {
+            return "[DataType]\n";
+        }
+        return "[DataType]\n$literalData";
     }
 }
 
@@ -649,7 +652,7 @@ class Ogc_Exception extends OgcDocument {
     }
 
     @override String toString() {
-        return "[Exception]\n";
+        return "[Exception] $text\n";
     }
 }
 

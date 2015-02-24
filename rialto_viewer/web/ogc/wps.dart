@@ -67,12 +67,18 @@ class WpsService extends OwsService {
     Future<OgcDocument> getCapabilitiesAsync() {
         var c = new Completer<OgcDocument>();
 
-        _doServerRequest("GetCapabilities").then((Xml.XmlDocument doc) {
-            var caps = OgcDocument.parse(doc);
-            if (caps == null) {
-                Hub.error("Error parsing OWS Capabilities response document");
+        _doServerRequest("GetCapabilities").then((Xml.XmlDocument xmlDoc) {
+            if (xmlDoc == null) {
+                c.complete(null);
+                return;
             }
-            c.complete(caps);
+            var ogcDoc = OgcDocument.parse(xmlDoc);
+            if (ogcDoc == null) {
+                Hub.error("Error parsing OWS Capabilities response document");
+                c.complete(null);
+                return;
+            }
+            c.complete(ogcDoc);
         });
 
         return c.future;
@@ -81,63 +87,118 @@ class WpsService extends OwsService {
     Future<OgcDocument> getProcessDescriptionAsync(String processIdentifier) {
         var c = new Completer<OgcDocument>();
 
-        _doServerRequest("DescribeProcess", ["identifier=$processIdentifier"]).then((Xml.XmlDocument doc) {
-            var ret = OgcDocument.parse(doc);
-            var desc;
-
-            if (ret is Ogc_ExceptionReport) {
-                log("exception report!");
-                c.complete(ret);
-            } else {
-                assert(ret is Ogc_ProcessDescriptions);
-                desc = ret.descriptions.where((d) => d.identifier == processIdentifier);
-
-                if (desc == null || desc.isEmpty || desc.length > 1) {
-                    Hub.error("Error parsing OWS Process Description response document");
-                }
-
-                c.complete(desc.first);
+        _doServerRequest("DescribeProcess", ["identifier=$processIdentifier"]).then((Xml.XmlDocument xmlDoc) {
+            if (xmlDoc == null) {
+                c.complete(null);
+                return;
             }
+
+            var ogcDoc = OgcDocument.parse(xmlDoc);
+            if (ogcDoc == null) {
+                Hub.error("Error parsing WPS process description response document");
+                c.complete(null);
+                return;
+            }
+
+            if (ogcDoc is Ogc_ExceptionReport) {
+                log("exception report!");
+                c.complete(ogcDoc);
+                return;
+            }
+
+            assert(ogcDoc is Ogc_ProcessDescriptions);
+            var desc = ogcDoc.descriptions.where((d) => d.identifier == processIdentifier);
+
+            if (desc == null || desc.isEmpty || desc.length > 1) {
+                Hub.error("Error parsing OWS Process Description response document");
+            }
+
+            c.complete(desc.first);
         });
 
         return c.future;
     }
 
-    Future<OgcDocument> executeProcessAsync(String processName, Map<String, String> params) {
+    Future<OgcDocument> executeProcessAsync(String processName, Map<String, dynamic> params) {
         var c = new Completer<OgcDocument>();
+
+        String alpha, beta;
+
+        if (processName == "Viewshed") { // TODO
+            processName = "groovy:wpshello";
+            alpha = params["observerLon"].toString();
+            beta = params["observerLat"].toString();
+        } else if (processName == "groovy:wpshello") {
+            alpha = params["alpha"];
+            beta = params["beta"];
+        } else {
+            throw new ArgumentError("unknown WPS service");
+        }
 
         String identifier = "Identifier=$processName";
-        String dataInputs = "DataInputs=alpha=17;beta=11";
+        String dataInputs = "DataInputs=alpha=$alpha;beta=$beta";
 
-        _doServerRequest("Execute", [identifier, dataInputs]).then((Xml.XmlDocument doc) {
-            var resp = OgcDocument.parse(doc);
-            if (resp == null) Hub.error("Error parsing OWS Execute response document");
-            c.complete(resp);
+        _doServerRequest("Execute", [identifier, dataInputs]).then((Xml.XmlDocument xmlDoc) {
+            if (xmlDoc == null) {
+                c.complete(null);
+                return;
+            }
+
+            var ogcDoc = OgcDocument.parse(xmlDoc);
+            if (ogcDoc == null) {
+                Hub.error("Error parsing WPS process execution response document");
+                c.complete(null);
+                return;
+            }
+
+            c.complete(ogcDoc);
         });
 
         return c.future;
     }
 
-    void getViewshedAsync(double observerLon, double observerLat, double radius) {
-        var c = new Completer<OgcDocument>();
+    Future<bool> _getViewshedAsync(double observerLon, double observerLat, double radius) {
+        var c = new Completer<bool>();
 
         var params = {
-            "observerLon": observerLon.toString(),
-            "observerLat": observerLat.toString(),
-            "radius": radius.toString()
+            "observerLon": observerLon,
+            "observerLat": observerLat,
+            "radius": radius
         };
-        executeProcessAsync("Viewshed", params).then((OgcDocument doc) {
-            if (doc is Ogc_ExceptionReport) {
-                log("viewshed returned exception report");
+
+        executeProcessAsync("Viewshed", params).then((OgcDocument ogcDoc) {
+            if (ogcDoc == null) {
+                c.complete(null);
+                return;
             }
-            log(doc);
-            c.complete(doc);
+            if (ogcDoc is Ogc_ExceptionReport) {
+                log("viewshed returned exception report");
+                log(ogcDoc);
+                c.complete(false);
+                return;
+            }
+            log(ogcDoc);
+            c.complete(true);
         });
 
         return c.future;
     }
 
     void _handleWpsRequest(WpsRequestData data) {
-        log("WPS request: ${WpsRequestData.name[data.type]}, params=${data.params.length}");
+        if (data.type == WpsRequestData.VIEWSHED) {
+            double lon = data.params[0];
+            double lat = data.params[1];
+            double radius = data.params[2];
+            _getViewshedAsync(lon, lat, radius).then((_) {
+
+                var random = new Random();
+                var msecs = 1000 + random.nextInt(3000);
+                var duration = new Duration(milliseconds: msecs);
+                new Timer(duration, () => _hub.events.WpsRequestCompleted.fire(null));
+                log("request done after $msecs ms");
+            });
+        } else {
+            throw new ArgumentError("invalid WPS request");
+        }
     }
 }

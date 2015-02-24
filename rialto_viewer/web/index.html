@@ -16,6 +16,22 @@
             .small-dialog {
                 width: 400px;
             }
+            .message-panel-bar {
+                position: absolute;
+                z-index: 1;
+                display: table;
+            }
+            .message-panel-row {
+                display: table-row;
+            }
+            .message-panel {
+                padding: 0;
+                display: table-cell;
+            }
+            .message-panel-gap {
+                padding: 0;
+                display: table-cell;
+            }
         </style>
 
         <script src="3rd-party/jquery-2.1.3.min.js"></script>
@@ -106,9 +122,25 @@
         </div>
 
 
-        <div class="uk-panel uk-panel-box uk-position-bottom-right uk-margin-small-right uk-margin-small-bottom"
-             style="padding: 0 0 0 0; position: absolute; z-index: 1;">
-            <span id="textMouseCoords" class="uk-text-small"></span>
+        <div class="uk-position-bottom uk-margin-small-bottom message-panel-bar">
+            <div class="message-panel-row">
+
+                <div class="message-panel-gap" style="width: 77%"></div>
+
+                <div class="uk-panel uk-panel-box uk-text-small uk-text-center"
+                style="padding: 0; display: table-cell; width:10%;">
+                     <span id="textWpsPending"> </span>
+                </div>
+
+                <div class="message-panel-gap" style="width:1%"></div>
+
+                <div class="uk-panel uk-panel-box uk-text-small uk-text-center"
+                     style="padding: 0; display: table-cell; width: 10%">
+                    <span id="textMouseCoords"> </span>
+                </div>
+
+                <div class="message-panel-gap" style="width:1%"></div>
+            </div>
         </div>
 
 

@@ -53,6 +53,7 @@ class EventRegistry {
     SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
 
     SignalFunctions<WpsRequestData> WpsRequest = new SignalFunctions<WpsRequestData>();
+    SignalFunctions<WpsRequestCompletedData> WpsRequestCompleted = new SignalFunctions<WpsRequestCompletedData>();
 }
 
 class MouseData {
@@ -164,6 +165,11 @@ class WpsRequestData {
 
     WpsRequestData(int this.type, List<Object> this.params);
 }
+
+
+class WpsRequestCompletedData {
+}
+
 
 class ColorizeLayersData {
     String ramp;
