@@ -13,6 +13,9 @@
             html, body, #cesiumContainer {
                 width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
             }
+            .small-dialog {
+                width: 400px;
+            }
         </style>
 
         <script src="3rd-party/jquery-2.1.3.min.js"></script>
@@ -28,8 +31,6 @@
 
        <div style="position: absolute; z-index: 1">
             <nav class="uk-navbar uk-margin-small-top uk-margin-small-left">
-
-                <a class="uk-navbar-brand" id="aboutDialog_open" data-uk-modal="{target:'#aboutDialog'}"><em>R</em></a>
 
                 <ul class="uk-navbar-nav">
 
@@ -89,6 +90,15 @@
                         </div>
                     </li>
 
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">Help <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
+                                <li class="uk-active"><a id="aboutDialog_open">About...</a></li>
+                                <li class="uk-active"><a id="aboutCesiumDialog_open">Cesium...</a></li>
+                            </ul>
+                        </div>
+                    </li>
                 </ul>
 
             </nav>
@@ -365,30 +375,40 @@
         </div>
 
 
+        <div id="aboutCesiumDialog" class="uk-modal">
+            <div class="uk-modal-dialog small-dialog">
+                <div class="uk-modal-header">
+                    Cesium Credits
+                </div>
+
+                <div>
+                    Rialto is built on top of <a href="http://www.cesiumjs.org">Cesium</a> and
+                    its partner data providers.
+
+                    <div id="creditContainer" class="uk-text-small uk-text-muted"></div>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="aboutCesiumDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
         <div id="aboutDialog" class="uk-modal">
-            <div class="uk-modal-dialog">
+            <div class="uk-modal-dialog small-dialog">
                 <div class="uk-modal-header">
                     The Rialto Viewer
                 </div>
 
                 <div>
-                    Copyright © RadiantBlue 2014-2015.
-                    <img src="images/radiantblue-logo.png">
-
-                    <hr>
-
-                    <div>
-                        WebGL provided by <a href="http://www.cesiumjs.org">Cesium</a> and their partners.
-                        <div id="creditContainer" class="uk-text-small uk-text-muted"></div>
-                    </div>
-                    <div>
-                        CSS provided by <a href="http://www.getuikit.com">uikit</a>.
-                        <img src="images/uikit-logo.png">
-                    </div>
-                    <div>
-                        Javascript by <a href="http://www.dartlang.org">Dart</a>.
-                        <img src="images/dart-logo.png">
-                    </div>
+                    Copyright © 2014-2015 RadiantBlue Technologies, Inc. This
+                    software is provided under an MIT-style open source license.
+                    <br><br>
+                    WebGL provided by <a href="http://www.cesiumjs.org">Cesium</a>.
+                    <br>
+                    CSS provided by <a href="http://www.getuikit.com">uikit</a>.
+                    <br>
+                    Javascript provided by <a href="http://www.dartlang.org">Dart</a>.
                 </div>
 
                 <div class="uk-modal-footer uk-text-right">

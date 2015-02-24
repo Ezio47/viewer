@@ -11,7 +11,7 @@ class RialtoElement  {
     LayerManagerDialogVM _layerManager;
     SettingsDialogVM _advancedSettings;
     ModalButtonsVM _modalButtons;
-    AboutVM _about;
+    AboutVM _about, _aboutCesium;
 
     int viewMode = ViewModeData.MODE_3D;
 
@@ -42,6 +42,7 @@ class RialtoElement  {
         _advancedSettings = new SettingsDialogVM("#advancedSettingsDialog");
 
         _about = new AboutVM("#aboutDialog");
+        _aboutCesium = new AboutVM("#aboutCesiumDialog");
 
         _hub.events.MouseMove.subscribe(_updateCoords);
     }
