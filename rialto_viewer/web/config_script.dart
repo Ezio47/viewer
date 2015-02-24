@@ -7,47 +7,33 @@ part of rialto.viewer;
 
 class ConfigScript {
     Hub _hub;
+    final String _url;
 
-    ConfigScript(String url) {
+    ConfigScript(String this._url) :
         _hub = Hub.root;
 
-        Comms.httpGet(url).then((yamlText) {
+    Future<List<dynamic>> run() {
+        var c = new Completer<List<dynamic>>();
+
+        Comms.httpGet(_url).then((yamlText) {
             List<Map<String, Map>> commands = loadYaml(yamlText);
 
-            List<dynamic> results = [];
-            var c = new Completer();
-            _executeNextCommand(commands, 0, results, c).then((ok) {
+            var cc = new CommandChainer(_executeCommandAsync);
+            Future<List<dynamic>> results = cc.run(commands);
+            results.then((_) {
+                // we don't eactually use the results...
+                Hub.root.events.LoadScriptCompleted.fire(_url);
+                c.complete(results);
             });
-        });
-
-        Hub.root.events.LoadScriptCompleted.fire(url);
-    }
-
-    Future _executeNextCommand(List<Map<String, Map>> commands, int index, List<dynamic> results, Completer c) {
-
-        Map command = commands[index];
-
-        assert(command.keys.length == 1);
-        String key = command.keys.first;
-        Map data = command[key];
-
-        _executeCommandAsync(key, data).then((dynamic result) {
-            log("command done: $key");
-
-            results.add(result);
-
-            if (index + 1 != commands.length) {
-                _executeNextCommand(commands, index + 1, results, c);
-            } else {
-                c.complete();
-                return;
-            }
         });
 
         return c.future;
     }
 
-    Future<dynamic> _executeCommandAsync(String key, Map data) {
+    Future<dynamic> _executeCommandAsync(Map command) {
+        assert(command.keys.length == 1);
+        String key = command.keys.first;
+        Map data = command[key];
 
         log("Script command: $key");
 

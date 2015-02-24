@@ -98,6 +98,7 @@ class Hub {
 
     void _handleLoadScript(String url) {
         var s = new ConfigScript(url);
+        var junk = s.run();
     }
 
     void _handleDisplayBbox(bool v) {
