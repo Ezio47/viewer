@@ -11,65 +11,64 @@ class ConfigScript {
     ConfigScript(String url) {
         _hub = Hub.root;
 
-        var f = Comms.httpGet(url);
+        Comms.httpGet(url).then((yamlText) {
+            List<Map<String, Map>> commands = loadYaml(yamlText);
 
-        f.then((s) {
-            _executeFirst(s).then((ok) {
-               if (ok) {
-                   _executeSecond(s);
-               }
+            List<dynamic> results = [];
+            var c = new Completer();
+            _executeNextCommand(commands, 0, results, c).then((ok) {
             });
         });
 
         Hub.root.events.LoadScriptCompleted.fire(url);
     }
 
-    void _executeSecond(String json) {
+    Future _executeNextCommand(List<Map<String, Map>> commands, int index, List<dynamic> results, Completer c) {
 
-        Map commands = loadYaml(json);
+        Map command = commands[index];
 
-        for (String command in commands.keys) {
+        assert(command.keys.length == 1);
+        String key = command.keys.first;
+        Map data = command[key];
 
-            var data = commands[command];
-            //log("Script command: $command");
+        _executeCommandAsync(key, data).then((dynamic result) {
+            log("command done: $key");
 
-            switch (command) {
-                case "layers":
-                    // already handled in executeFirst()
-                    break;
-                case "camera":
-                    _doCommand_camera(data);
-                    break;
-                case "display":
-                    _doCommand_display(data);
-                    break;
-                case "wps":
-                    _doCommand_wps(data);
-                    break;
-                default:
-                    Hub.error("Unrecognized command in configuration file", info: {"Command": command});
-                    return;
+            results.add(result);
+
+            if (index + 1 != commands.length) {
+                _executeNextCommand(commands, index + 1, results, c);
+            } else {
+                c.complete();
+                return;
             }
-        }
-    }
-
-    Future<bool> _executeFirst(String json) {
-        var c = new Completer<bool>();
-        Map commands = loadYaml(json);
-
-        if (commands.containsKey("layers")) {
-            // do this first, since other things like colorize depend on it
-            _doCommand_layers(commands["layers"]).then((ok) {
-                c.complete(ok);
-            });
-        } else {
-            c.complete(true);
-        }
+        });
 
         return c.future;
     }
 
-    void _doCommand_wps(Map data) {
+    Future<dynamic> _executeCommandAsync(String key, Map data) {
+
+        log("Script command: $key");
+
+        switch (key) {
+            case "layers":
+                return _doCommand_layers(data);
+            case "camera":
+                return _doCommand_camera(data);
+            case "display":
+                return _doCommand_display(data);
+            case "wps":
+                return _doCommand_wps(data);
+        }
+
+        Hub.error("Unrecognized command in configuration file", info: {
+            "Command": key
+        });
+        return null;
+    }
+
+    Future _doCommand_wps(Map data) {
         //OgcDocumentTests.test();
 
         var proxy = YamlUtils.getOptionalSettingAsString(data, "proxy");
@@ -88,7 +87,10 @@ class ConfigScript {
             //log(doc);
         });
 
-        var params = {"alpha": "17", "beta": "11"};
+        var params = {
+            "alpha": "17",
+            "beta": "11"
+        };
 
         wps.executeProcessAsync("groovy:wpshello", params).then((OgcDocument doc) {
             assert(doc is Ogc_ExecuteResponse);
@@ -101,10 +103,14 @@ class ConfigScript {
         });
 
         _hub.wps = wps;
+
+        var c = new Completer();
+        c.complete();
+        return c.future;
     }
 
 
-    void _doCommand_camera(Map data) {
+    Future _doCommand_camera(Map data) {
         assert(data.containsKey("eye"));
         assert(data.containsKey("target"));
         if (!data.containsKey("up")) {
@@ -127,9 +133,13 @@ class ConfigScript {
 
         var cameraData = new CameraData(eye, target, up, fov);
         _hub.events.UpdateCamera.fire(cameraData);
+
+        var c = new Completer();
+        c.complete();
+        return c.future;
     }
 
-    void _doCommand_display(Map data) {
+    Future _doCommand_display(Map data) {
         if (data.containsKey("bbox")) {
             _hub.events.DisplayBbox.fire(data["bbox"]);
         }
@@ -141,23 +151,20 @@ class ConfigScript {
             String dimName = colorizeData["dimension"];
             _hub.events.ColorizeLayers.fire(new ColorizeLayersData(ramp, dimName));
         }
+
+        var c = new Completer();
+        c.complete();
+        return c.future;
     }
 
-    Future<bool> _doCommand_layers(Map layers) {
-        int count = 0;
-        var c = new Completer<bool>();
-
-        _hub.events.AddLayerCompleted.subscribe((layer) {
-            ++count;
-            if (count == layers.length) {
-                c.complete(true);
-            }
-        });
+    Future<List<Layer>> _doCommand_layers(Map layers) {
+        var futures = [];
 
         for (var name in layers.keys) {
-            _hub.events.AddLayer.fire(new LayerData(name, layers[name]));
+            var f = _hub.commands.addLayer(new LayerData(name, layers[name]));
+            futures.add(f);
         }
 
-        return c.future;
+        return Future.wait(futures);
     }
 }

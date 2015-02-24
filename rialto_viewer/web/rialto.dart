@@ -18,10 +18,11 @@ import 'package:yaml/yaml.dart';
 import 'package:xml/xml.dart' as Xml;
 
 part 'annotation_controller.dart';
+part 'commands.dart';
 part 'comms.dart';
-part 'hub.dart';
-part 'event_registry.dart';
 part 'config_script.dart';
+part 'event_registry.dart';
+part 'hub.dart';
 part 'layer_manager.dart';
 part 'measurement_controller.dart';
 part 'mode_controller.dart';

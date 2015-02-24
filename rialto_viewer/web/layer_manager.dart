@@ -13,7 +13,6 @@ class LayerManager {
     LayerManager() {
         _hub = Hub.root;
 
-        _hub.events.AddLayer.subscribe(_handleAddLayer);
         _hub.events.RemoveLayer.subscribe(_handleRemoveLayer);
         _hub.events.RemoveAllLayers.subscribe0(_handleRemoveAllLayers);
         _hub.events.ColorizeLayers.subscribe(_handleColorizeLayers);
@@ -34,39 +33,36 @@ class LayerManager {
         return;
     }
 
-    void _handleAddLayer(LayerData data) {
+    Future<Layer> doAddLayer(LayerData data) {
         final name = data.name;
+
+        var c = new Completer<Layer>();
 
         if (layers.containsKey(name)) {
             Hub.error("Layer $name already loaded.");
-            return;
+            c.complete(null);
+            return c.future;
         }
 
         Layer layer = LayerManager._createLayer(name, data.map);
         if (layer == null) {
             Hub.error("Unable to load layer $name.");
-            return;
+            c.complete(null);
+            return c.future;
         }
 
         layer.load().then((_) {
-            //Future f;
-            //if (layer is PointCloudLayer) {
-            //    f = layer.colorizeAsync(new ColorizeLayersData());
-            //} else {
-            //    f = new Future.sync((){});
-            //}
-            //f.then((_) => _addLayer(layer));
-            _addLayer(layer);
+            layers[layer.name] = layer;
+
+            bbox.unionWith(layer.bbox);
+            _hub.events.LayersBboxChanged.fire(bbox);
+
+            _hub.events.AddLayerCompleted.fire(layer);
+
+            c.complete(layer);
         });
-    }
 
-    void _addLayer(Layer layer) {
-        layers[layer.name] = layer;
-
-        bbox.unionWith(layer.bbox);
-        _hub.events.LayersBboxChanged.fire(bbox);
-
-        _hub.events.AddLayerCompleted.fire(layer);
+        return c.future;
     }
 
     void _handleRemoveLayer(String name) {
@@ -119,7 +115,9 @@ class LayerManager {
                 layer = new PointCloudLayer(name, map);
                 break;
             default:
-                Hub.error("Unrecognized layer type in configuration file", info: {"Layer type": type});
+                Hub.error("Unrecognized layer type in configuration file", info: {
+                    "Layer type": type
+                });
                 return null;
         }
 

@@ -1,4 +1,4 @@
-layers:
+- layers:
     tiledserp:
         type: pointcloud   # always tiled
         server: http://localhost:12345/file
@@ -7,19 +7,19 @@ layers:
         visible: true       # optional, default=true
 
 
-camera:
+- camera:
     eye: [-83.43271, 39.02617, 50.0]
     target: [-83.43271, 39.02617, 0]
     up: [0, 0, 1]
     fov: 60
 
-display:
+- display:
     bbox: true
     colorize:
         ramp: Spectral
         dimension: Z
 
-wps:
+- wps:
     proxy: http://localhost:12345/proxy?xyzzy=
     server: http://localhost:12348/geoserver/ows
     description: "la la la"

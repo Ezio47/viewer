@@ -19,10 +19,12 @@ class Hub {
 
     // globals
     EventRegistry events;
+    Commands commands;
     ModeController modeController;
     CesiumBridge cesium;
     JsBridge js;
     WpsService wps;
+    LayerManager layerManager;
 
     // privates
     ViewController _viewController;
@@ -31,7 +33,6 @@ class Hub {
     ViewshedController _viewshedController;
     BboxShape _bboxShape;
     Camera _camera;
-    LayerManager _layerManager;
 
     // TODO: make private
     List<Annotation> annotations = new List<Annotation>();
@@ -49,8 +50,9 @@ class Hub {
         js = new JsBridge();
 
         events = new EventRegistry();
+        commands = new Commands();
 
-        _layerManager = new LayerManager();
+        layerManager = new LayerManager();
 
         cesium = new CesiumBridge('cesiumContainer');
 
