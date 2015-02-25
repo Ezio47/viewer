@@ -8,8 +8,6 @@ part of rialto.viewer;
 // All components should register themselves with the hub and then
 // express interest in whatever events they care about.
 //
-// For polymer elements, this is done in ready() or maybe attached()
-//
 
 class EventRegistry {
 
@@ -42,6 +40,7 @@ class EventRegistry {
     SignalFunctions<WpsRequestUpdateData> WpsRequestUpdate = new SignalFunctions<WpsRequestUpdateData>();
 }
 
+
 class MouseData {
     final double x;
     final double y;
@@ -66,6 +65,7 @@ class MouseData {
         y = ny.toDouble();
 }
 
+
 class WheelData {
     double delta;
 
@@ -82,6 +82,7 @@ class WheelData {
         delta = d.toDouble();
 }
 
+
 class KeyboardData {
     bool controlKey;
     bool altKey;
@@ -96,89 +97,9 @@ class KeyboardData {
     }
 }
 
-class DisplayLayerData {
-    Layer layer;
-    bool visible;
-    DisplayLayerData(this.layer, this.visible);
-}
-
-class CameraData {
-    static const int NORMAL_MODE = 0;
-    static const int WORLDVIEW_MODE = 1;
-    static const int DATAVIEW_MODE = 2;
-    int viewMode;
-    Cartographic3 eye; // cartographic
-    Cartographic3 target; // cartographic
-    Cartesian3 up; // cartesian
-    double fov;
-    CameraData(this.eye, this.target, this.up, this.fov) : viewMode=NORMAL_MODE;
-    CameraData.fromMode(this.viewMode);
-}
-
-class LayerData {
-    String name;
-    Map map;
-    LayerData(String this.name, Map this.map);
-}
-
-class ModeData {
-    static const int INVALID = 0;
-    static const int MEASUREMENT = 1;
-    static const int VIEW = 2;
-    static const int ANNOTATION = 4;
-    static const int VIEWSHED = 5;
-    static final name = {
-        MEASUREMENT: "measurement",
-        VIEW: "view",
-        ANNOTATION: "annotation",
-        VIEWSHED: "viewshed"
-    };
-
-    int type;
-
-    ModeData(int this.type);
-}
-
-class WpsRequestData {
-    static const int INVALID = 0;
-    static const int VIEWSHED = 1;
-    static final name = {
-        VIEWSHED: "viewshed"
-    };
-
-    final int type;
-    final List<Object> params;
-
-    WpsRequestData(int this.type, List<Object> this.params);
-}
-
 
 class WpsRequestUpdateData {
     final int count; // +1 or -1, for now...
 
     WpsRequestUpdateData(int this.count);
-}
-
-
-class ColorizeLayersData {
-    String ramp;
-    String dimension;
-    ColorizeLayersData(String this.ramp, String this.dimension);
-}
-
-class ViewModeData {
-    static const int MODE_2D = 0;
-    static const int MODE_25D = 1;
-    static const int MODE_3D = 2;
-
-    final int mode;
-
-    ViewModeData(int this.mode);
-
-    static String name(int m) {
-        if (m == ViewModeData.MODE_2D) return "2D";
-        if (m == ViewModeData.MODE_25D) return "2.5D";
-        if (m == ViewModeData.MODE_3D) return "3D";
-        throw new ArgumentError("bad view mode value");
-    }
 }
