@@ -18,8 +18,7 @@ class ConfigScript {
         Comms.httpGet(_url).then((yamlText) {
             List<Map<String, Map>> commands = loadYaml(yamlText);
 
-            var cc = new CommandChainer(_executeCommandAsync);
-            Future<List<dynamic>> results = cc.run(commands);
+            Future<List<dynamic>> results = Commands.run(_executeCommandAsync, commands);
             results.then((_) {
                 // we don't eactually use the results...
                 Hub.root.events.LoadScriptCompleted.fire(_url);
@@ -90,9 +89,7 @@ class ConfigScript {
 
         _hub.wps = wps;
 
-        var c = new Completer();
-        c.complete();
-        return c.future;
+        return new Future((){});
     }
 
 
@@ -120,9 +117,7 @@ class ConfigScript {
         var cameraData = new CameraData(eye, target, up, fov);
         _hub.events.UpdateCamera.fire(cameraData);
 
-        var c = new Completer();
-        c.complete();
-        return c.future;
+        return new Future((){});
     }
 
     Future _doCommand_display(Map data) {
@@ -135,12 +130,10 @@ class ConfigScript {
             String ramp = colorizeData["ramp"];
             assert(colorizeData.containsKey("dimension"));
             String dimName = colorizeData["dimension"];
-            _hub.events.ColorizeLayers.fire(new ColorizeLayersData(ramp, dimName));
+            var f = _hub.commands.colorizeLayers(new ColorizeLayersData(ramp, dimName));
         }
 
-        var c = new Completer();
-        c.complete();
-        return c.future;
+        return new Future((){});
     }
 
     Future<List<Layer>> _doCommand_layers(Map layers) {

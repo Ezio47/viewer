@@ -12,7 +12,7 @@ void main() {
     //OgcDocumentTests.test();
 
     try {
-        hub.events.LoadScript.fire("http://localhost:12345/file/test.yaml");
+        hub.commands.loadScript("http://localhost:12345/file/test.yaml");
     } catch(e) {
         Hub.error("Top-level exception caught", object: e);
     }

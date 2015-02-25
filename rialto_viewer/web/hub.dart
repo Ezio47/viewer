@@ -81,8 +81,6 @@ class Hub {
         _camera = new Camera();
 
         events.ChangeMode.fire(new ModeData(ModeData.VIEW));
-
-        events.LoadScript.subscribe(_handleLoadScript);
     }
 
     void _handleLayersBboxChanged(CartographicBbox box) {
@@ -94,11 +92,6 @@ class Hub {
 
     void _handleSetViewMode(ViewModeData mode) {
         cesium.setViewMode(mode.mode);
-    }
-
-    void _handleLoadScript(String url) {
-        var s = new ConfigScript(url);
-        var junk = s.run();
     }
 
     void _handleDisplayBbox(bool v) {

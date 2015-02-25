@@ -60,9 +60,7 @@ class OwsService {
 class WpsService extends OwsService {
 
     WpsService(String server, {String proxy, String description})
-            : super("WPS", server, proxy: proxy, description: description) {
-        _hub.events.WpsRequest.subscribe(_handleWpsRequest);
-    }
+            : super("WPS", server, proxy: proxy, description: description);
 
     Future<OgcDocument> getCapabilitiesAsync() {
         var c = new Completer<OgcDocument>();
@@ -184,8 +182,11 @@ class WpsService extends OwsService {
         return c.future;
     }
 
-    void _handleWpsRequest(WpsRequestData data) {
+    Future doWpsRequest(WpsRequestData data) {
         if (data.type == WpsRequestData.VIEWSHED) {
+
+            _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
+
             double lon = data.params[0];
             double lat = data.params[1];
             double radius = data.params[2];
@@ -194,11 +195,13 @@ class WpsService extends OwsService {
                 var random = new Random();
                 var msecs = 1000 + random.nextInt(3000);
                 var duration = new Duration(milliseconds: msecs);
-                new Timer(duration, () => _hub.events.WpsRequestCompleted.fire(null));
+                new Timer(duration, () => _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1)));
                 log("request done after $msecs ms");
             });
         } else {
             throw new ArgumentError("invalid WPS request");
         }
+
+        return new Future((){});
     }
 }

@@ -4,6 +4,7 @@
 
 part of rialto.viewer;
 
+typedef Future<dynamic> ChainCommndFunction(dynamic);
 
 class Commands {
     Hub _hub;
@@ -14,42 +15,55 @@ class Commands {
     Future<Layer> addLayer(LayerData data) {
         return _hub.layerManager.doAddLayer(data);
     }
-}
 
-
-// given a list of things, run a function F against each one, in order
-// and with an explicit wait between each one
-//
-// and return a Future with the list of the results from each F
-class CommandChainer {
-    Function _f;
-
-    CommandChainer(Function this._f) {
-
+    Future colorizeLayers(ColorizeLayersData data) {
+        return _hub.layerManager.doColorizeLayers(data);
     }
 
-    Future<List<dynamic>> run(List<dynamic> inputs) {
+    Future removeLayer(String layer) {
+        return _hub.layerManager.doRemoveLayer(layer);
+    }
+
+    Future removeAllLayers() {
+        return _hub.layerManager.doRemoveAllLayers();
+    }
+
+    Future loadScript(String url) {
+        var s = new ConfigScript(url);
+        var f = s.run();
+        return f;
+    }
+
+    Future wpsRequest(WpsRequestData data) {
+        return _hub.wps.doWpsRequest(data);
+    }
+
+    // given a list of things, run a function F against each one, in order
+    // and with an explicit wait between each one
+    //
+    // and return a Future with the list of the results from each F
+    static Future<List<dynamic>> run(ChainCommndFunction f, List<dynamic> inputs) {
 
         List<dynamic> outputs = [];
         var c = new Completer();
 
-        _executeNextCommand(inputs, 0, outputs, c).then((_) {
+        _executeNextCommand(f, inputs, 0, outputs, c).then((_) {
 
         });
 
         return c.future;
     }
 
-    Future _executeNextCommand(List<dynamic> inputs, int index, List<dynamic> outputs, Completer c) {
+    static Future _executeNextCommand(ChainCommndFunction f, List<dynamic> inputs, int index, List<dynamic> outputs, Completer c) {
 
           dynamic input = inputs[index];
 
-          _f(input).then((dynamic result) {
+          f(input).then((dynamic result) {
 
               outputs.add(result);
 
               if (index + 1 != inputs.length) {
-                  _executeNextCommand(inputs, index + 1, outputs, c);
+                  _executeNextCommand(f, inputs, index + 1, outputs, c);
               } else {
                   c.complete(outputs);
                   return;
@@ -58,4 +72,14 @@ class CommandChainer {
 
           return c.future;
       }
+}
+
+
+class CommandChainer {
+    Function _f;
+
+    CommandChainer(Function this._f) {
+
+    }
+
 }

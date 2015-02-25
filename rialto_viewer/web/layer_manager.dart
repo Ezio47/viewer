@@ -10,15 +10,10 @@ class LayerManager {
     Map<String, Layer> layers = new Map<String, Layer>();
     CartographicBbox bbox = new CartographicBbox.empty();
 
-    LayerManager() {
+    LayerManager() :
         _hub = Hub.root;
 
-        _hub.events.RemoveLayer.subscribe(_handleRemoveLayer);
-        _hub.events.RemoveAllLayers.subscribe0(_handleRemoveAllLayers);
-        _hub.events.ColorizeLayers.subscribe(_handleColorizeLayers);
-    }
-
-    void _handleColorizeLayers(ColorizeLayersData data) {
+    Future doColorizeLayers(ColorizeLayersData data) {
         var futures = new List<Future>();
 
         for (var layer in layers.values) {
@@ -28,9 +23,9 @@ class LayerManager {
             }
         }
 
-        var wait = Future.wait(futures); // TODO: eventually will return this
+        var wait = Future.wait(futures);
 
-        return;
+        return wait;
     }
 
     Future<Layer> doAddLayer(LayerData data) {
@@ -65,7 +60,7 @@ class LayerManager {
         return c.future;
     }
 
-    void _handleRemoveLayer(String name) {
+    Future doRemoveLayer(String name) {
         assert(layers.containsKey(name));
         Layer layer = layers[name];
         assert(layer != null);
@@ -79,12 +74,16 @@ class LayerManager {
         _hub.events.LayersBboxChanged.fire(bbox);
 
         _hub.events.RemoveLayerCompleted.fire(name);
+
+        return new Future((){});
     }
 
-    void _handleRemoveAllLayers() {
+    Future doRemoveAllLayers() {
         var items = layers.values.toList();
-        items.forEach((layer) => _hub.events.RemoveLayer.fire(layer.name));
+        items.forEach((layer) => _hub.commands.removeLayer(layer.name));
         _hub.events.RemoveAllLayersCompleted.fire0();
+
+        return new Future((){});
     }
 
     // this function should do no heavywieght work, save that for load()

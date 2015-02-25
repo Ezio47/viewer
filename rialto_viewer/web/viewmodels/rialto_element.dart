@@ -53,8 +53,7 @@ class RialtoElement {
         _hub.events.MouseMove.subscribe(_updateCoords);
 
         _textWpsPending = querySelector("#textWpsPending");
-        _hub.events.WpsRequest.subscribe(_handleWpsRequest);
-        _hub.events.WpsRequestCompleted.subscribe(_handleWpsRequestCompleted);
+        _hub.events.WpsRequestUpdate.subscribe(_handleWpsRequestUpdate);
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name(viewMode)}";
@@ -71,17 +70,19 @@ class RialtoElement {
 
     String get _wpsStatusString => "WPS pending: $_pendingWpsRequests";
 
-    void _handleWpsRequest(WpsRequestData data) {
-        ++_pendingWpsRequests;
-        _textWpsPending.classes.remove("uk-text-muted");
-        _textWpsPending.text = _wpsStatusString;
-    }
-
-    void _handleWpsRequestCompleted(WpsRequestCompletedData data) {
-        --_pendingWpsRequests;
-        if (_pendingWpsRequests == 0) {
-            _textWpsPending.classes.add("uk-text-muted");
+    void _handleWpsRequestUpdate(WpsRequestUpdateData data) {
+        if (data.count == 1) {
+            ++_pendingWpsRequests;
+            _textWpsPending.classes.remove("uk-text-muted");
+            _textWpsPending.text = _wpsStatusString;
+        } else if (data.count == -1) {
+            --_pendingWpsRequests;
+            if (_pendingWpsRequests == 0) {
+                _textWpsPending.classes.add("uk-text-muted");
+            }
+            _textWpsPending.text = _wpsStatusString;
+        } else {
+            throw new ArgumentError("invalid WPS request count");
         }
-        _textWpsPending.text = _wpsStatusString;
     }
 }

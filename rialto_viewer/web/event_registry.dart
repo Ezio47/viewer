@@ -32,28 +32,21 @@ class EventRegistry {
 
     SignalFunctions<DisplayLayerData> DisplayLayer = new SignalFunctions<DisplayLayerData>();
 
-    SignalFunctions<ColorizeLayersData> ColorizeLayers = new SignalFunctions<ColorizeLayersData>();
-
     SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
     SignalFunctions<ViewModeData> SetViewMode = new SignalFunctions<ViewModeData>();
 
-    SignalFunctions<LayerData> AddLayer = new SignalFunctions<LayerData>();
     SignalFunctions<Layer> AddLayerCompleted = new SignalFunctions<Layer>();
     SignalFunctions<Layer> AddAllLayersCompleted = new SignalFunctions<Layer>();
-    SignalFunctions<String> RemoveLayer = new SignalFunctions<String>();
     SignalFunctions<String> RemoveLayerCompleted = new SignalFunctions<String>();
-    SignalFunctions RemoveAllLayers = new SignalFunctions();
     SignalFunctions RemoveAllLayersCompleted = new SignalFunctions();
 
     SignalFunctions<ModeData> ChangeMode = new SignalFunctions();
 
-    SignalFunctions<String> LoadScript = new SignalFunctions<String>();
     SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();
 
     SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
 
-    SignalFunctions<WpsRequestData> WpsRequest = new SignalFunctions<WpsRequestData>();
-    SignalFunctions<WpsRequestCompletedData> WpsRequestCompleted = new SignalFunctions<WpsRequestCompletedData>();
+    SignalFunctions<WpsRequestUpdateData> WpsRequestUpdate = new SignalFunctions<WpsRequestUpdateData>();
 }
 
 class MouseData {
@@ -167,7 +160,10 @@ class WpsRequestData {
 }
 
 
-class WpsRequestCompletedData {
+class WpsRequestUpdateData {
+    final int count; // +1 or -1, for now...
+
+    WpsRequestUpdateData(int this.count);
 }
 
 
