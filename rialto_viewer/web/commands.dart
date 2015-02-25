@@ -38,6 +38,31 @@ class Commands {
         return _hub.wps.doWpsRequest(data);
     }
 
+    Future updateCamera(CameraData data) {
+        return _hub.camera.doUpdateCamera(data);
+    }
+
+    Future setViewMode(ViewModeData mode) {
+        _hub.cesium.setViewMode(mode.mode);
+        return new Future((){});
+    }
+
+    Future displayLayerData(DisplayLayerData data) {
+        assert(data.layer != null);
+        data.layer.visible = data.visible;
+        return new Future((){});
+    }
+
+    Future displayBbox(bool v) {
+        _hub.displayBbox(v);
+        return new Future((){});
+    }
+
+    Future changeMode(ModeData data) {
+        _hub.modeController.doChangeMode(data);
+        return new Future((){});
+    }
+
     // given a list of things, run a function F against each one, in order
     // and with an explicit wait between each one
     //

@@ -25,6 +25,7 @@ class Hub {
     JsBridge js;
     WpsService wps;
     LayerManager layerManager;
+    Camera camera;
 
     // privates
     ViewController _viewController;
@@ -32,7 +33,6 @@ class Hub {
     MeasurementController _measurementController;
     ViewshedController _viewshedController;
     BboxShape _bboxShape;
-    Camera _camera;
 
     // TODO: make private
     List<Annotation> annotations = new List<Annotation>();
@@ -53,6 +53,7 @@ class Hub {
         commands = new Commands();
 
         layerManager = new LayerManager();
+        modeController = new ModeController();
 
         cesium = new CesiumBridge('cesiumContainer');
 
@@ -66,21 +67,16 @@ class Hub {
         // onKeyUp...
         // onResize...
 
-        events.SetViewMode.subscribe(_handleSetViewMode);
-
-        events.DisplayBbox.subscribe(_handleDisplayBbox);
-
         events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
 
-        modeController = new ModeController();
         _viewController = new ViewController();
         _annotationController = new AnnotationController();
         _measurementController = new MeasurementController();
         _viewshedController = new ViewshedController();
 
-        _camera = new Camera();
+        camera = new Camera();
 
-        events.ChangeMode.fire(new ModeData(ModeData.VIEW));
+        commands.changeMode(new ModeData(ModeData.VIEW));
     }
 
     void _handleLayersBboxChanged(CartographicBbox box) {
@@ -90,18 +86,9 @@ class Hub {
         }
     }
 
-    void _handleSetViewMode(ViewModeData mode) {
-        cesium.setViewMode(mode.mode);
-    }
-
-    void _handleDisplayBbox(bool v) {
+    void displayBbox(bool v) {
         if (_bboxShape == null) return;
         _bboxShape.isVisible = v;
-    }
-
-    void _handleDisplayLayer(DisplayLayerData data) {
-        assert(data.layer != null);
-        data.layer.visible = data.visible;
     }
 
     static void error(String text, {Map<String, dynamic> info: null, Object object: null}) {

@@ -23,17 +23,17 @@ class RialtoElement {
 
         querySelector(
                 "#homeWorldButton").onClick.listen(
-                        (ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.WORLDVIEW_MODE)));
+                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraData.WORLDVIEW_MODE)));
         querySelector(
                 "#homeDataButton").onClick.listen(
-                        (ev) => _hub.events.UpdateCamera.fire(new CameraData.fromMode(CameraData.DATAVIEW_MODE)));
+                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraData.DATAVIEW_MODE)));
 
         var modeButton2D = querySelector("#modeButton2D");
         var modeButton25D = querySelector("#modeButton25D");
         var modeButton3D = querySelector("#modeButton3D");
-        modeButton2D.onClick.listen((ev) => _hub.events.SetViewMode.fire(new ViewModeData(0)));
-        modeButton25D.onClick.listen((ev) => _hub.events.SetViewMode.fire(new ViewModeData(1)));
-        modeButton3D.onClick.listen((ev) => _hub.events.SetViewMode.fire(new ViewModeData(2)));
+        modeButton2D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(0)));
+        modeButton25D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(1)));
+        modeButton3D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(2)));
 
         _modalButtons = new ModalButtonsVM({
             querySelector("#viewModeButton"): new ModeData(ModeData.VIEW),

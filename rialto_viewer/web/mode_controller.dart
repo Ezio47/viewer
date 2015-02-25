@@ -14,12 +14,12 @@ class ModeController {
     ModeController()
             : _hub = Hub.root,
               _modes = new Map<int, IController>(),
-              _currentMode = null {
-        _hub.events.ChangeMode.subscribe(_handleChangeMode);
-    }
+              _currentMode = null;
 
-    void _handleChangeMode(ModeData ev) {
-        if (!_modes.containsKey(ev.type)) return;
+    Future doChangeMode(ModeData ev) {
+        if (!_modes.containsKey(ev.type)) {
+            return new Future((){});
+        }
 
         if (_currentMode != null) {
             var type = _lookupType(_currentMode);
@@ -33,6 +33,8 @@ class ModeController {
         log("starting mode ${ModeData.name[ev.type]}");
         _currentMode.isRunning = true;
         _currentMode.startMode();
+
+        return new Future((){});
     }
 
     bool isEnabled(IController thing) => (_currentMode == thing);

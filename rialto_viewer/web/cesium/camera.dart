@@ -21,7 +21,6 @@ class Camera {
 
     Camera() {
         _hub = Hub.root;
-        _hub.events.UpdateCamera.subscribe(_handleUpdateCamera);
         _hub.events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
 
     }
@@ -45,7 +44,7 @@ class Camera {
         _defaultCameraEyePosition = new Cartographic3(centerLon, centerLat, h);
     }
 
-    void _handleUpdateCamera(CameraData data) {
+    Future doUpdateCamera(CameraData data) {
         assert(data != null);
 
         switch (data.viewMode) {
@@ -57,7 +56,7 @@ class Camera {
                 break;
             case CameraData.WORLDVIEW_MODE:
                 _hub.cesium.goHome();
-                return;
+                return new Future((){});
             case CameraData.DATAVIEW_MODE:
                 _eyePosition = _defaultCameraEyePosition;
                 _targetPosition = _defaultTargetPosition;
@@ -69,5 +68,7 @@ class Camera {
         }
 
         _hub.cesium.lookAt(_eyePosition, _targetPosition, _upDirection, _cameraFov);
+
+        return new Future((){});
     }
 }

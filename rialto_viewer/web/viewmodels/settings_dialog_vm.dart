@@ -26,7 +26,7 @@ class SettingsDialogVM extends DialogVM {
     SettingsDialogVM(String id) : super(id) {
 
         _hub = Hub.root;
-        _hub.events.DisplayBbox.subscribe((v) => _bboxChecked = v);
+        _hub.events.DisplayBboxUpdate.subscribe((v) => _bboxChecked = v);
         _bboxChecked = false;
 
         _eyeLon = new TextInputVM("#advancedSettingsDialog_eyeLon", "0.0");
@@ -120,12 +120,12 @@ class SettingsDialogVM extends DialogVM {
         Cartesian3 up = new Cartesian3(upX, upY, upZ);
 
         var data = new CameraData(eye, target, up, fov);
-        _hub.events.UpdateCamera.fire(data);
+        _hub.commands.updateCamera(data);
     }
 
     void _performBboxWork() {
         if (_bboxEnabled.changed) {
-            _hub.events.DisplayBbox.fire(_bboxEnabled.value);
+            _hub.events.DisplayBboxUpdate.fire(_bboxEnabled.value);
         }
     }
 }

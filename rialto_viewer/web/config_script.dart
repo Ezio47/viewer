@@ -115,14 +115,14 @@ class ConfigScript {
         double fov = data["fov"].toDouble();
 
         var cameraData = new CameraData(eye, target, up, fov);
-        _hub.events.UpdateCamera.fire(cameraData);
+        _hub.commands.updateCamera(cameraData);
 
         return new Future((){});
     }
 
     Future _doCommand_display(Map data) {
         if (data.containsKey("bbox")) {
-            _hub.events.DisplayBbox.fire(data["bbox"]);
+            _hub.commands.displayBbox(data["bbox"]);
         }
         if (data.containsKey("colorize")) {
             Map colorizeData = data["colorize"];

@@ -28,19 +28,12 @@ class EventRegistry {
 
     SignalFunctions<Vector3> MouseGeoCoords = new SignalFunctions<Vector3>();
 
-    SignalFunctions<bool> DisplayBbox = new SignalFunctions<bool>();
-
-    SignalFunctions<DisplayLayerData> DisplayLayer = new SignalFunctions<DisplayLayerData>();
-
-    SignalFunctions<CameraData> UpdateCamera = new SignalFunctions<CameraData>();
-    SignalFunctions<ViewModeData> SetViewMode = new SignalFunctions<ViewModeData>();
+    SignalFunctions<bool> DisplayBboxUpdate = new SignalFunctions<bool>();
 
     SignalFunctions<Layer> AddLayerCompleted = new SignalFunctions<Layer>();
     SignalFunctions<Layer> AddAllLayersCompleted = new SignalFunctions<Layer>();
     SignalFunctions<String> RemoveLayerCompleted = new SignalFunctions<String>();
     SignalFunctions RemoveAllLayersCompleted = new SignalFunctions();
-
-    SignalFunctions<ModeData> ChangeMode = new SignalFunctions();
 
     SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();
 

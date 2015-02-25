@@ -44,6 +44,6 @@ class ModalButtonsVM {
 
         assert(modeData != null);
 
-        _hub.events.ChangeMode.fire(modeData);
+        _hub.commands.changeMode(modeData);
     }
 }
