@@ -5,6 +5,10 @@
         path: /tiles/tiledserp18
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
+    bingbong:
+        type: base_imagery
+        server: BING
+        path: notused
 
 
 - camera:

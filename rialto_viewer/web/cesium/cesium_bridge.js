@@ -4,7 +4,6 @@
 
 
 var CesiumBridge = function (element) {
-    Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
     var options = {
         animation: false,
@@ -26,6 +25,19 @@ var CesiumBridge = function (element) {
 
     this.viewer.cesiumWidget.creditContainer.className = "";
 
+    this.createBingImageryProvider = function(apiKey) {
+        var provider = new Cesium.BingMapsImageryProvider({
+            url : '//dev.virtualearth.net',
+            key : apiKey,
+            mapStyle : Cesium.BingMapsStyle.AERIAL
+        });
+
+        return provider;
+    }
+
+    this.addImageryProvider = function(provider) {
+        this.viewer.imageryLayers.addImageryProvider(provider);
+    }
 
     // 0=3D, 1=2.5D, 2=2D
     this.setViewMode = function(m) {

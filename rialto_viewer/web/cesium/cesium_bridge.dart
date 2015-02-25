@@ -13,6 +13,14 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    dynamic createBingImageryProvider(String apiKey) {
+        return _bridge.callMethod('createBingImageryProvider', [apiKey]);
+    }
+
+    void addImageryProvider(dynamic provider) {
+        return _bridge.callMethod('addImageryProvider', [provider]);
+    }
+
     void setViewMode(int m) {
         _bridge.callMethod('setViewMode', [m]);
     }
