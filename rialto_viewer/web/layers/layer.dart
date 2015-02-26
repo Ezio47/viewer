@@ -9,8 +9,7 @@ abstract class Layer {
     final Hub _hub;
 
     final String name;
-    final String server;
-    final String path;
+    final Uri uri;
     final String description;
 
     bool _visible;
@@ -18,8 +17,7 @@ abstract class Layer {
 
     Layer(String this.name, Map map)
             : _hub = Hub.root,
-              server = YamlUtils.getRequiredSettingAsString(map, "server"),
-              path = YamlUtils.getRequiredSettingAsString(map, "path"),
+              uri = YamlUtils.getRequiredSettingAsUri(map, "url"),
               description = YamlUtils.getOptionalSettingAsString(map, "description"),
               _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
 

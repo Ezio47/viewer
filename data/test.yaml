@@ -1,14 +1,14 @@
 - layers:
     tiledserp:
         type: pointcloud   # always tiled
-        server: http://localhost:12345/file
-        path: /tiles/tiledserp18
+        url: http://localhost:12345/file/tiles/tiledserp18
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
     bingbong:
         type: base_imagery
-        server: BING
-        path: notused
+        url: BING
+        bingStyle: Aerial # AerialWithLabels, CollinsBart???, OrdnanceSurvey, Road
+        bingApiKey: ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf
 
 
 - camera:

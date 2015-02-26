@@ -4,18 +4,30 @@
 
 part of rialto.viewer;
 
-
 class BaseImageryLayer extends Layer {
-    static const String defaultBingKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
     dynamic _provider;
-    String apiKey;
+
+    static const int _SourceInvalid = 0;
+    static const int _SourceBing = 1;
+    int source;
+
+    static final _bingStyles = ['Aerial', 'AerialWithLabels', 'CollinsBart', 'OrdnanceSurvey', 'Road'];
+    static const String _bingDefaultStyle = 'Aerial';
+    String _bingStyle = 'Aerial';
+    static const _defaultBingKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
+    String _bingApiKey;
 
     BaseImageryLayer(String name, Map map)
             : super(name, map),
-            apiKey = YamlUtils.getOptionalSettingAsString(map, "apiKey", defaultBingKey) {
+              _bingApiKey = YamlUtils.getOptionalSettingAsString(map, "bingApiKey", _defaultBingKey),
+              _bingStyle = YamlUtils.getOptionalSettingAsString(map, "bingStyle", _bingDefaultStyle) {
 
-        if (server == "BING") {
+        if (uri.toString() == "BING") {
+            source = _SourceBing;
+            if (!_bingStyles.contains(_bingStyle)) {
+                throw new ArgumentError("invalid bing style");
+            }
 
         } else {
             throw new ArgumentError("invalid base image layer type");
@@ -25,9 +37,17 @@ class BaseImageryLayer extends Layer {
     @override
     Future<bool> load() {
 
-        _provider = _hub.cesium.createBingImageryProvider(apiKey);
-        _hub.cesium.addImageryProvider(_provider);
+        switch (source) {
 
-        return new Future((){});
+            case _SourceBing:
+                _provider = _hub.cesium.createBingImageryProvider(_bingApiKey, _bingStyle);
+                _hub.cesium.addImageryProvider(_provider);
+                break;
+
+            default:
+                throw new ArgumentError("inbalid base imagery source");
+        }
+
+        return new Future(() {});
     }
 }

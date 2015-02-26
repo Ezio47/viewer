@@ -20,7 +20,7 @@ class PointCloudLayer extends Layer {
     Future<bool> load() {
         Completer c = new Completer();
 
-        _hub.cesium.createTileProviderAsync(server + path, colorizeRamp, colorizeDimension, visible).then((provider) {
+        _hub.cesium.createTileProviderAsync(uri.toString(), colorizeRamp, colorizeDimension, visible).then((provider) {
             _provider = provider;
 
             numPoints = _hub.cesium.getNumPointsFromProvider(_provider);

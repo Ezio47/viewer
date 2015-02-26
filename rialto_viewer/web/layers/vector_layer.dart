@@ -10,16 +10,14 @@ class VectorLayer extends Layer {
 
     VectorLayer(String name, Map map)
             : super(name, map) {
-        log("New vector layer: $name .. $server .. $path");
+        log("New vector layer: $name .. $uri");
     }
 
     @override
     Future<bool> load() {
         Completer c = new Completer();
 
-        dataSource = _hub.cesium.addGeoJson(server + path);
-        //dataSource = _hub.cesium.addGeoJson('http://localhost:12345/poly.json');
-        //_hub.cesium.addGeoJson('http://localhost:12345/mpg.json');
+        dataSource = _hub.cesium.addGeoJson(uri.toString());
 
         // TODO: set visibility
         // TODO: set bbox
