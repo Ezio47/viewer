@@ -41,6 +41,12 @@ class YamlUtils {
     static String getOptionalSettingAsString(Map map, String key, [String defalt = null]) =>
             _getOptionalSettingAsType(map, key, _stringType, defalt);
 
+    static Uri getOptionalSettingAsUri(Map map, String key, [String defalt = null]) {
+        String s = getOptionalSettingAsString(map, key, defalt);
+        var u = Uri.parse(s);
+        return u;
+    }
+
     static int getOptionalSettingAsInt(Map map, String key, [int defalt = 0]) =>
             _getOptionalSettingAsType(map, key, _intType, defalt);
 

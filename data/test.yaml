@@ -25,5 +25,5 @@
 
 - wps:
     proxy: http://localhost:12345/proxy?xyzzy=
-    server: http://localhost:12348/geoserver/ows
+    url: http://localhost:12348/geoserver/ows
     description: "la la la"

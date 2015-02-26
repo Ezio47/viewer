@@ -6,13 +6,13 @@ part of rialto.viewer;
 
 class OwsService {
     final String service;
-    final String server;
-    final String proxy;
+    final Uri server;
+    final Uri proxy;
     final String description;
     Hub _hub;
     Http.Client _client;
 
-    OwsService(String this.service, String this.server, {String this.proxy, String this.description}) : _hub = Hub.root;
+    OwsService(String this.service, Uri this.server, {Uri this.proxy, String this.description}) : _hub = Hub.root;
 
     void open() {
         _client = new BHttp.BrowserClient();
@@ -31,15 +31,17 @@ class OwsService {
 
         Completer c = new Completer<Xml.XmlDocument>();
 
-        String url = Uri.encodeComponent(server + operation);
+        String s = Uri.encodeComponent(server.toString() + operation);
 
         if (proxy != null) {
-            url = proxy + url;
+            s = proxy.toString() + s;
         }
 
-        log("wps server request: $url");
+        var uri = Uri.parse(s);
 
-        var f = _client.get(url).then((response) {
+        log("wps server request: $uri");
+
+        var f = _client.get(uri).then((response) {
             String s = response.body;
             try {
                 var doc = Xml.parse(s);
@@ -59,7 +61,7 @@ class OwsService {
 
 class WpsService extends OwsService {
 
-    WpsService(String server, {String proxy, String description})
+    WpsService(Uri server, {Uri proxy, String description})
             : super("WPS", server, proxy: proxy, description: description);
 
     Future<OgcDocument> getCapabilitiesAsync() {

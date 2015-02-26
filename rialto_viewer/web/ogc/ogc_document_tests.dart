@@ -29,7 +29,9 @@ class OgcDocumentTests {
         var wpsCaps = OgcDocument.parse(wpsCapsDoc);
         log(wpsCaps);
 
-        var wps = new WpsService("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService", proxy: "http://localhost:12345/proxy?xyzzy=");
+        var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
+        var prox = Uri.parse("http://localhost:12345/proxy?xyzzy=");
+        var wps = new WpsService(uri, proxy: prox);
         wps.open();
         wps.getCapabilitiesAsync().then((doc) { assert(doc is Ogc_Capabilities); });
         wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is Ogc_ProcessDescription); });
