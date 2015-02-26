@@ -75,8 +75,11 @@ class Server {
             return;
         }
 
-        if (path == PROXY) {
-            String query = request.uri.queryParameters["xyzzy"];
+        if (path.startsWith(PROXY)) {
+            String query = request.uri.query;
+            print(request.uri);
+            print(path);
+            print(query);
             query = Uri.decodeComponent(query);
             Uri uri = Uri.parse(query);
             _proxyHandler(request, uri);
@@ -135,10 +138,30 @@ class Server {
 
         var cli = new HttpClient();
 
-        cli.getUrl(uri).then((HttpClientRequest request) => request.close()).then((HttpClientResponse response) {
-            response.transform(UTF8.decoder).listen((contents) {
-                c.complete(contents);
-            });
+        cli.getUrl(uri).then((HttpClientRequest request) {
+
+            headers.forEach((k, v) => request.headers.set(k, v));
+
+            return request.close();
+        }).then((HttpClientResponse response) {
+            log(response.statusCode);
+            log(response.headers);
+            if (response.headers.contentType == ContentType.BINARY) {
+                response.listen((contents) {
+                    c.complete(contents);
+                });
+            } else if (response.headers.contentType == ContentType.HTML ||
+                    response.headers.contentType == ContentType.TEXT ||
+                    response.headers.contentType == ContentType.JSON) {
+                response.transform(UTF8.decoder).listen((contents) {
+                    c.complete(contents);
+                });
+            } else {
+                log("*** UNKNOWN CONTENT TYPE: -${response.headers.contentType}-");
+                response.listen((contents) {
+                    c.complete(contents);
+                });
+            }
         });
 
         return c.future;

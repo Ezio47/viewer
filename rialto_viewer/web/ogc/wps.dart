@@ -34,7 +34,7 @@ class OwsService {
         String s = Uri.encodeComponent(server.toString() + operation);
 
         if (proxy != null) {
-            s = proxy.toString() + s;
+            s = proxy.toString() + "?" + s;
         }
 
         var uri = Uri.parse(s);

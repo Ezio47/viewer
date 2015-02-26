@@ -11,6 +11,7 @@ abstract class Layer {
     final String name;
     final Uri uri;
     final String description;
+    final String _proxy;
 
     bool _visible;
     CartographicBbox _bbox;
@@ -19,7 +20,8 @@ abstract class Layer {
             : _hub = Hub.root,
               uri = YamlUtils.getRequiredSettingAsUri(map, "url"),
               description = YamlUtils.getOptionalSettingAsString(map, "description"),
-              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true);
+              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
+              _proxy = YamlUtils.getOptionalSettingAsString(map, "proxy", null);
 
     Future<bool> load();
 
@@ -31,6 +33,7 @@ abstract class Layer {
 
     // some of the Cesium examples use URLs with the "http" part removed, so...
     static String removeScheme(String s) {
+        return s;
         if (s.startsWith("http:")) {
             s = s.substring(5);
         } else if (s.startsWith("https:")) {

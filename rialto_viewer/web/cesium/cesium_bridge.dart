@@ -13,23 +13,26 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    dynamic addSingleTileImageryProvider(String url, List<num> rectList) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRect', [rectList[0], rectList[1], rectList[2], rectList[3]]);
-        var provider = _bridge.callMethod('newSingleTileImageryProvider', [url, rect]);
+    dynamic addSingleTileImageryProvider(String url, List<num> rectList, String proxyUrl) {
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangle', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
+        var provider = _bridge.callMethod('newSingleTileImageryProvider', [url, rect, proxy]);
         _bridge.callMethod('addImageryProvider', [provider]);
         return provider;
     }
 
-    dynamic addWebMapServiceImageryProvider(String url, String layers, List<num> rectList) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRect', [rectList[0], rectList[1], rectList[2], rectList[3]]);
-        var provider = _bridge.callMethod('newWebMapServiceImageryProvider', [url, layers, rect]);
+    dynamic addWebMapServiceImageryProvider(String url, String layers, List<num> rectList, String proxyUrl) {
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangle', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
+        var provider = _bridge.callMethod('newWebMapServiceImageryProvider', [url, layers, rect, proxy]);
         _bridge.callMethod('addImageryProvider', [provider]);
         return provider;
     }
 
-    dynamic addTileMapServiceImageryProvider(String url, List<num> rectList, int maximumLevel) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRect', [rectList[0], rectList[1], rectList[2], rectList[3]]);
-        var provider = _bridge.callMethod('newTileMapServiceImageryProvider', [url, rect, maximumLevel]);
+    dynamic addTileMapServiceImageryProvider(String url, List<num> rectList, int maximumLevel, String proxyUrl) {
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangle', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
+        var provider = _bridge.callMethod('newTileMapServiceImageryProvider', [url, rect, maximumLevel, proxy]);
         _bridge.callMethod('addImageryProvider', [provider]);
         return provider;
     }

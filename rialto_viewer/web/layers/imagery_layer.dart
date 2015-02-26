@@ -25,7 +25,7 @@ class SingleImageryLayer extends ImageryLayer {
     @override
     Future<bool> load() {
         String url = Layer.removeScheme(_url.toString());
-        _provider = _hub.cesium.addSingleTileImageryProvider(url, _rect);
+        _provider = _hub.cesium.addSingleTileImageryProvider(url, _rect, _proxy);
         return new Future(() {});
     }
 }
@@ -41,7 +41,7 @@ class WmsImageryLayer extends ImageryLayer {
     @override
     Future<bool> load() {
         String url = Layer.removeScheme(_url.toString());
-        _provider = _hub.cesium.addWebMapServiceImageryProvider(url, _layers, _rect);
+        _provider = _hub.cesium.addWebMapServiceImageryProvider(url, _layers, _rect, _proxy);
         return new Future(() {});
     }
 }
@@ -58,7 +58,7 @@ class WtmsImageryLayer extends ImageryLayer {
     @override
     Future<bool> load() {
         String url = Layer.removeScheme(_url.toString());
-        _provider = _hub.cesium.addTileMapServiceImageryProvider(url, _rect, _maximumLevel);
+        _provider = _hub.cesium.addTileMapServiceImageryProvider(url, _rect, _maximumLevel, _proxy);
         return new Future(() {});
     }
 }

@@ -4,6 +4,7 @@
 
 
 var CesiumBridge = function (element) {
+    var _proxy;
 
     Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
@@ -31,33 +32,47 @@ var CesiumBridge = function (element) {
     this.viewer.imageryLayers.removeAll();
 
 
-    this.newRect = function (w, s, e, n) {
-        var rect = new Cesium.Rect(w, s, e, n);
+    this.createProxy = function (url) {
+        _proxy = new Object();
+        _proxy._url = url;
+        _proxy.getURL = function (resource) {
+            return _proxy._url + '?' + encodeURIComponent(resource);
+        }
+
+        return _proxy;
+    }
+
+    this.newRectangle = function (w, s, e, n) {
+        var rect = new Cesium.Rectangle(w, s, e, n);
         return rect;
     }
 
-    this.newSingleTileImageryProvider = function (url, rect) {
+    this.newSingleTileImageryProvider = function (url, rect, proxy) {
         var options = {
             url: url,
-            rect: rect == null ? undefined : rect
+            rect: rect == null ? undefined : rect,
+            proxy: proxy == null ? undefined : proxy
         };
         return new Cesium.SingleTileImageryProvider(options);
     }
 
-    this.newWebMapServiceImageryProvider = function (url, layers, rect) {
+    this.newWebMapServiceImageryProvider = function (url, layers, rect, proxy) {
         var options = {
             url: url,
             layers: layers,
-            rect: rect == null ? undefined : rect
+            rect: rect == null ? undefined : rect,
+            proxy: proxy == null ? undefined : proxy
         };
+        myassert(proxy != null);
         return new Cesium.WebMapServiceImageryProvider(options);
     }
 
-    this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel) {
+    this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel, proxy) {
         var options = {
             url: url,
             rect: rect == null ? undefined : rect,
-            maximumLevel: maximumLevel
+            maximumLevel: maximumLevel,
+            proxy: proxy == null ? undefined : proxy
         };
         return new Cesium.TileMapServiceImageryProvider(options);
     }
@@ -100,7 +115,6 @@ var CesiumBridge = function (element) {
     this.setArcGisBaseTerrainProvider = function (apiKey) {
         var provider = new Cesium.ArcGisImageServerTerrainProvider({
             url : '//elevation.arcgisonline.com/ArcGIS/rest/services/WorldElevation/DTMEllipsoidal/ImageServer',
-            proxy : new Cesium.DefaultProxy('/terrain/'),
             token : apiKey
         });
         this.viewer.terrainProvider = provider;

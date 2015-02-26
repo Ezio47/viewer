@@ -30,7 +30,7 @@ class OgcDocumentTests {
         log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
-        var prox = Uri.parse("http://localhost:12345/proxy?xyzzy=");
+        var prox = Uri.parse("http://localhost:12345/proxy");
         var wps = new WpsService(uri, proxy: prox);
         wps.open();
         wps.getCapabilitiesAsync().then((doc) { assert(doc is Ogc_Capabilities); });
