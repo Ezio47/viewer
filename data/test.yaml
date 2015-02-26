@@ -2,13 +2,21 @@
     tiledserp:
         type: pointcloud
         url: http://localhost:12345/file/tiles/tiledserp18
-    bingbong:
-        type: base_imagery
-        url: BING
-        bingStyle: Aerial
-    terrain:
-        type: terrain
-        url: http://cesiumjs.org/stk-terrain/tilesets/world/tiles
+#    bingbong:
+#        type: base_imagery
+#        url: BING
+#        bingStyle: Aerial
+
+    x:
+        type: wms_imagery
+        url: //server.arcgisonline.com/arcgis/rest/services/Reference/World_Boundaries_and_Places/MapServer/WMSServer
+        layers: 0
+        rect:  [ -2.0037507067161843E7,  -3.024097145838628E7, 2.0037507067161843E7, 3.0240971458386235E7 ] # w, s, e, n
+
+#    y:
+#        type: wtms_imagery
+#        url: //cesiumjs.org/blackmarble
+#        maximumLevel : 8
 
 - camera:
     eye: [-83.43271, 39.02617, 50.0]
@@ -21,8 +29,3 @@
     colorize:
         ramp: Spectral
         dimension: Z
-
-- wps:
-    proxy: http://localhost:12345/proxy?xyzzy=
-    url: http://localhost:12348/geoserver/ows
-    description: "la la la"

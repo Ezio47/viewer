@@ -31,10 +31,10 @@ final Map tests = {
 void main() {
     var hub = new Hub();
 
-    OgcDocumentTests.test();
+    //OgcDocumentTests.test();
 
     try {
-        String s = "http://localhost:12345/file/" + tests[17];
+        String s = "http://localhost:12345/file/" + tests[0];
         var uri = Uri.parse(s);
         hub.commands.loadScript(uri);
     } catch (e) {

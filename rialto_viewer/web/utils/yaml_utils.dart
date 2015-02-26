@@ -10,11 +10,17 @@ class YamlUtils {
     static final Type _intType = (0).runtimeType;
     static final Type _boolType = (false).runtimeType;
     static final Type _doubleType = (0.0).runtimeType;
+    static final Type _list4Type = [4].runtimeType;
 
     static dynamic _getRequiredSettingAsType(Map map, String key, Type type) {
         if (!map.containsKey(key)) {
             throw new ArgumentError("required setting '$key' not found");
         }
+
+//        if (type == _stringType && map[key].runtimeType != type) {
+//            return map[key].toString();
+//        }
+
         assert(map[key].runtimeType == type);
         return map[key];
     }
@@ -46,6 +52,9 @@ class YamlUtils {
         var u = Uri.parse(s);
         return u;
     }
+
+    static List<num> getOptionalSettingAsList4(Map map, String key, [List<num> defalt = null]) =>
+            _getOptionalSettingAsType(map, key, _list4Type, defalt);
 
     static int getOptionalSettingAsInt(Map map, String key, [int defalt = 0]) =>
             _getOptionalSettingAsType(map, key, _intType, defalt);

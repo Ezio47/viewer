@@ -31,6 +31,38 @@ var CesiumBridge = function (element) {
     this.viewer.imageryLayers.removeAll();
 
 
+    this.newRect = function (w, s, e, n) {
+        var rect = new Cesium.Rect(w, s, e, n);
+        return rect;
+    }
+
+    this.newSingleTileImageryProvider = function (url, rect) {
+        var options = {
+            url: url,
+            rect: rect == null ? undefined : rect
+        };
+        return new Cesium.SingleTileImageryProvider(options);
+    }
+
+    this.newWebMapServiceImageryProvider = function (url, layers, rect) {
+        var options = {
+            url: url,
+            layers: layers,
+            rect: rect == null ? undefined : rect
+        };
+        return new Cesium.WebMapServiceImageryProvider(options);
+    }
+
+    this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel) {
+        var options = {
+            url: url,
+            rect: rect == null ? undefined : rect,
+            maximumLevel: maximumLevel
+        };
+        return new Cesium.TileMapServiceImageryProvider(options);
+    }
+
+
     this.setCesiumTerrainProvider = function (url) {
         var provider = new Cesium.CesiumTerrainProvider({
             url: url,

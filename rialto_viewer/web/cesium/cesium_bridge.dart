@@ -13,6 +13,27 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    dynamic addSingleTileImageryProvider(String url, List<num> rectList) {
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRect', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var provider = _bridge.callMethod('newSingleTileImageryProvider', [url, rect]);
+        _bridge.callMethod('addImageryProvider', [provider]);
+        return provider;
+    }
+
+    dynamic addWebMapServiceImageryProvider(String url, String layers, List<num> rectList) {
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRect', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var provider = _bridge.callMethod('newWebMapServiceImageryProvider', [url, layers, rect]);
+        _bridge.callMethod('addImageryProvider', [provider]);
+        return provider;
+    }
+
+    dynamic addTileMapServiceImageryProvider(String url, List<num> rectList, int maximumLevel) {
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRect', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var provider = _bridge.callMethod('newTileMapServiceImageryProvider', [url, rect, maximumLevel]);
+        _bridge.callMethod('addImageryProvider', [provider]);
+        return provider;
+    }
+
     dynamic setCesiumTerrainProvider(String url) {
         return _bridge.callMethod('setCesiumTerrainProvider', [url]);
     }
@@ -30,7 +51,7 @@ class CesiumBridge {
     }
 
     void addImageryProvider(dynamic provider) {
-        return _bridge.callMethod('addImageryProvider', [provider]);
+        _bridge.callMethod('addImageryProvider', [provider]);
     }
 
     dynamic setEllipsoidBaseTerrainProvider() {

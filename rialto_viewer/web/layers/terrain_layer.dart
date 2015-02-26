@@ -18,11 +18,7 @@ class TerrainLayer extends Layer {
     Future<bool> load() {
 
         String s = _url.toString();
-        if (s.startsWith("http:")) {
-            s = s.substring(5);
-        } else if (s.startsWith("https:")) {
-                s = s.substring(6);
-        }
+        s = Layer.removeScheme(s);
         _provider = _hub.cesium.setCesiumTerrainProvider(s);
 
         return new Future(() {});

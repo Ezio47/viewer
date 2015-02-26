@@ -101,8 +101,14 @@ class LayerManager {
             case "base_terrain":
                 layer = new BaseTerrainLayer(name, map);
                 break;
-            case "imagery":
-                layer = new ImageryLayer(name, map);
+            case "wms_imagery":
+                layer = new WmsImageryLayer(name, map);
+                break;
+            case "wtms_imagery":
+                layer = new WtmsImageryLayer(name, map);
+                break;
+            case "single_imagery":
+                layer = new SingleImageryLayer(name, map);
                 break;
             case "terrain":
                 layer = new TerrainLayer(name, map);

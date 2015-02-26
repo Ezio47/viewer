@@ -28,4 +28,14 @@ abstract class Layer {
 
     CartographicBbox get bbox => _bbox;
     set bbox(CartographicBbox bbox) => _bbox = bbox;
+
+    // some of the Cesium examples use URLs with the "http" part removed, so...
+    static String removeScheme(String s) {
+        if (s.startsWith("http:")) {
+            s = s.substring(5);
+        } else if (s.startsWith("https:")) {
+                s = s.substring(6);
+        }
+        return s;
+    }
 }
