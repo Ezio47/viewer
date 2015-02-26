@@ -10,6 +10,8 @@ class BaseImageryLayer extends Layer {
 
     static const int _SourceInvalid = 0;
     static const int _SourceBing = 1;
+    static const int _SourceArcGis = 2;
+    static const int _SourceOsm = 3;
     int source;
 
     static final _bingStyles = ['Aerial', 'AerialWithLabels', 'CollinsBart', 'OrdnanceSurvey', 'Road'];
@@ -29,6 +31,12 @@ class BaseImageryLayer extends Layer {
                 throw new ArgumentError("invalid bing style");
             }
 
+        } else if (uri.toString() == "ARCGIS") {
+                source = _SourceArcGis;
+
+        } else if (uri.toString() == "OSM") {
+                source = _SourceOsm;
+
         } else {
             throw new ArgumentError("invalid base image layer type");
         }
@@ -41,6 +49,16 @@ class BaseImageryLayer extends Layer {
 
             case _SourceBing:
                 _provider = _hub.cesium.createBingImageryProvider(_bingApiKey, _bingStyle);
+                _hub.cesium.addImageryProvider(_provider);
+                break;
+
+            case _SourceArcGis:
+                _provider = _hub.cesium.createArcGisImageryProvider();
+                _hub.cesium.addImageryProvider(_provider);
+                break;
+
+            case _SourceOsm:
+                _provider = _hub.cesium.createOsmImageryProvider();
                 _hub.cesium.addImageryProvider(_provider);
                 break;
 

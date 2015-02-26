@@ -17,6 +17,14 @@ class CesiumBridge {
         return _bridge.callMethod('createBingImageryProvider', [apiKey, style]);
     }
 
+    dynamic createArcGisImageryProvider() {
+        return _bridge.callMethod('createArcGisImageryProvider', []);
+    }
+
+    dynamic createOsmImageryProvider() {
+        return _bridge.callMethod('createOsmImageryProvider', []);
+    }
+
     void addImageryProvider(dynamic provider) {
         return _bridge.callMethod('addImageryProvider', [provider]);
     }

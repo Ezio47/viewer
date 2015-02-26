@@ -4,12 +4,17 @@
         url: http://localhost:12345/file/tiles/tiledserp18
         description: "foor bar yow"  # optional, default=""
         visible: true       # optional, default=true
-    bingbong:
+    #bingbong:
+     #   type: base_imagery
+      #  url: BING
+       # bingStyle: Aerial # AerialWithLabels, CollinsBart???, OrdnanceSurvey, Road
+        #bingApiKey: ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf
+    #esri:
+     #   type: base_imagery
+      #  url: ARCGIS
+    oossmm:
         type: base_imagery
-        url: BING
-        bingStyle: Aerial # AerialWithLabels, CollinsBart???, OrdnanceSurvey, Road
-        bingApiKey: ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf
-
+        url: OSM
 
 - camera:
     eye: [-83.43271, 39.02617, 50.0]

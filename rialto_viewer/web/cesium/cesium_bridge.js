@@ -42,6 +42,20 @@ var CesiumBridge = function (element) {
         return provider;
     }
 
+    this.createOsmImageryProvider = function() {
+        var provider = new Cesium.OpenStreetMapImageryProvider({});
+
+        return provider;
+    }
+
+    this.createArcGisImageryProvider = function() {
+        var provider = new Cesium.ArcGisMapServerImageryProvider({
+            url: '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        });
+
+        return provider;
+    }
+
     this.addImageryProvider = function(provider) {
         this.viewer.imageryLayers.addImageryProvider(provider);
     }
