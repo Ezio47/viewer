@@ -16,6 +16,27 @@
         type: base_imagery
         url: OSM
 
+    #ellip_terrain:
+     #   type: base_terrain
+      #  url: ELLIPSOID
+
+    #cesium_terrain:
+     #   type: base_terrain
+      #  url: CESIUM_SMALL
+
+#    cesium_terrain:
+ #       type: base_terrain
+  #      url: CESIUM_STK
+
+    vr_terrain:
+        type: base_terrain
+        url: VR_THEWORLD
+
+    #arcgis_terrain:
+     #   type: base_terrain
+      #  url: ARCGIS
+       # arcGisApiKey: KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..
+
 - camera:
     eye: [-83.43271, 39.02617, 50.0]
     target: [-83.43271, 39.02617, 0]

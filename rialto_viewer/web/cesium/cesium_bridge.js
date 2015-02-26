@@ -31,6 +31,37 @@ var CesiumBridge = function (element) {
     this.viewer.imageryLayers.removeAll();
 
 
+    this.setEllipsoidBaseTerrainProvider = function () {
+        var provider = new Cesium.EllipsoidTerrainProvider();
+        this.viewer.terrainProvider = provider;
+    }
+
+    this.setVrTheWorldBaseTerrainProvider = function (url) {
+        var provider = new Cesium.VRTheWorldTerrainProvider({
+            url: url
+        });
+        this.viewer.terrainProvider = provider;
+    }
+
+    this.setCesiumBaseTerrainProvider = function (url, credit) {
+        if (credit == null) {
+            credit = undefined;
+        }
+        var provider = new Cesium.CesiumTerrainProvider({
+            url: url,
+            credit: credit
+        });
+        this.viewer.terrainProvider = provider;
+    }
+
+    this.setArcGisBaseTerrainProvider = function (apiKey) {
+        var provider = new Cesium.ArcGisImageServerTerrainProvider({
+            url : '//elevation.arcgisonline.com/ArcGIS/rest/services/WorldElevation/DTMEllipsoidal/ImageServer',
+            proxy : new Cesium.DefaultProxy('/terrain/'),
+            token : apiKey
+        });
+        this.viewer.terrainProvider = provider;
+    }
 
     this.createBingImageryProvider = function(apiKey, style) {
         var provider = new Cesium.BingMapsImageryProvider({

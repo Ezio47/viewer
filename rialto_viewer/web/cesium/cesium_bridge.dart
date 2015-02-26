@@ -29,6 +29,22 @@ class CesiumBridge {
         return _bridge.callMethod('addImageryProvider', [provider]);
     }
 
+    void setEllipsoidBaseTerrainProvider() {
+        return _bridge.callMethod('setEllipsoidBaseTerrainProvider', []);
+    }
+
+    void setVrTheWorldBaseTerrainProvider(String url) {
+        return _bridge.callMethod('setVrTheWorldBaseTerrainProvider', [url]);
+    }
+
+    void setCesiumBaseTerrainProvider(String url, String credit) {
+        return _bridge.callMethod('setCesiumBaseTerrainProvider', [url, credit]);
+    }
+
+    void setArcGisBaseTerrainProvider(apiKey) {
+        return _bridge.callMethod('setArcGisBaseTerrainProvider', [apiKey]);
+    }
+
     void setViewMode(int m) {
         _bridge.callMethod('setViewMode', [m]);
     }
