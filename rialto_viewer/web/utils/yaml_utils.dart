@@ -13,7 +13,7 @@ class YamlUtils {
 
     static dynamic _getRequiredSettingAsType(Map map, String key, Type type) {
         if (!map.containsKey(key)) {
-            throw new Exception();
+            throw new ArgumentError("required setting '$key' not found");
         }
         assert(map[key].runtimeType == type);
         return map[key];

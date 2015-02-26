@@ -1,0 +1,4 @@
+- layers:
+    esri:
+        type: base_imagery
+        url: ARCGIS

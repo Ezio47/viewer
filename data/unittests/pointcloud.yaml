@@ -1,11 +1,9 @@
 - layers:
     tiledserp:
-        type: pointcloud
+        type: pointcloud   # always tiled
         url: http://localhost:12345/file/tiles/tiledserp18
-    bingbong:
-        type: base_imagery
-        url: BING
-        bingStyle: Aerial
+        description: "foor bar yow"  # optional, default=""
+        visible: true       # optional, default=true
 
 - camera:
     eye: [-83.43271, 39.02617, 50.0]
@@ -18,8 +16,3 @@
     colorize:
         ramp: Spectral
         dimension: Z
-
-- wps:
-    proxy: http://localhost:12345/proxy?xyzzy=
-    url: http://localhost:12348/geoserver/ows
-    description: "la la la"

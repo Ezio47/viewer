@@ -30,8 +30,9 @@ class InitScriptDialogVM extends DialogVM {
     void _hide(bool okay) {
         if (!okay) return;
 
-        var url = _serverName.value + _scriptName.value;
-        _hub.commands.loadScript(url);
+        var s = _serverName.value + _scriptName.value;
+        var u = Uri.parse(s);
+        _hub.commands.loadScript(u);
     }
 
     void _selectHandler(var e) {

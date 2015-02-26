@@ -7,9 +7,9 @@ part of rialto.viewer;
 
 class ConfigScript {
     Hub _hub;
-    final String _url;
+    final Uri _url;
 
-    ConfigScript(String this._url) :
+    ConfigScript(Uri this._url) :
         _hub = Hub.root;
 
     Future<List<dynamic>> run() {

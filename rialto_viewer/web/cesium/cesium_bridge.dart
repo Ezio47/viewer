@@ -13,35 +13,35 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
-    dynamic createBingImageryProvider(String apiKey, String style) {
-        return _bridge.callMethod('createBingImageryProvider', [apiKey, style]);
+    dynamic setBingBaseImageryProvider(String apiKey, String style) {
+        return _bridge.callMethod('setBingBaseImageryProvider', [apiKey, style]);
     }
 
-    dynamic createArcGisImageryProvider() {
-        return _bridge.callMethod('createArcGisImageryProvider', []);
+    dynamic setArcGisBaseImageryProvider() {
+        return _bridge.callMethod('setArcGisBaseImageryProvider', []);
     }
 
-    dynamic createOsmImageryProvider() {
-        return _bridge.callMethod('createOsmImageryProvider', []);
+    dynamic setOsmBaseImageryProvider() {
+        return _bridge.callMethod('setOsmBaseImageryProvider', []);
     }
 
     void addImageryProvider(dynamic provider) {
         return _bridge.callMethod('addImageryProvider', [provider]);
     }
 
-    void setEllipsoidBaseTerrainProvider() {
+    dynamic setEllipsoidBaseTerrainProvider() {
         return _bridge.callMethod('setEllipsoidBaseTerrainProvider', []);
     }
 
-    void setVrTheWorldBaseTerrainProvider(String url) {
+    dynamic setVrTheWorldBaseTerrainProvider(String url) {
         return _bridge.callMethod('setVrTheWorldBaseTerrainProvider', [url]);
     }
 
-    void setCesiumBaseTerrainProvider(String url, String credit) {
+    dynamic setCesiumBaseTerrainProvider(String url, String credit) {
         return _bridge.callMethod('setCesiumBaseTerrainProvider', [url, credit]);
     }
 
-    void setArcGisBaseTerrainProvider(apiKey) {
+    dynamic setArcGisBaseTerrainProvider(apiKey) {
         return _bridge.callMethod('setArcGisBaseTerrainProvider', [apiKey]);
     }
 

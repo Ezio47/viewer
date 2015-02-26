@@ -1,0 +1,13 @@
+- camera:
+    eye: [-83.43271, 39.02617, 50.0]
+    target: [-83.43271, 39.02617, 0]
+    up: [0, 0, 1]
+    fov: 60
+
+- layers:
+    tiledserp:
+        type: pointcloud
+        url: http://localhost:12345/file/tiles/tiledserp18
+    test_poly:
+        type: vector
+        url: http://localhost:12345/file/unittests/geojson/mpg.json

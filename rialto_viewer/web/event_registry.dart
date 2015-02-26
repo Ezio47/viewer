@@ -33,7 +33,7 @@ class EventRegistry {
     SignalFunctions<String> RemoveLayerCompleted = new SignalFunctions<String>();
     SignalFunctions RemoveAllLayersCompleted = new SignalFunctions();
 
-    SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();
+    SignalFunctions<Uri> LoadScriptCompleted = new SignalFunctions<Uri>();
 
     SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
 

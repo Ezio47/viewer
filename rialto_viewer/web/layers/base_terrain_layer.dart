@@ -45,27 +45,27 @@ class BaseTerrainLayer extends Layer {
         switch (source) {
 
             case _SourceEllipsoid:
-                _hub.cesium.setEllipsoidBaseTerrainProvider();
+                _provider = _hub.cesium.setEllipsoidBaseTerrainProvider();
                 break;
 
             case _SourceArcGis:
-                _hub.cesium.setArcGisBaseTerrainProvider(_arcGisApiKey);
+                _provider = _hub.cesium.setArcGisBaseTerrainProvider(_arcGisApiKey);
                 break;
 
             case _SourceCesiumSmall:
                 var url = '//cesiumjs.org/smallterrain';
                 var credit = 'Terrain data courtesy Analytical Graphics, Inc.';
-                _hub.cesium.setCesiumBaseTerrainProvider(url, credit);
+                _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, credit);
                 break;
 
             case _SourceCesiumStk:
                 var url = '//cesiumjs.org/stk-terrain/tilesets/world/tiles';
-                _hub.cesium.setCesiumBaseTerrainProvider(url, null);
+                _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, null);
                 break;
 
             case _SourceVrTheWorld:
                 var url = '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/';
-                _hub.cesium.setVrTheWorldBaseTerrainProvider(url);
+                _provider = _hub.cesium.setVrTheWorldBaseTerrainProvider(url);
                 break;
 
             default:

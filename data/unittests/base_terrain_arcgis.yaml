@@ -1,0 +1,19 @@
+# FAILS
+# ArcGis terrain doesn't work in Cesium 1.5?
+
+- camera:
+    eye: [-113.0, 35.5, 20.0]
+    target: [-113.0, 37.0, 0.0]
+    up: [0, 0, 1]
+    fov: 60
+
+- layers:
+    bing:
+        type: base_imagery
+        url: BING
+        bingStyle: AerialWithLabels
+
+    arcgis_terrain:
+        type: base_terrain
+        url: ARCGIS
+        arcGisApiKey: KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..

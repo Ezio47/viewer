@@ -2,22 +2,12 @@
     tiledserp:
         type: pointcloud
         url: http://localhost:12345/file/tiles/tiledserp18
-    bingbong:
-        type: base_imagery
-        url: BING
-        bingStyle: Aerial
 
 - camera:
     eye: [-83.43271, 39.02617, 50.0]
     target: [-83.43271, 39.02617, 0]
     up: [0, 0, 1]
     fov: 60
-
-- display:
-    bbox: true
-    colorize:
-        ramp: Spectral
-        dimension: Z
 
 - wps:
     proxy: http://localhost:12345/proxy?xyzzy=

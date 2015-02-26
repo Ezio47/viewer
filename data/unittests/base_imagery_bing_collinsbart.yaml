@@ -1,0 +1,9 @@
+# FAILS
+# CollinsBart doesn't work in Cesium 1.5?
+
+- layers:
+    bingbong:
+        type: base_imagery
+        url: BING
+        bingStyle: CollinsBart
+        bingApiKey: ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf

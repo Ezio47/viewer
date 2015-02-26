@@ -12,6 +12,11 @@ class BaseImageryLayer extends Layer {
     static const int _SourceBing = 1;
     static const int _SourceArcGis = 2;
     static const int _SourceOsm = 3;
+    static final Map<String, int> _sourceMap = {
+        'BING': _SourceBing,
+        'ARCGIS': _SourceArcGis,
+        'OSM': _SourceOsm
+    };
     int source;
 
     static final _bingStyles = ['Aerial', 'AerialWithLabels', 'CollinsBart', 'OrdnanceSurvey', 'Road'];
@@ -25,20 +30,12 @@ class BaseImageryLayer extends Layer {
               _bingApiKey = YamlUtils.getOptionalSettingAsString(map, "bingApiKey", _defaultBingKey),
               _bingStyle = YamlUtils.getOptionalSettingAsString(map, "bingStyle", _bingDefaultStyle) {
 
-        if (uri.toString() == "BING") {
-            source = _SourceBing;
-            if (!_bingStyles.contains(_bingStyle)) {
-                throw new ArgumentError("invalid bing style");
-            }
-
-        } else if (uri.toString() == "ARCGIS") {
-                source = _SourceArcGis;
-
-        } else if (uri.toString() == "OSM") {
-                source = _SourceOsm;
-
-        } else {
+        if (!_sourceMap.containsKey(uri.toString())) {
             throw new ArgumentError("invalid base image layer type");
+        }
+        source = _sourceMap[uri.toString()];
+        if (!_bingStyles.contains(_bingStyle)) {
+            throw new ArgumentError("invalid bing style");
         }
     }
 
@@ -48,18 +45,15 @@ class BaseImageryLayer extends Layer {
         switch (source) {
 
             case _SourceBing:
-                _provider = _hub.cesium.createBingImageryProvider(_bingApiKey, _bingStyle);
-                _hub.cesium.addImageryProvider(_provider);
+                _provider = _hub.cesium.setBingBaseImageryProvider(_bingApiKey, _bingStyle);
                 break;
 
             case _SourceArcGis:
-                _provider = _hub.cesium.createArcGisImageryProvider();
-                _hub.cesium.addImageryProvider(_provider);
+                _provider = _hub.cesium.setArcGisBaseImageryProvider();
                 break;
 
             case _SourceOsm:
-                _provider = _hub.cesium.createOsmImageryProvider();
-                _hub.cesium.addImageryProvider(_provider);
+                _provider = _hub.cesium.setOsmBaseImageryProvider();
                 break;
 
             default:

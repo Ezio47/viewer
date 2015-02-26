@@ -34,6 +34,7 @@ var CesiumBridge = function (element) {
     this.setEllipsoidBaseTerrainProvider = function () {
         var provider = new Cesium.EllipsoidTerrainProvider();
         this.viewer.terrainProvider = provider;
+        return provider;
     }
 
     this.setVrTheWorldBaseTerrainProvider = function (url) {
@@ -41,6 +42,7 @@ var CesiumBridge = function (element) {
             url: url
         });
         this.viewer.terrainProvider = provider;
+        return provider;
     }
 
     this.setCesiumBaseTerrainProvider = function (url, credit) {
@@ -52,6 +54,7 @@ var CesiumBridge = function (element) {
             credit: credit
         });
         this.viewer.terrainProvider = provider;
+        return provider;
     }
 
     this.setArcGisBaseTerrainProvider = function (apiKey) {
@@ -61,29 +64,30 @@ var CesiumBridge = function (element) {
             token : apiKey
         });
         this.viewer.terrainProvider = provider;
+        return provider;
     }
 
-    this.createBingImageryProvider = function(apiKey, style) {
+    this.setBingBaseImageryProvider = function(apiKey, style) {
         var provider = new Cesium.BingMapsImageryProvider({
             url : '//dev.virtualearth.net',
             key : apiKey,
             mapStyle : style
         });
-
+        this.viewer.imageryLayers.addImageryProvider(provider);
         return provider;
     }
 
-    this.createOsmImageryProvider = function() {
+    this.setOsmBaseImageryProvider = function() {
         var provider = new Cesium.OpenStreetMapImageryProvider({});
-
+        this.viewer.imageryLayers.addImageryProvider(provider);
         return provider;
     }
 
-    this.createArcGisImageryProvider = function() {
+    this.setArcGisBaseImageryProvider = function() {
         var provider = new Cesium.ArcGisMapServerImageryProvider({
             url: '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
         });
-
+        this.viewer.imageryLayers.addImageryProvider(provider);
         return provider;
     }
 

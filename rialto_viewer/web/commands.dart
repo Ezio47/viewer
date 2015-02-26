@@ -28,7 +28,7 @@ class Commands {
         return _hub.layerManager.doRemoveAllLayers();
     }
 
-    Future loadScript(String url) {
+    Future loadScript(Uri url) {
         var s = new ConfigScript(url);
         var f = s.run();
         return f;
