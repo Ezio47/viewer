@@ -13,6 +13,10 @@ class CesiumBridge {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
     }
 
+    dynamic setCesiumTerrainProvider(String url) {
+        return _bridge.callMethod('setCesiumTerrainProvider', [url]);
+    }
+
     dynamic setBingBaseImageryProvider(String apiKey, String style) {
         return _bridge.callMethod('setBingBaseImageryProvider', [apiKey, style]);
     }

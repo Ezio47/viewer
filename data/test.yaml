@@ -6,6 +6,9 @@
         type: base_imagery
         url: BING
         bingStyle: Aerial
+    terrain:
+        type: terrain
+        url: http://cesiumjs.org/stk-terrain/tilesets/world/tiles
 
 - camera:
     eye: [-83.43271, 39.02617, 50.0]

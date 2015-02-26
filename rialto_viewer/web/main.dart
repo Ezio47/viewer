@@ -5,7 +5,7 @@
 import 'dart:core';
 import 'rialto.dart';
 
-var tests = {
+final Map tests = {
     0: "test.yaml",
     1: "unittests/base_imagery_arcgis.yaml",
     2: "unittests/base_imagery_bing_aerial.yaml",
@@ -23,7 +23,8 @@ var tests = {
     14: "unittests/geojson_2.yaml",
     15: "unittests/geojson_3.yaml",
     16: "unittests/pointcloud.yaml",
-    17: "unittests/wps.yaml",
+    17: "unittests/terrain.yaml",
+    18: "unittests/wps.yaml",
 };
 
 

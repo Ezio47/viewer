@@ -31,6 +31,14 @@ var CesiumBridge = function (element) {
     this.viewer.imageryLayers.removeAll();
 
 
+    this.setCesiumTerrainProvider = function (url) {
+        var provider = new Cesium.CesiumTerrainProvider({
+            url: url,
+        });
+        this.viewer.terrainProvider = provider;
+        return provider;
+    }
+
     this.setEllipsoidBaseTerrainProvider = function () {
         var provider = new Cesium.EllipsoidTerrainProvider();
         this.viewer.terrainProvider = provider;
