@@ -7,27 +7,28 @@ import 'rialto.dart';
 
 final Map tests = {
     0: "test.yaml",
-    1: "unittests/base_imagery_arcgis.yaml",
-    2: "unittests/base_imagery_bing_aerial.yaml",
-    3: "unittests/base_imagery_bing_aeriallabels.yaml",
+    1: "unittests/base_imagery_arcgis.yaml",                // world, arcgis base image
+    2: "unittests/base_imagery_bing_aerial.yaml",           // world, bing base image
+    3: "unittests/base_imagery_bing_aeriallabels.yaml",     // world, bing base image with labels
     //4: "unittests/base_imagery_bing_collinsbart.yaml",
     //5: "unittests/base_imagery_bing_ordnancesurvey.yaml",
-    6: "unittests/base_imagery_bing_road.yaml",
-    7: "unittests/base_imagery_osm.yaml",
+    6: "unittests/base_imagery_bing_road.yaml",             // world, bing base vectors
+    7: "unittests/base_imagery_osm.yaml",                   // world, osm base vectors
     //8: "unittests/base_terrain_arcgis.yaml",
-    9: "unittests/base_terrain_cesium_small.yaml",
-    10: "unittests/base_terrain_cesium_stk.yaml",
-    11: "unittests/base_terrain_ellipsoid.yaml",
-    12: "unittests/base_terrain_vrtheworld.yaml",
-    13: "unittests/geojson_1.yaml",
-    14: "unittests/geojson_2.yaml",
-    15: "unittests/geojson_3.yaml",
-    16: "unittests/pointcloud.yaml",
-    17: "unittests/single_imagery.yaml",
-    18: "unittests/terrain.yaml",
-    19: "unittests/wms_imagery.yaml",
-    20: "unittests/wps.yaml",
-    21: "unittests/wtms_imagery.yaml",
+    9: "unittests/base_terrain_cesium_small.yaml",          // grand canyon, base image with terrain
+    10: "unittests/base_terrain_cesium_stk.yaml",           // grand canyon, base image with terrain
+    11: "unittests/base_terrain_ellipsoid.yaml",            // grand canyon, base image with flat terrain
+    12: "unittests/base_terrain_vrtheworld.yaml",           // grand canyon, base image with terrain
+    13: "unittests/geojson_1.yaml",                         // two shapes + serp cloud
+    14: "unittests/geojson_2.yaml",                         // giraffe + serp cloud
+    15: "unittests/geojson_3.yaml",                         // two shape & giraffe + serp cloud
+    16: "unittests/pointcloud_1.yaml",                      // just serp cloud
+    17: "unittests/pointcloud_2.yaml",                      // serp cloud on bing base imagery
+    18: "unittests/single_imagery.yaml",                    // world + fan
+    19: "unittests/terrain.yaml",                           // grand canyon, base imagery with terrain
+    20: "unittests/wms_imagery.yaml",                       // just dots on white world
+    21: "unittests/wps.yaml",                               // just pointcloud, plus output to console
+    22: "unittests/wtms_imagery.yaml",                      // world at night
 };
 
 
@@ -37,7 +38,7 @@ void main() {
     //OgcDocumentTests.test();
 
     try {
-        String s = "http://localhost:12345/file/" + tests[21];
+        String s = "http://localhost:12345/file/" + tests[0];
         var uri = Uri.parse(s);
         hub.commands.loadScript(uri);
     } catch (e) {

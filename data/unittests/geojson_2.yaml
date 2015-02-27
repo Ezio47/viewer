@@ -7,7 +7,7 @@
 - layers:
     tiledserp:
         type: pointcloud
-        url: http://localhost:12345/file/tiles/tiledserp18
+        url: http://localhost:12345/file/unittests/tiles/serp14
     test_poly:
         type: vector
         url: http://localhost:12345/file/unittests/geojson/mpg.json
