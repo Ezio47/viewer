@@ -1,23 +1,30 @@
 - layers:
-    tiledserp:
-        type: pointcloud
-        url: http://localhost:12345/file/tiles/tiledserp18
-
-    esri:
+    - esri:
         type: arcgis_base_imagery
-    z:
+        visible: true
+
+    - z1:
         type: single_imagery
         url: http://localhost:12345/file/unittests/images/fan.jpg
-        rectangle: [ -75.0, 28.0, -67.0, 29.75 ]
+        rectangle: [ -100.0, 10.0, -90.0, 20.0 ]
+        alpha: 0.5
 
-- camera:
-    eye: [-83.43271, 39.02617, 50.0]
-    target: [-83.43271, 39.02617, 0]
-    up: [0, 0, 1]
-    fov: 60
+    - z2:
+        type: single_imagery
+        url: http://localhost:12345/file/unittests/images/fan.jpg
+        rectangle: [ -90.0, 20.0, -80.0, 30.0 ]
+        brightness: 0.25
+        contrast: 0.75
 
-- display:
-    bbox: true
-    colorize:
-        ramp: Spectral
-        dimension: Z
+    - z3:
+        type: single_imagery
+        url: http://localhost:12345/file/unittests/images/fan.jpg
+        rectangle: [ -80.0, 30.0, -70.0, 40.0 ]
+        hue: 0.75
+        saturation: 0.25
+
+    - z4:
+        type: single_imagery
+        url: http://localhost:12345/file/unittests/images/fan.jpg
+        rectangle: [ -70.0, 40.0, -60.0, 50.0 ]
+        gamma: 0.25

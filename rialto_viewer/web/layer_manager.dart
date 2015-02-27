@@ -143,7 +143,7 @@ class LayerManager {
             case "single_imagery":
                 if (!_hasBaseImagery) {
                     // TODO: under what conditions is this really a problem?
-                    throw new ArgumentError("single_imagery requires a base imager layer");
+                    throw new ArgumentError("single_imagery requires a base imagery layer");
                 }
                 layer = new SingleImageryLayer(name, map);
                 break;

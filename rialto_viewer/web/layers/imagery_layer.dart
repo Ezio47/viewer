@@ -20,6 +20,13 @@ abstract class ImageryLayer extends UrlLayer with VisibilityControl, AlphaContro
 
     ImageryLayer(String type, String name, Map map)
             : super(type, name, map),
+              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
+              _alpha = YamlUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
+              _brightness = YamlUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
+              _contrast = YamlUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
+              _hue = YamlUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
+              _saturation = YamlUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
+              _gamma = YamlUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
               _rectangle = YamlUtils.getOptionalSettingAsList4(map, "rectangle"); // w, s, e, n
 
     @override set visible(bool v) => _visible = _hub.cesium.setLayerVisible(_layer, v);
@@ -42,6 +49,16 @@ abstract class ImageryLayer extends UrlLayer with VisibilityControl, AlphaContro
 
     @override set gamma(double d) => _gamma = _hub.cesium.setLayerGamma(_layer, d);
     @override double get gamma => _gamma;
+
+    void _forceUpdates() {
+        visible = _visible;
+        alpha = _alpha;
+        brightness = _brightness;
+        contrast = _contrast;
+        hue = _hue;
+        saturation = _saturation;
+        gamma = _gamma;
+    }
 }
 
 
@@ -55,6 +72,9 @@ class SingleImageryLayer extends ImageryLayer {
         String url = _url.toString();
         String proxy = (_proxy == null) ? null : _proxy.toString();
         _layer = _hub.cesium.addSingleTileImageryProvider(url, _rectangle, proxy);
+
+        _forceUpdates();
+
         return new Future(() {});
     }
 }
@@ -72,6 +92,9 @@ class WmsImageryLayer extends ImageryLayer {
         String url = _url.toString();
         String proxy = (_proxy == null) ? null : _proxy.toString();
         _layer = _hub.cesium.addWebMapServiceImageryProvider(url, _layers, _rectangle, proxy);
+
+        _forceUpdates();
+
         return new Future(() {});
     }
 }
@@ -90,6 +113,9 @@ class WtmsImageryLayer extends ImageryLayer {
         String url = _url.toString();
         String proxy = (_proxy == null) ? null : _proxy.toString();
         _layer = _hub.cesium.addTileMapServiceImageryProvider(url, _rectangle, _maximumLevel, proxy);
+
+        _forceUpdates();
+
         return new Future(() {});
     }
 }

@@ -32,7 +32,7 @@ class ConfigScript {
     Future<dynamic> _executeCommandAsync(Map command) {
         assert(command.keys.length == 1);
         String key = command.keys.first;
-        Map data = command[key];
+        Object data = command[key];
 
         log("Script command: $key");
 
@@ -136,11 +136,15 @@ class ConfigScript {
         return new Future((){});
     }
 
-    Future<List<Layer>> _doCommand_layers(Map layers) {
+    Future<List<Layer>> _doCommand_layers(List layers) {
         var futures = [];
 
-        for (var name in layers.keys) {
-            var f = _hub.commands.addLayer(new LayerData(name, layers[name]));
+        for (Map layermap in layers) {
+            assert(layermap is Map);
+            assert(layermap.length == 1);
+            var name = layermap.keys.first;
+            var data = layermap[name];
+            var f = _hub.commands.addLayer(new LayerData(name, data));
             futures.add(f);
         }
 

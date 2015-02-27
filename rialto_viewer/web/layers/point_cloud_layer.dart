@@ -11,7 +11,7 @@ class PointCloudLayer extends UrlLayer with VisibilityControl {
     String colorizeRamp = "Spectral";
     String colorizeDimension = "Z";
 
-    bool _visible;
+    bool _visible = true;
 
     PointCloudLayer(String name, Map map)
             : super("pointcloud", name, map);

@@ -81,27 +81,27 @@ var CesiumBridge = function (element) {
     }
 
     this.setLayerAlpha = function (layer, d) {
-        layer.alpha = v;
+        layer.alpha = d;
     }
 
     this.setLayerBrightness = function (layer, d) {
-        layer.brightness = v;
+        layer.brightness = d;
     }
 
     this.setLayerContrast = function (layer, d) {
-        layer.contrast = v;
+        layer.contrast = d;
     }
 
     this.setLayerHue = function (layer, d) {
-        layer.hue = v;
+        layer.hue = d;
     }
 
     this.setLayerSaturation = function (layer, d) {
-        layer.saturation = v;
+        layer.saturation = d;
     }
 
     this.setLayerGamma = function (layer, d) {
-        layer.gamma = v;
+        layer.gamma = d;
     }
 
 

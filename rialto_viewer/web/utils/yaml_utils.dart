@@ -68,6 +68,9 @@ class YamlUtils {
     static bool getOptionalSettingAsBool(Map map, String key, [bool defalt = false]) =>
             _getOptionalSettingAsType(map, key, _boolType, defalt);
 
+    static double getOptionalSettingAsDouble(Map map, String key, [double defalt = 0.0]) =>
+            _getOptionalSettingAsType(map, key, _doubleType, defalt);
+
     static bool _boolParse(String s) {
         s = s.toLowerCase();
         if (s == "true") return true;

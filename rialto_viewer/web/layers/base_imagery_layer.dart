@@ -19,7 +19,14 @@ abstract class BaseImageryLayer extends Layer with VisibilityControl, AlphaContr
     double _gamma;
 
     BaseImageryLayer(String type, String name, Map map)
-            : super(type, name, map);
+            : super(type, name, map),
+              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
+              _alpha = YamlUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
+              _brightness = YamlUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
+              _contrast = YamlUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
+              _hue = YamlUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
+              _saturation = YamlUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
+              _gamma = YamlUtils.getOptionalSettingAsDouble(map, "gamma", 1.0);
 
     @override set visible(bool v) => _visible = _hub.cesium.setLayerVisible(_layer, v);
     @override bool get visible => _visible;
@@ -41,6 +48,16 @@ abstract class BaseImageryLayer extends Layer with VisibilityControl, AlphaContr
 
     @override set gamma(double d) => _gamma = _hub.cesium.setLayerGamma(_layer, d);
     @override double get gamma => _gamma;
+
+    void _forceUpdates() {
+        visible = _visible;
+        alpha = _alpha;
+        brightness = _brightness;
+        contrast = _contrast;
+        hue = _hue;
+        saturation = _saturation;
+        gamma = _gamma;
+    }
 }
 
 
@@ -67,6 +84,8 @@ class BingBaseImageryLayer extends BaseImageryLayer {
 
         _layer = _hub.cesium.setBingBaseImageryProvider(_apiKey, _style);
 
+        _forceUpdates();
+
         return new Future(() {});
     }
 }
@@ -82,6 +101,8 @@ class ArcGisBaseImageryLayer extends BaseImageryLayer {
 
         _layer = _hub.cesium.setArcGisBaseImageryProvider();
 
+        _forceUpdates();
+
         return new Future(() {});
     }
 }
@@ -96,6 +117,9 @@ class OsmBaseImageryLayer extends BaseImageryLayer {
     Future<bool> load() {
 
         _layer = _hub.cesium.setOsmBaseImageryProvider();
+
+        _forceUpdates();
+
         return new Future(() {});
     }
 }
