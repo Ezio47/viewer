@@ -17,9 +17,8 @@ class TerrainLayer extends Layer {
     @override
     Future<bool> load() {
 
-        String s = _url.toString();
-        s = Layer.removeScheme(s);
-        _provider = _hub.cesium.setCesiumTerrainProvider(s);
+        String url = _url.toString();
+        _provider = _hub.cesium.setCesiumTerrainProvider(url);
 
         return new Future(() {});
     }
