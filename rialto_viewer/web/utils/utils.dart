@@ -30,6 +30,28 @@ class Key {
 
 class Utils {
 
+    static Uri firstPart(Uri uri) {
+        var scheme = uri.scheme;
+        var userInfo = uri.userInfo;
+        var host = uri.host;
+        var port = uri.port;
+        //var path = uri.path;
+        //var query = uri.query;
+        //var frag = uri.fragment;
+        return new Uri(scheme: scheme, userInfo: userInfo, host: host, port: port);
+    }
+
+    static Uri secondPart(Uri uri) {
+        //var scheme = uri.scheme;
+        //var userInfo = uri.userInfo;
+        //var host = uri.host;
+        //var port = uri.port;
+        var path = uri.path;
+        var query = uri.query;
+        var fragment = uri.fragment;
+        return new Uri(path: path, query: query, fragment: fragment);
+    }
+
     // Uint64 not supported in dart2js
     static int ByteData_getUint64(ByteData buf, int index, Endianness e) {
         assert(e == Endianness.LITTLE_ENDIAN);

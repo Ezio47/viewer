@@ -5,14 +5,12 @@
 part of rialto.viewer;
 
 
-class TerrainLayer extends Layer {
+class TerrainLayer extends UrlLayer {
 
     dynamic _provider;
-    Uri _url;
 
     TerrainLayer(String name, Map map)
-            : super(name, map),
-              _url = YamlUtils.getRequiredSettingAsUri(map, "url");
+            : super("terrain", name, map);
 
     @override
     Future<bool> load() {

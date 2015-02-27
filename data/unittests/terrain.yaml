@@ -6,9 +6,8 @@
 
 - layers:
     bing:
-        type: base_imagery
-        url: BING
-        bingStyle: AerialWithLabels
+        type: bing_base_imagery
+        style: AerialWithLabels
 
     terrain:
         type: terrain

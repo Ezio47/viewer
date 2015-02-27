@@ -41,7 +41,7 @@ class YamlUtils {
 
     static String getRequiredSettingAsString(Map map, String key) => _getRequiredSettingAsType(map, key, _stringType);
 
-    static Uri getRequiredSettingAsUri(Map map, String key) {
+    static Uri getRequiredSettingAsUrl(Map map, String key) {
         var s = _getRequiredSettingAsType(map, key, _stringType);
         var u = Uri.parse(s);
         return u;
@@ -52,8 +52,9 @@ class YamlUtils {
     static String getOptionalSettingAsString(Map map, String key, [String defalt = null]) =>
             _getOptionalSettingAsType(map, key, _stringType, defalt);
 
-    static Uri getOptionalSettingAsUri(Map map, String key, [String defalt = null]) {
+    static Uri getOptionalSettingAsUrl(Map map, String key, [String defalt = null]) {
         String s = getOptionalSettingAsString(map, key, defalt);
+        if (s == null) return null;
         var u = Uri.parse(s);
         return u;
     }

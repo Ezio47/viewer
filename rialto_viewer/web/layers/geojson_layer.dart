@@ -5,19 +5,17 @@
 part of rialto.viewer;
 
 
-class VectorLayer extends Layer {
+class GeoJsonLayer extends UrlLayer {
     dynamic dataSource;
 
-    VectorLayer(String name, Map map)
-            : super(name, map) {
-        log("New vector layer: $name .. $uri");
-    }
+    GeoJsonLayer(String name, Map map)
+            : super("geojson", name, map);
 
     @override
     Future<bool> load() {
         Completer c = new Completer();
 
-        dataSource = _hub.cesium.addGeoJson(uri.toString());
+        dataSource = _hub.cesium.addGeoJson(_url.toString());
 
         // TODO: set visibility
         // TODO: set bbox

@@ -5,22 +5,20 @@
 part of rialto.viewer;
 
 
-class PointCloudLayer extends Layer {
+class PointCloudLayer extends UrlLayer {
     var _provider;
     int numPoints;
     String colorizeRamp = "Spectral";
     String colorizeDimension = "Z";
 
     PointCloudLayer(String name, Map map)
-            : super(name, map) {
-        //log("New pointcloud layer: $name .. $server .. $path");
-    }
+            : super("pointcloud", name, map);
 
     @override
     Future<bool> load() {
         Completer c = new Completer();
 
-        _hub.cesium.createTileProviderAsync(uri.toString(), colorizeRamp, colorizeDimension, visible).then((provider) {
+        _hub.cesium.createTileProviderAsync(url.toString(), colorizeRamp, colorizeDimension, visible).then((provider) {
             _provider = provider;
 
             numPoints = _hub.cesium.getNumPointsFromProvider(_provider);

@@ -96,19 +96,50 @@ class LayerManager {
 
         Layer layer = null;
         switch (type) {
-            case "base_imagery":
-                layer = new BaseImageryLayer(name, map);
+
+            case "bing_base_imagery":
+                layer = new BingBaseImageryLayer(name, map);
                 _hasBaseImagery = true;
                 break;
-            case "base_terrain":
-                layer = new BaseTerrainLayer(name, map);
+
+            case "arcgis_base_imagery":
+                layer = new ArcGisBaseImageryLayer(name, map);
+                _hasBaseImagery = true;
                 break;
+
+            case "osm_base_imagery":
+                layer = new OsmBaseImageryLayer(name, map);
+                _hasBaseImagery = true;
+                break;
+
+            case "ellipsoid_base_terrain":
+                layer = new EllipsoidBaseTerrainLayer(name, map);
+                break;
+
+            case "arcgis_base_terrain":
+                layer = new ArcGisBaseTerrainLayer(name, map);
+                break;
+
+            case "cesium_small_base_terrain":
+                layer = new CesiumSmallBaseTerrainLayer(name, map);
+                break;
+
+            case "cesium_stk_base_terrain":
+                layer = new CesiumStkBaseTerrainLayer(name, map);
+                break;
+
+            case "vrtheworld_base_terrain":
+                layer = new VrTheWorldBaseTerrainLayer(name, map);
+                break;
+
             case "wms_imagery":
                 layer = new WmsImageryLayer(name, map);
                 break;
+
             case "wtms_imagery":
                 layer = new WtmsImageryLayer(name, map);
                 break;
+
             case "single_imagery":
                 if (!_hasBaseImagery) {
                     // TODO: under what conditions is this really a problem?
@@ -116,15 +147,19 @@ class LayerManager {
                 }
                 layer = new SingleImageryLayer(name, map);
                 break;
+
             case "terrain":
                 layer = new TerrainLayer(name, map);
                 break;
-            case "vector":
-                layer = new VectorLayer(name, map);
+
+            case "geojson":
+                layer = new GeoJsonLayer(name, map);
                 break;
+
             case "pointcloud":
                 layer = new PointCloudLayer(name, map);
                 break;
+
             default:
                 Hub.error("Unrecognized layer type in configuration file", info: {
                     "Layer type": type

@@ -43,7 +43,7 @@ part 'layers/base_terrain_layer.dart';
 part 'layers/imagery_layer.dart';
 part 'layers/point_cloud_layer.dart';
 part 'layers/terrain_layer.dart';
-part 'layers/vector_layer.dart';
+part 'layers/geojson_layer.dart';
 
 part 'ogc/ogc_document.dart';
 part 'ogc/ogc_document_tests.dart';

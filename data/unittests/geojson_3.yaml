@@ -9,8 +9,8 @@
         type: pointcloud
         url: http://localhost:12345/file/unittests/tiles/serp14
     p1:
-        type: vector
+        type: geojson
         url: http://localhost:12345/file/unittests/geojson/poly.json
     p2:
-        type: vector
+        type: geojson
         url: http://localhost:12345/file/unittests/geojson/mpg.json

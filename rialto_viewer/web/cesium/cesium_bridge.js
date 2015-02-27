@@ -4,33 +4,49 @@
 
 
 var CesiumBridge = function (element) {
-    var _proxy;
 
-    Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
-    var options = {
-        animation: false,
-        baseLayerPicker: false,
-        fullscreenButton: false,
-        geocoder: false,
-        homeButton: false,
-        infoBox: false,
-        sceneModePicker: false,
-        selectionIndicator: false,
-        timeline: false,
-        navigationHelpButton: false,
-        navigationInstructionsInitiallyVisible: false,
-        sceneMode : Cesium.SceneMode.SCENE3D,
-        creditContainer: "creditContainer",
-        imageProvider: null
-    };
+    //---------------------------------------------------------------------------------------------
+    //
+    // ctor
+    //
+    //---------------------------------------------------------------------------------------------
 
-    this.viewer = new Cesium.Viewer(element, options);
+    {
+        var _proxy;
 
-    this.viewer.cesiumWidget.creditContainer.className = "";
+        Cesium.BingMapsApi.defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
 
-    this.viewer.imageryLayers.removeAll();
+        var options = {
+            animation: false,
+            baseLayerPicker: false,
+            fullscreenButton: false,
+            geocoder: false,
+            homeButton: false,
+            infoBox: false,
+            sceneModePicker: false,
+            selectionIndicator: false,
+            timeline: false,
+            navigationHelpButton: false,
+            navigationInstructionsInitiallyVisible: false,
+            sceneMode : Cesium.SceneMode.SCENE3D,
+            creditContainer: "creditContainer",
+            imageProvider: null
+        };
 
+        this.viewer = new Cesium.Viewer(element, options);
+
+        this.viewer.cesiumWidget.creditContainer.className = "";
+
+        this.viewer.imageryLayers.removeAll();
+    }
+
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // utils
+    //
+    //---------------------------------------------------------------------------------------------
 
     this.createProxy = function (url) {
         _proxy = new Object();
@@ -42,10 +58,24 @@ var CesiumBridge = function (element) {
         return _proxy;
     }
 
+
     this.newRectangleFromDegrees = function (w, s, e, n) {
         var rect = new Cesium.Rectangle.fromDegrees(w, s, e, n);
         return rect;
     }
+
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // Imagery Providers
+    //
+    //---------------------------------------------------------------------------------------------
+
+
+    this.addImageryProvider = function(provider) {
+        return this.viewer.imageryLayers.addImageryProvider(provider);
+    }
+
 
     this.newSingleTileImageryProvider = function (url, rect, proxy) {
         var options = {
@@ -53,9 +83,9 @@ var CesiumBridge = function (element) {
             rectangle: rect == null ? undefined : rect,
             proxy: proxy == null ? undefined : proxy
         };
-        mylog(rect.north);
         return new Cesium.SingleTileImageryProvider(options);
     }
+
 
     this.newWebMapServiceImageryProvider = function (url, layers, rect, proxy) {
         var options = {
@@ -68,6 +98,7 @@ var CesiumBridge = function (element) {
         return new Cesium.WebMapServiceImageryProvider(options);
     }
 
+
     this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel, proxy) {
         var options = {
             url: url,
@@ -79,6 +110,13 @@ var CesiumBridge = function (element) {
     }
 
 
+    //---------------------------------------------------------------------------------------------
+    //
+    // Terrain Providers
+    //
+    //---------------------------------------------------------------------------------------------
+
+
     this.setCesiumTerrainProvider = function (url) {
         var provider = new Cesium.CesiumTerrainProvider({
             url: url,
@@ -87,11 +125,13 @@ var CesiumBridge = function (element) {
         return provider;
     }
 
+
     this.setEllipsoidBaseTerrainProvider = function () {
         var provider = new Cesium.EllipsoidTerrainProvider();
         this.viewer.terrainProvider = provider;
         return provider;
     }
+
 
     this.setVrTheWorldBaseTerrainProvider = function (url) {
         var provider = new Cesium.VRTheWorldTerrainProvider({
@@ -100,6 +140,7 @@ var CesiumBridge = function (element) {
         this.viewer.terrainProvider = provider;
         return provider;
     }
+
 
     this.setCesiumBaseTerrainProvider = function (url, credit) {
         if (credit == null) {
@@ -113,6 +154,7 @@ var CesiumBridge = function (element) {
         return provider;
     }
 
+
     this.setArcGisBaseTerrainProvider = function (apiKey) {
         var provider = new Cesium.ArcGisImageServerTerrainProvider({
             url : '//elevation.arcgisonline.com/ArcGIS/rest/services/WorldElevation/DTMEllipsoidal/ImageServer',
@@ -122,50 +164,46 @@ var CesiumBridge = function (element) {
         return provider;
     }
 
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // Base Imagery Providers
+    //
+    //---------------------------------------------------------------------------------------------
+
+
     this.setBingBaseImageryProvider = function(apiKey, style) {
         var provider = new Cesium.BingMapsImageryProvider({
             url : '//dev.virtualearth.net',
             key : apiKey,
             mapStyle : style
         });
-        this.viewer.imageryLayers.addImageryProvider(provider);
-        return provider;
+        var layer = this.viewer.imageryLayers.addImageryProvider(provider);
+        return layer;
     }
+
 
     this.setOsmBaseImageryProvider = function() {
         var provider = new Cesium.OpenStreetMapImageryProvider({});
-        this.viewer.imageryLayers.addImageryProvider(provider);
-        return provider;
+        var layer = this.viewer.imageryLayers.addImageryProvider(provider);
+        return layer;
     }
+
 
     this.setArcGisBaseImageryProvider = function() {
         var provider = new Cesium.ArcGisMapServerImageryProvider({
             url: '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
         });
-        this.viewer.imageryLayers.addImageryProvider(provider);
-        return provider;
+        var layer = this.viewer.imageryLayers.addImageryProvider(provider);
+        return layer;
     }
 
-    this.addImageryProvider = function(provider) {
-        this.viewer.imageryLayers.addImageryProvider(provider);
-    }
 
-    // 0=3D, 1=2.5D, 2=2D
-    this.setViewMode = function(m) {
-
-        var scene = this.viewer.scene;
-        var sec = 0.5;
-
-        if (m == 0) {
-            scene.morphTo2D(sec);
-        } else if (m == 1) {
-            scene.morphToColumbusView(sec);
-        } else if (m == 2) {
-            scene.morphTo3D(sec);
-        } else {
-            myassert(false, "bad scene mode value");
-        }
-    }
+    //---------------------------------------------------------------------------------------------
+    //
+    // point cloud support
+    //
+    //---------------------------------------------------------------------------------------------
 
 
     // returns a promise<provider>
@@ -182,6 +220,7 @@ var CesiumBridge = function (element) {
 
         return deferred.promise;
     }
+
 
     // returns nothing, but sets the completer<promise>
     this.createTileProviderAsync = function(urlarg, colorizeRamp, colorizeDimension, visible, completer) {
@@ -206,6 +245,7 @@ var CesiumBridge = function (element) {
         });
     }
 
+
     this.unloadTileProvider = function(provider) {
 
         var viewer = this.viewer;
@@ -214,6 +254,7 @@ var CesiumBridge = function (element) {
 
         primitives.remove(provider.quadtree);
     }
+
 
     this.getDimensionNamesFromProvider = function (provider) {
         var ret = [];
@@ -226,15 +267,18 @@ var CesiumBridge = function (element) {
         return ret;
     }
 
+
     this.getNumPointsFromProvider = function (provider) {
         var n = provider.header.numPoints;
         return n;
     }
 
+
     this.getTileBboxFromProvider = function (provider) {
         var b = provider.header.tilebbox;
         return b;
     }
+
 
     this.getStatsFromProvider = function (provider, dimName) {
         var dims = provider.header.dimensions;
@@ -248,18 +292,29 @@ var CesiumBridge = function (element) {
         return null;
     }
 
+
     this.getColorRampNames = function () {
         var keys = Object.keys(colorRamps);
         return keys;
     }
 
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // GeoJSON support
+    //
+    //---------------------------------------------------------------------------------------------
+
+
     this.addDataSource = function (dataSource) {
         this.viewer.dataSources.add(dataSource);
     }
 
+
     this.removeDataSource = function (dataSource) {
         this.viewer.dataSources.remove(dataSource);
     }
+
 
     this.addGeoJson = function(url) {
         var viewer = this.viewer;
@@ -276,67 +331,18 @@ var CesiumBridge = function (element) {
         return ds;
     }
 
-    // taken from HomeButtonView.viewHome
-    this.goHome = function() {
-        var scene = this.viewer.scene;
-        var mode = scene.mode;
 
-        if (Cesium.defined(scene) && mode === Cesium.SceneMode.MORPHING) {
-            scene.completeMorph();
-        }
+    //---------------------------------------------------------------------------------------------
+    //
+    // primitives support
+    //
+    //---------------------------------------------------------------------------------------------
 
-        var direction;
-        var right;
-        var up;
-
-        if (mode === Cesium.SceneMode.SCENE2D) {
-            scene.camera.flyToRectangle({
-                destination : Cesium.Rectangle.MAX_VALUE,
-                duration : 0,
-                endTransform : Cesium.Matrix4.IDENTITY
-            });
-        } else if (mode === Cesium.SceneMode.SCENE3D) {
-            var destination = scene.camera.getRectangleCameraCoordinates(Cesium.Camera.DEFAULT_VIEW_RECTANGLE);
-            var mag = Cesium.Cartesian3.magnitude(destination);
-            mag += mag * Cesium.Camera.DEFAULT_VIEW_FACTOR;
-            Cesium.Cartesian3.normalize(destination, destination);
-            Cesium.Cartesian3.multiplyByScalar(destination, mag, destination);
-
-            direction = Cesium.Cartesian3.normalize(destination, new Cesium.Cartesian3());
-            Cesium.Cartesian3.negate(direction, direction);
-            right = Cesium.Cartesian3.cross(direction, Cesium.Cartesian3.UNIT_Z, new Cesium.Cartesian3());
-            up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
-
-            scene.camera.flyTo({
-                destination : destination,
-                direction: direction,
-                up : up,
-                duration : 0,
-                endTransform : Cesium.Matrix4.IDENTITY
-            });
-        } else if (mode === Cesium.SceneMode.COLUMBUS_VIEW) {
-            var maxRadii = scene.globe.ellipsoid.maximumRadius;
-            var position = new Cesium.Cartesian3(0.0, -1.0, 1.0);
-            position = Cesium.Cartesian3.multiplyByScalar(Cesium.Cartesian3.normalize(position, position), 5.0 * maxRadii, position);
-            direction = new Cesium.Cartesian3();
-            direction = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(Cesium.Cartesian3.ZERO, position, direction), direction);
-            right = Cesium.Cartesian3.cross(direction, Cesium.Cartesian3.UNIT_Z, new Cesium.Cartesian3());
-            up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
-
-            scene.camera.flyTo({
-                destination : position,
-                duration : 0,
-                up : up,
-                direction : direction,
-                endTransform : Cesium.Matrix4.IDENTITY,
-                convert : false
-            });
-        }
-    }
 
     this.isPrimitiveVisible = function(primitive) {
         return primitive.show;
     }
+
 
     this.setPrimitiveVisible = function(primitive, value) {
         //mylog("was " + primitive.show);
@@ -344,125 +350,6 @@ var CesiumBridge = function (element) {
         //mylog("now " + primitive.show);
     }
 
-    this.setUpdater = function(f) {
-        this.viewer.scene.preRender.addEventListener(f);
-    }
-
-    // input: cartographic, height in meters
-    this.lookAtCartographic = function(eyeLon, eyeLat, eyeHeight,
-                                       targetLon, targetLat, targetHeight,
-                                       upX, upY, upZ, fovDegrees) {
-        var scene = this.viewer.scene;
-        var mode = scene.mode;
-
-        if (Cesium.defined(scene) && mode === Cesium.SceneMode.MORPHING) {
-            scene.completeMorph();
-        }
-
-        if (mode === Cesium.SceneMode.SCENE2D ||
-            mode == Cesium.SceneMode.COLUMBUS_VIEW) {
-            // TODO: hack fix for now
-            this.goHome();
-            return;
-        }
-
-        var ellipsoid = scene.globe.ellipsoid;
-
-        var eyeCartographic = Cesium.Cartographic.fromDegrees(eyeLon, eyeLat, eyeHeight);
-        var targetCartographic = Cesium.Cartographic.fromDegrees(targetLon, targetLat, targetHeight);
-        var eyeCartesian = ellipsoid.cartographicToCartesian(eyeCartographic);
-        var targetCartesian = ellipsoid.cartographicToCartesian(targetCartographic);
-
-        //mylog("eye cartesian: " + eyeCartesian.x + ", " + eyeCartesian.y + ", " + eyeCartesian.z);
-        //mylog("target cartesian: " + targetCartesian.x + ", " + targetCartesian.y + ", " + targetCartesian.z);
-
-        var up = new Cesium.Cartesian3(upX, upY, upZ);
-
-        // we only support PerspectiveFrustum camera, so seeting FOV is okay
-        this.viewer.camera.frustum.fov = Cesium.Math.toRadians(fovDegrees);
-
-        this.viewer.camera.lookAt(eyeCartesian, targetCartesian, up);
-    }
-
-    this.onMouseMove = function(f) {
-        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-        handler.setInputAction(
-
-            function(event) {
-                var windowX = event.endPosition.x;
-                var windowY = event.endPosition.y;
-                f(windowX,windowY);
-            },
-
-            Cesium.ScreenSpaceEventType.MOUSE_MOVE
-        );
-    }
-
-    this.onMouseDown = function(f) {
-        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-        handler.setInputAction(
-            function(event) {
-                var windowX = event.position.x;
-                var windowY = event.position.y;
-                f(windowX, windowY, 0);
-            },
-            Cesium.ScreenSpaceEventType.LEFT_DOWN
-        );
-        handler.setInputAction(
-            function(event) {
-                var windowX = event.position.x;
-                var windowY = event.position.y;
-                f(windowX, windowY, 1);
-            },
-            Cesium.ScreenSpaceEventType.MIDDLE_DOWN
-        );
-        handler.setInputAction(
-            function(event) {
-                var windowX = event.position.x;
-                var windowY = event.position.y;
-                f(windowX, windowY, 2);
-            },
-            Cesium.ScreenSpaceEventType.RIGHT_DOWN
-        );
-    }
-
-    this.onMouseUp = function(f) {
-        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-        handler.setInputAction(
-            function(event) {
-                var windowX = event.position.x;
-                var windowY = event.position.y;
-                f(windowX, windowY, 0);
-            },
-            Cesium.ScreenSpaceEventType.LEFT_UP
-        );
-        handler.setInputAction(
-            function(event) {
-                var windowX = event.position.x;
-                var windowY = event.position.y;
-                f(windowX, windowY, 1);
-            },
-            Cesium.ScreenSpaceEventType.MIDDLE_UP
-        );
-        handler.setInputAction(
-            function(event) {
-                var windowX = event.position.x;
-                var windowY = event.position.y;
-                f(windowX, windowY, 2);
-            },
-            Cesium.ScreenSpaceEventType.RIGHT_UP
-        );
-    }
-
-    this.onMouseWheel = function(f) {
-        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-        handler.setInputAction(
-            function(delta) {
-                f(delta);
-            },
-            Cesium.ScreenSpaceEventType.WHEEL
-        );
-    }
 
     this.createRectangle = function(x1, y1, x2, y2, colorR, colorG, colorB) {
         var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
@@ -528,11 +415,13 @@ var CesiumBridge = function (element) {
         return prim;
     }
 
+
     this.removePrimitive = function(prim) {
         var scene = this.viewer.scene;
         var primitives = scene.primitives;
         primitives.remove(prim);
     }
+
 
     this._createLineInstance = function(x0, y0, z0, x1, y1, z1, color) {
       var p1 = Cesium.Cartesian3.fromDegrees(x0, y0, z0);
@@ -597,6 +486,97 @@ var CesiumBridge = function (element) {
     }
 
 
+    //---------------------------------------------------------------------------------------------
+    //
+    // mouse
+    //
+    //---------------------------------------------------------------------------------------------
+
+
+    this.onMouseMove = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+
+            function(event) {
+                var windowX = event.endPosition.x;
+                var windowY = event.endPosition.y;
+                f(windowX,windowY);
+            },
+
+            Cesium.ScreenSpaceEventType.MOUSE_MOVE
+        );
+    }
+
+
+    this.onMouseDown = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 0);
+            },
+            Cesium.ScreenSpaceEventType.LEFT_DOWN
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 1);
+            },
+            Cesium.ScreenSpaceEventType.MIDDLE_DOWN
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 2);
+            },
+            Cesium.ScreenSpaceEventType.RIGHT_DOWN
+        );
+    }
+
+
+    this.onMouseUp = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 0);
+            },
+            Cesium.ScreenSpaceEventType.LEFT_UP
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 1);
+            },
+            Cesium.ScreenSpaceEventType.MIDDLE_UP
+        );
+        handler.setInputAction(
+            function(event) {
+                var windowX = event.position.x;
+                var windowY = event.position.y;
+                f(windowX, windowY, 2);
+            },
+            Cesium.ScreenSpaceEventType.RIGHT_UP
+        );
+    }
+
+
+    this.onMouseWheel = function(f) {
+        var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+        handler.setInputAction(
+            function(delta) {
+                f(delta);
+            },
+            Cesium.ScreenSpaceEventType.WHEEL
+        );
+    }
+
+
     // returns triplet of cartographic degrees as doubles
     this.getMouseCoords = function(windowX, windowY) {
         var pt2 = new Cesium.Cartesian2(windowX, windowY);
@@ -611,5 +591,126 @@ var CesiumBridge = function (element) {
         } else {
             return null;
         }
+    }
+
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // Home & view modes
+    //
+    //---------------------------------------------------------------------------------------------
+
+
+    // 0=3D, 1=2.5D, 2=2D
+    this.setViewMode = function(m) {
+
+        var scene = this.viewer.scene;
+        var sec = 0.5;
+
+        if (m == 0) {
+            scene.morphTo2D(sec);
+        } else if (m == 1) {
+            scene.morphToColumbusView(sec);
+        } else if (m == 2) {
+            scene.morphTo3D(sec);
+        } else {
+            myassert(false, "bad scene mode value");
+        }
+    }
+
+
+    // taken from HomeButtonView.viewHome
+    this.goHome = function() {
+        var scene = this.viewer.scene;
+        var mode = scene.mode;
+
+        if (Cesium.defined(scene) && mode === Cesium.SceneMode.MORPHING) {
+            scene.completeMorph();
+        }
+
+        var direction;
+        var right;
+        var up;
+
+        if (mode === Cesium.SceneMode.SCENE2D) {
+            scene.camera.flyToRectangle({
+                destination : Cesium.Rectangle.MAX_VALUE,
+                duration : 0,
+                endTransform : Cesium.Matrix4.IDENTITY
+            });
+        } else if (mode === Cesium.SceneMode.SCENE3D) {
+            var destination = scene.camera.getRectangleCameraCoordinates(Cesium.Camera.DEFAULT_VIEW_RECTANGLE);
+            var mag = Cesium.Cartesian3.magnitude(destination);
+            mag += mag * Cesium.Camera.DEFAULT_VIEW_FACTOR;
+            Cesium.Cartesian3.normalize(destination, destination);
+            Cesium.Cartesian3.multiplyByScalar(destination, mag, destination);
+
+            direction = Cesium.Cartesian3.normalize(destination, new Cesium.Cartesian3());
+            Cesium.Cartesian3.negate(direction, direction);
+            right = Cesium.Cartesian3.cross(direction, Cesium.Cartesian3.UNIT_Z, new Cesium.Cartesian3());
+            up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
+
+            scene.camera.flyTo({
+                destination : destination,
+                direction: direction,
+                up : up,
+                duration : 0,
+                endTransform : Cesium.Matrix4.IDENTITY
+            });
+        } else if (mode === Cesium.SceneMode.COLUMBUS_VIEW) {
+            var maxRadii = scene.globe.ellipsoid.maximumRadius;
+            var position = new Cesium.Cartesian3(0.0, -1.0, 1.0);
+            position = Cesium.Cartesian3.multiplyByScalar(Cesium.Cartesian3.normalize(position, position), 5.0 * maxRadii, position);
+            direction = new Cesium.Cartesian3();
+            direction = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(Cesium.Cartesian3.ZERO, position, direction), direction);
+            right = Cesium.Cartesian3.cross(direction, Cesium.Cartesian3.UNIT_Z, new Cesium.Cartesian3());
+            up = Cesium.Cartesian3.cross(right, direction, new Cesium.Cartesian3());
+
+            scene.camera.flyTo({
+                destination : position,
+                duration : 0,
+                up : up,
+                direction : direction,
+                endTransform : Cesium.Matrix4.IDENTITY,
+                convert : false
+            });
+        }
+    }
+
+
+    // input: cartographic, height in meters
+    this.lookAtCartographic = function(eyeLon, eyeLat, eyeHeight,
+                                       targetLon, targetLat, targetHeight,
+                                       upX, upY, upZ, fovDegrees) {
+        var scene = this.viewer.scene;
+        var mode = scene.mode;
+
+        if (Cesium.defined(scene) && mode === Cesium.SceneMode.MORPHING) {
+            scene.completeMorph();
+        }
+
+        if (mode === Cesium.SceneMode.SCENE2D ||
+            mode == Cesium.SceneMode.COLUMBUS_VIEW) {
+            // TODO: hack fix for now
+            this.goHome();
+            return;
+        }
+
+        var ellipsoid = scene.globe.ellipsoid;
+
+        var eyeCartographic = Cesium.Cartographic.fromDegrees(eyeLon, eyeLat, eyeHeight);
+        var targetCartographic = Cesium.Cartographic.fromDegrees(targetLon, targetLat, targetHeight);
+        var eyeCartesian = ellipsoid.cartographicToCartesian(eyeCartographic);
+        var targetCartesian = ellipsoid.cartographicToCartesian(targetCartographic);
+
+        //mylog("eye cartesian: " + eyeCartesian.x + ", " + eyeCartesian.y + ", " + eyeCartesian.z);
+        //mylog("target cartesian: " + targetCartesian.x + ", " + targetCartesian.y + ", " + targetCartesian.z);
+
+        var up = new Cesium.Cartesian3(upX, upY, upZ);
+
+        // we only support PerspectiveFrustum camera, so seeting FOV is okay
+        this.viewer.camera.frustum.fov = Cesium.Math.toRadians(fovDegrees);
+
+        this.viewer.camera.lookAt(eyeCartesian, targetCartesian, up);
     }
 }

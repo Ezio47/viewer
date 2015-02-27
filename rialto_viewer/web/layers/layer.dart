@@ -8,20 +8,19 @@ part of rialto.viewer;
 abstract class Layer {
     final Hub _hub;
 
+    final String type;
     final String name;
-    final Uri uri;
     final String description;
-    final String _proxy;
 
     bool _visible;
     CartographicBbox _bbox;
 
-    Layer(String this.name, Map map)
+    Layer(String this.type, String this.name, Map map)
             : _hub = Hub.root,
-              uri = YamlUtils.getRequiredSettingAsUri(map, "url"),
               description = YamlUtils.getOptionalSettingAsString(map, "description"),
-              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
-              _proxy = YamlUtils.getOptionalSettingAsString(map, "proxy", null);
+              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true) {
+        log("New $type layer: $name");
+    }
 
     Future<bool> load();
 
@@ -30,4 +29,19 @@ abstract class Layer {
 
     CartographicBbox get bbox => _bbox;
     set bbox(CartographicBbox bbox) => _bbox = bbox;
+}
+
+
+abstract class UrlLayer extends Layer {
+    Uri _url;
+    Uri _proxy;
+
+    UrlLayer(String type, String name, Map map)
+            : super(type, name, map) {
+        _url = YamlUtils.getOptionalSettingAsUrl(map, "url");
+        _proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy");
+    }
+
+    Uri get url => _url;
+    Uri get proxy => _proxy;
 }

@@ -1,6 +1,5 @@
 - layers:
     bingbong:
-        type: base_imagery
-        url: BING
-        bingStyle: Road
-        bingApiKey: ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf
+        type: bing_base_imagery
+        style: Road
+        apiKey: ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf

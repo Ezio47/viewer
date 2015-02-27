@@ -1,7 +1,6 @@
 - layers:
     esri:
-        type: base_imagery
-        url: ARCGIS
+        type: arcgis_base_imagery
 
     xx:
        type: wms_imagery

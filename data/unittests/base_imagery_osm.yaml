@@ -1,4 +1,3 @@
 - layers:
     oossmm:
-        type: base_imagery
-        url: OSM
+        type: osm_base_imagery

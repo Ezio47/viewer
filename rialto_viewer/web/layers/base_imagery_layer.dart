@@ -2,39 +2,33 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
+
 part of rialto.viewer;
 
-class BaseImageryLayer extends Layer {
 
-    dynamic _provider;
+abstract class BaseImageryLayer extends Layer {
 
-    static const int _SourceInvalid = 0;
-    static const int _SourceBing = 1;
-    static const int _SourceArcGis = 2;
-    static const int _SourceOsm = 3;
-    static final Map<String, int> _sourceMap = {
-        'BING': _SourceBing,
-        'ARCGIS': _SourceArcGis,
-        'OSM': _SourceOsm
-    };
-    int source;
+    dynamic _layer;
 
-    static final _bingStyles = ['Aerial', 'AerialWithLabels', 'CollinsBart', 'OrdnanceSurvey', 'Road'];
-    static const String _bingDefaultStyle = 'Aerial';
-    String _bingStyle = 'Aerial';
-    static const _defaultBingKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
-    String _bingApiKey;
+    BaseImageryLayer(String type, String name, Map map)
+            : super(type, name, map);
+}
 
-    BaseImageryLayer(String name, Map map)
-            : super(name, map),
-              _bingApiKey = YamlUtils.getOptionalSettingAsString(map, "bingApiKey", _defaultBingKey),
-              _bingStyle = YamlUtils.getOptionalSettingAsString(map, "bingStyle", _bingDefaultStyle) {
 
-        if (!_sourceMap.containsKey(uri.toString())) {
-            throw new ArgumentError("invalid base image layer type");
-        }
-        source = _sourceMap[uri.toString()];
-        if (!_bingStyles.contains(_bingStyle)) {
+class BingBaseImageryLayer extends BaseImageryLayer {
+
+    static final _styles = ['Aerial', 'AerialWithLabels', 'CollinsBart', 'OrdnanceSurvey', 'Road'];
+    static const String _defaultStyle = 'Aerial';
+    String _style = 'Aerial';
+    static const _defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
+    String _apiKey;
+
+    BingBaseImageryLayer(String name, Map map)
+            : super("bing_base_imagery", name, map),
+              _apiKey = YamlUtils.getOptionalSettingAsString(map, "apiKey", _defaultKey),
+              _style = YamlUtils.getOptionalSettingAsString(map, "style", _defaultStyle) {
+
+        if (!_styles.contains(_style)) {
             throw new ArgumentError("invalid bing style");
         }
     }
@@ -42,24 +36,37 @@ class BaseImageryLayer extends Layer {
     @override
     Future<bool> load() {
 
-        switch (source) {
+        _layer = _hub.cesium.setBingBaseImageryProvider(_apiKey, _style);
 
-            case _SourceBing:
-                _provider = _hub.cesium.setBingBaseImageryProvider(_bingApiKey, _bingStyle);
-                break;
+        return new Future(() {});
+    }
+}
 
-            case _SourceArcGis:
-                _provider = _hub.cesium.setArcGisBaseImageryProvider();
-                break;
 
-            case _SourceOsm:
-                _provider = _hub.cesium.setOsmBaseImageryProvider();
-                break;
+class ArcGisBaseImageryLayer extends BaseImageryLayer {
 
-            default:
-                throw new ArgumentError("inbalid base imagery source");
-        }
+    ArcGisBaseImageryLayer(String name, Map map)
+            : super("arcgis_base_imagery", name, map);
 
+    @override
+    Future<bool> load() {
+
+        _layer = _hub.cesium.setArcGisBaseImageryProvider();
+
+        return new Future(() {});
+    }
+}
+
+
+class OsmBaseImageryLayer extends BaseImageryLayer {
+
+    OsmBaseImageryLayer(String name, Map map)
+            : super("osm_base_imagery", name, map);
+
+    @override
+    Future<bool> load() {
+
+        _layer = _hub.cesium.setOsmBaseImageryProvider();
         return new Future(() {});
     }
 }

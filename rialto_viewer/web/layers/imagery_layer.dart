@@ -4,28 +4,28 @@
 
 part of rialto.viewer;
 
-abstract class ImageryLayer extends Layer {
+abstract class ImageryLayer extends UrlLayer {
 
-    dynamic _provider;
+    dynamic _layer;
     Uri _url;
-    List<num> _rect;
+    List<num> _rectangle;
 
-    ImageryLayer(String name, Map map)
-            : super(name, map),
-              _url = YamlUtils.getRequiredSettingAsUri(map, "url"),
-              _rect = YamlUtils.getOptionalSettingAsList4(map, "rect"); // w, s, e, n
+    ImageryLayer(String type, String name, Map map)
+            : super(type, name, map),
+              _rectangle = YamlUtils.getOptionalSettingAsList4(map, "rectangle"); // w, s, e, n
 }
 
 
 class SingleImageryLayer extends ImageryLayer {
 
     SingleImageryLayer(String name, Map map)
-            : super(name, map);
+            : super("single_imagery", name, map);
 
     @override
     Future<bool> load() {
         String url = _url.toString();
-        _provider = _hub.cesium.addSingleTileImageryProvider(url, _rect, _proxy);
+        String proxy = (_proxy == null) ? null : _proxy.toString();
+        _layer = _hub.cesium.addSingleTileImageryProvider(url, _rectangle, proxy);
         return new Future(() {});
     }
 }
@@ -35,13 +35,14 @@ class WmsImageryLayer extends ImageryLayer {
     String _layers;
 
     WmsImageryLayer(String name, Map map)
-            : super(name, map),
+            : super("wms_imagery", name, map),
             _layers = YamlUtils.getRequiredSettingAsString(map, "layers");
 
     @override
     Future<bool> load() {
         String url = _url.toString();
-        _provider = _hub.cesium.addWebMapServiceImageryProvider(url, _layers, _rect, _proxy);
+        String proxy = (_proxy == null) ? null : _proxy.toString();
+        _layer = _hub.cesium.addWebMapServiceImageryProvider(url, _layers, _rectangle, proxy);
         return new Future(() {});
     }
 }
@@ -52,13 +53,14 @@ class WtmsImageryLayer extends ImageryLayer {
     int _maximumLevel;
 
     WtmsImageryLayer(String name, Map map)
-            : super(name, map),
+            : super("wtms_imagery", name, map),
             _maximumLevel = YamlUtils.getOptionalSettingAsInt(map, "maximumLevel", 18);
 
     @override
     Future<bool> load() {
         String url = _url.toString();
-        _provider = _hub.cesium.addTileMapServiceImageryProvider(url, _rect, _maximumLevel, _proxy);
+        String proxy = (_proxy == null) ? null : _proxy.toString();
+        _layer = _hub.cesium.addTileMapServiceImageryProvider(url, _rectangle, _maximumLevel, proxy);
         return new Future(() {});
     }
 }

@@ -5,72 +5,91 @@
 part of rialto.viewer;
 
 
-class BaseTerrainLayer extends Layer {
+abstract class BaseTerrainLayer extends Layer {
 
     dynamic _provider;
 
-    static const int _SourceInvalid = 0;
-    static const int _SourceEllipsoid = 1;
-    static const int _SourceArcGis = 2;
-    static const int _SourceCesiumSmall = 3;
-    static const int _SourceCesiumStk = 4;
-    static const int _SourceVrTheWorld = 5;
-    static final Map<String, int> _sourceMap = {
-        'ELLIPSOID': _SourceEllipsoid,
-        'ARCGIS': _SourceArcGis,
-        'CESIUM_SMALL': _SourceCesiumSmall,
-        'CESIUM_STK': _SourceCesiumStk,
-        'VR_THEWORLD': _SourceVrTheWorld
-    };
+    BaseTerrainLayer(String type, String name, Map map) : super(type, name, map);
+}
 
-    int source;
+
+class EllipsoidBaseTerrainLayer extends BaseTerrainLayer {
+
+    EllipsoidBaseTerrainLayer(String name, Map map)
+            : super("ellipsoid_base_terrain", name, map);
+
+    @override
+    Future<bool> load() {
+        _provider = _hub.cesium.setEllipsoidBaseTerrainProvider();
+
+        return new Future(() {});
+    }
+}
+
+
+class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
 
     static const _defaultArcGisKey =
             'KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..';
     String _arcGisApiKey;
 
-    BaseTerrainLayer(String name, Map map)
-            : super(name, map),
-              _arcGisApiKey = YamlUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultArcGisKey) {
-
-        if (!_sourceMap.containsKey(uri.toString())) {
-            throw new ArgumentError("invalid base image layer type");
-        }
-        source = _sourceMap[uri.toString()];
-    }
+    ArcGisBaseTerrainLayer(String name, Map map)
+            : super("arcgis_base_terrain", name, map),
+              _arcGisApiKey = YamlUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultArcGisKey);
 
     @override
     Future<bool> load() {
 
-        switch (source) {
+        _provider = _hub.cesium.setArcGisBaseTerrainProvider(_arcGisApiKey);
 
-            case _SourceEllipsoid:
-                _provider = _hub.cesium.setEllipsoidBaseTerrainProvider();
-                break;
+        return new Future(() {});
+    }
+}
 
-            case _SourceArcGis:
-                _provider = _hub.cesium.setArcGisBaseTerrainProvider(_arcGisApiKey);
-                break;
 
-            case _SourceCesiumSmall:
-                var url = '//cesiumjs.org/smallterrain';
-                var credit = 'Terrain data courtesy Analytical Graphics, Inc.';
-                _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, credit);
-                break;
+class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
 
-            case _SourceCesiumStk:
-                var url = '//cesiumjs.org/stk-terrain/tilesets/world/tiles';
-                _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, null);
-                break;
+    CesiumSmallBaseTerrainLayer(String name, Map map)
+            : super("cesium_small_base_terrain", name, map);
 
-            case _SourceVrTheWorld:
-                var url = '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/';
-                _provider = _hub.cesium.setVrTheWorldBaseTerrainProvider(url);
-                break;
+    @override
+    Future<bool> load() {
 
-            default:
-                throw new ArgumentError("inbalid base terrain source");
-        }
+        var url = '//cesiumjs.org/smallterrain';
+        var credit = 'Terrain data courtesy Analytical Graphics, Inc.';
+        _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, credit);
+
+        return new Future(() {});
+    }
+}
+
+
+class CesiumStkBaseTerrainLayer extends BaseTerrainLayer {
+
+    CesiumStkBaseTerrainLayer(String name, Map map)
+            : super("cesium_stk_base_terrain", name, map);
+
+    @override
+    Future<bool> load() {
+
+        var url = '//cesiumjs.org/stk-terrain/tilesets/world/tiles';
+        _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, null);
+
+        return new Future(() {});
+    }
+}
+
+
+class VrTheWorldBaseTerrainLayer extends BaseTerrainLayer {
+
+    VrTheWorldBaseTerrainLayer(String name, Map map)
+            : super("vrtheworld_base_terrain", name, map);
+
+    @override
+    Future<bool> load() {
+
+        var url = '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/';
+        _provider = _hub.cesium.setVrTheWorldBaseTerrainProvider(url);
 
         return new Future(() {});
     }
