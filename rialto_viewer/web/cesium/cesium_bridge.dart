@@ -69,7 +69,7 @@ class CesiumBridge {
 
     double setLayerBrightness(dynamic layer, double d) => _bridge.callMethod('setLayerBrightness', [layer, d]);
 
-    double setLayerContrast(dynamic layer, double d) => _bridge.callMethod('setLayerVisible', [layer, d]);
+    double setLayerContrast(dynamic layer, double d) => _bridge.callMethod('setLayerContrast', [layer, d]);
 
     double setLayerHue(dynamic layer, double d) => _bridge.callMethod('setLayerHue', [layer, d]);
 
