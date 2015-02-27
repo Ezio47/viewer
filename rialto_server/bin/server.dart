@@ -123,18 +123,23 @@ class Server {
     void _proxyHandler(HttpRequest request, Uri uri) {
         //log("proxy request for: $uri");
 
-        getter(uri).then((s) {
-            request.response.statusCode = HttpStatus.OK;
-            request.response.write(s);
+        getter(uri).then((List list) {
+            HttpResponse actualResponse = list[0];
+            var data = list[1];
+
+            request.response.statusCode = actualResponse.statusCode;
+            request.response.headers.contentType = actualResponse.headers.contentType;
+            request.response.add(data);
             request.response.close();
         });
     }
 
     Future getter(uri) {
-        var c = new Completer<String>();
+        log("PROXY TO: " + uri.toString());
 
-        List<int> retList = [];
-        String retString = "";
+        var c = new Completer();
+
+        List<int> data = [];
 
         var cli = new HttpClient();
 
@@ -145,29 +150,13 @@ class Server {
             return request.close();
 
         }).then((HttpClientResponse response) {
-            //log(response.statusCode);
-            //log(response.headers);
 
-            if (response.headers.contentType == ContentType.BINARY ||
-                    response.headers.contentType.toString() == "image/jpeg") {
-                response.listen((contents) {
-                    retList.addAll(contents);
-                }, onDone: () {
-                    c.complete(retList);
-                });
-            } else if (response.headers.contentType == ContentType.HTML ||
-                    response.headers.contentType == ContentType.TEXT ||
-                    response.headers.contentType == ContentType.JSON ||
-                    response.headers.contentType.toString() == "text/xml") { // TODO: hack
-                response.transform(UTF8.decoder).listen((contents) {
-                    retString += contents;
-                }, onDone: () {
-                    c.complete(retString);
-                });
-            } else {
-                log("*** UNKNOWN CONTENT TYPE: -${response.headers.contentType.toString()}-");
-                exit(99);
-            }
+            response.listen((contents) {
+                data.addAll(contents);
+            }, onDone: () {
+                c.complete([response, data]);
+            });
+
         });
 
         return c.future;
