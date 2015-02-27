@@ -1,7 +1,0 @@
-layers:
-    test_point:
-        type: vector
-        server: http://localhost:12345
-        path: /file/mpg.json
-        description: "foor bar yow"  # optional, default=""
-        visible: true       # optional, default=true

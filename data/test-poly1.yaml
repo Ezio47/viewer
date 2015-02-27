@@ -1,5 +1,0 @@
-layers:
-    test_poly:
-        type: vector
-        server: http://localhost:12345
-        path: /file/unittests/geojson/poly.json
