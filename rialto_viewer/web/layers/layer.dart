@@ -12,24 +12,50 @@ abstract class Layer {
     final String name;
     final String description;
 
-    bool _visible;
     CartographicBbox _bbox;
 
     Layer(String this.type, String this.name, Map map)
             : _hub = Hub.root,
-              description = YamlUtils.getOptionalSettingAsString(map, "description"),
-              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true) {
+              description = YamlUtils.getOptionalSettingAsString(map, "description") {
         log("New $type layer: $name");
     }
 
     Future<bool> load();
 
-    bool get visible => _visible;
-    set visible(bool v) => _visible = v;
-
     CartographicBbox get bbox => _bbox;
     set bbox(CartographicBbox bbox) => _bbox = bbox;
 }
+
+
+abstract class VisibilityControl {
+    bool get visible;
+    set visible(bool v);
+}
+
+
+abstract class AlphaControl {
+    double get alpha;
+    set alpha(double d);
+}
+
+
+abstract class ColorCorrectionControl {
+    double get brightness;
+    set brightness(double d);
+
+    double get contrast;
+    set contrast(double d);
+
+    double get hue;
+    set hue(double d);
+
+    double get saturation;
+    set saturation(double d);
+
+    double get gamma;
+    set gamma(double d);
+}
+
 
 
 abstract class UrlLayer extends Layer {

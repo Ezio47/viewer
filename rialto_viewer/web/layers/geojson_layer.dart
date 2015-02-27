@@ -24,18 +24,4 @@ class GeoJsonLayer extends UrlLayer {
 
         return c.future;
     }
-
-    @override
-    set visible(bool v) {
-        if (v == _visible) return;
-
-        if (v) {
-            // make it visible
-            _hub.cesium.addDataSource(dataSource);
-        } else {
-            // make it invisible
-            _hub.cesium.removeDataSource(dataSource);
-        }
-        _visible = v;
-    }
 }

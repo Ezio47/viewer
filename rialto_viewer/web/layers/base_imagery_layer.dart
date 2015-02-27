@@ -6,12 +6,41 @@
 part of rialto.viewer;
 
 
-abstract class BaseImageryLayer extends Layer {
+abstract class BaseImageryLayer extends Layer with VisibilityControl, AlphaControl, ColorCorrectionControl {
 
     dynamic _layer;
 
+    bool _visible;
+    double _alpha;
+    double _brightness;
+    double _contrast;
+    double _hue;
+    double _saturation;
+    double _gamma;
+
     BaseImageryLayer(String type, String name, Map map)
             : super(type, name, map);
+
+    @override set visible(bool v) => _visible = _hub.cesium.setLayerVisible(_layer, v);
+    @override bool get visible => _visible;
+
+    @override set alpha(double d) => _alpha = _hub.cesium.setLayerAlpha(_layer, d);
+    @override double get alpha => _alpha;
+
+    @override set brightness(double d) => _brightness = _hub.cesium.setLayerBrightness(_layer, d);
+    @override double get brightness => _brightness;
+
+    @override set contrast(double d) => _contrast = _hub.cesium.setLayerContrast(_layer, d);
+    @override double get contrast => _contrast;
+
+    @override set hue(double d) => _hue = _hub.cesium.setLayerHue(_layer, d);
+    @override double get hue => _hue;
+
+    @override set saturation(double d) => _saturation = _hub.cesium.setLayerSaturation(_layer, d);
+    @override double get saturation => _saturation;
+
+    @override set gamma(double d) => _gamma = _hub.cesium.setLayerGamma(_layer, d);
+    @override double get gamma => _gamma;
 }
 
 

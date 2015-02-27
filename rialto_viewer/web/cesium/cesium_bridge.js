@@ -67,7 +67,7 @@ var CesiumBridge = function (element) {
 
     //---------------------------------------------------------------------------------------------
     //
-    // Imagery Providers
+    // imagery provider utils
     //
     //---------------------------------------------------------------------------------------------
 
@@ -76,6 +76,40 @@ var CesiumBridge = function (element) {
         return this.viewer.imageryLayers.addImageryProvider(provider);
     }
 
+    this.setLayerVisible = function (layer, v) {
+        layer.show = v;
+    }
+
+    this.setLayerAlpha = function (layer, d) {
+        layer.alpha = v;
+    }
+
+    this.setLayerBrightness = function (layer, d) {
+        layer.brightness = v;
+    }
+
+    this.setLayerContrast = function (layer, d) {
+        layer.contrast = v;
+    }
+
+    this.setLayerHue = function (layer, d) {
+        layer.hue = v;
+    }
+
+    this.setLayerSaturation = function (layer, d) {
+        layer.saturation = v;
+    }
+
+    this.setLayerGamma = function (layer, d) {
+        layer.gamma = v;
+    }
+
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // Imagery Providers
+    //
+    //---------------------------------------------------------------------------------------------
 
     this.newSingleTileImageryProvider = function (url, rect, proxy) {
         var options = {

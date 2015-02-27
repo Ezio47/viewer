@@ -49,7 +49,9 @@ class Commands {
 
     Future displayLayerData(DisplayLayerData data) {
         assert(data.layer != null);
-        data.layer.visible = data.visible;
+        if (data.layer is VisibilityControl) {
+            (data.layer as VisibilityControl).visible = data.visible;
+        }
         return new Future((){});
     }
 

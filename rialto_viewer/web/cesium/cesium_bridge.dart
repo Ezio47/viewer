@@ -51,10 +51,31 @@ class CesiumBridge {
         return layer;
     }
 
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // imagery layer support
+    //
+    //---------------------------------------------------------------------------------------------
+
     // returns a layer
     dynamic addImageryProvider(dynamic provider) {
         return _bridge.callMethod('addImageryProvider', [provider]);
     }
+
+    bool setLayerVisible(dynamic layer, bool v) => _bridge.callMethod('setLayerVisible', [layer, v]);
+
+    double setLayerAlpha(dynamic layer, double d) => _bridge.callMethod('setLayerAlpha', [layer, d]);
+
+    double setLayerBrightness(dynamic layer, double d) => _bridge.callMethod('setLayerBrightness', [layer, d]);
+
+    double setLayerContrast(dynamic layer, double d) => _bridge.callMethod('setLayerVisible', [layer, d]);
+
+    double setLayerHue(dynamic layer, double d) => _bridge.callMethod('setLayerHue', [layer, d]);
+
+    double setLayerSaturation(dynamic layer, double d) => _bridge.callMethod('setLayerSaturation', [layer, d]);
+
+    double setLayerGamma(dynamic layer, double d) => _bridge.callMethod('setLayerGamma', [layer, d]);
 
 
     //---------------------------------------------------------------------------------------------

@@ -63,8 +63,11 @@ class LayerManagerDialogVM extends DialogVM {
         if (items[0] == null) return;
         Layer layer = items[0].layer;
 
-        layer.visible = _layerVisible.value;
-        log("Visibility of ${layer.name} changed to ${layer.visible}");
+        if (layer is VisibilityControl) {
+            VisibilityControl vc = layer as VisibilityControl;
+            vc.visible = _layerVisible.value;
+            log("Visibility of ${layer.name} changed to ${vc.visible}");
+        }
     }
 
     void _selectHandler(var e) {
@@ -75,7 +78,9 @@ class LayerManagerDialogVM extends DialogVM {
 
         log("${layer.name} selected");
 
-        _layerVisible.value = layer.visible;
+        if (layer is VisibilityControl) {
+            _layerVisible.value = (layer as VisibilityControl).visible;
+        }
     }
 
     Layer get currentSelection {

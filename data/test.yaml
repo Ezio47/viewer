@@ -3,6 +3,13 @@
         type: pointcloud
         url: http://localhost:12345/file/tiles/tiledserp18
 
+    esri:
+        type: arcgis_base_imagery
+    z:
+        type: single_imagery
+        url: http://localhost:12345/file/unittests/images/fan.jpg
+        rectangle: [ -75.0, 28.0, -67.0, 29.75 ]
+
 - camera:
     eye: [-83.43271, 39.02617, 50.0]
     target: [-83.43271, 39.02617, 0]
