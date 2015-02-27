@@ -23,8 +23,11 @@ final Map tests = {
     14: "unittests/geojson_2.yaml",
     15: "unittests/geojson_3.yaml",
     16: "unittests/pointcloud.yaml",
-    17: "unittests/terrain.yaml",
-    18: "unittests/wps.yaml",
+    17: "unittests/single_imagery.yaml",
+    18: "unittests/terrain.yaml",
+    19: "unittests/wms_imagery.yaml",
+    20: "unittests/wps.yaml",
+    21: "unittests/wtms_imagery.yaml",
 };
 
 
@@ -34,7 +37,7 @@ void main() {
     //OgcDocumentTests.test();
 
     try {
-        String s = "http://localhost:12345/file/" + tests[0];
+        String s = "http://localhost:12345/file/" + tests[21];
         var uri = Uri.parse(s);
         hub.commands.loadScript(uri);
     } catch (e) {

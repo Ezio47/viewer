@@ -1,0 +1,10 @@
+- layers:
+    esri:
+        type: base_imagery
+        url: ARCGIS
+
+    xx:
+       type: wms_imagery
+       url: http://beta.sedac.ciesin.columbia.edu/geoserver/wms
+       layers: energy:energy-pop-exposure-nuclear-plants-locations_plants
+       proxy: http://localhost:12345/proxy

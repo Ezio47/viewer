@@ -1,0 +1,8 @@
+- layers:
+    esri:
+        type: base_imagery
+        url: ARCGIS
+    z:
+        type: single_imagery
+        url: http://localhost:12345/file/unittests/images/fan.jpg
+        rect: [ -75.0, 28.0, -67.0, 29.75 ]
