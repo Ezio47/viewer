@@ -22,13 +22,14 @@ final Map tests = {
     10: "unittests/geojson_1.yaml",                         // two shapes + serp cloud
     11: "unittests/geojson_2.yaml",                         // giraffe + serp cloud
     12: "unittests/geojson_3.yaml",                         // two shape & giraffe + serp cloud
-    13: "unittests/pointcloud_1.yaml",                      // just serp cloud
-    14: "unittests/pointcloud_2.yaml",                      // serp cloud on bing base imagery
-    15: "unittests/single_imagery.yaml",                    // world + fan
-    16: "unittests/terrain.yaml",                           // grand canyon, base imagery with terrain
-    17: "unittests/wms_imagery.yaml",                       // just dots on white world
-    18: "unittests/wps.yaml",                               // just pointcloud, plus output to console
-    19: "unittests/wtms_imagery.yaml",                      // world at night
+    13: "unittests/imagery_mixins.yaml",                    // 5 different fans, only 4 visible
+    14: "unittests/pointcloud_1.yaml",                      // just serp cloud
+    15: "unittests/pointcloud_2.yaml",                      // serp cloud on bing base imagery
+    16: "unittests/single_imagery.yaml",                    // world + fan
+    17: "unittests/terrain.yaml",                           // grand canyon, base imagery with terrain
+    18: "unittests/wms_imagery.yaml",                       // just dots on white world
+    19: "unittests/wps.yaml",                               // just pointcloud, plus output to console
+    20: "unittests/wtms_imagery.yaml",                      // world at night
 };
 
 
@@ -38,7 +39,7 @@ void main() {
     //OgcDocumentTests.test();
 
     try {
-        String s = "http://localhost:12345/file/" + tests[0];
+        String s = "http://localhost:12345/file/" + tests[20];
         var uri = Uri.parse(s);
         hub.commands.loadScript(uri);
     } catch (e) {

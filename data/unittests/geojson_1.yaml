@@ -5,9 +5,9 @@
     fov: 60
 
 - layers:
-    tiledserp:
+    - tiledserp:
         type: pointcloud
         url: http://localhost:12345/file/unittests/tiles/serp14
-    test_poly:
+    - test_poly:
         type: geojson
         url: http://localhost:12345/file/unittests/geojson/poly.json

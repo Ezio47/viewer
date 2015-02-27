@@ -1,10 +1,10 @@
 - layers:
-    tiledserp:
+    - tiledserp:
         type: pointcloud   # always tiled
         url: http://localhost:12345/file/unittests/tiles/serp14
         description: "foor bar yow"  # optional, default=""
 
-    bingbong:
+    - bingbong:
         type: bing_base_imagery
         style: Aerial
         apiKey: ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf

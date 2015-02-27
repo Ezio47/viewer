@@ -8,10 +8,10 @@
     fov: 60
 
 - layers:
-    bing:
+    - bing:
         type: bing_base_imagery
         style: AerialWithLabels
 
-    arcgis_terrain:
+    - arcgis_terrain:
         type: arcgis_base_terrain
         apiKey: KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..

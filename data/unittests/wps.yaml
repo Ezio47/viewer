@@ -1,5 +1,5 @@
 - layers:
-    tiledserp:
+    - tiledserp:
         type: pointcloud
         url: http://localhost:12345/file/unittests/tiles/serp14
 

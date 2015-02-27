@@ -1,5 +1,5 @@
 - layers:
-    tiledserp:
+    - tiledserp:
         type: pointcloud   # always tiled
         url: http://localhost:12345/file/unittests/tiles/serp14
         description: "foor bar yow"  # optional, default=""

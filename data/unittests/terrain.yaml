@@ -5,10 +5,10 @@
     fov: 60
 
 - layers:
-    bing:
+    - bing:
         type: bing_base_imagery
         style: AerialWithLabels
 
-    terrain:
+    - terrain:
         type: terrain
         url: http://cesiumjs.org/stk-terrain/tilesets/world/tiles

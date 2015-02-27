@@ -1,6 +1,8 @@
 - layers:
     - esri:
         type: arcgis_base_imagery
+        visible: true
+        brightness: 0.2
 
     - z1:
         type: single_imagery

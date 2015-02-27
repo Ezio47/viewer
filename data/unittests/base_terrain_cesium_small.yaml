@@ -5,9 +5,9 @@
     fov: 60
 
 - layers:
-    bing:
+    - bing:
         type: bing_base_imagery
         style: AerialWithLabels
 
-    cs:
+    - cs:
         type: cesium_small_base_terrain
