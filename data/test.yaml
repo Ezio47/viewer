@@ -22,8 +22,13 @@
 
 #    y:
 #        type: wtms_imagery
-#        url: //cesiumjs.org/blackmarble
+#        url: http://cesiumjs.org/blackmarble
 #        maximumLevel : 8
+
+    z:
+        type: single_imagery
+        url: http://localhost:12345/file/cs.png
+        rect: [ -75.0, 28.0, -67.0, 29.75 ]
 
 - camera:
     eye: [-83.43271, 39.02617, 50.0]

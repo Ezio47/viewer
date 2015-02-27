@@ -42,17 +42,18 @@ var CesiumBridge = function (element) {
         return _proxy;
     }
 
-    this.newRectangle = function (w, s, e, n) {
-        var rect = new Cesium.Rectangle(w, s, e, n);
+    this.newRectangleFromDegrees = function (w, s, e, n) {
+        var rect = new Cesium.Rectangle.fromDegrees(w, s, e, n);
         return rect;
     }
 
     this.newSingleTileImageryProvider = function (url, rect, proxy) {
         var options = {
             url: url,
-            rect: rect == null ? undefined : rect,
+            rectangle: rect == null ? undefined : rect,
             proxy: proxy == null ? undefined : proxy
         };
+        mylog(rect.north);
         return new Cesium.SingleTileImageryProvider(options);
     }
 
@@ -60,7 +61,7 @@ var CesiumBridge = function (element) {
         var options = {
             url: url,
             layers: layers,
-            rect: rect == null ? undefined : rect,
+            rectangle: rect == null ? undefined : rect,
             proxy: proxy == null ? undefined : proxy
         };
         myassert(proxy != null);
@@ -70,7 +71,7 @@ var CesiumBridge = function (element) {
     this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel, proxy) {
         var options = {
             url: url,
-            rect: rect == null ? undefined : rect,
+            rectangle: rect == null ? undefined : rect,
             maximumLevel: maximumLevel,
             proxy: proxy == null ? undefined : proxy
         };

@@ -9,6 +9,7 @@ class LayerManager {
     Hub _hub;
     Map<String, Layer> layers = new Map<String, Layer>();
     CartographicBbox bbox = new CartographicBbox.empty();
+    bool _hasBaseImagery = false;
 
     LayerManager() :
         _hub = Hub.root;
@@ -39,7 +40,7 @@ class LayerManager {
             return c.future;
         }
 
-        Layer layer = LayerManager._createLayer(name, data.map);
+        Layer layer = _createLayer(name, data.map);
         if (layer == null) {
             Hub.error("Unable to load layer $name.");
             c.complete(null);
@@ -87,7 +88,7 @@ class LayerManager {
     }
 
     // this function should do no heavywieght work, save that for load()
-    static Layer _createLayer(String name, Map map) {
+    Layer _createLayer(String name, Map map) {
 
         assert(map.containsKey("type"));
 
@@ -97,6 +98,7 @@ class LayerManager {
         switch (type) {
             case "base_imagery":
                 layer = new BaseImageryLayer(name, map);
+                _hasBaseImagery = true;
                 break;
             case "base_terrain":
                 layer = new BaseTerrainLayer(name, map);
@@ -108,6 +110,10 @@ class LayerManager {
                 layer = new WtmsImageryLayer(name, map);
                 break;
             case "single_imagery":
+                if (!_hasBaseImagery) {
+                    // TODO: under what conditions is this really a problem?
+                    throw new ArgumentError("single_imagery requires a base imager layer");
+                }
                 layer = new SingleImageryLayer(name, map);
                 break;
             case "terrain":

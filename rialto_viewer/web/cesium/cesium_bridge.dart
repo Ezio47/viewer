@@ -14,7 +14,7 @@ class CesiumBridge {
     }
 
     dynamic addSingleTileImageryProvider(String url, List<num> rectList, String proxyUrl) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangle', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
         var provider = _bridge.callMethod('newSingleTileImageryProvider', [url, rect, proxy]);
         _bridge.callMethod('addImageryProvider', [provider]);
@@ -22,7 +22,7 @@ class CesiumBridge {
     }
 
     dynamic addWebMapServiceImageryProvider(String url, String layers, List<num> rectList, String proxyUrl) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangle', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
         var provider = _bridge.callMethod('newWebMapServiceImageryProvider', [url, layers, rect, proxy]);
         _bridge.callMethod('addImageryProvider', [provider]);
@@ -30,7 +30,7 @@ class CesiumBridge {
     }
 
     dynamic addTileMapServiceImageryProvider(String url, List<num> rectList, int maximumLevel, String proxyUrl) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangle', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
         var provider = _bridge.callMethod('newTileMapServiceImageryProvider', [url, rect, maximumLevel, proxy]);
         _bridge.callMethod('addImageryProvider', [provider]);
