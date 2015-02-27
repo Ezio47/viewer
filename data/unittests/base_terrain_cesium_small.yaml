@@ -1,0 +1,13 @@
+- camera:
+    eye: [-113.0, 35.5, 20.0]
+    target: [-113.0, 37.0, 0.0]
+    up: [0, 0, 1]
+    fov: 60
+
+- layers:
+    bing:
+        type: bing_base_imagery
+        style: AerialWithLabels
+
+    cs:
+        type: cesium_small_base_terrain
