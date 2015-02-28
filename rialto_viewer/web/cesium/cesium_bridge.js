@@ -350,14 +350,17 @@ var CesiumBridge = function (element) {
     }
 
     this.setDataSourceVisible = function (dataSource, v) {
-        myassert(!dataSource.isLoading, 120);
+        var list = this.viewer.dataSources;
 
-        var es = dataSource.entities;
-        mylog("a" + es);
-        mylog("b" + es.entities.length);
-        for (var e in es.values) {
-            mylog(e);
-            e.show = v;
+        // TODO: there should be a better way to do this, using the "show" property?
+        if (v) {
+            if (!list.contains(dataSource)) {
+                list.add(dataSource);
+            }
+        } else {
+            if (list.contains(dataSource)) {
+                list.remove(dataSource);
+            }
         }
     }
 
@@ -365,6 +368,7 @@ var CesiumBridge = function (element) {
         var viewer = this.viewer;
 
         var ds = new Cesium.GeoJsonDataSource(name);
+        viewer.dataSources.add(ds);
 
         // these are default styling settings, if no simplestyle present
         ds.loadUrl(url, {
@@ -372,11 +376,10 @@ var CesiumBridge = function (element) {
           fill: Cesium.Color.WHITE,
           strokeWidth: 1,
           markerSymbol: '*'
-        }).then(function(x) {
-            viewer.dataSources.add(ds);
+        }).then(function() {
             completer(ds);
         }).otherwise(function (error) {
-            myerror("Unable to read point cloud header: " + urlarg, error);
+            myerror("Unable to read geojson: " + urlarg, error);
         });
     }
 

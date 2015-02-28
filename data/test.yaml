@@ -1,3 +1,20 @@
 - layers:
     - esri:
         type: arcgis_base_imagery
+        saturation: 0.25
+        visible: true
+    - test_poly1:
+        type: geojson
+        url: http://localhost:12345/file/unittests/geojson/mpg.json
+        visible: true
+    - test_poly2:
+        type: geojson
+        url: http://localhost:12345/file/unittests/geojson/poly.json
+        visible: false
+
+- camera:
+    eye: [-83.43271, 39.02617, 50.0]
+    target: [-83.43271, 39.02617, 0]
+    up: [0, 0, 1]
+    fov: 60
+
