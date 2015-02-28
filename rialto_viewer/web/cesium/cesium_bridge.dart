@@ -28,7 +28,9 @@ class CesiumBridge {
     //---------------------------------------------------------------------------------------------
 
     dynamic addSingleTileImageryProvider(String url, List<num> rectList, String proxyUrl) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var rect = (rectList == null || rectList == []) ?
+                null :
+                _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
         var provider = _bridge.callMethod('newSingleTileImageryProvider', [url, rect, proxy]);
         var layer = _bridge.callMethod('addImageryProvider', [provider]);
@@ -36,7 +38,9 @@ class CesiumBridge {
     }
 
     dynamic addWebMapServiceImageryProvider(String url, String layers, List<num> rectList, String proxyUrl) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var rect = (rectList == null || rectList == []) ?
+                null :
+                _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
         var provider = _bridge.callMethod('newWebMapServiceImageryProvider', [url, layers, rect, proxy]);
         var layer = _bridge.callMethod('addImageryProvider', [provider]);
@@ -44,7 +48,9 @@ class CesiumBridge {
     }
 
     dynamic addTileMapServiceImageryProvider(String url, List<num> rectList, int maximumLevel, String proxyUrl) {
-        var rect = (rectList == null || rectList == []) ? null : _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
+        var rect = (rectList == null || rectList == []) ?
+                null :
+                _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
         var provider = _bridge.callMethod('newTileMapServiceImageryProvider', [url, rect, maximumLevel, proxy]);
         var layer = _bridge.callMethod('addImageryProvider', [provider]);
@@ -63,19 +69,19 @@ class CesiumBridge {
         return _bridge.callMethod('addImageryProvider', [provider]);
     }
 
-    bool setLayerVisible(dynamic layer, bool v) => _bridge.callMethod('setLayerVisible', [layer, v]);
+    void setLayerVisible(dynamic layer, bool v) => _bridge.callMethod('setLayerVisible', [layer, v]);
 
-    double setLayerAlpha(dynamic layer, double d) => _bridge.callMethod('setLayerAlpha', [layer, d]);
+    void setLayerAlpha(dynamic layer, double d) => _bridge.callMethod('setLayerAlpha', [layer, d]);
 
-    double setLayerBrightness(dynamic layer, double d) => _bridge.callMethod('setLayerBrightness', [layer, d]);
+    void setLayerBrightness(dynamic layer, double d) => _bridge.callMethod('setLayerBrightness', [layer, d]);
 
-    double setLayerContrast(dynamic layer, double d) => _bridge.callMethod('setLayerContrast', [layer, d]);
+    void setLayerContrast(dynamic layer, double d) => _bridge.callMethod('setLayerContrast', [layer, d]);
 
-    double setLayerHue(dynamic layer, double d) => _bridge.callMethod('setLayerHue', [layer, d]);
+    void setLayerHue(dynamic layer, double d) => _bridge.callMethod('setLayerHue', [layer, d]);
 
-    double setLayerSaturation(dynamic layer, double d) => _bridge.callMethod('setLayerSaturation', [layer, d]);
+    void setLayerSaturation(dynamic layer, double d) => _bridge.callMethod('setLayerSaturation', [layer, d]);
 
-    double setLayerGamma(dynamic layer, double d) => _bridge.callMethod('setLayerGamma', [layer, d]);
+    void setLayerGamma(dynamic layer, double d) => _bridge.callMethod('setLayerGamma', [layer, d]);
 
 
     //---------------------------------------------------------------------------------------------
@@ -141,7 +147,9 @@ class CesiumBridge {
     Future<dynamic> createTileProviderAsync(String url, String colorizeRamp, String colorizeDimension, bool visible) {
         var c = new Completer<dynamic>();
 
-        var cb = (obj) { c.complete(obj); };
+        var cb = (obj) {
+            c.complete(obj);
+        };
 
         _bridge.callMethod('createTileProviderAsync', [url, colorizeRamp, colorizeDimension, visible, cb]);
 
@@ -187,8 +195,20 @@ class CesiumBridge {
         _bridge.callMethod('removeDataSource', [dataSource]);
     }
 
-    dynamic addGeoJson(String url) {
-        return _bridge.callMethod('addGeoJson', [url]);
+    void setDataSourceVisible(var dataSource, bool v) {
+        _bridge.callMethod('setDataSourceVisible', [dataSource, v]);
+    }
+
+    Future<dynamic> addGeoJson(String name, String url) {
+        var c = new Completer<dynamic>();
+
+        var cb = (obj) {
+            c.complete(obj);
+        };
+
+        _bridge.callMethod('addGeoJson', [name, url, cb]);
+
+        return c.future;
     }
 
 
@@ -289,6 +309,7 @@ class CesiumBridge {
         assert(numPoints >= 0);
         assert(xArray.length == numPoints);
         assert(rgbaArray.length == numPoints * 4);
+
 
 
                 //var prim = _bridge.callMethod('createCloud', [numPoints, xArray.buffer, yArray.buffer, zArray.buffer, rgbaArray.buffer]);

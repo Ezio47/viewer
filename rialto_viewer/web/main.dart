@@ -39,7 +39,7 @@ void main() {
     //OgcDocumentTests.test();
 
     try {
-        String s = "http://localhost:12345/file/" + tests[20];
+        String s = "http://localhost:12345/file/" + tests[0];
         var uri = Uri.parse(s);
         hub.commands.loadScript(uri);
     } catch (e) {

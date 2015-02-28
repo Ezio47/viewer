@@ -349,20 +349,35 @@ var CesiumBridge = function (element) {
         this.viewer.dataSources.remove(dataSource);
     }
 
+    this.setDataSourceVisible = function (dataSource, v) {
+        myassert(!dataSource.isLoading, 120);
 
-    this.addGeoJson = function(url) {
+        var es = dataSource.entities;
+        mylog("a" + es);
+        mylog("b" + es.entities.length);
+        for (var e in es.values) {
+            mylog(e);
+            e.show = v;
+        }
+    }
+
+    this.addGeoJson = function(name, url, completer) {
         var viewer = this.viewer;
+
+        var ds = new Cesium.GeoJsonDataSource(name);
+
         // these are default styling settings, if no simplestyle present
-        var ds = Cesium.GeoJsonDataSource.fromUrl(url, {
+        ds.loadUrl(url, {
           stroke: Cesium.Color.WHITE,
           fill: Cesium.Color.WHITE,
           strokeWidth: 1,
           markerSymbol: '*'
+        }).then(function(x) {
+            viewer.dataSources.add(ds);
+            completer(ds);
+        }).otherwise(function (error) {
+            myerror("Unable to read point cloud header: " + urlarg, error);
         });
-
-        viewer.dataSources.add(ds);
-
-        return ds;
     }
 
 

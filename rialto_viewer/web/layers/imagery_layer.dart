@@ -30,25 +30,46 @@ abstract class ImageryLayer extends UrlLayer with VisibilityControl, AlphaContro
               _rectangle = YamlUtils.getOptionalSettingAsList4(map, "rectangle"),
               super(type, name, map);
 
-    @override set visible(bool v) => _visible = _hub.cesium.setLayerVisible(_layer, v);
+    @override set visible(bool v) {
+        _hub.cesium.setLayerVisible(_layer, v);
+        _visible = v;
+    }
     @override bool get visible => _visible;
 
-    @override set alpha(double d) => _alpha = _hub.cesium.setLayerAlpha(_layer, d);
+    @override set alpha(double d) {
+        _hub.cesium.setLayerAlpha(_layer, d);
+        _alpha = d;
+    }
     @override double get alpha => _alpha;
 
-    @override set brightness(double d) => _brightness = _hub.cesium.setLayerBrightness(_layer, d);
+    @override set brightness(double d) {
+        _hub.cesium.setLayerBrightness(_layer, d);
+        _brightness = d;
+    }
     @override double get brightness => _brightness;
 
-    @override set contrast(double d) => _contrast = _hub.cesium.setLayerContrast(_layer, d);
+    @override set contrast(double d) {
+        _hub.cesium.setLayerContrast(_layer, d);
+        _contrast = d;
+    }
     @override double get contrast => _contrast;
 
-    @override set hue(double d) => _hue = _hub.cesium.setLayerHue(_layer, d);
+    @override set hue(double d) {
+        _hub.cesium.setLayerHue(_layer, d);
+        _hue = d;
+    }
     @override double get hue => _hue;
 
-    @override set saturation(double d) => _saturation = _hub.cesium.setLayerSaturation(_layer, d);
+    @override set saturation(double d) {
+        _hub.cesium.setLayerSaturation(_layer, d);
+        _saturation = d;
+    }
     @override double get saturation => _saturation;
 
-    @override set gamma(double d) => _gamma = _hub.cesium.setLayerGamma(_layer, d);
+    @override set gamma(double d) {
+        _hub.cesium.setLayerGamma(_layer, d);
+        _gamma = d;
+    }
     @override double get gamma => _gamma;
 
     void _forceUpdates() {
