@@ -24,18 +24,15 @@ class GeoJsonLayer extends UrlLayer implements VisibilityControl {
     }
 
     @override
-    Future<bool> load() {
+    Future load() {
         Completer c = new Completer();
 
         _hub.cesium.addGeoJson(name, _url.toString()).then((ds) {
             _dataSource = ds;
 
-
-            // TODO: set bbox
-
             _forceUpdates();
 
-            c.complete(true);
+            c.complete();
         });
 
         return c.future;

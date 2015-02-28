@@ -101,13 +101,14 @@ class BingBaseImageryLayer extends BaseImageryLayer {
     }
 
     @override
-    Future<bool> load() {
+    Future load() {
 
-        _layer = _hub.cesium.setBingBaseImageryProvider(_apiKey, _style);
+        var f = new Future(() {
+            _layer = _hub.cesium.setBingBaseImageryProvider(_apiKey, _style);
+            _forceUpdates();
+        });
 
-        _forceUpdates();
-
-        return new Future(() {});
+        return f;
     }
 }
 
@@ -118,13 +119,13 @@ class ArcGisBaseImageryLayer extends BaseImageryLayer {
             : super("arcgis_base_imagery", name, map);
 
     @override
-    Future<bool> load() {
+    Future load() {
+        var f = new Future(() {
+            _layer = _hub.cesium.setArcGisBaseImageryProvider();
+            _forceUpdates();
+        });
 
-        _layer = _hub.cesium.setArcGisBaseImageryProvider();
-
-        _forceUpdates();
-
-        return new Future(() {});
+        return f;
     }
 }
 
@@ -135,12 +136,13 @@ class OsmBaseImageryLayer extends BaseImageryLayer {
             : super("osm_base_imagery", name, map);
 
     @override
-    Future<bool> load() {
+    Future load() {
 
-        _layer = _hub.cesium.setOsmBaseImageryProvider();
+        var f = new Future(() {
+            _layer = _hub.cesium.setOsmBaseImageryProvider();
 
-        _forceUpdates();
-
-        return new Future(() {});
+            _forceUpdates();
+        });
+        return f;
     }
 }

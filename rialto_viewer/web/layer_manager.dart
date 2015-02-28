@@ -14,12 +14,13 @@ class LayerManager {
     LayerManager() :
         _hub = Hub.root;
 
-    Future doColorizeLayers(ColorizeLayersData data) {
+    Future doColorizeLayers(ColorizerData data) {
         var futures = new List<Future>();
 
         for (var layer in layers.values) {
             if (layer is PointCloudLayer) {
-                Future f = layer.colorizeAsync(data);
+                (layer as ColorizerControl).colorizerData = data;
+                Future f = layer.colorizeAsync();
                 futures.add(f);
             }
         }

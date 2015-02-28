@@ -16,7 +16,7 @@ class Commands {
         return _hub.layerManager.doAddLayer(data);
     }
 
-    Future colorizeLayers(ColorizeLayersData data) {
+    Future colorizeLayers(ColorizerData data) {
         return _hub.layerManager.doColorizeLayers(data);
     }
 
@@ -163,10 +163,10 @@ class WpsRequestData {
 }
 
 
-class ColorizeLayersData {
+class ColorizerData {
     String ramp;
     String dimension;
-    ColorizeLayersData(String this.ramp, String this.dimension);
+    ColorizerData(String this.ramp, String this.dimension);
 }
 
 

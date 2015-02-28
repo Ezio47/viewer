@@ -90,14 +90,16 @@ class SingleImageryLayer extends ImageryLayer {
             : super("single_imagery", name, map);
 
     @override
-    Future<bool> load() {
-        String url = _url.toString();
-        String proxy = (_proxy == null) ? null : _proxy.toString();
-        _layer = _hub.cesium.addSingleTileImageryProvider(url, _rectangle, proxy);
+    Future load() {
+        var f = new Future(() {
 
-        _forceUpdates();
+            String url = _url.toString();
+            String proxy = (_proxy == null) ? null : _proxy.toString();
+            _layer = _hub.cesium.addSingleTileImageryProvider(url, _rectangle, proxy);
 
-        return new Future(() {});
+            _forceUpdates();
+        });
+        return f;
     }
 }
 
@@ -110,14 +112,16 @@ class WmsImageryLayer extends ImageryLayer {
               _layers = YamlUtils.getRequiredSettingAsString(map, "layers");
 
     @override
-    Future<bool> load() {
-        String url = _url.toString();
-        String proxy = (_proxy == null) ? null : _proxy.toString();
-        _layer = _hub.cesium.addWebMapServiceImageryProvider(url, _layers, _rectangle, proxy);
+    Future load() {
+        var f = new Future(() {
 
-        _forceUpdates();
+            String url = _url.toString();
+            String proxy = (_proxy == null) ? null : _proxy.toString();
+            _layer = _hub.cesium.addWebMapServiceImageryProvider(url, _layers, _rectangle, proxy);
 
-        return new Future(() {});
+            _forceUpdates();
+        });
+        return f;
     }
 }
 
@@ -131,13 +135,14 @@ class WtmsImageryLayer extends ImageryLayer {
               _maximumLevel = YamlUtils.getOptionalSettingAsInt(map, "maximumLevel", 18);
 
     @override
-    Future<bool> load() {
-        String url = _url.toString();
-        String proxy = (_proxy == null) ? null : _proxy.toString();
-        _layer = _hub.cesium.addTileMapServiceImageryProvider(url, _rectangle, _maximumLevel, proxy);
+    Future load() {
+        var f = new Future(() {
+            String url = _url.toString();
+            String proxy = (_proxy == null) ? null : _proxy.toString();
+            _layer = _hub.cesium.addTileMapServiceImageryProvider(url, _rectangle, _maximumLevel, proxy);
 
-        _forceUpdates();
-
-        return new Future(() {});
+            _forceUpdates();
+        });
+        return f;
     }
 }

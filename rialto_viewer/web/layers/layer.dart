@@ -20,10 +20,24 @@ abstract class Layer {
         log("New $type layer: $name");
     }
 
-    Future<bool> load();
+    Future load();
 
     CartographicBbox get bbox => _bbox;
-    set bbox(CartographicBbox bbox) => _bbox = bbox;
+}
+
+
+abstract class UrlLayer extends Layer {
+    Uri _url;
+    Uri _proxy;
+
+    UrlLayer(String type, String name, Map map)
+            : super(type, name, map) {
+        _url = YamlUtils.getOptionalSettingAsUrl(map, "url");
+        _proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy");
+    }
+
+    Uri get url => _url;
+    Uri get proxy => _proxy;
 }
 
 
@@ -57,17 +71,7 @@ abstract class ColorCorrectionControl {
 }
 
 
-
-abstract class UrlLayer extends Layer {
-    Uri _url;
-    Uri _proxy;
-
-    UrlLayer(String type, String name, Map map)
-            : super(type, name, map) {
-        _url = YamlUtils.getOptionalSettingAsUrl(map, "url");
-        _proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy");
-    }
-
-    Uri get url => _url;
-    Uri get proxy => _proxy;
+abstract class ColorizerControl {
+    ColorizerData get colorizerData;
+    set colorizerData(ColorizerData data);
 }

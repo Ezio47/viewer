@@ -5,11 +5,10 @@
 part of rialto.viewer;
 
 
-class PointCloudLayer extends UrlLayer with VisibilityControl {
+class PointCloudLayer extends UrlLayer with VisibilityControl, ColorizerControl {
     var _provider;
     int numPoints;
-    String colorizeRamp = "Spectral";
-    String colorizeDimension = "Z";
+    ColorizerData _colorizerData = new ColorizerData("Spectral", "Z");
 
     bool _visible = true;
 
@@ -17,10 +16,14 @@ class PointCloudLayer extends UrlLayer with VisibilityControl {
             : super("pointcloud", name, map);
 
     @override
-    Future<bool> load() {
+    Future load() {
         Completer c = new Completer();
 
-        _hub.cesium.createTileProviderAsync(url.toString(), colorizeRamp, colorizeDimension, visible).then((provider) {
+        _hub.cesium.createTileProviderAsync(
+                url.toString(),
+                _colorizerData.ramp,
+                _colorizerData.dimension,
+                visible).then((provider) {
             _provider = provider;
 
             numPoints = _hub.cesium.getNumPointsFromProvider(_provider);
@@ -31,9 +34,9 @@ class PointCloudLayer extends UrlLayer with VisibilityControl {
             var yStats = _hub.cesium.getStatsFromProvider(_provider, "Y");
             var zStats = _hub.cesium.getStatsFromProvider(_provider, "Z");
 
-            bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
+            _bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
 
-            c.complete(true);
+            c.complete();
         });
 
         return c.future;
@@ -49,11 +52,16 @@ class PointCloudLayer extends UrlLayer with VisibilityControl {
     @override
     bool get visible => _visible;
 
-    Future colorizeAsync(ColorizeLayersData data) {
+    ColorizerData get colorizerData => _colorizerData;
+
+    // note this doesn't run the colorizer, you need to do that manually
+    set colorizerData(ColorizerData d) {
+        _colorizerData = d;
+    }
+
+    Future colorizeAsync() {
         return new Future(() {
             _hub.cesium.unloadTileProvider(_provider);
-            colorizeRamp = data.ramp;
-            colorizeDimension = data.dimension;
             load();
         });
     }

@@ -13,11 +13,12 @@ class TerrainLayer extends UrlLayer {
             : super("terrain", name, map);
 
     @override
-    Future<bool> load() {
+    Future load() {
+        var f = new Future(() {
 
-        String url = _url.toString();
-        _provider = _hub.cesium.setCesiumTerrainProvider(url);
-
-        return new Future(() {});
+            String url = _url.toString();
+            _provider = _hub.cesium.setCesiumTerrainProvider(url);
+        });
+        return f;
     }
 }

@@ -10,10 +10,26 @@
     - test_poly2:
         type: geojson
         url: http://localhost:12345/file/unittests/geojson/poly.json
-        visible: false
+        visible: true
+    - test_poly3:
+        type: geojson
+        url: http://localhost:12345/file/unittests/geojson/poly.json
+        visible: true
+    - test_poly4:
+        type: geojson
+        url: http://localhost:12345/file/unittests/geojson/poly.json
+        visible: true
+    - Terr:
+        type: cesium_small_base_terrain
+        apiKey: KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..
+    - tiledserp:
+        type: pointcloud
+        url: http://localhost:12345/file/unittests/tiles/serp14
 
 - camera:
-    eye: [-83.43271, 39.02617, 50.0]
+#    eye: [-113.0, 35.5, 20.0]   # grand canyon
+#    target: [-113.0, 37.0, 0.0]
+    eye: [-83.43271, 39.02617, 50.0]   # serp
     target: [-83.43271, 39.02617, 0]
     up: [0, 0, 1]
     fov: 60

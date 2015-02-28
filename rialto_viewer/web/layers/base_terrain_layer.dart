@@ -19,10 +19,11 @@ class EllipsoidBaseTerrainLayer extends BaseTerrainLayer {
             : super("ellipsoid_base_terrain", name, map);
 
     @override
-    Future<bool> load() {
-        _provider = _hub.cesium.setEllipsoidBaseTerrainProvider();
-
-        return new Future(() {});
+    Future load() {
+        var f = new Future(() {
+            _provider = _hub.cesium.setEllipsoidBaseTerrainProvider();
+        });
+        return f;
     }
 }
 
@@ -38,11 +39,12 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
               _arcGisApiKey = YamlUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultArcGisKey);
 
     @override
-    Future<bool> load() {
+    Future load() {
+        var f = new Future(() {
 
-        _provider = _hub.cesium.setArcGisBaseTerrainProvider(_arcGisApiKey);
-
-        return new Future(() {});
+            _provider = _hub.cesium.setArcGisBaseTerrainProvider(_arcGisApiKey);
+        });
+        return f;
     }
 }
 
@@ -53,13 +55,14 @@ class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
             : super("cesium_small_base_terrain", name, map);
 
     @override
-    Future<bool> load() {
+    Future load() {
+        var f = new Future(() {
 
-        var url = '//cesiumjs.org/smallterrain';
-        var credit = 'Terrain data courtesy Analytical Graphics, Inc.';
-        _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, credit);
-
-        return new Future(() {});
+            var url = '//cesiumjs.org/smallterrain';
+            var credit = 'Terrain data courtesy Analytical Graphics, Inc.';
+            _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, credit);
+        });
+        return f;
     }
 }
 
@@ -70,12 +73,13 @@ class CesiumStkBaseTerrainLayer extends BaseTerrainLayer {
             : super("cesium_stk_base_terrain", name, map);
 
     @override
-    Future<bool> load() {
+    Future load() {
+        var f = new Future(() {
 
-        var url = '//cesiumjs.org/stk-terrain/tilesets/world/tiles';
-        _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, null);
-
-        return new Future(() {});
+            var url = '//cesiumjs.org/stk-terrain/tilesets/world/tiles';
+            _provider = _hub.cesium.setCesiumBaseTerrainProvider(url, null);
+        });
+        return f;
     }
 }
 
@@ -87,10 +91,11 @@ class VrTheWorldBaseTerrainLayer extends BaseTerrainLayer {
 
     @override
     Future<bool> load() {
+        var f = new Future(() {
 
-        var url = '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/';
-        _provider = _hub.cesium.setVrTheWorldBaseTerrainProvider(url);
-
-        return new Future(() {});
+            var url = '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/';
+            _provider = _hub.cesium.setVrTheWorldBaseTerrainProvider(url);
+        });
+        return f;
     }
 }
