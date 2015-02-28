@@ -18,16 +18,17 @@ abstract class ImageryLayer extends UrlLayer with VisibilityControl, AlphaContro
     double _saturation;
     double _gamma;
 
+    // rect is: w, s, e, n
     ImageryLayer(String type, String name, Map map)
-            : super(type, name, map),
-              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
+            : _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
               _alpha = YamlUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
               _brightness = YamlUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
               _contrast = YamlUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
               _hue = YamlUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
               _saturation = YamlUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
               _gamma = YamlUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
-              _rectangle = YamlUtils.getOptionalSettingAsList4(map, "rectangle"); // w, s, e, n
+              _rectangle = YamlUtils.getOptionalSettingAsList4(map, "rectangle"),
+              super(type, name, map);
 
     @override set visible(bool v) => _visible = _hub.cesium.setLayerVisible(_layer, v);
     @override bool get visible => _visible;

@@ -6,7 +6,7 @@
 part of rialto.viewer;
 
 
-abstract class BaseImageryLayer extends Layer with VisibilityControl, AlphaControl, ColorCorrectionControl {
+abstract class BaseImageryLayer extends Layer implements VisibilityControl, AlphaControl, ColorCorrectionControl {
 
     dynamic _layer;
 
@@ -19,14 +19,14 @@ abstract class BaseImageryLayer extends Layer with VisibilityControl, AlphaContr
     double _gamma;
 
     BaseImageryLayer(String type, String name, Map map)
-            : super(type, name, map),
-              _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
+            : _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
               _alpha = YamlUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
               _brightness = YamlUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
               _contrast = YamlUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
               _hue = YamlUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
               _saturation = YamlUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
-              _gamma = YamlUtils.getOptionalSettingAsDouble(map, "gamma", 1.0);
+              _gamma = YamlUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
+              super(type, name, map);
 
     @override set visible(bool v) => _visible = _hub.cesium.setLayerVisible(_layer, v);
     @override bool get visible => _visible;
@@ -70,9 +70,9 @@ class BingBaseImageryLayer extends BaseImageryLayer {
     String _apiKey;
 
     BingBaseImageryLayer(String name, Map map)
-            : super("bing_base_imagery", name, map),
-              _apiKey = YamlUtils.getOptionalSettingAsString(map, "apiKey", _defaultKey),
-              _style = YamlUtils.getOptionalSettingAsString(map, "style", _defaultStyle) {
+            : _apiKey = YamlUtils.getOptionalSettingAsString(map, "apiKey", _defaultKey),
+              _style = YamlUtils.getOptionalSettingAsString(map, "style", _defaultStyle),
+              super("bing_base_imagery", name, map) {
 
         if (!_styles.contains(_style)) {
             throw new ArgumentError("invalid bing style");
