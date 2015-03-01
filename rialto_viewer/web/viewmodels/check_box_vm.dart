@@ -11,8 +11,11 @@ class CheckBoxVM extends ViewModel {
     InputElement _inputElement;
     bool _defaultValue;
     bool _startingValue;
+    bool _disabled;
 
-    CheckBoxVM(String id, bool this._defaultValue) : super(id) {
+    CheckBoxVM(String id, bool this._defaultValue)
+            : super(id),
+              _disabled = false {
         _inputElement = _element;
         assert(_inputElement.type == "checkbox");
 
@@ -37,5 +40,21 @@ class CheckBoxVM extends ViewModel {
 
     set value(bool value) {
         _inputElement.checked = value;
+    }
+
+    bool get disabled => _disabled;
+    set disabled(bool v) {
+        _disabled = v;
+
+        var attrs = _inputElement.attributes;
+        if (v) {
+            if (!attrs.containsKey("disabled")) {
+                attrs["disabled"] = "true";
+            }
+        } else {
+            if (attrs.containsKey("disabled")) {
+                attrs.remove("disabled");
+            }
+        }
     }
 }

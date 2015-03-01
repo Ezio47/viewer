@@ -70,13 +70,20 @@ class LayerManagerDialogVM extends DialogVM {
         }
     }
 
-    void _selectHandler(var e) {
+    void _selectHandler(_) {
         List<_LayerItem> items = _listbox.getCurrentSelection();
         if (items == null) return;
         if (items[0] == null) return;
+
         Layer layer = items[0].layer;
 
         log("${layer.name} selected");
+
+        if (layer is VisibilityControl) {
+            _layerVisible.disabled = true;
+        } else {
+            _layerVisible.disabled = false;
+        }
 
         if (layer is VisibilityControl) {
             _layerVisible.value = (layer as VisibilityControl).visible;
