@@ -16,6 +16,6 @@ outputs = [
 ]
 
 def run(input) {
-    Thread.sleep(5 * 1000)
+    Thread.sleep(20 * 1000)
     [resultlon: input.pt2lon - input.pt1lon]
 }

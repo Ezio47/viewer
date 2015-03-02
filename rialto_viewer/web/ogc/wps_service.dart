@@ -46,7 +46,7 @@ class WpsService extends OwsService {
                 return;
             }
 
-            assert(ogcDoc is Ogc_ProcessDescriptions);
+            assert(ogcDoc is OgcProcessDescriptions_15);
             var idesc = ogcDoc.descriptions.where((d) => d.identifier == processIdentifier);
 
             if (idesc == null || idesc.isEmpty || idesc.length > 1) {
@@ -79,7 +79,24 @@ class WpsService extends OwsService {
         outputs.forEach((k) => dataOutputsKV += "$k;");
         dataOutputsKV = dataOutputsKV.substring(0, dataOutputsKV.length - 1); // remove trailing ';'
 
-        _sendKvpServerRequest("Execute", [identifierKV, dataInputsKV, dataOutputsKV]).then((Xml.XmlDocument xmlDoc) {
+        String responseDocumentKV = "ResponseDocument="; //gamma;delta
+        outputs.forEach((k) => responseDocumentKV += "$k;");
+        responseDocumentKV = responseDocumentKV.substring(0, responseDocumentKV.length - 1); // remove trailing ';'
+
+        String storeExecRespKV = "StoreExecuteResponse=true";
+        String lineageKV = "Lineage=true";
+        String statusKV = "Status=true";
+
+        var parms = [
+                identifierKV,
+                dataInputsKV,
+                dataOutputsKV,
+                responseDocumentKV,
+                storeExecRespKV,
+                lineageKV,
+                statusKV];
+
+        _sendKvpServerRequest("Execute", parms).then((Xml.XmlDocument xmlDoc) {
             if (xmlDoc == null) {
                 c.complete(null);
                 return;
@@ -138,7 +155,7 @@ class WpsService extends OwsService {
 
     void testCapabilities() {
         getCapabilities().then((OgcDocument doc) {
-            assert(doc is Ogc_Capabilities);
+            assert(doc is OgcCapabilities_7);
             //log(doc.dump(0));
             assert(doc.dump(0).contains("Identifier: groovy:wpshello"));
         });
@@ -146,8 +163,8 @@ class WpsService extends OwsService {
 
     void testDescribeHello() {
         getProcessDescription("Hello").then((OgcDocument doc) {
-            assert(doc is Ogc_ProcessDescription);
-            var desc = doc as Ogc_ProcessDescription;
+            assert(doc is OgcProcessDescription_16);
+            var desc = doc as OgcProcessDescription_16;
             //log(desc.dump(0));
             assert(desc.title == "GeoScriptHello");
             assert(desc.dataInput.dataInputs[0].identifier == "alpha");
@@ -164,12 +181,12 @@ class WpsService extends OwsService {
         var outputs = ["gamma"];
 
         executeProcess("Hello", inputs, outputs).then((OgcDocument doc) {
-            assert(doc is OgcExecuteResponseDocument);
-            OgcExecuteResponseDocument resp = doc;
+            assert(doc is OgcExecuteResponseDocument_54);
+            OgcExecuteResponseDocument_54 resp = doc;
             var status = resp.status.processSucceeded;
             assert(status != null);
-            Ogc_DataType datatype = resp.processOutputs.outputData[0].data;
-            Ogc_LiteralData48 literalData = datatype.literalData;
+            OgcDataType_46 datatype = resp.processOutputs.outputData[0].data;
+            OgcLiteralData_48 literalData = datatype.literalData;
             //log(literalData.dump(0));
             assert(literalData.value == "28.0");
         });
@@ -177,8 +194,8 @@ class WpsService extends OwsService {
 
     void testDescribeViewshed() {
         getProcessDescription("Viewshed").then((OgcDocument doc) {
-            assert(doc is Ogc_ProcessDescription);
-            var desc = doc as Ogc_ProcessDescription;
+            assert(doc is OgcProcessDescription_16);
+            var desc = doc as OgcProcessDescription_16;
             //log(desc.dump(0));
             assert(desc.title == "GeoScriptViewshed");
             var a = desc.dataInput.dataInputs.map((i) => i.identifier).toList();
@@ -199,18 +216,39 @@ class WpsService extends OwsService {
             "pt2lon": "100.0",
             "pt2lat": "1000.0"
         };
-        var outputs = ["resultLon"];
+        var outputs = ["resultlon"];
 
+        log("STARTED!");
         executeProcess("Viewshed", inputs, outputs).then((OgcDocument doc) {
-            //log(doc.dump(0));
-            assert(doc is OgcExecuteResponseDocument);
-            OgcExecuteResponseDocument resp = doc;
-            var status = resp.status.processSucceeded;
-            assert(status != null);
-            Ogc_DataType datatype = resp.processOutputs.outputData[0].data;
-            Ogc_LiteralData48 literalData = datatype.literalData;
-            //log(literalData.dump(0));
-            assert(literalData.value == "99.0");
+            log("DONE!");
+            log(doc.dump(0));
+            if (doc is OgcExceptionReportDocument) {
+                log(doc.dump(0));
+                assert(false);
+            } else {
+                assert(doc is OgcExecuteResponseDocument_54);
+                OgcExecuteResponseDocument_54 resp = doc;
+                var status = resp.status;
+                switch (status.code) {
+                    case OgcStatus_55.STATUS_ACCEPTED:
+                        log(status.dump(0));
+                        break;
+                    case OgcStatus_55.STATUS_STARTED:
+                        log(status.dump(0));
+                        break;
+                    case OgcStatus_55.STATUS_SUCCEEDED:
+                        OgcDataType_46 datatype = resp.processOutputs.outputData[0].data;
+                        OgcLiteralData_48 literalData = datatype.literalData;
+                        //log(literalData.dump(0));
+                        assert(literalData.value == "99.0");
+                        break;
+                    default:
+                        assert(false);
+                }
+            }
+        });
+        new Timer(new Duration(seconds: 5), () {
+            log("QUERIED!");
         });
     }
 }

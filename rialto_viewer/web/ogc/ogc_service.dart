@@ -44,7 +44,7 @@ class OwsService {
 
         var f = _client.get(uri).then((response) {
             String s = response.body;
-            //log(s);
+            log(s);
             try {
                 var doc = Xml.parse(s);
                 c.complete(doc);

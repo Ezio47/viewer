@@ -30,6 +30,13 @@ class Key {
 
 class Utils {
 
+    static bool boolParse(String s) {
+        s = s.toLowerCase();
+        if (s == "true") return true;
+        if (s == "false") return false;
+        throw new FormatException("invalid boolean: $s");
+    }
+
     static Uri firstPart(Uri uri) {
         var scheme = uri.scheme;
         var userInfo = uri.userInfo;

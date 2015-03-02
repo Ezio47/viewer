@@ -70,11 +70,4 @@ class YamlUtils {
 
     static double getOptionalSettingAsDouble(Map map, String key, [double defalt = 0.0]) =>
             _getOptionalSettingAsType(map, key, _doubleType, defalt);
-
-    static bool _boolParse(String s) {
-        s = s.toLowerCase();
-        if (s == "true") return true;
-        if (s == "false") return false;
-        throw new FormatException("invalid boolean: $s");
-    }
 }

@@ -6,6 +6,7 @@ part of rialto.viewer;
 
 
 // OGC 06-121r3, sec 7.4
+// class names are from the spec document and have their table number from the spec appended
 
 // TODO: we should respect namespace prefixes on element names
 
@@ -30,13 +31,13 @@ class OgcDocument {
             if (elem is Xml.XmlElement) {
                 switch (elem.name.local) {
                     case "Capabilities":
-                        return new Ogc_Capabilities(elem);
+                        return new OgcCapabilities_7(elem);
                     case "ExceptionReport":
                         return new OgcExceptionReportDocument(elem);
                     case "ProcessDescriptions":
-                        return new Ogc_ProcessDescriptions(elem);
+                        return new OgcProcessDescriptions_15(elem);
                     case "ExecuteResponse":
-                        return new OgcExecuteResponseDocument(elem);
+                        return new OgcExecuteResponseDocument_54(elem);
                     default:
                         log("Unhandled top-level doc type: ${elem.name.local}");
                         assert(false);
@@ -134,77 +135,13 @@ class OgcDocument {
 }
 
 
-// table 7
-class Ogc_Capabilities extends OgcDocument {
-
-    String service;
-    String request;
-    String version;
-    Ogc_ProcessOfferings processOfferings;
-
-    Ogc_Capabilities(Xml.XmlElement element)
-            : super(element) {
-
-        var a = element.attributes[0];
-
-        _registerAttributes({
-            "service": (attr) => service = attr.value,
-            "version": (attr) => version = attr.value,
-            "updateSequence": _ignoreAttribute,
-            "lang": _ignoreAttribute,
-        });
-
-        _registerElements({
-            "ServiceIdentification": _ignoreElement,
-            "ServiceProvider": _ignoreElement,
-            "OperationsMetadata": _ignoreElement,
-            "ProcessOfferings": (e) => processOfferings = new Ogc_ProcessOfferings(e),
-            "Languages": _ignoreElement,
-        });
-    }
-
-    @override String dump(int indent) {
-        return pad(indent) +
-                "[RequestBase]" +
-                "Service: $service\n" +
-                "Request: $request\n" +
-                "Version: $version\n" +
-                processOfferings.dump(indent + 1);
-    }
-}
-
-
-// table 8
-class Ogc_ProcessOfferings extends OgcDocument {
-
-    List<Ogc_ProcessBrief> processes = new List<Ogc_ProcessBrief>();
-
-    Ogc_ProcessOfferings(Xml.XmlElement element)
-            : super(element) {
-
-        // table 16
-        _registerElements({
-            "Process": (e) => processes.add(new Ogc_ProcessBrief(e))
-        });
-    }
-
-    @override String dump(int indent) {
-        String s = "";
-        s += pad(indent) + "[ProcessOfferings]\n";
-        processes.forEach((p) => s += p.dump(indent + 1));
-        return s;
-    }
-}
-
-
-// table 2
-class Ogc_ProcessBrief extends OgcDocument {
+class OgcProcessBrief_2 extends OgcDocument {
 
     String identifier;
     String title;
     String abstract;
 
-    Ogc_ProcessBrief(Xml.XmlElement element)
+    OgcProcessBrief_2(Xml.XmlElement element)
             : super(element) {
 
         _registerElements({
@@ -229,15 +166,73 @@ class Ogc_ProcessBrief extends OgcDocument {
 }
 
 
-// table 15
-class Ogc_ProcessDescriptions extends OgcDocument {
-    List<Ogc_ProcessDescription> descriptions = new List<Ogc_ProcessDescription>();
+class OgcCapabilities_7 extends OgcDocument {
 
-    Ogc_ProcessDescriptions(Xml.XmlElement element)
+    String service;
+    String version;
+    OgcProcessOfferings_8 processOfferings;
+
+    OgcCapabilities_7(Xml.XmlElement element)
+            : super(element) {
+
+        var a = element.attributes[0];
+
+        _registerAttributes({
+            "service": (attr) => service = attr.value,
+            "version": (attr) => version = attr.value,
+            "updateSequence": _ignoreAttribute,
+            "lang": _ignoreAttribute,
+        });
+
+        _registerElements({
+            "ServiceIdentification": _ignoreElement,
+            "ServiceProvider": _ignoreElement,
+            "OperationsMetadata": _ignoreElement,
+            "ProcessOfferings": (e) => processOfferings = new OgcProcessOfferings_8(e),
+            "Languages": _ignoreElement,
+        });
+    }
+
+    @override String dump(int indent) {
+        return pad(indent) +
+                "[RequestBase]" +
+                "Service: $service\n" +
+                "Version: $version\n" +
+                processOfferings.dump(indent + 1);
+    }
+}
+
+
+class OgcProcessOfferings_8 extends OgcDocument {
+
+    List<OgcProcessBrief_2> processes = new List<OgcProcessBrief_2>();
+
+    OgcProcessOfferings_8(Xml.XmlElement element)
+            : super(element) {
+
+        // table 16
+        _registerElements({
+            "Process": (e) => processes.add(new OgcProcessBrief_2(e))
+        });
+    }
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessOfferings]\n";
+        processes.forEach((p) => s += p.dump(indent + 1));
+        return s;
+    }
+}
+
+
+class OgcProcessDescriptions_15 extends OgcDocument {
+    List<OgcProcessDescription_16> descriptions = new List<OgcProcessDescription_16>();
+
+    OgcProcessDescriptions_15(Xml.XmlElement element)
             : super(element) {
 
         _registerElements({
-            "ProcessDescription": (e) => descriptions.add(new Ogc_ProcessDescription(e))
+            "ProcessDescription": (e) => descriptions.add(new OgcProcessDescription_16(e))
         });
 
         _registerAttributes({
@@ -253,16 +248,15 @@ class Ogc_ProcessDescriptions extends OgcDocument {
 }
 
 
-// table 16
-class Ogc_ProcessDescription extends OgcDocument {
+class OgcProcessDescription_16 extends OgcDocument {
 
     String identifier;
     String title;
     String abstract;
-    Ogc_Input dataInput;
-    Ogc_ProcessOutputs34 processOutputs;
+    OgcInput_18 dataInput;
+    OgcProcessOutputs_34 processOutputs;
 
-    Ogc_ProcessDescription(Xml.XmlElement element)
+    OgcProcessDescription_16(Xml.XmlElement element)
             : super(element) {
 
         _registerElements({
@@ -272,8 +266,8 @@ class Ogc_ProcessDescription extends OgcDocument {
             "Metadata": _ignoreElement,
             "Profile": _errorElement,
             "WSDL": _errorElement,
-            "DataInputs": (e) => dataInput = new Ogc_Input(e),
-            "ProcessOutputs": (e) => processOutputs = new Ogc_ProcessOutputs34(e),
+            "DataInputs": (e) => dataInput = new OgcInput_18(e),
+            "ProcessOutputs": (e) => processOutputs = new OgcProcessOutputs_34(e),
         });
 
         _registerAttributes({
@@ -296,16 +290,15 @@ class Ogc_ProcessDescription extends OgcDocument {
 }
 
 
-// table 19
-class Ogc_Input extends OgcDocument {
-    List<Ogc_InputDescription> dataInputs = new List<Ogc_InputDescription>();
+class OgcInput_18 extends OgcDocument {
+    List<OgcInputDescription_19> dataInputs = new List<OgcInputDescription_19>();
 
 
-    Ogc_Input(Xml.XmlElement element) : super(element) {
+    OgcInput_18(Xml.XmlElement element) : super(element) {
 
         // table 19
         _registerElements({
-            "Input": (e) => dataInputs.add(new Ogc_InputDescription(e))
+            "Input": (e) => dataInputs.add(new OgcInputDescription_19(e))
         });
     }
 
@@ -318,17 +311,17 @@ class Ogc_Input extends OgcDocument {
     }
 }
 
-// table 19
-class Ogc_InputDescription extends OgcDocument {
+
+class OgcInputDescription_19 extends OgcDocument {
     String identifier;
     String title;
     String abstract;
     int minOccurs;
     int maxOccurs;
 
-    Ogc_LiteralInput literalData;
+    OgcLiteralInput_25 literalData;
 
-    Ogc_InputDescription(Xml.XmlElement element) : super(element) {
+    OgcInputDescription_19(Xml.XmlElement element) : super(element) {
 
         // table 19
         _registerElements({
@@ -339,7 +332,7 @@ class Ogc_InputDescription extends OgcDocument {
 
             // InputFormChoice, table 20
             "ComplexData": _ignoreElement,
-            "LiteralData": (e) => new Ogc_LiteralInput(e),
+            "LiteralData": (e) => new OgcLiteralInput_25(e),
             "BoundingBoxData": _errorElement
         });
 
@@ -359,15 +352,14 @@ class Ogc_InputDescription extends OgcDocument {
 }
 
 
-// table 25
-class Ogc_LiteralInput extends OgcDocument {
+class OgcLiteralInput_25 extends OgcDocument {
     String datatype;
     String defaultValue;
     String allowedValues;
     String anyValue;
     String valuesReference;
 
-    Ogc_LiteralInput(Xml.XmlElement element) : super(element) {
+    OgcLiteralInput_25(Xml.XmlElement element) : super(element) {
 
         _registerElements({
             "DataType": (e) => datatype = e.text,
@@ -388,15 +380,34 @@ class Ogc_LiteralInput extends OgcDocument {
 }
 
 
+class OgcProcessOutputs_34 extends OgcDocument {
+    List<OgcOutputDescription_35> outputData = new List<OgcOutputDescription_35>();
 
-// table 35
-class Ogc_OutputDescription35 extends OgcDocument {
+    OgcProcessOutputs_34(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "Output": (e) => outputData.add(new OgcOutputDescription_35(e))
+        });
+    }
+
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessOutputs34]\n";
+        outputData.forEach((i) => s += i.dump(indent + 1));
+        return s;
+    }
+}
+
+
+class OgcOutputDescription_35 extends OgcDocument {
     String identifier;
     String title;
     String abstract;
-    Ogc_LiteralOutput37 literalOutput;
+    OgcLiteralOutput_37 literalOutput;
 
-    Ogc_OutputDescription35(Xml.XmlElement element) : super(element) {
+    OgcOutputDescription_35(Xml.XmlElement element) : super(element) {
 
         _registerElements({
             "Identifier": (e) => identifier = e.text,
@@ -406,7 +417,7 @@ class Ogc_OutputDescription35 extends OgcDocument {
 
             // OutputFormChoice, table 36
             "ComplexOutput": _ignoreElement,
-            "LiteralOutput": (e) => new Ogc_LiteralOutput37(e),
+            "LiteralOutput": (e) => new OgcLiteralOutput_37(e),
             "BoundingBoxOutput": _errorElement
         });
     }
@@ -421,11 +432,10 @@ class Ogc_OutputDescription35 extends OgcDocument {
 }
 
 
-// table 37
-class Ogc_LiteralOutput37 extends OgcDocument {
+class OgcLiteralOutput_37 extends OgcDocument {
     String datatype;
 
-    Ogc_LiteralOutput37(Xml.XmlElement element) : super(element) {
+    OgcLiteralOutput_37(Xml.XmlElement element) : super(element) {
 
         _registerElements({
             "DataType": (e) => datatype = e.text,
@@ -440,125 +450,13 @@ class Ogc_LiteralOutput37 extends OgcDocument {
 }
 
 
-// table 48
-class Ogc_LiteralData48 extends OgcDocument {
-    String value;
+class OgcDataInputs_40 extends OgcDocument {
+    OgcInputType_41 inputType;
 
-    Ogc_LiteralData48(Xml.XmlElement element) : super(element) {
-
-        _registerAttributes({
-            "datatype": _errorAttribute,
-            "uom": _errorAttribute,
-        });
-
-        value = element.text;
-    }
-
-
-    @override String dump(int indent) {
-        String s = "";
-        s += pad(indent) + "[LiteralData48]\n";
-        s += pad(indent + 1) + "Value: $value\n";
-        return s;
-    }
-}
-
-// table 54
-class OgcExecuteResponseDocument extends OgcDocument {
-    String service;
-    String version;
-    String statusLocation;
-    String serviceInstance;
-    Ogc_ProcessBrief processBrief;
-    Ogc_Status status;
-    Ogc_ProcessOutputs59 processOutputs;
-
-    List<Ogc_InputDescription> dataInputs = new List<Ogc_InputDescription>();
-
-    OgcExecuteResponseDocument(Xml.XmlElement element)
-            : super(element) {
+    OgcDataInputs_40(Xml.XmlElement element) : super(element) {
 
         _registerElements({
-            "Process": (e) => processBrief = new Ogc_ProcessBrief(e),
-            "Status": (e) => status = new Ogc_Status(e),
-            "DataInputs": (e) => dataInputs.add(new Ogc_InputDescription(e)),
-            "OutputDefinitions": _errorElement,
-            "ProcessOutputs": (e) => processOutputs = new Ogc_ProcessOutputs59(e)
-        });
-
-        _registerAttributes({
-            "service": (attr) => service = attr.value,
-            "version": (attr) => version = attr.value,
-            "lang": _ignoreAttribute,
-            "statusLocation": (attr) => statusLocation = attr.value,
-            "serviceInstance": (attr) => serviceInstance = attr.value,
-        });
-
-    }
-
-
-    @override String dump(int indent) {
-        String s = "";
-        s += pad(indent) + "[ExecuteResponse]\n";
-        s += pad(indent + 1) + "StatusLocation: $statusLocation\n";
-        s += status.dump(indent + 1);
-        s += processBrief.dump(indent + 1);
-        s += processOutputs.dump(indent + 1);
-        return s;
-    }
-}
-
-
-// table 55
-class Ogc_Status extends OgcDocument {
-    String creationTime;
-    String processAccepted;
-    String processStarted;
-    String processPaused;
-    String processSucceeded;
-    Ogc_ProcessFailed processFailed;
-
-    Ogc_Status(Xml.XmlElement element)
-            : super(element) {
-
-        _registerElements({
-            "ProcessAccepted": (e) => processAccepted = e.text,
-            "ProcessStarted": (e) => processStarted = e.text, // TODO: percent completed
-            "ProcessPaused": (e) => processPaused = e.text,
-            "ProcessSucceeded": (e) => processSucceeded = e.text,
-            "ProcessFailed": (e) => processFailed = new Ogc_ProcessFailed(e)
-        });
-
-        _registerAttributes({
-            "creationTime": (attr) => creationTime = attr.value,
-        });
-
-    }
-
-    @override String dump(int indent) {
-        String s = "";
-        s += pad(indent) + "[Status]\n";
-        s += pad(indent + 1) + "creationTime: $creationTime\n";
-        s += pad(indent + 1) + "processAccepted: $processAccepted\n";
-        s += pad(indent + 1) + "processStarted: $processStarted\n";
-        s += pad(indent + 1) + "processPaused: $processPaused\n";
-        s += pad(indent + 1) + "processSucceeded: $processSucceeded\n";
-        if (processFailed != null) {
-            s += processFailed.dump(indent + 1);
-        }
-        return s;
-    }
-}
-
-
-class Ogc_ProcessFailed extends OgcDocument {
-    OgcExceptionReportDocument exceptionReport;
-
-    Ogc_ProcessFailed(Xml.XmlElement element)
-            : super(element) {
-
-        _registerElements({
-            "ExceptionReport": (e) => exceptionReport = new OgcExceptionReportDocument(e)
+            "Input": (e) => inputType = new OgcInputType_41(e)
         });
 
         _registerAttributes({});
@@ -566,99 +464,51 @@ class Ogc_ProcessFailed extends OgcDocument {
 
     @override String dump(int indent) {
         String s = "";
-        s += pad(indent) + "[ProcessFailed]\n";
-        s += exceptionReport.dump(indent + 1);
+        s += pad(indent) + "[DataInputs40]\n";
+        s += inputType.dump(indent + 1);
         return s;
     }
 }
 
 
-// table 34
-class Ogc_ProcessOutputs34 extends OgcDocument {
-    List<Ogc_OutputDescription35> outputData = new List<Ogc_OutputDescription35>();
-
-    Ogc_ProcessOutputs34(Xml.XmlElement element)
-            : super(element) {
-
-        _registerElements({
-            "Output": (e) => outputData.add(new Ogc_OutputDescription35(e))
-        });
-    }
-
-
-    @override String dump(int indent) {
-        String s = "";
-        s += pad(indent) + "[ProcessOutputs34]\n";
-        outputData.forEach((i) => s += i.dump(indent + 1));
-        return s;
-    }
-}
-
-
-// table 59
-class Ogc_ProcessOutputs59 extends OgcDocument {
-    List<Ogc_OutputData60> outputData = new List<Ogc_OutputData60>();
-
-    Ogc_ProcessOutputs59(Xml.XmlElement element)
-            : super(element) {
-
-        _registerElements({
-            "Output": (e) => outputData.add(new Ogc_OutputData60(e))
-        });
-    }
-
-
-    @override String dump(int indent) {
-        String s = "";
-        s += pad(indent) + "[ProcessOutputs59]\n";
-        outputData.forEach((i) => s += i.dump(indent + 1));
-        return s;
-    }
-}
-
-
-// table 60
-class Ogc_OutputData60 extends OgcDocument {
+class OgcInputType_41 extends OgcDocument {
     String identifier;
     String title;
     String abstract;
-    Ogc_OutputReference61 outputReference;
-    Ogc_DataType data;
+    OgcDataType_46 dataType;
 
-    Ogc_OutputData60(Xml.XmlElement element)
-            : super(element) {
+    OgcInputType_41(Xml.XmlElement element) : super(element) {
 
         _registerElements({
             "Identifier": (e) => identifier = e.text,
             "Title": (e) => title = e.text,
             "Abstract": (e) => abstract = e.text,
 
-            "Reference": (e) => outputReference = new Ogc_OutputReference61(e),
-
-            "Data": (e) => data = new Ogc_DataType(e),
+            // InputDataFormChoice, table 42
+            "Reference": _errorElement,
+            "Data": (e) => dataType = new OgcDataType_46(e)
         });
+
+        _registerAttributes({});
     }
 
     @override String dump(int indent) {
         String s = "";
-        s += pad(indent) + "[OutputData60]\n";
-        s += pad(indent + 1) + "Title: $title\n";
-        s += data.dump(indent + 1);
+        s += pad(indent) + "[InputType41]\n";
         return s;
     }
 }
 
 
-// table 46
-class Ogc_DataType extends OgcDocument {
-    Ogc_LiteralData48 literalData;
+class OgcDataType_46 extends OgcDocument {
+    OgcLiteralData_48 literalData;
 
-    Ogc_DataType(Xml.XmlElement element)
+    OgcDataType_46(Xml.XmlElement element)
             : super(element) {
 
         _registerElements({
             "ComplexData": _ignoreElement,
-            "LiteralData": (e) => literalData = new Ogc_LiteralData48(e),
+            "LiteralData": (e) => literalData = new OgcLiteralData_48(e),
             "BoundingBoxData": _ignoreElement,
         });
     }
@@ -678,14 +528,282 @@ class Ogc_DataType extends OgcDocument {
 }
 
 
-// table 61
-class Ogc_OutputReference61 extends OgcDocument {
+class OgcLiteralData_48 extends OgcDocument {
+    String value;
+
+    OgcLiteralData_48(Xml.XmlElement element) : super(element) {
+
+        _registerAttributes({
+            "datatype": _errorAttribute,
+            "uom": _errorAttribute,
+        });
+
+        value = element.text;
+    }
+
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[LiteralData48]\n";
+        s += pad(indent + 1) + "Value: $value\n";
+        return s;
+    }
+}
+
+
+class OgcOutput_51 extends OgcDocument {
+    String mimeType;
+    String encoding;
+    String schema;
+    String uom;
+    bool asReference;
+    String identifier;
+    String title;
+    String abstract;
+
+    OgcOutput_51(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "mimeType": (e) => mimeType = e.text,
+            "encoding": (e) => encoding = e.text,
+            "schema": (e) => schema = e.text,
+            "uom": (e) => uom = e.text,
+            "identifier": (e) => identifier = e.text,
+            "title": (e) => title = e.text,
+            "abstract": (e) => abstract = e.text
+
+        });
+
+        _registerAttributes({
+            "asReference": (e) => asReference = Utils.boolParse(e.value)
+        });
+    }
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[Output_51]\n";
+        s += pad(indent + 1) + "MimeType: $mimeType\n";
+        s += pad(indent + 1) + "Encoding: encoding\n";
+        s += pad(indent + 1) + "Schema: $schema\n";
+        s += pad(indent + 1) + "Uom: uom\n";
+        s += pad(indent + 1) + "AsReference: $asReference\n";
+        s += pad(indent + 1) + "Identifier: identifier\n";
+        s += pad(indent + 1) + "Title: title\n";
+        s += pad(indent + 1) + "Abstract: abstract\n";
+        return s;
+    }
+}
+
+
+
+class OgcExecuteResponseDocument_54 extends OgcDocument {
+    String service;
+    String version;
+    String statusLocation;
+    String serviceInstance;
+    OgcProcessBrief_2 processBrief;
+    OgcStatus_55 status;
+    List<OgcOutputDefinitions_58> outputDefintions = new List<OgcOutputDefinitions_58>();
+    OgcProcessOutputs_59 processOutputs;
+
+    List<OgcDataInputs_40> dataInputs = new List<OgcDataInputs_40>();
+
+    OgcExecuteResponseDocument_54(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "Process": (e) => processBrief = new OgcProcessBrief_2(e),
+            "Status": (e) => status = new OgcStatus_55(e),
+            "DataInputs": (e) => dataInputs.add(new OgcDataInputs_40(e)),
+            "OutputDefinitions": (e) => outputDefintions.add(new OgcOutputDefinitions_58(e)),
+            "ProcessOutputs": (e) => processOutputs = new OgcProcessOutputs_59(e)
+        });
+
+        _registerAttributes({
+            "service": (attr) => service = attr.value,
+            "version": (attr) => version = attr.value,
+            "lang": _ignoreAttribute,
+            "statusLocation": (attr) => statusLocation = attr.value,
+            "serviceInstance": (attr) => serviceInstance = attr.value,
+        });
+
+    }
+
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ExecuteResponse]\n";
+        s += pad(indent + 1) + "StatusLocation: $statusLocation\n";
+        s += status.dump(indent + 1);
+        s += processBrief.dump(indent + 1);
+        if (processOutputs != null) {
+            s += processOutputs.dump(indent + 1);
+        }
+        return s;
+    }
+}
+
+
+class OgcStatus_55 extends OgcDocument {
+    static const int STATUS_INVALID = 0;
+    static const int STATUS_ACCEPTED = 1;
+    static const int STATUS_STARTED = 2;
+    static const int STATUS_PAUSED = 3;
+    static const int STATUS_SUCCEEDED = 4;
+    static const int STATUS_FAILED = 5;
+
+    String creationTime;
+    String processAccepted;
+    String processStarted;
+    String processPaused;
+    String processSucceeded;
+    OgcProcessFailed_57 processFailed;
+
+    OgcStatus_55(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "ProcessAccepted": (e) => processAccepted = e.text,
+            "ProcessStarted": (e) => processStarted = e.text, // TODO: percent completed
+            "ProcessPaused": (e) => processPaused = e.text,
+            "ProcessSucceeded": (e) => processSucceeded = e.text,
+            "ProcessFailed": (e) => processFailed = new OgcProcessFailed_57(e)
+        });
+
+        _registerAttributes({
+            "creationTime": (attr) => creationTime = attr.value,
+        });
+    }
+
+    int get code {
+        if (processAccepted != null) return STATUS_ACCEPTED;
+        if (processStarted != null) return STATUS_STARTED;
+        if (processPaused != null) return STATUS_PAUSED;
+        if (processSucceeded != null) return STATUS_SUCCEEDED;
+        if (processFailed != null) return STATUS_FAILED;
+        return STATUS_INVALID;
+    }
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[Status]\n";
+        s += pad(indent + 1) + "creationTime: $creationTime\n";
+        s += pad(indent + 1) + "processAccepted: $processAccepted\n";
+        s += pad(indent + 1) + "processStarted: $processStarted\n";
+        s += pad(indent + 1) + "processPaused: $processPaused\n";
+        s += pad(indent + 1) + "processSucceeded: $processSucceeded\n";
+        if (processFailed != null) {
+            s += processFailed.dump(indent + 1);
+        }
+        return s;
+    }
+}
+
+
+class OgcProcessFailed_57 extends OgcDocument {
+    OgcExceptionReportDocument exceptionReport;
+
+    OgcProcessFailed_57(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "ExceptionReport": (e) => exceptionReport = new OgcExceptionReportDocument(e)
+        });
+
+        _registerAttributes({});
+    }
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessFailed]\n";
+        s += exceptionReport.dump(indent + 1);
+        return s;
+    }
+}
+
+
+class OgcOutputDefinitions_58 extends OgcDocument {
+    OgcOutput_51 output;
+
+    OgcOutputDefinitions_58(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "Output": (e) => output = new OgcOutput_51(e)
+        });
+
+        _registerAttributes({});
+    }
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessFailed]\n";
+        s += output.dump(indent + 1);
+        return s;
+    }
+}
+
+
+class OgcProcessOutputs_59 extends OgcDocument {
+    List<OgcOutputData_60> outputData = new List<OgcOutputData_60>();
+
+    OgcProcessOutputs_59(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "Output": (e) => outputData.add(new OgcOutputData_60(e))
+        });
+    }
+
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessOutputs59]\n";
+        outputData.forEach((i) => s += i.dump(indent + 1));
+        return s;
+    }
+}
+
+
+class OgcOutputData_60 extends OgcDocument {
+    String identifier;
+    String title;
+    String abstract;
+    OgcOutputReference_61 outputReference;
+    OgcDataType_46 data;
+
+    OgcOutputData_60(Xml.XmlElement element)
+            : super(element) {
+
+        _registerElements({
+            "Identifier": (e) => identifier = e.text,
+            "Title": (e) => title = e.text,
+            "Abstract": (e) => abstract = e.text,
+
+            "Reference": (e) => outputReference = new OgcOutputReference_61(e),
+
+            "Data": (e) => data = new OgcDataType_46(e),
+        });
+    }
+
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[OutputData60]\n";
+        s += pad(indent + 1) + "Title: $title\n";
+        s += data.dump(indent + 1);
+        return s;
+    }
+}
+
+
+class OgcOutputReference_61 extends OgcDocument {
     String format;
     String encoding;
     String schema;
     String href;
 
-    Ogc_OutputReference61(Xml.XmlElement element)
+    OgcOutputReference_61(Xml.XmlElement element)
             : super(element) {
 
         _registerAttributes({
