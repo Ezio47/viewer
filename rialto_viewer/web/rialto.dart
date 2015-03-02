@@ -49,6 +49,7 @@ part 'ogc/ogc_document.dart';
 part 'ogc/ogc_document_tests.dart';
 part 'ogc/ogc_service.dart';
 part 'ogc/wps_service.dart';
+part 'ogc/wps_service_tests.dart';
 
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';

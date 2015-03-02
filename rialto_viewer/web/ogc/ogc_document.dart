@@ -132,6 +132,17 @@ class OgcDocument {
         assert(false);
     }
 
+    bool get isException => this is OgcExceptionReportDocument;
+    String get exceptionString {
+        var doc = this;
+        if (doc is! OgcExceptionReportDocument) return null;
+
+        String s = "";
+        doc.exceptions.forEach((e) => s += e.text);
+
+        return s;
+    }
+
     String dump(int indent) {
         return pad(indent) + "[$type]";
     }
