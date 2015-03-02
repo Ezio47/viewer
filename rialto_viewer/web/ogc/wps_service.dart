@@ -34,7 +34,7 @@ class WpsService extends OwsService {
                 return;
             }
 
-            var ogcDoc = OgcDocument.parse(xmlDoc);
+            var ogcDoc = OgcDocument.parseXml(xmlDoc);
             if (ogcDoc == null) {
                 Hub.error("Error parsing WPS process description response document");
                 c.complete(null);
@@ -103,7 +103,7 @@ class WpsService extends OwsService {
                 return;
             }
 
-            var ogcDoc = OgcDocument.parse(xmlDoc);
+            var ogcDoc = OgcDocument.parseXml(xmlDoc);
             if (ogcDoc == null) {
                 Hub.error("Error parsing WPS process execution response document");
                 c.complete(null);
@@ -300,14 +300,14 @@ class WpsService extends OwsService {
             log("started: $id");
 
             //new Timer.periodic(new Duration(seconds: 5), (t) {
-            new Timer(new Duration(seconds: 2), () {
+            new Timer.periodic(new Duration(seconds: 1), (_) {
                 log("QUERIED!");
 
                 var req = this.requestStatus[id];
                 var url = req.statusLocation;
-                var f = _client.get(url).then((response) {
-                    String s = response.body;
-                    log(s);
+                var f = Comms.httpGet(url, proxy: this.proxy).then((response) {
+                    var ogcDoc = OgcDocument.parseString(response.body);
+                    log(ogcDoc.dump(0));
                 });
             });
         });

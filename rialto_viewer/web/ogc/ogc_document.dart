@@ -25,8 +25,13 @@ class OgcDocument {
         type = element.name.local;
     }
 
+    static OgcDocument parseString(String text) {
+        var xmlDoc = Xml.parse(text);
+        var ogcDoc = parseXml(xmlDoc);
+        return ogcDoc;
+    }
 
-    static OgcDocument parse(Xml.XmlDocument document) {
+    static OgcDocument parseXml(Xml.XmlDocument document) {
         for (var elem in document.children) {
             if (elem is Xml.XmlElement) {
                 switch (elem.name.local) {

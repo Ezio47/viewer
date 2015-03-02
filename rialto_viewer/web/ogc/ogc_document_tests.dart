@@ -13,20 +13,16 @@ part of rialto.viewer;
 class OgcDocumentTests {
 
     static void test() {
-        var exDoc = Xml.parse(OgcDocumentTests.generalException);
-        var ex = OgcDocument.parse(exDoc);
+        var ex = OgcDocument.parseString(generalException);
         //log(ex);
 
-        var procDoc = Xml.parse(OgcDocumentTests.describeProcess);
-        var proc = OgcDocument.parse(procDoc);
+        var proc = OgcDocument.parseString(describeProcess);
         //log(proc);
 
-        var expDoc = Xml.parse(OgcDocumentTests.describeProcessError);
-        var exp = OgcDocument.parse(expDoc);
+        var exp = OgcDocument.parseString(describeProcessError);
         //log(exp);
 
-        var wpsCapsDoc = Xml.parse(OgcDocumentTests.capabilities);
-        var wpsCaps = OgcDocument.parse(wpsCapsDoc);
+        var wpsCaps = OgcDocument.parseString(capabilities);
         //log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");

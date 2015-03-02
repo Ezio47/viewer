@@ -34,15 +34,11 @@ class OwsService {
 
         String s = Uri.encodeComponent(server.toString() + operation);
 
-        if (proxy != null) {
-            s = proxy.toString() + "?" + s;
-        }
-
         var uri = Uri.parse(s);
 
         //log("ows server request: $uri");
 
-        var f = _client.get(uri).then((response) {
+        Comms.httpGet(uri, proxy: proxy).then((response) {
             String s = response.body;
             //log(s);
             try {
@@ -68,7 +64,7 @@ class OwsService {
                 c.complete(null);
                 return;
             }
-            var ogcDoc = OgcDocument.parse(xmlDoc);
+            var ogcDoc = OgcDocument.parseXml(xmlDoc);
             if (ogcDoc == null) {
                 Hub.error("Error parsing OWS Capabilities response document");
                 c.complete(null);
