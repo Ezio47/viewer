@@ -61,8 +61,7 @@ class ConfigScript {
         var wps = new WpsService(url, proxy: proxy, description: description);
         wps.open();
 
-        //wps.test();
-        wps.testExecuteViewshed();
+        wps.test();
 
         _hub.wps = wps;
 

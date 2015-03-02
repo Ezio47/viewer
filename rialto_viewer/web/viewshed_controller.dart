@@ -63,13 +63,13 @@ class ViewshedController implements IController {
 
         Viewshed a = new Viewshed(point1, point2);
 
-        var params = [];
+        var params = new List(3);
         params[0] = "Viewshed";
         params[1] = {
-            "pt1Lon": point1.longitude,
-            "pt1Lat": point1.latitude,
-            "pt2Lon": point2.longitude,
-            "pt2Lat": point2.latitude
+            "pt1lon": point1.longitude,
+            "pt1lat": point1.latitude,
+            "pt2lon": point2.longitude,
+            "pt2lat": point2.latitude
         };
         params[2] = ["resultLon"];
 

@@ -14,6 +14,7 @@ class WpsService extends OwsService {
         "org.ciesin.gis.wps.algorithms.PopStat": "org.ciesin.gis.wps.algorithms.PopStat"
     };
 
+    Map<String, WpsRequestStatus> requestStatus = new Map<String, WpsRequestStatus>();
 
     WpsService(Uri server, {Uri proxy, String description})
             : super("WPS", server, proxy: proxy, description: description);
@@ -109,6 +110,20 @@ class WpsService extends OwsService {
                 return;
             }
 
+            if (ogcDoc is OgcExceptionReportDocument) {
+                c.complete(ogcDoc);
+                return;
+            }
+
+            if (ogcDoc is! OgcExecuteResponseDocument_54) {
+                Hub.error("Error parsing WPS process execution response document");
+                c.complete(ogcDoc);
+                return;
+            }
+
+            var statusLoc = ogcDoc.statusLocation;
+            //log(statusLoc);
+
             c.complete(ogcDoc);
         });
 
@@ -116,41 +131,56 @@ class WpsService extends OwsService {
     }
 
 
-    Future<OgcDocument> doWpsRequest(WpsRequestData data) {
-        var c = new Completer<OgcDocument>();
+    // returns the job ID
+    Future<String> doWpsRequest(WpsRequestData data) {
 
-        if (data.operation == WpsRequestData.EXECUTE_PROCESS) {
-
-            _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
-
-            assert(data.parameters.length == 3);
-            String name = data.parameters[0];
-            Map<String, dynamic> inputs = data.parameters[1];
-            List<String> outputs = data.parameters[2];
-
-            executeProcess(name, inputs, outputs).then((ogcDoc) {
-
-                var random = new Random();
-                var msecs = 1000 + random.nextInt(3000);
-                var duration = new Duration(milliseconds: msecs);
-                new Timer(duration, () => _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1)));
-                log("request done after $msecs ms");
-                c.complete(ogcDoc);
-            });
-        } else {
+        if (data.operation != WpsRequestData.EXECUTE_PROCESS) {
             throw new ArgumentError("invalid WPS request");
         }
+
+        var c = new Completer<String>();
+
+        _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
+
+        assert(data.parameters.length == 3);
+        String name = data.parameters[0];
+        Map<String, dynamic> inputs = data.parameters[1];
+        List<String> outputs = data.parameters[2];
+
+        String id;
+
+        executeProcess(name, inputs, outputs).then((ogcDoc) {
+
+            if (ogcDoc is OgcExceptionReportDocument) {
+                assert(false); // TODO
+            } else if (ogcDoc is! OgcExecuteResponseDocument_54) {
+                assert(false);
+            } else {
+                var resp = ogcDoc as OgcExecuteResponseDocument_54;
+                id = resp.statusLocation; // TODO: is this the best unique ID we have?
+                var url = Uri.parse(resp.statusLocation);
+                var time = resp.status.creationTime;
+                var code = resp.status.code;
+                var request = new WpsRequestStatus(id, url, time, code);
+                requestStatus[id] = request;
+            }
+
+            _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
+
+            c.complete(id);
+        });
 
         return c.future;
     }
 
     void test() {
-        OgcDocumentTests.test();
-        testCapabilities();
-        testDescribeHello();
-        testExecuteHello();
-        testDescribeViewshed();
-        testExecuteViewshed();
+        //OgcDocumentTests.test();
+        //testCapabilities();
+        //testDescribeHello();
+        //testExecuteHello();
+        //testDescribeViewshed();
+        //testExecuteViewshed();
+        testExecuteViewshed2();
     }
 
     void testCapabilities() {
@@ -218,37 +248,79 @@ class WpsService extends OwsService {
         };
         var outputs = ["resultlon"];
 
-        log("STARTED!");
         executeProcess("Viewshed", inputs, outputs).then((OgcDocument doc) {
-            log("DONE!");
-            log(doc.dump(0));
+
+            //log(doc.dump(0));
+
             if (doc is OgcExceptionReportDocument) {
                 log(doc.dump(0));
                 assert(false);
-            } else {
-                assert(doc is OgcExecuteResponseDocument_54);
-                OgcExecuteResponseDocument_54 resp = doc;
-                var status = resp.status;
-                switch (status.code) {
-                    case OgcStatus_55.STATUS_ACCEPTED:
-                        log(status.dump(0));
-                        break;
-                    case OgcStatus_55.STATUS_STARTED:
-                        log(status.dump(0));
-                        break;
-                    case OgcStatus_55.STATUS_SUCCEEDED:
-                        OgcDataType_46 datatype = resp.processOutputs.outputData[0].data;
-                        OgcLiteralData_48 literalData = datatype.literalData;
-                        //log(literalData.dump(0));
-                        assert(literalData.value == "99.0");
-                        break;
-                    default:
-                        assert(false);
-                }
+                return;
             }
-        });
-        new Timer(new Duration(seconds: 5), () {
-            log("QUERIED!");
+
+            assert(doc is OgcExecuteResponseDocument_54);
+            OgcExecuteResponseDocument_54 resp = doc;
+
+            var status = resp.status;
+            switch (status.code) {
+                case OgcStatus_55.STATUS_ACCEPTED:
+                    //log(status.dump(0));
+                    break;
+                case OgcStatus_55.STATUS_STARTED:
+                    log(status.dump(0));
+                    assert(false);
+                    break;
+                case OgcStatus_55.STATUS_SUCCEEDED:
+                    log(status.dump(0));
+                    assert(false);
+                    OgcDataType_46 datatype = resp.processOutputs.outputData[0].data;
+                    OgcLiteralData_48 literalData = datatype.literalData;
+                    //log(literalData.dump(0));
+                    assert(literalData.value == "99.0");
+                    break;
+                default:
+                    assert(false);
+            }
+
         });
     }
+
+    void testExecuteViewshed2() {
+        var params = new List(3);
+        params[0] = "Viewshed";
+        params[1] = {
+            "pt1lon": 2.0,
+            "pt1lat": 20.0,
+            "pt2lon": 200.0,
+            "pt2lat": 2000.0
+        };
+        params[2] = ["resultlon"];
+
+        doWpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params)).then((id) {
+            log("started: $id");
+
+            //new Timer.periodic(new Duration(seconds: 5), (t) {
+            new Timer(new Duration(seconds: 2), () {
+                log("QUERIED!");
+
+                var req = this.requestStatus[id];
+                var url = req.statusLocation;
+                var f = _client.get(url).then((response) {
+                    String s = response.body;
+                    log(s);
+                });
+            });
+        });
+    }
+}
+
+
+class WpsRequestStatus {
+    final String id;
+    final Uri statusLocation;
+    final String creationTime;
+
+    int code; // from OgcStatus_55 enums
+
+    WpsRequestStatus(String this.id, Uri this.statusLocation, String this.creationTime, int code1) : code = code1;
 }
