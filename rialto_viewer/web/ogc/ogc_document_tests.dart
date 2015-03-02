@@ -15,27 +15,27 @@ class OgcDocumentTests {
     static void test() {
         var exDoc = Xml.parse(OgcDocumentTests.generalException);
         var ex = OgcDocument.parse(exDoc);
-        log(ex);
+        //log(ex);
 
         var procDoc = Xml.parse(OgcDocumentTests.describeProcess);
         var proc = OgcDocument.parse(procDoc);
-        log(proc);
+        //log(proc);
 
         var expDoc = Xml.parse(OgcDocumentTests.describeProcessError);
         var exp = OgcDocument.parse(expDoc);
-        log(exp);
+        //log(exp);
 
         var wpsCapsDoc = Xml.parse(OgcDocumentTests.capabilities);
         var wpsCaps = OgcDocument.parse(wpsCapsDoc);
-        log(wpsCaps);
+        //log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
         var prox = Uri.parse("http://localhost:12345/proxy");
         var wps = new WpsService(uri, proxy: prox);
         wps.open();
-        wps.getCapabilitiesAsync().then((doc) { assert(doc is Ogc_Capabilities); });
-        wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is Ogc_ProcessDescription); });
-        wps.getProcessDescriptionAsync("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is Ogc_ExceptionReport); });
+        wps.getCapabilities().then((doc) { assert(doc is Ogc_Capabilities); });
+        wps.getProcessDescription("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is Ogc_ProcessDescription); });
+        wps.getProcessDescription("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is OgcExceptionReportDocument); });
         wps.close();
 
         log("OGC tests done");

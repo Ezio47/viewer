@@ -47,7 +47,8 @@ part 'layers/geojson_layer.dart';
 
 part 'ogc/ogc_document.dart';
 part 'ogc/ogc_document_tests.dart';
-part 'ogc/wps.dart';
+part 'ogc/ogc_service.dart';
+part 'ogc/wps_service.dart';
 
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';

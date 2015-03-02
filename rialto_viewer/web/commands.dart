@@ -151,15 +151,16 @@ class ModeData {
 
 class WpsRequestData {
     static const int INVALID = 0;
-    static const int VIEWSHED = 1;
+    static const int GET_CAPABILITIES = 1;
+    static const int GET_PROCESS_DESCRIPTION = 2;
+    static const int EXECUTE_PROCESS = 3;
     static final name = {
-        VIEWSHED: "viewshed"
     };
 
-    final int type;
-    final List<Object> params;
+    final int operation;
+    final List<Object> parameters;
 
-    WpsRequestData(int this.type, List<Object> this.params);
+    WpsRequestData(int this.operation, [List<Object> this.parameters = null]);
 }
 
 

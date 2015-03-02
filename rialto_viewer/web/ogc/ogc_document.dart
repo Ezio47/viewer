@@ -32,11 +32,11 @@ class OgcDocument {
                     case "Capabilities":
                         return new Ogc_Capabilities(elem);
                     case "ExceptionReport":
-                        return new Ogc_ExceptionReport(elem);
+                        return new OgcExceptionReportDocument(elem);
                     case "ProcessDescriptions":
                         return new Ogc_ProcessDescriptions(elem);
                     case "ExecuteResponse":
-                        return new Ogc_ExecuteResponse(elem);
+                        return new OgcExecuteResponseDocument(elem);
                     default:
                         log("Unhandled top-level doc type: ${elem.name.local}");
                         assert(false);
@@ -126,10 +126,11 @@ class OgcDocument {
         assert(false);
     }
 
-    @override
-    String toString() {
-        return "[$type]";
+    String dump(int indent) {
+        return pad(indent) + "[$type]";
     }
+
+    String pad(int indent) => "    " * indent;
 }
 
 
@@ -162,12 +163,13 @@ class Ogc_Capabilities extends OgcDocument {
         });
     }
 
-    @override String toString() {
-        return "[RequestBase]" +
+    @override String dump(int indent) {
+        return pad(indent) +
+                "[RequestBase]" +
                 "Service: $service\n" +
                 "Request: $request\n" +
                 "Version: $version\n" +
-                processOfferings.toString();
+                processOfferings.dump(indent + 1);
     }
 }
 
@@ -186,8 +188,11 @@ class Ogc_ProcessOfferings extends OgcDocument {
         });
     }
 
-    @override String toString() {
-        return "[ProcessOfferings]" + processes.map((p) => p.toString()).join();
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessOfferings]\n";
+        processes.forEach((p) => s += p.dump(indent + 1));
+        return s;
     }
 }
 
@@ -214,8 +219,12 @@ class Ogc_ProcessBrief extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[Process]\n" + "  Identifier: $identifier\n" + "  Title: $title\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessBrief]\n";
+        s += pad(indent + 1) + "Identifier: $identifier\n";
+        s += pad(indent + 1) + "Title: $title\n";
+        return s;
     }
 }
 
@@ -238,8 +247,8 @@ class Ogc_ProcessDescriptions extends OgcDocument {
         });
     }
 
-    @override String toString() {
-        return "[ProcessDescriptions]\n" + descriptions.map((i) => i.toString()).join();
+    @override String dump(int indent) {
+        return pad(indent) + "[ProcessDescriptions]\n" + descriptions.map((i) => i.dump(indent + 1)).join();
     }
 }
 
@@ -263,8 +272,8 @@ class Ogc_ProcessDescription extends OgcDocument {
             "Metadata": _ignoreElement,
             "Profile": _errorElement,
             "WSDL": _errorElement,
-            "DataInputs": (e) => new Ogc_Input(e),
-            "ProcessOutputs": (e) => new Ogc_ProcessOutputs34(e),
+            "DataInputs": (e) => dataInput = new Ogc_Input(e),
+            "ProcessOutputs": (e) => processOutputs = new Ogc_ProcessOutputs34(e),
         });
 
         _registerAttributes({
@@ -275,8 +284,14 @@ class Ogc_ProcessDescription extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[ProcessDescription]" + "Identifier: $identifier\n" + "Title: $title\n" + processOutputs.toString();
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessDescription]\n";
+        s += pad(indent + 1) + "Identifier: $identifier\n";
+        s += pad(indent + 1) + "Title: $title\n";
+        s += dataInput.dump(indent + 1);
+        s += processOutputs.dump(indent + 1);
+        return s;
     }
 }
 
@@ -295,8 +310,11 @@ class Ogc_Input extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[Input]\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[Input]\n";
+        dataInputs.forEach((i) => s += i.dump(indent + 1));
+        return s;
     }
 }
 
@@ -332,8 +350,11 @@ class Ogc_InputDescription extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[InputDescription]\n" + "Identifier: $identifier\n" + "Title: $title\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[InputDescription]\n";
+        s += pad(indent + 1) + "Identifier: $identifier\n";
+        return s;
     }
 }
 
@@ -361,8 +382,8 @@ class Ogc_LiteralInput extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[LiteralInput]\n" + "Datatype: $datatype\n" + "DefaultValue: $defaultValue";
+    @override String dump(int indent) {
+        return pad(indent) + "[LiteralInput]\n" + "Datatype: $datatype\n" + "DefaultValue: $defaultValue";
     }
 }
 
@@ -391,8 +412,11 @@ class Ogc_OutputDescription35 extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[OutputDescription]\n" + "Identifier: $identifier\n" + "Title: $title\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[OutputDescription35]\n";
+        s += pad(indent + 1) + "Identifier: $identifier\n";
+        return s;
     }
 }
 
@@ -410,8 +434,8 @@ class Ogc_LiteralOutput37 extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[LiteralOutput37]\n" + "Datatype: $datatype\n";
+    @override String dump(int indent) {
+        return pad(indent) + "[LiteralOutput37]\n" + "Datatype: $datatype\n";
     }
 }
 
@@ -431,28 +455,31 @@ class Ogc_LiteralData48 extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[LiteralData48]\n" + "Value: $value\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[LiteralData48]\n";
+        s += pad(indent + 1) + "Value: $value\n";
+        return s;
     }
 }
 
 // table 54
-class Ogc_ExecuteResponse extends OgcDocument {
+class OgcExecuteResponseDocument extends OgcDocument {
     String service;
     String version;
     String statusLocation;
     String serviceInstance;
-    Ogc_ProcessBrief process;
+    Ogc_ProcessBrief processBrief;
     Ogc_Status status;
     Ogc_ProcessOutputs59 processOutputs;
 
     List<Ogc_InputDescription> dataInputs = new List<Ogc_InputDescription>();
 
-    Ogc_ExecuteResponse(Xml.XmlElement element)
+    OgcExecuteResponseDocument(Xml.XmlElement element)
             : super(element) {
 
         _registerElements({
-            "Process": (e) => process = new Ogc_ProcessBrief(e),
+            "Process": (e) => processBrief = new Ogc_ProcessBrief(e),
             "Status": (e) => status = new Ogc_Status(e),
             "DataInputs": (e) => dataInputs.add(new Ogc_InputDescription(e)),
             "OutputDefinitions": _errorElement,
@@ -470,8 +497,14 @@ class Ogc_ExecuteResponse extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[ExecuteResponse] + $processOutputs\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ExecuteResponse]\n";
+        s += pad(indent + 1) + "StatusLocation: $statusLocation\n";
+        s += status.dump(indent + 1);
+        s += processBrief.dump(indent + 1);
+        s += processOutputs.dump(indent + 1);
+        return s;
     }
 }
 
@@ -502,27 +535,40 @@ class Ogc_Status extends OgcDocument {
 
     }
 
-    @override String toString() {
-        return "[Status]\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[Status]\n";
+        s += pad(indent + 1) + "creationTime: $creationTime\n";
+        s += pad(indent + 1) + "processAccepted: $processAccepted\n";
+        s += pad(indent + 1) + "processStarted: $processStarted\n";
+        s += pad(indent + 1) + "processPaused: $processPaused\n";
+        s += pad(indent + 1) + "processSucceeded: $processSucceeded\n";
+        if (processFailed != null) {
+            s += processFailed.dump(indent + 1);
+        }
+        return s;
     }
 }
 
 
 class Ogc_ProcessFailed extends OgcDocument {
-    Ogc_ExceptionReport exceptionReport;
+    OgcExceptionReportDocument exceptionReport;
 
     Ogc_ProcessFailed(Xml.XmlElement element)
             : super(element) {
 
         _registerElements({
-            "ExceptionReport": (e) => exceptionReport = new Ogc_ExceptionReport(e)
+            "ExceptionReport": (e) => exceptionReport = new OgcExceptionReportDocument(e)
         });
 
         _registerAttributes({});
     }
 
-    @override String toString() {
-        return "[ProcessFailed]\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessFailed]\n";
+        s += exceptionReport.dump(indent + 1);
+        return s;
     }
 }
 
@@ -540,8 +586,11 @@ class Ogc_ProcessOutputs34 extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[ProcessOutputs34]\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessOutputs34]\n";
+        outputData.forEach((i) => s += i.dump(indent + 1));
+        return s;
     }
 }
 
@@ -559,8 +608,11 @@ class Ogc_ProcessOutputs59 extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[ProcessOutputs59]\n" + outputData.map((i) => i.toString()).join();
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ProcessOutputs59]\n";
+        outputData.forEach((i) => s += i.dump(indent + 1));
+        return s;
     }
 }
 
@@ -587,8 +639,12 @@ class Ogc_OutputData60 extends OgcDocument {
         });
     }
 
-    @override String toString() {
-        return "[OutputData60]\nTitle: $title\n$data";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[OutputData60]\n";
+        s += pad(indent + 1) + "Title: $title\n";
+        s += data.dump(indent + 1);
+        return s;
     }
 }
 
@@ -608,11 +664,16 @@ class Ogc_DataType extends OgcDocument {
     }
 
 
-    @override String toString() {
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[DataType]\n";
+
         if (literalData == null) {
-            return "[DataType]\n";
+            s += pad(indent + 1) + "<<unparsed data payload>>\n";
+        } else {
+            s += literalData.dump(indent + 1);
         }
-        return "[DataType]\n$literalData";
+        return s;
     }
 }
 
@@ -636,8 +697,8 @@ class Ogc_OutputReference61 extends OgcDocument {
     }
 
 
-    @override String toString() {
-        return "[OutputReference]\n";
+    @override String dump(int indent) {
+        return pad(indent) + "[OutputReference]\n";
     }
 }
 
@@ -651,27 +712,33 @@ class Ogc_Exception extends OgcDocument {
         });
     }
 
-    @override String toString() {
-        return "[Exception] $text\n";
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[Exception]\n";
+        s += pad(indent + 1) + "Text: $text\n";
+        return s;
     }
 }
 
 
 
 
-class Ogc_ExceptionReport extends OgcDocument {
+class OgcExceptionReportDocument extends OgcDocument {
 
     List<Ogc_Exception> exceptions = new List<Ogc_Exception>();
 
-    Ogc_ExceptionReport(Xml.XmlElement element)
+    OgcExceptionReportDocument(Xml.XmlElement element)
             : super(element) {
         _registerElements({
             "Exception": (e) => exceptions.add(new Ogc_Exception(e))
         });
     }
 
-    @override String toString() {
-        return "[ExceptionReport]\n" + exceptions.map((i) => i.toString()).join();
+    @override String dump(int indent) {
+        String s = "";
+        s += pad(indent) + "[ExceptionReport]\n";
+        exceptions.forEach((i) => s += i.dump(indent + 1));
+        return s;
     }
 }
 

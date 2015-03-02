@@ -58,13 +58,22 @@ class ViewshedController implements IController {
             return;
         }
 
-        log("viewshed origin: ${Utils.toString_Cartographic3(point1)}");
-        log("viewshed radius: ${Utils.toString_Cartographic3(point2)}");
+        log("viewshed pt1: ${Utils.toString_Cartographic3(point1)}");
+        log("viewshed pt2: ${Utils.toString_Cartographic3(point2)}");
 
         Viewshed a = new Viewshed(point1, point2);
 
-        var params = [point1.longitude, point1.latitude, point2.longitude, point2.latitude];
-        _hub.commands.wpsRequest(new WpsRequestData(WpsRequestData.VIEWSHED, params));
+        var params = [];
+        params[0] = "Viewshed";
+        params[1] = {
+            "pt1Lon": point1.longitude,
+            "pt1Lat": point1.latitude,
+            "pt2Lon": point2.longitude,
+            "pt2Lat": point2.latitude
+        };
+        params[2] = ["resultLon"];
+
+        _hub.commands.wpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params));
 
         point1 = point2 = null;
     }

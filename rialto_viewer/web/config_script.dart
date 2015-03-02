@@ -9,8 +9,7 @@ class ConfigScript {
     Hub _hub;
     final Uri _url;
 
-    ConfigScript(Uri this._url) :
-        _hub = Hub.root;
+    ConfigScript(Uri this._url) : _hub = Hub.root;
 
     Future<List<dynamic>> run() {
         var c = new Completer<List<dynamic>>();
@@ -62,34 +61,12 @@ class ConfigScript {
         var wps = new WpsService(url, proxy: proxy, description: description);
         wps.open();
 
-        wps.getCapabilitiesAsync().then((OgcDocument doc) {
-            assert(doc is Ogc_Capabilities);
-            //log(doc);
-        });
-
-        wps.getProcessDescriptionAsync("groovy:wpshello").then((OgcDocument doc) {
-            assert(doc is Ogc_ProcessDescription);
-            //log(doc);
-        });
-
-        var params = {
-            "alpha": "17",
-            "beta": "11"
-        };
-
-        wps.executeProcessAsync("groovy:wpshello", params).then((OgcDocument doc) {
-            assert(doc is Ogc_ExecuteResponse);
-            Ogc_ExecuteResponse resp = doc;
-            var status = resp.status.processSucceeded;
-            assert(status != null);
-            Ogc_DataType datatype = resp.processOutputs.outputData[0].data;
-            Ogc_LiteralData48 literalData = datatype.literalData;
-            log(literalData);
-        });
+        //wps.test();
+        wps.testExecuteViewshed();
 
         _hub.wps = wps;
 
-        return new Future((){});
+        return new Future(() {});
     }
 
 
@@ -117,7 +94,7 @@ class ConfigScript {
         var cameraData = new CameraData(eye, target, up, fov);
         _hub.commands.updateCamera(cameraData);
 
-        return new Future((){});
+        return new Future(() {});
     }
 
     Future _doCommand_display(Map data) {
@@ -133,7 +110,7 @@ class ConfigScript {
             var f = _hub.commands.colorizeLayers(new ColorizerData(ramp, dimName));
         }
 
-        return new Future((){});
+        return new Future(() {});
     }
 
     Future<List<Layer>> _doCommand_layers(List layers) {

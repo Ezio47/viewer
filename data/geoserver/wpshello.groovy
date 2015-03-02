@@ -1,4 +1,5 @@
 import geoscript.geom.Geometry
+import java.util.timer.*  
 
 title = 'GeoScriptHello'
 description = 'Hello World using GeoScript'
@@ -9,9 +10,12 @@ inputs = [
 ]
 
 outputs = [
-	result: [name: 'result', description: 'output value', type: Double.class] 
+	gamma: [name: 'gamma', description: 'output value', type: Double.class] 
 ]
 
 def run(input) {
-	[result: input.alpha + input.beta]
+
+    //Thread.sleep(1 * 1000)
+    
+	[gamma: input.alpha + input.beta]
 }

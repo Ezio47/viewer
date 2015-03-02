@@ -36,8 +36,6 @@ final Map tests = {
 void main() {
     var hub = new Hub();
 
-    //OgcDocumentTests.test();
-
     try {
         String s = "http://localhost:12345/file/" + tests[0];
         var uri = Uri.parse(s);
