@@ -100,21 +100,16 @@ var doColorize = function (rampName, dataArray, numPoints, zmin, zmax, rgbaArray
     for (i = 0; i < numPoints; i += 1) {
         z = dataArray[i];
 
+        // handle FP math
         if (z < zmin) {
-            myassert(zmin - z >= 0.0000001);
             z = zmin;
         } else if (z > zmax) {
-            myassert(z - zmax >= 0.0000001);
             z = zmax;
         }
 
         scaledZ = (zLen == 0.0) ? 0.0 : (z - zmin) / zLen;
 
-        // TODO: clip, due to FP math (and above)
-        if (!(scaledZ >= -0.00000001 && scaledZ <= 1.00000001)) {
-            mylog(scaledZ);
-        }
-        myassert(scaledZ >= -0.00000001 && scaledZ <= 1.00000001);
+        // handle FP math
         if (scaledZ < 0.0) {
             scaledZ = 0.0;
         }
