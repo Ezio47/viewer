@@ -697,9 +697,11 @@ class OgcStatus_55 extends OgcDocument {
         return STATUS_INVALID;
     }
 
-    static bool isComplete(int code) {
-        return (code == STATUS_SUCCEEDED || code == STATUS_FAILED || code == STATUS_SYSTEMFAILURE);
-    }
+    static bool isComplete(int code) =>
+            (code == STATUS_SUCCEEDED || code == STATUS_FAILED || code == STATUS_SYSTEMFAILURE);
+
+    static bool isActive(code) =>
+            (code == STATUS_NOTYETSUBMITTED || code == STATUS_ACCEPTED || code == STATUS_STARTED || code == STATUS_PAUSED);
 
     @override String dump(int indent) {
         String s = "";

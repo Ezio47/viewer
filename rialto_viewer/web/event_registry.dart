@@ -37,7 +37,7 @@ class EventRegistry {
 
     SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
 
-    SignalFunctions<WpsRequestUpdateData> WpsRequestUpdate = new SignalFunctions<WpsRequestUpdateData>();
+    SignalFunctions<WpsJobUpdateData> WpsJobUpdate = new SignalFunctions<WpsJobUpdateData>();
 }
 
 
@@ -98,8 +98,8 @@ class KeyboardData {
 }
 
 
-class WpsRequestUpdateData {
-    final int count; // +1 or -1, for now...
+class WpsJobUpdateData {
+    final int jobId; // some change has happened with respect to this job
 
-    WpsRequestUpdateData(int this.count);
+    WpsJobUpdateData(int this.jobId);
 }

@@ -8,13 +8,13 @@ part of rialto.viewer;
 class WpsServiceTest {
 
     static void test(WpsService wps) {
-        //OgcDocumentTests.test();
-        //testCapabilities();
-        //testDescribeHello();
-        //testExecuteHello();
-        //testDescribeViewshed();
-        //testExecuteViewshed();
-        testExecuteViewshed2(wps);
+        OgcDocumentTests.test();
+        testCapabilities(wps);
+        testDescribeHello(wps);
+        testExecuteHello(wps);
+        testDescribeViewshed(wps);
+        testExecuteViewshed(wps);
+        //testExecuteViewshed2(wps);
     }
 
     static void testCapabilities(WpsService wps) {
@@ -133,6 +133,17 @@ class WpsServiceTest {
         wps.doWpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params)).then((id) {
             log("started: $id");
         });
+        wps.doWpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params)).then((id) {
+            log("started: $id");
+        });
+        wps.doWpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params)).then((id) {
+            log("started: $id");
+        });
+        wps.doWpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params)).then((id) {
+            log("started: $id");
+        });
+        wps.doWpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params)).then((id) {
+            log("started: $id");
+        });
     }
 }
-

@@ -15,8 +15,7 @@ class RialtoElement {
 
     int viewMode = ViewModeData.MODE_3D;
 
-    int _pendingWpsRequests = 0;
-    Element _textWpsPending;
+    Element _textWpsJobStatus;
 
     RialtoElement() {
         _hub = Hub.root;
@@ -52,8 +51,8 @@ class RialtoElement {
         _mouseCoords = querySelector("#textMouseCoords");
         _hub.events.MouseMove.subscribe(_updateCoords);
 
-        _textWpsPending = querySelector("#textWpsPending");
-        _hub.events.WpsRequestUpdate.subscribe(_handleWpsRequestUpdate);
+        _textWpsJobStatus = querySelector("#textWpsJobStatus");
+        _hub.events.WpsJobUpdate.subscribe(_handleWpsJobUpdate);
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name(viewMode)}";
@@ -68,21 +67,25 @@ class RialtoElement {
         return;
     }
 
-    String get _wpsStatusString => "WPS pending: $_pendingWpsRequests";
+    String _wpsStatusString(int count) => "WPS pending: $count";
 
-    void _handleWpsRequestUpdate(WpsRequestUpdateData data) {
-        if (data.count == 1) {
-            ++_pendingWpsRequests;
-            _textWpsPending.classes.remove("uk-text-muted");
-            _textWpsPending.text = _wpsStatusString;
-        } else if (data.count == -1) {
-            --_pendingWpsRequests;
-            if (_pendingWpsRequests == 0) {
-                _textWpsPending.classes.add("uk-text-muted");
-            }
-            _textWpsPending.text = _wpsStatusString;
-        } else {
+    void _handleWpsJobUpdate(WpsJobUpdateData data) {
+        final int numActive = _hub.wpsJobManager.numActive;
+
+        if (numActive < 0) {
             throw new ArgumentError("invalid WPS request count");
         }
+
+        if (numActive == 0) {
+            if (!_textWpsJobStatus.classes.contains("uk-text-muted")) {
+                _textWpsJobStatus.classes.add("uk-text-muted");
+            }
+        } else {
+            if (_textWpsJobStatus.classes.contains("uk-text-muted")) {
+                _textWpsJobStatus.classes.remove("uk-text-muted");
+            }
+        }
+
+        _textWpsJobStatus.text = "WPS jobs: $numActive";
     }
 }

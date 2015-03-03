@@ -26,6 +26,7 @@ class Hub {
     WpsService wps;
     LayerManager layerManager;
     Camera camera;
+    WpsJobManager wpsJobManager;
 
     // privates
     ViewController _viewController;
@@ -48,6 +49,8 @@ class Hub {
         _root = this;
 
         js = new JsBridge();
+
+        wpsJobManager = new WpsJobManager();
 
         events = new EventRegistry();
         commands = new Commands();

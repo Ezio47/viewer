@@ -14,8 +14,6 @@ class WpsService extends OwsService {
         "org.ciesin.gis.wps.algorithms.PopStat": "org.ciesin.gis.wps.algorithms.PopStat"
     };
 
-    WpsRequestStatusList statusList = new WpsRequestStatusList();
-
     WpsService(Uri server, {Uri proxyUri: null, String description: null})
             : super("WPS", server, proxyUri: proxyUri, description: description);
 
@@ -138,7 +136,10 @@ class WpsService extends OwsService {
         Map<String, dynamic> inputs = data.parameters[1];
         List<String> outputs = data.parameters[2];
 
-        var request = statusList.createStatusObject();
+        var request = _hub.wpsJobManager.createStatusObject(this);
+        request.onSuccess = (_) => log("success event");
+        request.onFailure = (_) => log("failure event");
+        request.onTimeout = (_) => log("timeout event");
 
         executeProcess(name, inputs, outputs).then((ogcDoc) {
 
@@ -159,7 +160,7 @@ class WpsService extends OwsService {
 
             request.statusLocation = Uri.parse(resp.statusLocation);
             request.proxyUri = proxyUri;
-            request.creationTime = resp.status.creationTime;
+            request.processCreationTime = DateTime.parse(resp.status.creationTime);
             request.code = resp.status.code;
 
             c.complete(request.id);
@@ -167,85 +168,4 @@ class WpsService extends OwsService {
 
         return c.future;
     }
-}
-
-
-class WpsRequestStatusList {
-    Hub _hub;
-    Map<int, WpsRequestStatus> map = new Map<int, WpsRequestStatus>();
-    int _jobId = 0;
-
-    WpsRequestStatusList() : _hub = Hub.root;
-
-    WpsRequestStatus createStatusObject() {
-        var obj = new WpsRequestStatus(newJobId);
-        add(obj);
-        return obj;
-    }
-
-    void add(WpsRequestStatus status) {
-        map[status.id] = status;
-    }
-
-    int get newJobId => _jobId++;
-}
-
-
-class WpsRequestStatus {
-    Hub _hub = Hub.root;
-    final int id;
-    Uri statusLocation;
-    String creationTime;
-    Uri proxyUri;
-    int code; // from OgcStatus_55 enums
-    List<String> exceptionTexts;
-    OgcExecuteResponseDocument_54 responseDocument;
-
-    final delay = new Duration(seconds: 2);
-
-    WpsRequestStatus(int this.id) : code = OgcStatus_55.STATUS_NOTYETSUBMITTED {
-        _incrementCounter();
-
-        new Timer(delay, _poll);
-    }
-
-    void _poll() {
-
-        log("polling...");
-
-        Comms.httpGet(statusLocation, proxyUri: proxyUri).then((Http.Response response) {
-            var ogcDoc = OgcDocument.parseString(response.body);
-            //log(ogcDoc.dump(0));
-
-            if (ogcDoc.isException) {
-                code = OgcStatus_55.STATUS_SYSTEMFAILURE;
-                exceptionTexts = ogcDoc.exceptionTexts;
-                _decrementCounter();
-                return;
-            }
-
-            if (ogcDoc is! OgcExecuteResponseDocument_54) {
-                code = OgcStatus_55.STATUS_SYSTEMFAILURE;
-                exceptionTexts = ["polled response neither exception report not response document"];
-                _decrementCounter();
-                return;
-            }
-
-            OgcExecuteResponseDocument_54 resp = ogcDoc;
-            code = resp.status.code;
-            responseDocument = resp;
-
-            if (OgcStatus_55.isComplete(code)) {
-                log("done!");
-                _decrementCounter();
-                return;
-            }
-
-            log("requeueing!");
-            new Timer(delay, _poll);
-        });
-    }
-
-    void _incrementCounter() => _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
-    void _decrementCounter() => _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
 }
