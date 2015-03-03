@@ -64,16 +64,37 @@ class ViewshedController implements IController {
         Viewshed a = new Viewshed(point1, point2);
 
         var params = new List(3);
-        params[0] = "Viewshed";
+        params[0] = "groovy:wpsviewshed";
         params[1] = {
             "pt1lon": point1.longitude,
             "pt1lat": point1.latitude,
             "pt2lon": point2.longitude,
             "pt2lat": point2.latitude
         };
-        params[2] = ["resultLon"];
+        params[2] = ["resultlon"];
 
-        _hub.commands.wpsExecuteProcess(new WpsExecuteProcessData(params));
+        var yes = (WpsJob job) {
+            log("SUCCESS!");
+            log(job.responseDocument.dump(0));
+        };
+
+        var no = (WpsJob job) {
+            log("FAILURE");
+            assert(job.responseDocument != null || job.exceptionTexts != null);
+            if (job.responseDocument != null) {
+                log(job.responseDocument.dump(0));
+            }
+            if (job.exceptionTexts != null) {
+                log(job.exceptionTexts);
+            }
+        };
+
+        var time = (WpsJob job) {
+            Hub.error("wps request timed out!");
+        };
+
+        var data = new WpsExecuteProcessData(params, successHandler: yes, errorHandler: no, timeoutHandler: time);
+        _hub.commands.wpsExecuteProcess(data);
 
         point1 = point2 = null;
     }

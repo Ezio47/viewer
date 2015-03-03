@@ -52,11 +52,6 @@ class OwsService {
                 Hub.error("Unable to parse server response", object: e);
                 c.complete(null);
             }
-
-        }).catchError((e) {
-            Hub.error("Server request failed", object: e, info: {});
-            c.complete(null);
-            return;
         });
 
         return c.future;

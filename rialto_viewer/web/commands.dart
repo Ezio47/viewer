@@ -9,8 +9,7 @@ typedef Future<dynamic> ChainCommndFunction(dynamic);
 class Commands {
     Hub _hub;
 
-    Commands() :
-        _hub = Hub.root;
+    Commands() : _hub = Hub.root;
 
     Future<Layer> addLayer(LayerData data) {
         return _hub.layerManager.doAddLayer(data);
@@ -35,7 +34,11 @@ class Commands {
     }
 
     Future wpsExecuteProcess(WpsExecuteProcessData data) {
-        return _hub.wps.doWpsExecuteProcess(data);
+        return _hub.wps.doWpsExecuteProcess(
+                data,
+                successHandler: data.successHandler,
+                errorHandler: data.errorHandler,
+                timeoutHandler: data.timeoutHandler);
     }
 
     Future wpsDescribeProcess(String processName) {
@@ -52,7 +55,7 @@ class Commands {
 
     Future setViewMode(ViewModeData mode) {
         _hub.cesium.setViewMode(mode.mode);
-        return new Future((){});
+        return new Future(() {});
     }
 
     Future displayLayerData(DisplayLayerData data) {
@@ -60,17 +63,17 @@ class Commands {
         if (data.layer is VisibilityControl) {
             (data.layer as VisibilityControl).visible = data.visible;
         }
-        return new Future((){});
+        return new Future(() {});
     }
 
     Future displayBbox(bool v) {
         _hub.displayBbox(v);
-        return new Future((){});
+        return new Future(() {});
     }
 
     Future changeMode(ModeData data) {
         _hub.modeController.doChangeMode(data);
-        return new Future((){});
+        return new Future(() {});
     }
 
     // given a list of things, run a function F against each one, in order
@@ -89,24 +92,25 @@ class Commands {
         return c.future;
     }
 
-    static Future _executeNextCommand(ChainCommndFunction f, List<dynamic> inputs, int index, List<dynamic> outputs, Completer c) {
+    static Future _executeNextCommand(ChainCommndFunction f, List<dynamic> inputs, int index, List<dynamic> outputs,
+            Completer c) {
 
-          dynamic input = inputs[index];
+        dynamic input = inputs[index];
 
-          f(input).then((dynamic result) {
+        f(input).then((dynamic result) {
 
-              outputs.add(result);
+            outputs.add(result);
 
-              if (index + 1 != inputs.length) {
-                  _executeNextCommand(f, inputs, index + 1, outputs, c);
-              } else {
-                  c.complete(outputs);
-                  return;
-              }
-          });
+            if (index + 1 != inputs.length) {
+                _executeNextCommand(f, inputs, index + 1, outputs, c);
+            } else {
+                c.complete(outputs);
+                return;
+            }
+        });
 
-          return c.future;
-      }
+        return c.future;
+    }
 }
 
 
@@ -126,7 +130,7 @@ class CameraData {
     Cartographic3 target; // cartographic
     Cartesian3 up; // cartesian
     double fov;
-    CameraData(this.eye, this.target, this.up, this.fov) : viewMode=NORMAL_MODE;
+    CameraData(this.eye, this.target, this.up, this.fov) : viewMode = NORMAL_MODE;
     CameraData.fromMode(this.viewMode);
 }
 
@@ -159,7 +163,15 @@ class ModeData {
 
 class WpsExecuteProcessData {
     final List<Object> parameters;
-    WpsExecuteProcessData(List<Object> this.parameters);
+    final WpsJobResultHandler successHandler;
+    final WpsJobResultHandler errorHandler;
+    final WpsJobResultHandler timeoutHandler;
+
+    WpsExecuteProcessData(List<Object> this.parameters, {WpsJobResultHandler successHandler: null,
+            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
+            : this.successHandler = successHandler,
+              this.errorHandler = errorHandler,
+              this.timeoutHandler = timeoutHandler;
 }
 
 
@@ -186,4 +198,3 @@ class ViewModeData {
         throw new ArgumentError("bad view mode value");
     }
 }
-

@@ -26,8 +26,23 @@ class OgcDocument {
     }
 
     static OgcDocument parseString(String text) {
-        var xmlDoc = Xml.parse(text);
-        var ogcDoc = parseXml(xmlDoc);
+        var xmlDoc;
+        var ogcDoc;
+
+        try {
+            xmlDoc = Xml.parse(text);
+        } catch (e) {
+            Hub.error("failed to parse XML response", object: e);
+            return null;
+        }
+
+        try {
+            ogcDoc = parseXml(xmlDoc);
+        } catch (e) {
+            Hub.error("failed to parse OWS response", object: e);
+            return null;
+        }
+
         return ogcDoc;
     }
 
@@ -663,7 +678,8 @@ class OgcStatus_55 extends OgcDocument {
     static const int STATUS_PAUSED = 4;
     static const int STATUS_SUCCEEDED = 5;
     static const int STATUS_FAILED = 6;
-    static const int STATUS_SYSTEMFAILURE = 7;
+    static const int STATUS_TIMEOUT = 7;
+    static const int STATUS_SYSTEMFAILURE = 8;
 
     String creationTime;
     String processAccepted;
@@ -698,10 +714,16 @@ class OgcStatus_55 extends OgcDocument {
     }
 
     static bool isComplete(int code) =>
-            (code == STATUS_SUCCEEDED || code == STATUS_FAILED || code == STATUS_SYSTEMFAILURE);
+            (code == STATUS_SUCCEEDED || code == STATUS_FAILED || code == STATUS_TIMEOUT || code == STATUS_SYSTEMFAILURE);
 
     static bool isActive(code) =>
             (code == STATUS_NOTYETSUBMITTED || code == STATUS_ACCEPTED || code == STATUS_STARTED || code == STATUS_PAUSED);
+
+    static bool isFailure(code) =>
+            (code == STATUS_FAILED || code == STATUS_TIMEOUT || code == STATUS_SYSTEMFAILURE);
+
+    static bool isSuccess(code) =>
+            (code == STATUS_SUCCEEDED);
 
     @override String dump(int indent) {
         String s = "";

@@ -126,6 +126,7 @@ class WpsService extends OwsService {
 
             if (ogcDoc == null) {
                 request.code = OgcStatus_55.STATUS_SYSTEMFAILURE;
+                request.stopPolling();
                 c.complete(request);
                 return;
             }
@@ -133,6 +134,7 @@ class WpsService extends OwsService {
             if (ogcDoc is OgcExceptionReportDocument) {
                 request.code = OgcStatus_55.STATUS_FAILED;
                 request.exceptionTexts = ogcDoc.exceptionTexts;
+                request.stopPolling();
                 c.complete(request);
                 return;
             }
@@ -143,6 +145,8 @@ class WpsService extends OwsService {
             request.proxyUri = proxyUri;
             request.processCreationTime = DateTime.parse(resp.status.creationTime);
             request.code = resp.status.code;
+
+            request.startPolling();
 
             c.complete(request);
         });

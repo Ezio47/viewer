@@ -1,6 +1,10 @@
 - layers:
     - esri:
-        type: arcgis_base_imagery
+        type: bing_base_imagery
+#    - foo.ria:
+#        type: pointcloud
+#        url: http://localhost:12345/file/tiles/foo.ria
+
 - wps:
     proxy: http://localhost:12345/proxy
     url: http://localhost:12348/geoserver/ows

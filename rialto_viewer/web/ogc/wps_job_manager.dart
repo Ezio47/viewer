@@ -9,7 +9,7 @@ typedef dynamic WpsJobResultHandler(WpsJob job);
 
 
 class WpsJobManager {
-    static final Duration pollingDelay = new Duration(seconds: 1);
+    static final Duration pollingDelay = new Duration(seconds: 2);
     static final Duration pollingTimeout = new Duration(minutes: 5);
 
     Hub _hub;
@@ -68,30 +68,52 @@ class WpsJob {
 
         _timeoutTime = _startTime.add(WpsJobManager.pollingTimeout);
         _signalJobChange();
-
-        new Timer(WpsJobManager.pollingDelay, _poll);
     }
 
     bool get isActive => OgcStatus_55.isActive(code);
     bool get isComplete => OgcStatus_55.isComplete(code);
+    bool get isFailure => OgcStatus_55.isFailure(code);
+    bool get isSuccess => OgcStatus_55.isSuccess(code);
 
-    void _poll() {
+    startPolling() => new Timer(WpsJobManager.pollingDelay, _poll);
 
-        log("poll $_pollCount...");
-
-        var now = new DateTime.now();
-        if (now.isAfter(_timeoutTime)) {
-            code = OgcStatus_55.STATUS_SYSTEMFAILURE;
-            exceptionTexts = ["process timed out"];
-
-            _signalJobChange();
-
+    stopPolling() {
+        if (code == OgcStatus_55.STATUS_TIMEOUT) {
             if (_timeoutHandler != null) {
                 _timeoutHandler(this);
             }
-            return;
-
         }
+
+        if (isFailure) {
+            if (_errorHandler != null) {
+                _errorHandler(this);
+            }
+        } else {
+            assert(isSuccess);
+            if (_successHandler != null) {
+                _successHandler(this);
+            }
+        }
+
+        _signalJobChange();
+    }
+
+
+    void _poll() {
+
+        var secs = new DateTime.now().difference(_startTime).inSeconds;
+        log("poll #$_pollCount, $secs seconds elapsed");
+
+        var now = new DateTime.now();
+        if (now.isAfter(_timeoutTime)) {
+            code = OgcStatus_55.STATUS_TIMEOUT;
+            exceptionTexts = ["process timed out"];
+
+            stopPolling();
+            return;
+        }
+
+        assert(statusLocation != null);
 
         Comms.httpGet(statusLocation, proxyUri: proxyUri).then((Http.Response response) {
             var ogcDoc = OgcDocument.parseString(response.body);
@@ -100,22 +122,16 @@ class WpsJob {
             if (ogcDoc.isException) {
                 code = OgcStatus_55.STATUS_SYSTEMFAILURE;
                 exceptionTexts = ogcDoc.exceptionTexts;
-                _signalJobChange();
 
-                if (_errorHandler != null) {
-                    _errorHandler(this);
-                }
+                stopPolling();
                 return;
             }
 
             if (ogcDoc is! OgcExecuteResponseDocument_54) {
                 code = OgcStatus_55.STATUS_SYSTEMFAILURE;
                 exceptionTexts = ["polled response neither exception report not response document"];
-                _signalJobChange();
 
-                if (_errorHandler != null) {
-                    _errorHandler(this);
-                }
+                stopPolling();
                 return;
             }
 
@@ -125,11 +141,8 @@ class WpsJob {
 
             if (OgcStatus_55.isComplete(code)) {
                 log("done!");
-                _signalJobChange();
 
-                if (_successHandler != null) {
-                    _successHandler(this);
-                }
+                stopPolling();
                 return;
             }
 
