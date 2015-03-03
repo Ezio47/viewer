@@ -11,8 +11,7 @@ class LayerManager {
     CartographicBbox bbox = new CartographicBbox.empty();
     bool _hasBaseImagery = false;
 
-    LayerManager() :
-        _hub = Hub.root;
+    LayerManager() : _hub = Hub.root;
 
     Future doColorizeLayers(ColorizerData data) {
         var futures = new List<Future>();
@@ -51,8 +50,10 @@ class LayerManager {
         layer.load().then((_) {
             layers[layer.name] = layer;
 
-            bbox.unionWith(layer.bbox);
-            _hub.events.LayersBboxChanged.fire(bbox);
+            if (layer.bbox != null) {
+                bbox.unionWith(layer.bbox);
+                _hub.events.LayersBboxChanged.fire(bbox);
+            }
 
             _hub.events.AddLayerCompleted.fire(layer);
 
@@ -67,17 +68,23 @@ class LayerManager {
         Layer layer = layers[name];
         assert(layer != null);
 
+        var bboxAffected = (layer.bbox != null);
+
         layers.remove(layer.name);
 
-        bbox = new CartographicBbox.empty();
-        for (var layer in layers.values) {
-            bbox.unionWith(layer.bbox);
+        if (bboxAffected) {
+            bbox = new CartographicBbox.empty();
+            for (var layer in layers.values) {
+                if (layer.bbox != null) {
+                    bbox.unionWith(layer.bbox);
+                }
+            }
+            _hub.events.LayersBboxChanged.fire(bbox);
         }
-        _hub.events.LayersBboxChanged.fire(bbox);
 
         _hub.events.RemoveLayerCompleted.fire(name);
 
-        return new Future((){});
+        return new Future(() {});
     }
 
     Future doRemoveAllLayers() {
@@ -85,7 +92,7 @@ class LayerManager {
         items.forEach((layer) => _hub.commands.removeLayer(layer.name));
         _hub.events.RemoveAllLayersCompleted.fire0();
 
-        return new Future((){});
+        return new Future(() {});
     }
 
     // this function should do no heavywieght work, save that for load()

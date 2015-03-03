@@ -12,32 +12,32 @@ abstract class Layer {
     final String name;
     final String description;
 
+    final Uri url;
+    final Uri proxy;
+
     CartographicBbox _bbox;
 
     Layer(String this.type, String this.name, Map map)
             : _hub = Hub.root,
+              url = YamlUtils.getOptionalSettingAsUrl(map, "url"),
+              proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy"),
               description = YamlUtils.getOptionalSettingAsString(map, "description") {
         log("New $type layer: $name");
     }
 
+    _requireUrl() {
+        if (url != null)  return;
+         throw new ArgumentError("url not set in config file");
+    }
+
+    String get urlString => url.toString();
+    String get proxyString => (proxy == null) ? null : proxy.toString();
+
     Future load();
 
     CartographicBbox get bbox => _bbox;
-}
 
-
-abstract class UrlLayer extends Layer {
-    Uri _url;
-    Uri _proxy;
-
-    UrlLayer(String type, String name, Map map)
-            : super(type, name, map) {
-        _url = YamlUtils.getOptionalSettingAsUrl(map, "url");
-        _proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy");
-    }
-
-    Uri get url => _url;
-    Uri get proxy => _proxy;
+    bool get canZoomTo => (bbox != null);
 }
 
 

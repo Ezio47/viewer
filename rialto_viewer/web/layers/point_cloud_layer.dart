@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-class PointCloudLayer extends UrlLayer with VisibilityControl, ColorizerControl {
+class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
     var _provider;
     int numPoints;
     ColorizerData _colorizerData = new ColorizerData("Spectral", "Z");
@@ -13,14 +13,16 @@ class PointCloudLayer extends UrlLayer with VisibilityControl, ColorizerControl 
     bool _visible = true;
 
     PointCloudLayer(String name, Map map)
-            : super("pointcloud", name, map);
+            : super("pointcloud", name, map) {
+        _requireUrl();
+    }
 
     @override
     Future load() {
         Completer c = new Completer();
 
         _hub.cesium.createTileProviderAsync(
-                url.toString(),
+                urlString,
                 _colorizerData.ramp,
                 _colorizerData.dimension,
                 visible).then((provider) {

@@ -5,13 +5,15 @@
 part of rialto.viewer;
 
 
-class GeoJsonLayer extends UrlLayer implements VisibilityControl {
+class GeoJsonLayer extends Layer implements VisibilityControl {
     dynamic _dataSource;
     bool _visible;
 
     GeoJsonLayer(String name, Map map)
             : _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
-              super("geojson", name, map);
+              super("geojson", name, map) {
+        _requireUrl();
+    }
 
     @override set visible(bool v) {
         _hub.cesium.setDataSourceVisible(_dataSource, v);
@@ -27,7 +29,7 @@ class GeoJsonLayer extends UrlLayer implements VisibilityControl {
     Future load() {
         Completer c = new Completer();
 
-        _hub.cesium.addGeoJson(name, _url.toString()).then((ds) {
+        _hub.cesium.addGeoJson(name, urlString).then((ds) {
             _dataSource = ds;
 
             _forceUpdates();
