@@ -204,7 +204,7 @@ class WpsRequestStatus {
     final delay = new Duration(seconds: 2);
 
     WpsRequestStatus(int this.id) : code = OgcStatus_55.STATUS_NOTYETSUBMITTED {
-        _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
+        _incrementCounter();
 
         new Timer(delay, _poll);
     }
@@ -220,14 +220,14 @@ class WpsRequestStatus {
             if (ogcDoc.isException) {
                 code = OgcStatus_55.STATUS_SYSTEMFAILURE;
                 exceptionTexts = ogcDoc.exceptionTexts;
-                _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
+                _decrementCounter();
                 return;
             }
 
             if (ogcDoc is! OgcExecuteResponseDocument_54) {
                 code = OgcStatus_55.STATUS_SYSTEMFAILURE;
                 exceptionTexts = ["polled response neither exception report not response document"];
-                _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
+                _decrementCounter();
                 return;
             }
 
@@ -237,7 +237,7 @@ class WpsRequestStatus {
 
             if (OgcStatus_55.isComplete(code)) {
                 log("done!");
-                _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
+                _decrementCounter();
                 return;
             }
 
@@ -245,4 +245,7 @@ class WpsRequestStatus {
             new Timer(delay, _poll);
         });
     }
+
+    void _incrementCounter() => _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
+    void _decrementCounter() => _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
 }
