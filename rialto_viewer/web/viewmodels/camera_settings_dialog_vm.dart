@@ -67,19 +67,19 @@ class CameraSettingsDialogVM extends DialogVM {
             return;
         }
 
-        var eyeLon = _eyeLon.getValueAsDouble();
-        var eyeLat = _eyeLat.getValueAsDouble();
-        var eyeHeight = _eyeHeight.getValueAsDouble();
+        var eyeLon = _eyeLon.valueAsDouble;
+        var eyeLat = _eyeLat.valueAsDouble;
+        var eyeHeight = _eyeHeight.valueAsDouble;
 
-        var targetLon = _targetLon.getValueAsDouble();
-        var targetLat = _targetLat.getValueAsDouble();
-        var targetHeight = _targetHeight.getValueAsDouble();
+        var targetLon = _targetLon.valueAsDouble;
+        var targetLat = _targetLat.valueAsDouble;
+        var targetHeight = _targetHeight.valueAsDouble;
 
-        var upX = _upX.getValueAsDouble();
-        var upY = _upY.getValueAsDouble();
-        var upZ = _upZ.getValueAsDouble();
+        var upX = _upX.valueAsDouble;
+        var upY = _upY.valueAsDouble;
+        var upZ = _upZ.valueAsDouble;
 
-        var fov = _fov.getValueAsDouble();
+        var fov = _fov.valueAsDouble;
 
         final eyeOkay = (eyeLon != null && eyeLat != null && eyeHeight != null);
         if (!eyeOkay) {

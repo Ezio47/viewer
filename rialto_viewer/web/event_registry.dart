@@ -26,7 +26,7 @@ class EventRegistry {
 
     SignalFunctions<Vector3> MouseGeoCoords = new SignalFunctions<Vector3>();
 
-    SignalFunctions<bool> DisplayBboxUpdate = new SignalFunctions<bool>();
+    SignalFunctions<AdvancedSettingsChangedData> AdvancedSettingsChanged = new SignalFunctions<AdvancedSettingsChangedData>();
 
     SignalFunctions<Layer> AddLayerCompleted = new SignalFunctions<Layer>();
     SignalFunctions<Layer> AddAllLayersCompleted = new SignalFunctions<Layer>();
@@ -38,6 +38,14 @@ class EventRegistry {
     SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
 
     SignalFunctions<WpsJobUpdateData> WpsJobUpdate = new SignalFunctions<WpsJobUpdateData>();
+}
+
+
+class AdvancedSettingsChangedData {
+    bool showBbox;
+    int displayPrecision;
+
+    AdvancedSettingsChangedData(this.showBbox, this.displayPrecision);
 }
 
 

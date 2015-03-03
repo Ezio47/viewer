@@ -86,7 +86,7 @@
                                 <li class=""><a id="viewshedModeButton">Viewshed</a></li>
                                 <li class="uk-nav-divider"></li>
                                 <li class="uk-active"><a id="cameraSettingsDialog_open">Camera settings...</a></li>
-                                <li class="uk-active"><a id="advancedSettingsDialog_open">Advnaced settings...</a></li>
+                                <li class="uk-active"><a id="advancedSettingsDialog_open">Advanced settings...</a></li>
                             </ul>
                         </div>
                     </li>
@@ -244,7 +244,7 @@
                                     <input id="cameraSettingsDialog_eyeLat" type="text">
                                 </td>
                                 <td>
-                                    <label for="cameraSettingsDialog_eyeHeight">Height (km):</label>
+                                    <label for="cameraSettingsDialog_eyeHeight">Height (m):</label>
                                     <input id="cameraSettingsDialog_eyeHeight" type="text">
                                 </td>
                             </tr>
@@ -261,7 +261,7 @@
                                     <input id="cameraSettingsDialog_targetLat" type="text">
                                 </td>
                                 <td>
-                                    <label for="cameraSettingsDialog_targetHeight">Height (km):</label>
+                                    <label for="cameraSettingsDialog_targetHeight">Height (m):</label>
                                     <input id="cameraSettingsDialog_targetHeight" type="text">
                                 </td>
                             </tr>
@@ -316,10 +316,14 @@
                     <tbody>
                         <tr>
                         <td>
-                            <span>Bbox enabled</span>
+                            <label for="advancedSettingsDialog_bboxEnabled">Bbox enabled:</label>
+                            <input id="advancedSettingsDialog_bboxEnabled" type="checkbox">
                         </td>
+                        </tr>
+                        <tr>
                         <td>
-                            <input id="advancedSettingsDialog_bboxEnabled" type="checkbox" class="padright">
+                            <label for="advancedSettingsDialog_displayPrecision">Display precision:</label>
+                            <input id="advancedSettingsDialog_displayPrecision" type="text">
                         </td>
                         </tr>
                     </tbody>

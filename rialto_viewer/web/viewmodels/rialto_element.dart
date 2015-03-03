@@ -19,6 +19,8 @@ class RialtoElement {
 
     Element _textWpsJobStatus;
 
+    int _displayPrecision = 5;
+
     RialtoElement() {
         _hub = Hub.root;
 
@@ -52,22 +54,25 @@ class RialtoElement {
         _aboutCesium = new AboutVM("#aboutCesiumDialog");
 
         _mouseCoords = querySelector("#textMouseCoords");
-        _hub.events.MouseMove.subscribe(_updateCoords);
+        _hub.events.MouseMove.subscribe(_handleUpdateCoords);
 
         _textWpsJobStatus = querySelector("#textWpsJobStatus");
         _hub.events.WpsJobUpdate.subscribe(_handleWpsJobUpdate);
+
+        _hub.events.AdvancedSettingsChanged.subscribe((data) => _displayPrecision = data.displayPrecision);
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name(viewMode)}";
 
-    void _updateCoords(MouseData d) {
+    void _handleUpdateCoords(MouseData d) {
         var v = _hub.cesium.getMouseCoordinates(d.x, d.y);
         if (v == null) return;
-        double lon = v.longitude;
-        double lat = v.latitude;
-        String s = "(${lon.toStringAsFixed(5)}, ${lat.toStringAsFixed(5)})";
+
+        final double lon = v.longitude;
+        final double lat = v.latitude;
+        String s = "(${lon.toStringAsFixed(_displayPrecision)}, ${lat.toStringAsFixed(_displayPrecision)})";
+
         _mouseCoords.text = s;
-        return;
     }
 
     String _wpsStatusString(int count) => "WPS pending: $count";

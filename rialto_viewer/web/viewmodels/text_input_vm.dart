@@ -32,12 +32,21 @@ class TextInputVM extends ViewModel {
     }
 
     // returns a double or null
-    double getValueAsDouble() {
+    double get valueAsDouble {
         String s = value;
         double d = null;
 
-        d = double.parse(s, (s) {} );
+        d = double.parse(s, (s) => 0.0);
         return d;
+    }
+
+    // returns a double or null
+    int get valueAsInt {
+        String s = value;
+        int i = null;
+
+        i = int.parse(s, onError: (s) => 0);
+        return i;
     }
 
     //TODO: add validation for data type of input string

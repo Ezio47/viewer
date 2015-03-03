@@ -80,6 +80,8 @@ class Hub {
         camera = new Camera();
 
         commands.changeMode(new ModeData(ModeData.VIEW));
+
+        events.AdvancedSettingsChanged.subscribe((data) => _bboxShape.isVisible = data.showBbox);
     }
 
     void _handleLayersBboxChanged(CartographicBbox box) {
