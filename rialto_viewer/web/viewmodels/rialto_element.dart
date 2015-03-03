@@ -9,9 +9,11 @@ class RialtoElement {
     SpanElement _mouseCoords;
     InitScriptDialogVM _initScriptDialog;
     LayerManagerDialogVM _layerManager;
-    SettingsDialogVM _advancedSettings;
+    CameraSettingsDialogVM _cameraSettingsDialog;
+    AdvancedSettingsDialogVM _advancedSettingsDialog;
     ModalButtonsVM _modalButtons;
-    AboutVM _about, _aboutCesium;
+    AboutVM _aboutRialto;
+    AboutVM _aboutCesium;
 
     int viewMode = ViewModeData.MODE_3D;
 
@@ -43,9 +45,10 @@ class RialtoElement {
 
         _initScriptDialog = new InitScriptDialogVM("#initScriptDialog");
         _layerManager = new LayerManagerDialogVM("#layerManagerDialog");
-        _advancedSettings = new SettingsDialogVM("#advancedSettingsDialog");
+        _cameraSettingsDialog = new CameraSettingsDialogVM("#cameraSettingsDialog");
+        _advancedSettingsDialog = new AdvancedSettingsDialogVM("#advancedSettingsDialog");
 
-        _about = new AboutVM("#aboutDialog");
+        _aboutRialto = new AboutVM("#aboutRialtoDialog");
         _aboutCesium = new AboutVM("#aboutCesiumDialog");
 
         _mouseCoords = querySelector("#textMouseCoords");

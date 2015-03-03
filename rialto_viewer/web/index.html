@@ -55,7 +55,7 @@
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
                                 <li class="uk-active"><a id="homeWorldButton">Home (world)</a></li>
-                                <li class="uk-active"><a id="homeDataButton">Home (data)</a></li>
+                                <li class="uk-active"><a id="homeDataButton">Zoom to points</a></li>
                                 <li class="uk-nav-header">Projection</li>
                                 <li class="uk-active"><a id="modeButton2D">2D</a></li>
                                 <li class="uk-active"><a id="modeButton25D">2.5D</a></li>
@@ -68,17 +68,8 @@
                         <a href="">Sources <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class="uk-active"><a id="initScriptDialog_open">Load config...</a></li>
-                                <li class="uk-active"><a id="layerManagerDialog_open">Manage layers...</a></li>
-                                <li class="uk-nav-divider"></li>
-                                <li class="uk-nav-header">Point clouds</li>
-                                <li><a href="#">Add..</a></li>
-                                <li class="uk-nav-header">Vectors</li>
-                                <li><a href="#">Add..</a></li>
-                                <li class="uk-nav-header">Base Imagery</li>
-                                <li><a href="#">Add..</a></li>
-                                <li class="uk-nav-header">Base Terrain</li>
-                                <li><a href="#">Add..</a></li>
+                                <li class="uk-active"><a id="layerManagerDialog_open">Manage sources...</a></li>
+                                <li class="uk-active"><a id="initScriptDialog_open">Load configuration...</a></li>
                             </ul>
                         </div>
                     </li>
@@ -87,21 +78,15 @@
                         <a href="">Tools <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class=""><a id="colorizerDialog_open">Colorizer...</a></li>
+                                <li class=""><a id="colorizerDialog_open">Colorize points...</a></li>
                                 <li class="uk-nav-divider"></li>
                                 <li class=""><a id="viewModeButton">View</a></li>
                                 <li class=""><a id="annotateModeButton">Annotate</a></li>
                                 <li class=""><a id="measureModeButton">Measure</a></li>
                                 <li class=""><a id="viewshedModeButton">Viewshed</a></li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
-                        <a href="">Settings <i class="uk-icon-caret-down"></i></a>
-                        <div class="uk-dropdown uk-dropdown-navbar">
-                            <ul class="uk-nav uk-nav-navbar">
-                                <li class="uk-active"><a id="advancedSettingsDialog_open">Advanced...</a></li>
+                                <li class="uk-nav-divider"></li>
+                                <li class="uk-active"><a id="cameraSettingsDialog_open">Camera settings...</a></li>
+                                <li class="uk-active"><a id="advancedSettingsDialog_open">Advnaced settings...</a></li>
                             </ul>
                         </div>
                     </li>
@@ -110,8 +95,8 @@
                         <a href="">Help <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class="uk-active"><a id="aboutDialog_open">About...</a></li>
-                                <li class="uk-active"><a id="aboutCesiumDialog_open">Cesium...</a></li>
+                                <li class="uk-active"><a id="aboutRialtoDialog_open">About...</a></li>
+                                <li class="uk-active"><a id="aboutCesiumDialog_open">About Cesium...</a></li>
                             </ul>
                         </div>
                     </li>
@@ -235,6 +220,90 @@
         </div>
 
 
+        <div id="cameraSettingsDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Camera Settings
+                </div>
+
+                <form class="uk-form uk-form-horizontal">
+
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><i>Camera eye point</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="cameraSettingsDialog_eyeLon">Lon:</label>
+                                    <input id="cameraSettingsDialog_eyeLon" type="text">
+                                </td>
+                                <td>
+                                    <label for="cameraSettingsDialog_eyeLat">Lat:</label>
+                                    <input id="cameraSettingsDialog_eyeLat" type="text">
+                                </td>
+                                <td>
+                                    <label for="cameraSettingsDialog_eyeHeight">Height (km):</label>
+                                    <input id="cameraSettingsDialog_eyeHeight" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera target point</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="cameraSettingsDialog_targetLon">Lon:</label>
+                                    <input id="cameraSettingsDialog_targetLon" type="text">
+                                </td>
+                                <td>
+                                    <label for="cameraSettingsDialog_targetLat">Lat:</label>
+                                    <input id="cameraSettingsDialog_targetLat" type="text">
+                                </td>
+                                <td>
+                                    <label for="cameraSettingsDialog_targetHeight">Height (km):</label>
+                                    <input id="cameraSettingsDialog_targetHeight" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera up direction</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="cameraSettingsDialog_upX">X:</label>
+                                    <input id="cameraSettingsDialog_upX" type="text">
+                                </td>
+                                <td>
+                                    <label for="cameraSettingsDialog_upY">Y:</label>
+                                    <input id="cameraSettingsDialog_upY" type="text">
+                                </td>
+                                <td>
+                                    <label for="cameraSettingsDialog_upZ">Z:</label>
+                                    <input id="cameraSettingsDialog_upZ" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><i>Camera FOV</i></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="cameraSettingsDialog_fov">Degrees:</label>
+                                    <input id="cameraSettingsDialog_fov" type="text">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </form>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="cameraSettingsDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="cameraSettingsDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
         <div id="advancedSettingsDialog" class="uk-modal">
             <div class="uk-modal-dialog">
                 <div class="uk-modal-header">
@@ -257,72 +326,6 @@
                     </table>
                 </div>
 
-                <div>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td><i>Camera eye point</i></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="advancedSettingsDialog_eyeLon">Lon:</label>
-                                    <input id="advancedSettingsDialog_eyeLon" type="text">
-                                </td>
-                                <td>
-                                    <label for="advancedSettingsDialog_eyeLat">Lat:</label>
-                                    <input id="advancedSettingsDialog_eyeLat" type="text">
-                                </td>
-                                <td>
-                                    <label for="advancedSettingsDialog_eyeHeight">Height (km):</label>
-                                    <input id="advancedSettingsDialog_eyeHeight" type="text">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><i>Camera target point</i></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="advancedSettingsDialog_targetLon">Lon:</label>
-                                    <input id="advancedSettingsDialog_targetLon" type="text">
-                                </td>
-                                <td>
-                                    <label for="advancedSettingsDialog_targetLat">Lat:</label>
-                                    <input id="advancedSettingsDialog_targetLat" type="text">
-                                </td>
-                                <td>
-                                    <label for="advancedSettingsDialog_targetHeight">Height (km):</label>
-                                    <input id="advancedSettingsDialog_targetHeight" type="text">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><i>Camera up direction</i></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="advancedSettingsDialog_upX">X:</label>
-                                    <input id="advancedSettingsDialog_upX" type="text">
-                                </td>
-                                <td>
-                                    <label for="advancedSettingsDialog_upY">Y:</label>
-                                    <input id="advancedSettingsDialog_upY" type="text">
-                                </td>
-                                <td>
-                                    <label for="advancedSettingsDialog_upZ">Z:</label>
-                                    <input id="advancedSettingsDialog_upZ" type="text">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><i>Camera FOV</i></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label for="advancedSettingsDialog_fov">Degrees:</label>
-                                    <input id="advancedSettingsDialog_fov" type="text">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
                 </form>
 
                 <div class="uk-modal-footer uk-text-right">
@@ -426,7 +429,7 @@
             </div>
         </div>
 
-        <div id="aboutDialog" class="uk-modal">
+        <div id="aboutRialtoDialog" class="uk-modal">
             <div class="uk-modal-dialog small-dialog">
                 <div class="uk-modal-header">
                     The Rialto Viewer
@@ -444,7 +447,7 @@
                 </div>
 
                 <div class="uk-modal-footer uk-text-right">
-                    <button id="aboutDialog_okay" class="uk-button uk-modal-close">Close</button>
+                    <button id="aboutRialtoDialog_okay" class="uk-button uk-modal-close">Close</button>
                 </div>
             </div>
         </div>

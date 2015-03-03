@@ -5,8 +5,7 @@
 part of rialto.viewer;
 
 
-class SettingsDialogVM extends DialogVM {
-    bool _bboxChecked;
+class CameraSettingsDialogVM extends DialogVM {
 
     TextInputVM _eyeLon;
     TextInputVM _eyeLat;
@@ -19,28 +18,22 @@ class SettingsDialogVM extends DialogVM {
     TextInputVM _upY;
     TextInputVM _upZ;
 
-    CheckBoxVM _bboxEnabled;
-
     Hub _hub;
 
-    SettingsDialogVM(String id) : super(id) {
+    CameraSettingsDialogVM(String id) : super(id) {
 
         _hub = Hub.root;
-        _hub.events.DisplayBboxUpdate.subscribe((v) => _bboxChecked = v);
-        _bboxChecked = false;
 
-        _eyeLon = new TextInputVM("#advancedSettingsDialog_eyeLon", "0.0");
-        _eyeLat = new TextInputVM("#advancedSettingsDialog_eyeLat", "0.0");
-        _eyeHeight = new TextInputVM("#advancedSettingsDialog_eyeHeight", "15000.0");
-        _targetLon = new TextInputVM("#advancedSettingsDialog_targetLon", "0.0");
-        _targetLat = new TextInputVM("#advancedSettingsDialog_targetLat", "0.0");
-        _targetHeight = new TextInputVM("#advancedSettingsDialog_targetHeight", "0.0");
-        _fov = new TextInputVM("#advancedSettingsDialog_fov", "60.0");
-        _upX = new TextInputVM("#advancedSettingsDialog_upX", "0.0");
-        _upY = new TextInputVM("#advancedSettingsDialog_upY", "0.0");
-        _upZ = new TextInputVM("#advancedSettingsDialog_upZ", "1.0");
-
-        _bboxEnabled = new CheckBoxVM("#advancedSettingsDialog_bboxEnabled", true);
+        _eyeLon = new TextInputVM("#cameraSettingsDialog_eyeLon", "0.0");
+        _eyeLat = new TextInputVM("#cameraSettingsDialog_eyeLat", "0.0");
+        _eyeHeight = new TextInputVM("#cameraSettingsDialog_eyeHeight", "15000.0");
+        _targetLon = new TextInputVM("#cameraSettingsDialog_targetLon", "0.0");
+        _targetLat = new TextInputVM("#cameraSettingsDialog_targetLat", "0.0");
+        _targetHeight = new TextInputVM("#cameraSettingsDialog_targetHeight", "0.0");
+        _fov = new TextInputVM("#cameraSettingsDialog_fov", "60.0");
+        _upX = new TextInputVM("#cameraSettingsDialog_upX", "0.0");
+        _upY = new TextInputVM("#cameraSettingsDialog_upY", "0.0");
+        _upZ = new TextInputVM("#cameraSettingsDialog_upZ", "1.0");
     }
 
     @override
@@ -55,8 +48,6 @@ class SettingsDialogVM extends DialogVM {
         _upX.clearState();
         _upY.clearState();
         _upZ.clearState();
-
-        _bboxEnabled.clearState();
     }
 
     @override
@@ -64,8 +55,6 @@ class SettingsDialogVM extends DialogVM {
         if (!okay) return;
 
         _performCameraWork();
-
-        _performBboxWork();
     }
 
     void _performCameraWork() {
@@ -121,11 +110,5 @@ class SettingsDialogVM extends DialogVM {
 
         var data = new CameraData(eye, target, up, fov);
         _hub.commands.updateCamera(data);
-    }
-
-    void _performBboxWork() {
-        if (_bboxEnabled.changed) {
-            _hub.events.DisplayBboxUpdate.fire(_bboxEnabled.value);
-        }
     }
 }

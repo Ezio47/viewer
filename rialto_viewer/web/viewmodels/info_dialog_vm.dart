@@ -38,7 +38,7 @@ class InfoVM extends DialogVM {
         if (layer != null) {
             querySelector("#infoDialog_name").text = layer.name;
             querySelector("#infoDialog_layerType").text = layer.type;
-            if (layer is UrlLayer) {
+            if (layer.url != null) {
                 querySelector("#infoDialog_server").text = Utils.firstPart(layer.url).toString();
                 querySelector("#infoDialog_path").text = Utils.secondPart(layer.url).toString();
             }

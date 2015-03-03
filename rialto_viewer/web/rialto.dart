@@ -61,7 +61,8 @@ part 'utils/utils.dart';
 part 'utils/yaml_utils.dart';
 
 part 'viewmodels/about_dialog_vm.dart';
-part 'viewmodels/settings_dialog_vm.dart';
+part 'viewmodels/advanced_settings_dialog_vm.dart';
+part 'viewmodels/camera_settings_dialog_vm.dart';
 part 'viewmodels/check_box_vm.dart';
 part 'viewmodels/colorizer_dialog_vm.dart';
 part 'viewmodels/dialog_vm.dart';
