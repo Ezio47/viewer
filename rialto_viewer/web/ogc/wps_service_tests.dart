@@ -19,7 +19,7 @@ class WpsServiceTest {
 
     static void testCapabilities(WpsService wps) {
         wps.getCapabilities().then((OgcDocument doc) {
-            assert(doc is OgcCapabilities_7);
+            assert(doc is OgcCapabilitiesDocument_7);
             //log(doc.dump(0));
             assert(doc.dump(0).contains("Identifier: groovy:wpshello"));
         });

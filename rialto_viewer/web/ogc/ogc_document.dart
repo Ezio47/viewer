@@ -36,7 +36,7 @@ class OgcDocument {
             if (elem is Xml.XmlElement) {
                 switch (elem.name.local) {
                     case "Capabilities":
-                        return new OgcCapabilities_7(elem);
+                        return new OgcCapabilitiesDocument_7(elem);
                     case "ExceptionReport":
                         return new OgcExceptionReportDocument(elem);
                     case "ProcessDescriptions":
@@ -133,15 +133,6 @@ class OgcDocument {
     }
 
     bool get isException => this is OgcExceptionReportDocument;
-    String get exceptionString {
-        var doc = this;
-        if (doc is! OgcExceptionReportDocument) return null;
-
-        String s = "";
-        doc.exceptions.forEach((e) => s += e.text);
-
-        return s;
-    }
 
     String dump(int indent) {
         return pad(indent) + "[$type]";
@@ -182,13 +173,13 @@ class OgcProcessBrief_2 extends OgcDocument {
 }
 
 
-class OgcCapabilities_7 extends OgcDocument {
+class OgcCapabilitiesDocument_7 extends OgcDocument {
 
     String service;
     String version;
     OgcProcessOfferings_8 processOfferings;
 
-    OgcCapabilities_7(Xml.XmlElement element)
+    OgcCapabilitiesDocument_7(Xml.XmlElement element)
             : super(element) {
 
         var a = element.attributes[0];
@@ -643,7 +634,6 @@ class OgcExecuteResponseDocument_54 extends OgcDocument {
             "statusLocation": (attr) => statusLocation = attr.value,
             "serviceInstance": (attr) => serviceInstance = attr.value,
         });
-
     }
 
 
@@ -662,13 +652,18 @@ class OgcExecuteResponseDocument_54 extends OgcDocument {
 
 
 class OgcStatus_55 extends OgcDocument {
+
+    // 1 is used when the status object is first created and no state yet exists
+    // 2..6 are legit OGC codes
+    // 7 is used when the HTTP call fails, or we don't get a valid OWS document in the response
     static const int STATUS_INVALID = 0;
-    static const int STATUS_ACCEPTED = 1;
-    static const int STATUS_STARTED = 2;
-    static const int STATUS_PAUSED = 3;
-    static const int STATUS_SUCCEEDED = 4;
-    static const int STATUS_FAILED = 5;
-    static const int STATUS_EXCEPTIONED = 6;
+    static const int STATUS_NOTYETSUBMITTED = 1;
+    static const int STATUS_ACCEPTED = 2;
+    static const int STATUS_STARTED = 3;
+    static const int STATUS_PAUSED = 4;
+    static const int STATUS_SUCCEEDED = 5;
+    static const int STATUS_FAILED = 6;
+    static const int STATUS_SYSTEMFAILURE = 7;
 
     String creationTime;
     String processAccepted;
@@ -703,7 +698,7 @@ class OgcStatus_55 extends OgcDocument {
     }
 
     static bool isComplete(int code) {
-        return (code == STATUS_SUCCEEDED || code == STATUS_FAILED || code == STATUS_EXCEPTIONED);
+        return (code == STATUS_SUCCEEDED || code == STATUS_FAILED || code == STATUS_SYSTEMFAILURE);
     }
 
     @override String dump(int indent) {
@@ -860,8 +855,6 @@ class Ogc_Exception extends OgcDocument {
 }
 
 
-
-
 class OgcExceptionReportDocument extends OgcDocument {
 
     List<Ogc_Exception> exceptions = new List<Ogc_Exception>();
@@ -873,6 +866,8 @@ class OgcExceptionReportDocument extends OgcDocument {
         });
     }
 
+    List<String> get exceptionTexts => exceptions.map((e) => e.text).toList();
+
     @override String dump(int indent) {
         String s = "";
         s += pad(indent) + "[ExceptionReport]\n";
@@ -880,20 +875,3 @@ class OgcExceptionReportDocument extends OgcDocument {
         return s;
     }
 }
-
-
-// ProcessDescription
-//   DataInputs
-//     Input
-//       ComplexData
-//         Default
-//         Supported
-//   ProcessOutputs - 34
-//     Output
-//       ComplexOutput
-//         Default
-//         Supported
-
-// <wps:Output>
-//   <wps:Data>
-//     <wps:LiteralData>

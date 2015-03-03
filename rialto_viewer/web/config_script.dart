@@ -14,7 +14,7 @@ class ConfigScript {
     Future<List<dynamic>> run() {
         var c = new Completer<List<dynamic>>();
 
-        Comms.httpGet(_url).then((response) {
+        Comms.httpGet(_url).then((Http.Response response) {
             String yamlText = response.body;
             List<Map<String, Map>> commands = loadYaml(yamlText);
 

@@ -14,7 +14,7 @@ class WpsService extends OwsService {
         "org.ciesin.gis.wps.algorithms.PopStat": "org.ciesin.gis.wps.algorithms.PopStat"
     };
 
-    Map<String, WpsRequestStatus> requestStatus = new Map<String, WpsRequestStatus>();
+    Map<int, WpsRequestStatus> requestStatus = new Map<int, WpsRequestStatus>();
 
     WpsService(Uri server, {Uri proxyUri: null, String description: null})
             : super("WPS", server, proxyUri: proxyUri, description: description);
@@ -28,13 +28,8 @@ class WpsService extends OwsService {
         }
         final String processIdentifier = processIdentifiers[processName];
 
-        _sendKvpServerRequest("DescribeProcess", ["identifier=$processIdentifier"]).then((Xml.XmlDocument xmlDoc) {
-            if (xmlDoc == null) {
-                c.complete(null);
-                return;
-            }
+        _sendKvpServerRequest("DescribeProcess", ["identifier=$processIdentifier"]).then((OgcDocument ogcDoc) {
 
-            var ogcDoc = OgcDocument.parseXml(xmlDoc);
             if (ogcDoc == null) {
                 Hub.error("Error parsing WPS process description response document");
                 c.complete(null);
@@ -47,14 +42,20 @@ class WpsService extends OwsService {
                 return;
             }
 
-            assert(ogcDoc is OgcProcessDescriptions_15);
-            var idesc = ogcDoc.descriptions.where((d) => d.identifier == processIdentifier);
+            if (ogcDoc is! OgcProcessDescriptions_15) {
+                Hub.error("Error parsing WPS process description response document");
+                c.complete(null);
+                return;
+            }
 
-            if (idesc == null || idesc.isEmpty || idesc.length > 1) {
+            var descs = ogcDoc as OgcProcessDescriptions_15;
+            var descList = descs.descriptions.where((d) => d.identifier == processIdentifier).toList();
+
+            if (descList == null || descList.isEmpty || descList.length > 1) {
                 Hub.error("Error parsing OWS Process Description response document");
             }
 
-            var desc = idesc.first;
+            var desc = descList[0];
             c.complete(desc);
         });
 
@@ -97,13 +98,8 @@ class WpsService extends OwsService {
                 lineageKV,
                 statusKV];
 
-        _sendKvpServerRequest("Execute", parms).then((Xml.XmlDocument xmlDoc) {
-            if (xmlDoc == null) {
-                c.complete(null);
-                return;
-            }
+        _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
 
-            var ogcDoc = OgcDocument.parseXml(xmlDoc);
             if (ogcDoc == null) {
                 Hub.error("Error parsing WPS process execution response document");
                 c.complete(null);
@@ -121,9 +117,6 @@ class WpsService extends OwsService {
                 return;
             }
 
-            var statusLoc = ogcDoc.statusLocation;
-            //log(statusLoc);
-
             c.complete(ogcDoc);
         });
 
@@ -131,14 +124,18 @@ class WpsService extends OwsService {
     }
 
 
-    // returns the job ID
-    Future<String> doWpsRequest(WpsRequestData data) {
+    int _jobId = 0;
+    int get newJobId => _jobId++;
+
+    // returns the job ID, and will have already created a status object for that ID (even in
+    // the case of any failures)
+    Future<int> doWpsRequest(WpsRequestData data) {
 
         if (data.operation != WpsRequestData.EXECUTE_PROCESS) {
             throw new ArgumentError("invalid WPS request");
         }
 
-        var c = new Completer<String>();
+        var c = new Completer<int>();
 
         _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
 
@@ -147,27 +144,34 @@ class WpsService extends OwsService {
         Map<String, dynamic> inputs = data.parameters[1];
         List<String> outputs = data.parameters[2];
 
-        String id;
+        var request = new WpsRequestStatus(newJobId);
+        requestStatus[request.id] = request;
 
         executeProcess(name, inputs, outputs).then((ogcDoc) {
 
-            if (ogcDoc is OgcExceptionReportDocument) {
-                assert(false); // TODO
-            } else if (ogcDoc is! OgcExecuteResponseDocument_54) {
-                assert(false);
-            } else {
-                var resp = ogcDoc as OgcExecuteResponseDocument_54;
-                id = resp.statusLocation; // TODO: is this the best unique ID we have?
-                var url = Uri.parse(resp.statusLocation);
-                var time = resp.status.creationTime;
-                var code = resp.status.code;
-                var request = new WpsRequestStatus(id, url, time, code, proxyUri: proxyUri);
-                requestStatus[id] = request;
+            if (ogcDoc == null) {
+                request.code = OgcStatus_55.STATUS_SYSTEMFAILURE;
+                c.complete(request.id);
+                return;
             }
+
+            if (ogcDoc is OgcExceptionReportDocument) {
+                request.code = OgcStatus_55.STATUS_FAILED;
+                request.exceptionTexts = ogcDoc.exceptionTexts;
+                c.complete(request.id);
+                return;
+            }
+
+            var resp = ogcDoc as OgcExecuteResponseDocument_54;
+
+            request.statusLocation = Uri.parse(resp.statusLocation);
+            request.proxyUri = proxyUri;
+            request.creationTime = resp.status.creationTime;
+            request.code = resp.status.code;
 
             _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
 
-            c.complete(id);
+            c.complete(request.id);
         });
 
         return c.future;
@@ -176,47 +180,52 @@ class WpsService extends OwsService {
 
 
 class WpsRequestStatus {
-    final String id;
-    final Uri statusLocation;
-    final String creationTime;
-    final Uri proxyUri;
-
+    final int id;
+    Uri statusLocation;
+    String creationTime;
+    Uri proxyUri;
     int code; // from OgcStatus_55 enums
-    String exception;
-    OgcExecuteResponseDocument_54 result;
+    List<String> exceptionTexts;
+    OgcExecuteResponseDocument_54 responseDocument;
 
-    var delay = new Duration(seconds: 2);
+    final delay = new Duration(seconds: 2);
 
-    WpsRequestStatus(String this.id, Uri this.statusLocation, String this.creationTime, int this.code, {Uri
-            this.proxyUri: null}) {
+    WpsRequestStatus(int this.id) : code = OgcStatus_55.STATUS_NOTYETSUBMITTED {
 
-        new Timer(delay, poll);
+        new Timer(delay, _poll);
     }
 
-    void poll() {
+    void _poll() {
 
         log("polling...");
 
-        var url = statusLocation;
-        Comms.httpGet(url, proxyUri: proxyUri).then((response) {
+        Comms.httpGet(statusLocation, proxyUri: proxyUri).then((Http.Response response) {
             var ogcDoc = OgcDocument.parseString(response.body);
             //log(ogcDoc.dump(0));
 
             if (ogcDoc.isException) {
-                code = OgcStatus_55.STATUS_EXCEPTIONED;
-                exception = ogcDoc.exceptionString;
-            } else {
-                OgcExecuteResponseDocument_54 resp = ogcDoc;
-                code = resp.status.code;
-                result = resp;
+                code = OgcStatus_55.STATUS_SYSTEMFAILURE;
+                exceptionTexts = ogcDoc.exceptionTexts;
+                return;
             }
 
-            if (!OgcStatus_55.isComplete(code)) {
-                log("requeueing!");
-                new Timer(delay, poll);
-            } else {
-                log("done!");
+            if (ogcDoc is! OgcExecuteResponseDocument_54) {
+                code = OgcStatus_55.STATUS_SYSTEMFAILURE;
+                exceptionTexts = ["polled response neither exception report not response document"];
+                return;
             }
+
+            OgcExecuteResponseDocument_54 resp = ogcDoc;
+            code = resp.status.code;
+            responseDocument = resp;
+
+            if (OgcStatus_55.isComplete(code)) {
+                log("done!");
+                return;
+            }
+
+            log("requeueing!");
+            new Timer(delay, _poll);
         });
     }
 }
