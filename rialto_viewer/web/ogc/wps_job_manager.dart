@@ -5,6 +5,9 @@
 part of rialto.viewer;
 
 
+typedef dynamic WpsJobResultHandler(WpsJob job);
+
+
 class WpsJobManager {
     static final Duration pollingDelay = new Duration(seconds: 1);
     static final Duration pollingTimeout = new Duration(minutes: 5);
@@ -15,8 +18,14 @@ class WpsJobManager {
 
     WpsJobManager() : _hub = Hub.root;
 
-    WpsJob createStatusObject(WpsService service) {
-        var obj = new WpsJob(service, newJobId);
+    WpsJob createStatusObject(WpsService service, {WpsJobResultHandler successHandler: null,
+            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null}) {
+        var obj = new WpsJob(
+                service,
+                newJobId,
+                successHandler: successHandler,
+                errorHandler: errorHandler,
+                timeoutHandler: timeoutHandler);
         add(obj);
         return obj;
     }
@@ -31,8 +40,6 @@ class WpsJobManager {
 }
 
 
-typedef Future WpsJobResultFunction(WpsJob);
-
 class WpsJob {
     Hub _hub = Hub.root;
     final WpsService service;
@@ -45,14 +52,20 @@ class WpsJob {
     OgcExecuteResponseDocument_54 responseDocument;
     final DateTime _startTime;
     DateTime _timeoutTime;
+    int _pollCount = 0;
 
-    WpsJobResultFunction onTimeout;
-    WpsJobResultFunction onSuccess;
-    WpsJobResultFunction onFailure;
+    final WpsJobResultHandler _successHandler;
+    final WpsJobResultHandler _errorHandler;
+    final WpsJobResultHandler _timeoutHandler;
 
-    WpsJob(WpsService this.service, int this.id)
+    WpsJob(WpsService this.service, int this.id, {WpsJobResultHandler successHandler: null,
+            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
             : code = OgcStatus_55.STATUS_NOTYETSUBMITTED,
-              _startTime = new DateTime.now() {
+              _startTime = new DateTime.now(),
+              _successHandler = successHandler,
+              _errorHandler = errorHandler,
+              _timeoutHandler = timeoutHandler {
+
         _timeoutTime = _startTime.add(WpsJobManager.pollingTimeout);
         _signalJobChange();
 
@@ -64,7 +77,7 @@ class WpsJob {
 
     void _poll() {
 
-        log("polling...");
+        log("poll $_pollCount...");
 
         var now = new DateTime.now();
         if (now.isAfter(_timeoutTime)) {
@@ -73,8 +86,8 @@ class WpsJob {
 
             _signalJobChange();
 
-            if (onTimeout != null) {
-                onTimeout(this);
+            if (_timeoutHandler != null) {
+                _timeoutHandler(this);
             }
             return;
 
@@ -89,8 +102,8 @@ class WpsJob {
                 exceptionTexts = ogcDoc.exceptionTexts;
                 _signalJobChange();
 
-                if (onFailure != null) {
-                    onFailure(this);
+                if (_errorHandler != null) {
+                    _errorHandler(this);
                 }
                 return;
             }
@@ -100,8 +113,8 @@ class WpsJob {
                 exceptionTexts = ["polled response neither exception report not response document"];
                 _signalJobChange();
 
-                if (onFailure != null) {
-                    onFailure(this);
+                if (_errorHandler != null) {
+                    _errorHandler(this);
                 }
                 return;
             }
@@ -114,13 +127,13 @@ class WpsJob {
                 log("done!");
                 _signalJobChange();
 
-                if (onSuccess != null) {
-                    onSuccess(this);
+                if (_successHandler != null) {
+                    _successHandler(this);
                 }
                 return;
             }
 
-            log("requeueing!");
+            ++_pollCount;
             new Timer(WpsJobManager.pollingDelay, _poll);
         });
     }

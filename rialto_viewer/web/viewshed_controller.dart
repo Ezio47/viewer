@@ -73,7 +73,7 @@ class ViewshedController implements IController {
         };
         params[2] = ["resultLon"];
 
-        _hub.commands.wpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params));
+        _hub.commands.wpsExecuteProcess(new WpsExecuteProcessData(params));
 
         point1 = point2 = null;
     }

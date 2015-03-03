@@ -7,26 +7,14 @@ part of rialto.viewer;
 
 class WpsService extends OwsService {
 
-    static final Map processIdentifiers = {
-        "Viewshed": "groovy:wpsviewshed",
-        "Hello": "groovy:wpshello",
-        "org.ciesin.gis.wps.algorithms.PopStats": "org.ciesin.gis.wps.algorithms.PopStats",
-        "org.ciesin.gis.wps.algorithms.PopStat": "org.ciesin.gis.wps.algorithms.PopStat"
-    };
-
     WpsService(Uri server, {Uri proxyUri: null, String description: null})
             : super("WPS", server, proxyUri: proxyUri, description: description);
 
 
-    Future<OgcDocument> getProcessDescription(String processName) {
+    Future<OgcDocument> _getProcessDescription(String processName) {
         var c = new Completer<OgcDocument>();
 
-        if (!processIdentifiers.containsKey(processName)) {
-            throw new ArgumentError("unknown WPS service: $processName");
-        }
-        final String processIdentifier = processIdentifiers[processName];
-
-        _sendKvpServerRequest("DescribeProcess", ["identifier=$processIdentifier"]).then((OgcDocument ogcDoc) {
+        _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"]).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
                 Hub.error("Error parsing WPS process description response document");
@@ -47,7 +35,7 @@ class WpsService extends OwsService {
             }
 
             var descs = ogcDoc as OgcProcessDescriptions_15;
-            var descList = descs.descriptions.where((d) => d.identifier == processIdentifier).toList();
+            var descList = descs.descriptions.where((d) => d.identifier == processName).toList();
 
             if (descList == null || descList.isEmpty || descList.length > 1) {
                 Hub.error("Error parsing OWS Process Description response document");
@@ -61,15 +49,10 @@ class WpsService extends OwsService {
     }
 
 
-    Future<OgcDocument> executeProcess(String processName, Map<String, dynamic> inputs, List<String> outputs) {
+    Future<OgcDocument> _executeProcess(String processName, Map<String, dynamic> inputs, List<String> outputs) {
         var c = new Completer<OgcDocument>();
 
-        if (!processIdentifiers.containsKey(processName)) {
-            throw new ArgumentError("unknown WPS service");
-        }
-        final processIdentifier = processIdentifiers[processName];
-
-        String identifierKV = "Identifier=$processIdentifier";
+        String identifierKV = "Identifier=$processName";
 
         String dataInputsKV = "DataInputs="; //alpha=$alpha;beta=$beta
         inputs.forEach((k, v) => dataInputsKV += "$k=${v.toString()};");
@@ -123,36 +106,34 @@ class WpsService extends OwsService {
 
     // returns the job ID, and will have already created a status object for that ID (even in
     // the case of any failures)
-    Future<int> doWpsRequest(WpsRequestData data) {
+    Future<WpsJob> doWpsExecuteProcess(WpsExecuteProcessData data, {WpsJobResultHandler successHandler: null,
+            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null}) {
 
-        if (data.operation != WpsRequestData.EXECUTE_PROCESS) {
-            throw new ArgumentError("invalid WPS request");
-        }
-
-        var c = new Completer<int>();
+        var c = new Completer<WpsJob>();
 
         assert(data.parameters.length == 3);
         String name = data.parameters[0];
         Map<String, dynamic> inputs = data.parameters[1];
         List<String> outputs = data.parameters[2];
 
-        var request = _hub.wpsJobManager.createStatusObject(this);
-        request.onSuccess = (_) => log("success event");
-        request.onFailure = (_) => log("failure event");
-        request.onTimeout = (_) => log("timeout event");
+        var request = _hub.wpsJobManager.createStatusObject(
+                this,
+                successHandler: successHandler,
+                errorHandler: errorHandler,
+                timeoutHandler: timeoutHandler);
 
-        executeProcess(name, inputs, outputs).then((ogcDoc) {
+        _executeProcess(name, inputs, outputs).then((ogcDoc) {
 
             if (ogcDoc == null) {
                 request.code = OgcStatus_55.STATUS_SYSTEMFAILURE;
-                c.complete(request.id);
+                c.complete(request);
                 return;
             }
 
             if (ogcDoc is OgcExceptionReportDocument) {
                 request.code = OgcStatus_55.STATUS_FAILED;
                 request.exceptionTexts = ogcDoc.exceptionTexts;
-                c.complete(request.id);
+                c.complete(request);
                 return;
             }
 
@@ -163,9 +144,14 @@ class WpsService extends OwsService {
             request.processCreationTime = DateTime.parse(resp.status.creationTime);
             request.code = resp.status.code;
 
-            c.complete(request.id);
+            c.complete(request);
         });
 
         return c.future;
+    }
+
+
+    Future<OgcDocument> doWpsDescribeProcess(String processName) {
+        return _getProcessDescription(processName);
     }
 }

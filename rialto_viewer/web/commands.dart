@@ -34,8 +34,16 @@ class Commands {
         return f;
     }
 
-    Future wpsRequest(WpsRequestData data) {
-        return _hub.wps.doWpsRequest(data);
+    Future wpsExecuteProcess(WpsExecuteProcessData data) {
+        return _hub.wps.doWpsExecuteProcess(data);
+    }
+
+    Future wpsDescribeProcess(String processName) {
+        return _hub.wps.doWpsDescribeProcess(processName);
+    }
+
+    Future owsGetCapabilities() {
+        return _hub.wps.doOwsGetCapabilities();
     }
 
     Future updateCamera(CameraData data) {
@@ -149,18 +157,9 @@ class ModeData {
 }
 
 
-class WpsRequestData {
-    static const int INVALID = 0;
-    static const int GET_CAPABILITIES = 1;
-    static const int GET_PROCESS_DESCRIPTION = 2;
-    static const int EXECUTE_PROCESS = 3;
-    static final name = {
-    };
-
-    final int operation;
+class WpsExecuteProcessData {
     final List<Object> parameters;
-
-    WpsRequestData(int this.operation, [List<Object> this.parameters = null]);
+    WpsExecuteProcessData(List<Object> this.parameters);
 }
 
 
