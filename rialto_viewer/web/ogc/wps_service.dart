@@ -14,7 +14,7 @@ class WpsService extends OwsService {
         "org.ciesin.gis.wps.algorithms.PopStat": "org.ciesin.gis.wps.algorithms.PopStat"
     };
 
-    Map<int, WpsRequestStatus> requestStatus = new Map<int, WpsRequestStatus>();
+    WpsRequestStatusList statusList = new WpsRequestStatusList();
 
     WpsService(Uri server, {Uri proxyUri: null, String description: null})
             : super("WPS", server, proxyUri: proxyUri, description: description);
@@ -123,10 +123,6 @@ class WpsService extends OwsService {
         return c.future;
     }
 
-
-    int _jobId = 0;
-    int get newJobId => _jobId++;
-
     // returns the job ID, and will have already created a status object for that ID (even in
     // the case of any failures)
     Future<int> doWpsRequest(WpsRequestData data) {
@@ -137,15 +133,12 @@ class WpsService extends OwsService {
 
         var c = new Completer<int>();
 
-        _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
-
         assert(data.parameters.length == 3);
         String name = data.parameters[0];
         Map<String, dynamic> inputs = data.parameters[1];
         List<String> outputs = data.parameters[2];
 
-        var request = new WpsRequestStatus(newJobId);
-        requestStatus[request.id] = request;
+        var request = statusList.createStatusObject();
 
         executeProcess(name, inputs, outputs).then((ogcDoc) {
 
@@ -169,8 +162,6 @@ class WpsService extends OwsService {
             request.creationTime = resp.status.creationTime;
             request.code = resp.status.code;
 
-            _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
-
             c.complete(request.id);
         });
 
@@ -179,7 +170,29 @@ class WpsService extends OwsService {
 }
 
 
+class WpsRequestStatusList {
+    Hub _hub;
+    Map<int, WpsRequestStatus> map = new Map<int, WpsRequestStatus>();
+    int _jobId = 0;
+
+    WpsRequestStatusList() : _hub = Hub.root;
+
+    WpsRequestStatus createStatusObject() {
+        var obj = new WpsRequestStatus(newJobId);
+        add(obj);
+        return obj;
+    }
+
+    void add(WpsRequestStatus status) {
+        map[status.id] = status;
+    }
+
+    int get newJobId => _jobId++;
+}
+
+
 class WpsRequestStatus {
+    Hub _hub = Hub.root;
     final int id;
     Uri statusLocation;
     String creationTime;
@@ -191,6 +204,7 @@ class WpsRequestStatus {
     final delay = new Duration(seconds: 2);
 
     WpsRequestStatus(int this.id) : code = OgcStatus_55.STATUS_NOTYETSUBMITTED {
+        _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(1));
 
         new Timer(delay, _poll);
     }
@@ -206,12 +220,14 @@ class WpsRequestStatus {
             if (ogcDoc.isException) {
                 code = OgcStatus_55.STATUS_SYSTEMFAILURE;
                 exceptionTexts = ogcDoc.exceptionTexts;
+                _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
                 return;
             }
 
             if (ogcDoc is! OgcExecuteResponseDocument_54) {
                 code = OgcStatus_55.STATUS_SYSTEMFAILURE;
                 exceptionTexts = ["polled response neither exception report not response document"];
+                _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
                 return;
             }
 
@@ -221,6 +237,7 @@ class WpsRequestStatus {
 
             if (OgcStatus_55.isComplete(code)) {
                 log("done!");
+                _hub.events.WpsRequestUpdate.fire(new WpsRequestUpdateData(-1));
                 return;
             }
 
