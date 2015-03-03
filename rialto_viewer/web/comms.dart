@@ -6,14 +6,14 @@ part of rialto.viewer;
 
 
 class Comms {
-    static Future<dynamic> httpGet(Uri url, {Uri proxy: null}) {
+    static Future<dynamic> httpGet(Uri url, {Uri proxyUri: null}) {
 
         var c = new Completer<dynamic>();
 
         String s = url.toString();
 
-        if (proxy != null) {
-            s = proxy.toString() + "?" + s;
+        if (proxyUri != null) {
+            s = proxyUri.toString() + "?" + s;
             url = Uri.parse(s);
         }
 

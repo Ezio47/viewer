@@ -668,6 +668,7 @@ class OgcStatus_55 extends OgcDocument {
     static const int STATUS_PAUSED = 3;
     static const int STATUS_SUCCEEDED = 4;
     static const int STATUS_FAILED = 5;
+    static const int STATUS_EXCEPTIONED = 6;
 
     String creationTime;
     String processAccepted;
@@ -699,6 +700,10 @@ class OgcStatus_55 extends OgcDocument {
         if (processSucceeded != null) return STATUS_SUCCEEDED;
         if (processFailed != null) return STATUS_FAILED;
         return STATUS_INVALID;
+    }
+
+    static bool isComplete(int code) {
+        return (code == STATUS_SUCCEEDED || code == STATUS_FAILED || code == STATUS_EXCEPTIONED);
     }
 
     @override String dump(int indent) {

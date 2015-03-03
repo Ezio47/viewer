@@ -8,12 +8,13 @@ part of rialto.viewer;
 class OwsService {
     final String service;
     final Uri server;
-    final Uri proxy;
+    final Uri proxyUri;
     final String description;
     Hub _hub;
     Http.Client _client;
 
-    OwsService(String this.service, Uri this.server, {Uri this.proxy, String this.description}) : _hub = Hub.root;
+    OwsService(String this.service, Uri this.server, {Uri this.proxyUri: null, String this.description: null})
+            : _hub = Hub.root;
 
     void open() {
         _client = new BHttp.BrowserClient();
@@ -38,7 +39,7 @@ class OwsService {
 
         //log("ows server request: $uri");
 
-        Comms.httpGet(uri, proxy: proxy).then((response) {
+        Comms.httpGet(uri, proxyUri: proxyUri).then((response) {
             String s = response.body;
             //log(s);
             try {

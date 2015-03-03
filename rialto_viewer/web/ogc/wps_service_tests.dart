@@ -132,18 +132,6 @@ class WpsServiceTest {
 
         wps.doWpsRequest(new WpsRequestData(WpsRequestData.EXECUTE_PROCESS, params)).then((id) {
             log("started: $id");
-
-            //new Timer.periodic(new Duration(seconds: 5), (t) {
-            new Timer.periodic(new Duration(seconds: 1), (_) {
-                log("QUERIED!");
-
-                var req = wps.requestStatus[id];
-                var url = req.statusLocation;
-                var f = Comms.httpGet(url, proxy: wps.proxy).then((response) {
-                    var ogcDoc = OgcDocument.parseString(response.body);
-                    log(ogcDoc.dump(0));
-                });
-            });
         });
     }
 }

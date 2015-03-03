@@ -16,8 +16,8 @@ class WpsService extends OwsService {
 
     Map<String, WpsRequestStatus> requestStatus = new Map<String, WpsRequestStatus>();
 
-    WpsService(Uri server, {Uri proxy, String description})
-            : super("WPS", server, proxy: proxy, description: description);
+    WpsService(Uri server, {Uri proxyUri: null, String description: null})
+            : super("WPS", server, proxyUri: proxyUri, description: description);
 
 
     Future<OgcDocument> getProcessDescription(String processName) {
@@ -161,7 +161,7 @@ class WpsService extends OwsService {
                 var url = Uri.parse(resp.statusLocation);
                 var time = resp.status.creationTime;
                 var code = resp.status.code;
-                var request = new WpsRequestStatus(id, url, time, code);
+                var request = new WpsRequestStatus(id, url, time, code, proxyUri: proxyUri);
                 requestStatus[id] = request;
             }
 
@@ -179,26 +179,44 @@ class WpsRequestStatus {
     final String id;
     final Uri statusLocation;
     final String creationTime;
-    final Uri proxy;
+    final Uri proxyUri;
 
     int code; // from OgcStatus_55 enums
+    String exception;
+    OgcExecuteResponseDocument_54 result;
 
-    WpsRequestStatus(String this.id, Uri this.statusLocation, String this.creationTime, int code1, {Uri proxy1: null})
-            : code = code1,
-              proxy = proxy1 {
+    var delay = new Duration(seconds: 2);
 
-        new Timer.periodic(new Duration(seconds: 1), (t) {
-            log("QUERIED!");
+    WpsRequestStatus(String this.id, Uri this.statusLocation, String this.creationTime, int this.code, {Uri
+            this.proxyUri: null}) {
 
-            var url = statusLocation;
-            var f = Comms.httpGet(url, proxy: proxy).then((response) {
-                var ogcDoc = OgcDocument.parseString(response.body);
-                log(ogcDoc.dump(0));
+        new Timer(delay, poll);
+    }
 
-               if (ogcDoc.isException) {
+    void poll() {
 
-               }
-            });
+        log("polling...");
+
+        var url = statusLocation;
+        Comms.httpGet(url, proxyUri: proxyUri).then((response) {
+            var ogcDoc = OgcDocument.parseString(response.body);
+            //log(ogcDoc.dump(0));
+
+            if (ogcDoc.isException) {
+                code = OgcStatus_55.STATUS_EXCEPTIONED;
+                exception = ogcDoc.exceptionString;
+            } else {
+                OgcExecuteResponseDocument_54 resp = ogcDoc;
+                code = resp.status.code;
+                result = resp;
+            }
+
+            if (!OgcStatus_55.isComplete(code)) {
+                log("requeueing!");
+                new Timer(delay, poll);
+            } else {
+                log("done!");
+            }
         });
     }
 }

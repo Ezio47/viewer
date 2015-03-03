@@ -26,8 +26,8 @@ class OgcDocumentTests {
         //log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
-        var prox = Uri.parse("http://localhost:12345/proxy");
-        var wps = new WpsService(uri, proxy: prox);
+        var proxyUri = Uri.parse("http://localhost:12345/proxy");
+        var wps = new WpsService(uri, proxyUri: proxyUri);
         wps.open();
         wps.getCapabilities().then((doc) { assert(doc is OgcCapabilities_7); });
         wps.getProcessDescription("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is OgcProcessDescription_16); });

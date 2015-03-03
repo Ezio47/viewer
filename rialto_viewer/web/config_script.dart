@@ -56,10 +56,10 @@ class ConfigScript {
     Future _doCommand_wps(Map data) {
         //OgcDocumentTests.test();
 
-        var proxy = YamlUtils.getOptionalSettingAsUrl(data, "proxy");
+        var proxyUri = YamlUtils.getOptionalSettingAsUrl(data, "proxy");
         var url = YamlUtils.getRequiredSettingAsUrl(data, "url");
         var description = YamlUtils.getOptionalSettingAsString(data, "description");
-        var wps = new WpsService(url, proxy: proxy, description: description);
+        var wps = new WpsService(url, proxyUri: proxyUri, description: description);
         wps.open();
 
         WpsServiceTest.test(wps);
