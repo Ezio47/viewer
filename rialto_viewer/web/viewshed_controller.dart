@@ -81,9 +81,12 @@ class ViewshedController implements IController {
             "fovEnd": 360.0,
             "eyeHeight": 1.5,
             "radius": radius,
-            "inputDem": "foobarbaz"
+            "inputDem": "foobarbaz",
+            "serverInputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/inputs",
+            "serverOutputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/outputs",
+            "serverOutputUrl": "http://localhost:12345/file/wps-scratch/outputs",
         };
-        params[2] = ["outputUrl", "summary"];
+        params[2] = ["outputUrl", "stdoutText", "stderrText"];
 
         var yes = (WpsJob job) {
             log("SUCCESS!");
@@ -129,7 +132,7 @@ class Viewshed {
 
 
 
-class ViewshedParameters {
+/****
     double obsLat, obsLon;
 
     // --fov <start> <end>
@@ -190,4 +193,5 @@ class ViewshedParameters {
     //                            ** not supported **
     //
     // output-image-file          ** used by thge server script **
-}
+****/
+
