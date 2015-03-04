@@ -18,6 +18,8 @@ class CesiumBridge {
 
     CesiumBridge(String elementName) {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
+
+        ///_bridge.callMethod('createDrawHelper', [elementName]);
     }
 
 
