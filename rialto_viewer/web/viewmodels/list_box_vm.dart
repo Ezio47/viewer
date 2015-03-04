@@ -5,41 +5,44 @@
 part of rialto.viewer;
 
 
-class ListBoxItem<T> {
+class ListBoxItem {
     final String name;
     OptionElement optionElement;
-    final T data;
 
-    ListBoxItem(this.data, this.name) {
+    ListBoxItem(this.name) {
         optionElement = new OptionElement(value: name);
         optionElement.text = name;
     }
 }
 
-class ListBoxVM<T> extends ViewModel with MStateControl<T> {
-    List<ListBoxItem<T>> _list = new List<ListBoxItem<T>>();
+class ListBoxVM extends ViewModel with MStateControl<String> {
+    List<ListBoxItem> _list = new List<ListBoxItem>();
     SelectElement _selectElement;
-    Map<OptionElement, T> _map = new Map<OptionElement, T>();
+    Map<OptionElement, String> _map = new Map<OptionElement, String>();
+    Function _selectHandler;
 
-    T _selectedItem;
+    ListBoxVM(String id, {Function onSelect: null})
+            : super(id),
+              _selectHandler = onSelect {
 
-    ListBoxVM(String id) : super(id) {
         _selectElement = _element;
         _selectElement.children.clear();
+        _selectElement.onChange.listen(_selectHandler);
     }
 
     @override
-    T get value => _selectedItem;
-
-    @override
-    set value(T t) => _selectedItem = t;
-
-    void setSelectHandler(var f) {
-        _selectElement.onClick.listen((e) => f(e));
+    String get value {
+        if (_selectElement.value == null || _selectElement.value.isEmpty) {
+            return null;
+        }
+        return _selectElement.value;
     }
 
-    void add(T item) {
-        var wrapper = new ListBoxItem<T>(item, item.toString());
+    @override
+    set value(String t) => _selectElement.value = (t == null) ? "" : t;
+
+    void add(String item) {
+        var wrapper = new ListBoxItem(item);
         _list.add(wrapper);
         _selectElement.children.add(wrapper.optionElement);
         _map[wrapper.optionElement] = item;
@@ -49,22 +52,9 @@ class ListBoxVM<T> extends ViewModel with MStateControl<T> {
         _list.clear();
         _map.clear();
         _selectElement.children.clear();
-        value = null;
+        value = "";
     }
-
-    //void removeWhere(bool test(T element)) {
-    //  _list.removeWhere((i) => test(i.data));
-    //}
-
-    List<T> getCurrentSelection() {
-        var list = new List<T>();
-        // var o = _selectElement.selectedOptions;
-        _selectElement.selectedOptions.forEach((opt) => list.add(_map[opt]));
-        return list;
-    }
-
-    int get length => _list.length;
 
     // only use for item iteration, no modification
-    List<ListBoxItem<T>> get list => _list;
+//    List<ListBoxItem<T>> get list => _list;
 }

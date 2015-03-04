@@ -12,46 +12,55 @@ class InfoVM extends DialogVM {
 
     @override
     void _show() {
-        int numPoints;
-        double minx, miny, minz;
-        double maxx, maxy, maxz;
+        assert(_parent.currentSelection != null);
 
-        Layer layer = _parent.currentSelection;
+        final layer = _hub.layerManager.layers[_parent.currentSelection];
+        assert(layer != null);
 
-        if (layer == null) {
-            numPoints = 0;
-            minx = miny = minz = 0.0;
-            maxx = maxy = maxz = 0.0;
-        } else {
-            minx = layer.bbox.minimum.longitude;
-            miny = layer.bbox.minimum.latitude;
-            minz = layer.bbox.minimum.height;
-            maxx = layer.bbox.maximum.longitude;
-            maxy = layer.bbox.maximum.latitude;
-            maxz = layer.bbox.maximum.height;
+        final name = layer.name;
+        final type = layer.type;
+        final description = layer.description;
 
-            if (layer is PointCloudLayer) {
-                numPoints = layer.numPoints;
+        String url, proxy;
+        if (layer.url != null) {
+            url = layer.url.toString();
+            if (layer.proxy != null) {
+                proxy = layer.proxy.toString();
             }
         }
 
-        if (layer != null) {
-            querySelector("#infoDialog_name").text = layer.name;
-            querySelector("#infoDialog_layerType").text = layer.type;
-            if (layer.url != null) {
-                querySelector("#infoDialog_server").text = Utils.firstPart(layer.url).toString();
-                querySelector("#infoDialog_path").text = Utils.secondPart(layer.url).toString();
-            }
+        String minx, miny, minz;
+        String maxx, maxy, maxz;
+        if (layer.bbox != null) {
+            final precision = _hub.displayPrecision;
+
+            minx = layer.bbox.minimum.longitude.toStringAsFixed(precision);
+            miny = layer.bbox.minimum.latitude.toStringAsFixed(precision);
+            minz = layer.bbox.minimum.height.toStringAsFixed(precision);
+            maxx = layer.bbox.maximum.longitude.toStringAsFixed(precision);
+            maxy = layer.bbox.maximum.latitude.toStringAsFixed(precision);
+            maxz = layer.bbox.maximum.height.toStringAsFixed(precision);
         }
 
-        querySelector("#infoDialog_numPoints").text = numPoints.toString();
+        String numPoints;
+        if (layer is PointCloudLayer) {
+            numPoints = layer.numPoints.toString();
+        }
 
-        querySelector("#infoDialog_minX").text = minx.toStringAsFixed(3);
-        querySelector("#infoDialog_minY").text = miny.toStringAsFixed(3);
-        querySelector("#infoDialog_minZ").text = minz.toStringAsFixed(3);
+        querySelector("#infoDialog_name").text = name;
+        querySelector("#infoDialog_type").text = layer.type;
+        querySelector("#infoDialog_url").text = url;
+        querySelector("#infoDialog_proxy").text = proxy;
+        querySelector("#infoDialog_description").text = description;
 
-        querySelector("#infoDialog_maxX").text = maxx.toStringAsFixed(3);
-        querySelector("#infoDialog_maxY").text = maxy.toStringAsFixed(3);
-        querySelector("#infoDialog_maxZ").text = maxz.toStringAsFixed(3);
+        querySelector("#infoDialog_numPoints").text = numPoints;
+
+        querySelector("#infoDialog_minX").text = minx;
+        querySelector("#infoDialog_minY").text = miny;
+        querySelector("#infoDialog_minZ").text = minz;
+
+        querySelector("#infoDialog_maxX").text = maxx;
+        querySelector("#infoDialog_maxY").text = maxy;
+        querySelector("#infoDialog_maxZ").text = maxz;
     }
 }

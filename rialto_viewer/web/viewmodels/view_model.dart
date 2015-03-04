@@ -22,7 +22,7 @@ abstract class ViewModel {
 
 abstract class IForm {
     List<MStateControl> controls = new List();
-    register(MStateControl c) => controls.add(c);
+    _register(MStateControl c) => controls.add(c);
     void saveState() => controls.forEach((c) => c.saveState());
     void restoreState() => controls.forEach((c) => c.restoreState());
     bool get anyStateChanged => controls.any((c) => c.stateChanged);

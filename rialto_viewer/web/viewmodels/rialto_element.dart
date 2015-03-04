@@ -7,19 +7,18 @@ part of rialto.viewer;
 class RialtoElement {
     Hub _hub;
     SpanElement _mouseCoords;
-    InitScriptDialogVM _initScriptDialog;
+    LoadConfigurationDialogVM _loadConfigurationDialog;
     LayerManagerDialogVM _layerManager;
     CameraSettingsDialogVM _cameraSettingsDialog;
     AdvancedSettingsDialogVM _advancedSettingsDialog;
     ModalButtonsVM _modalButtons;
     AboutVM _aboutRialto;
     AboutVM _aboutCesium;
+    ColorizerDialogVM _colorizerDialog;
 
     int viewMode = ViewModeData.MODE_3D;
 
     Element _textWpsJobStatus;
-
-    int _displayPrecision = 5;
 
     RialtoElement() {
         _hub = Hub.root;
@@ -45,7 +44,7 @@ class RialtoElement {
             querySelector("#viewshedModeButton"): new ModeData(ModeData.VIEWSHED)
         }, querySelector("#viewModeButton"));
 
-        _initScriptDialog = new InitScriptDialogVM("#initScriptDialog");
+        _loadConfigurationDialog = new LoadConfigurationDialogVM("#loadConfigurationDialog");
         _layerManager = new LayerManagerDialogVM("#layerManagerDialog");
         _cameraSettingsDialog = new CameraSettingsDialogVM("#cameraSettingsDialog");
         _advancedSettingsDialog = new AdvancedSettingsDialogVM("#advancedSettingsDialog");
@@ -59,7 +58,7 @@ class RialtoElement {
         _textWpsJobStatus = querySelector("#textWpsJobStatus");
         _hub.events.WpsJobUpdate.subscribe(_handleWpsJobUpdate);
 
-        _hub.events.AdvancedSettingsChanged.subscribe((data) => _displayPrecision = data.displayPrecision);
+        _colorizerDialog = new ColorizerDialogVM("#colorizerDialog");
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name(viewMode)}";
@@ -68,9 +67,10 @@ class RialtoElement {
         var v = _hub.cesium.getMouseCoordinates(d.x, d.y);
         if (v == null) return;
 
+        final precision = _hub.displayPrecision;
         final double lon = v.longitude;
         final double lat = v.latitude;
-        String s = "(${lon.toStringAsFixed(_displayPrecision)}, ${lat.toStringAsFixed(_displayPrecision)})";
+        String s = "(${lon.toStringAsFixed(precision)}, ${lat.toStringAsFixed(precision)})";
 
         _mouseCoords.text = s;
     }

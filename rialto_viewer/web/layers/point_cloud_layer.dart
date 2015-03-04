@@ -8,6 +8,8 @@ part of rialto.viewer;
 class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
     var _provider;
     int numPoints;
+    List<String> dimensions;
+
     ColorizerData _colorizerData = new ColorizerData("Spectral", "Z");
 
     bool _visible = true;
@@ -37,6 +39,8 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
             var zStats = _hub.cesium.getStatsFromProvider(_provider, "Z");
 
             _bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
+
+            dimensions = _hub.cesium.getDimensionNamesFromProvider(_provider);
 
             c.complete();
         });

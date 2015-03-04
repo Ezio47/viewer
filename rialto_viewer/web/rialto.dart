@@ -66,7 +66,7 @@ part 'viewmodels/camera_settings_dialog_vm.dart';
 part 'viewmodels/check_box_vm.dart';
 part 'viewmodels/colorizer_dialog_vm.dart';
 part 'viewmodels/dialog_vm.dart';
-part 'viewmodels/init_script_dialog_vm.dart';
+part 'viewmodels/load_configuration_dialog_vm.dart';
 part 'viewmodels/info_dialog_vm.dart';
 part 'viewmodels/list_box_vm.dart';
 part 'viewmodels/modal_buttons_vm.dart';

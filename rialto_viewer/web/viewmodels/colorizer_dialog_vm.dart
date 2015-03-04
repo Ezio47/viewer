@@ -4,33 +4,51 @@
 
 part of rialto.viewer;
 
-// TODO: colorizer should affect only one layer, not all
 
 class ColorizerDialogVM extends DialogVM {
-    Hub _hub;
-    ListBoxVM<String> _listbox;
+
+    ListBoxVM _rampsListBox;
+    ListBoxVM _dimsListBox;
 
     ColorizerDialogVM(String id) : super(id) {
 
-        _hub = Hub.root;
+        _rampsListBox = new ListBoxVM("#colorizerDialog_ramps");
+        _dimsListBox = new ListBoxVM("#colorizerDialog_dims");
 
-        _listbox = new ListBoxVM<String>("#colorizerDialog_items");
-
-        var names = _hub.cesium.getColorRampNames();
-        names.forEach((s) => _listbox.add(s));
+        _register(_rampsListBox);
+        _register(_dimsListBox);
     }
 
     @override
-    void _show() {}
+    void _show() {
+        var ramps = _hub.cesium.getColorRampNames();
+        ramps.forEach((s) => _rampsListBox.add(s));
+        _rampsListBox.value = ramps[0];
+
+        var dims = new Set<String>();
+        var layers = _hub.layerManager.layers.values;
+        for (var layer in layers) {
+            if (layer is PointCloudLayer) {
+                dims.addAll(layer.dimensions);
+            }
+        }
+
+        dims = dims.toList();
+        dims.sort();
+
+        dims.forEach((d) => _dimsListBox.add(d));
+        _dimsListBox.value = dims[0];
+    }
 
     @override
     void _hide() {
 
-        String item = _listbox.value;
-        if (item == null) return;
+        String ramp = _rampsListBox.value;
+        if (ramp == null) return;
 
-        String rampName = item;
+        String dim = _dimsListBox.value;
+        if (dim == null) return;
 
-        _hub.commands.colorizeLayers(new ColorizerData(rampName, "Z"));
+        _hub.commands.colorizeLayers(new ColorizerData(ramp, dim));
     }
 }

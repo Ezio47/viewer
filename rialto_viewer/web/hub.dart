@@ -28,6 +28,8 @@ class Hub {
     Camera camera;
     WpsJobManager wpsJobManager;
 
+    int displayPrecision = 5;
+
     // privates
     ViewController _viewController;
     AnnotationController _annotationController;
@@ -82,6 +84,7 @@ class Hub {
         commands.changeMode(new ModeData(ModeData.VIEW));
 
         events.AdvancedSettingsChanged.subscribe((data) => _bboxShape.isVisible = data.showBbox);
+        events.AdvancedSettingsChanged.subscribe((data) => displayPrecision = data.displayPrecision);
     }
 
     void _handleLayersBboxChanged(CartographicBbox box) {

@@ -31,16 +31,16 @@ class CameraSettingsDialogVM extends DialogVM {
         _upY = new TextInputVM("#cameraSettingsDialog_upY", "0.0");
         _upZ = new TextInputVM("#cameraSettingsDialog_upZ", "1.0");
 
-        register(_eyeLon);
-        register(_eyeLat);
-        register(_eyeHeight);
-        register(_targetLon);
-        register(_targetLat);
-        register(_targetHeight);
-        register(_fov);
-        register(_upX);
-        register(_upY);
-        register(_upZ);
+        _register(_eyeLon);
+        _register(_eyeLat);
+        _register(_eyeHeight);
+        _register(_targetLon);
+        _register(_targetLat);
+        _register(_targetHeight);
+        _register(_fov);
+        _register(_upX);
+        _register(_upY);
+        _register(_upZ);
     }
 
     @override

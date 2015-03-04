@@ -20,8 +20,8 @@ class AdvancedSettingsDialogVM extends DialogVM {
         _bboxChecked = false;
         _bboxEnabled = new CheckBoxVM("#advancedSettingsDialog_bboxEnabled", true);
 
-        register(_bboxEnabled);
-        register(_displayPrecision);
+        _register(_bboxEnabled);
+        _register(_displayPrecision);
     }
 
     void _handleChange(AdvancedSettingsChangedData data) {

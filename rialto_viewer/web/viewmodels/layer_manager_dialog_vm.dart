@@ -5,64 +5,46 @@
 part of rialto.viewer;
 
 class LayerManagerDialogVM extends DialogVM {
-    ListBoxVM<_LayerItem> _listbox;
+    ListBoxVM _listbox;
     CheckBoxVM _layerVisible;
 
-    ColorizerDialogVM _colorizer;
     InfoVM _info;
-
-    Map<String, Layer> _layers = new Map<String, Layer>();
 
     LayerManagerDialogVM(String id) : super(id) {
 
-        _colorizer = new ColorizerDialogVM("#colorizerDialog");
-
         _info = new InfoVM("#infoDialog", this);
 
-        _listbox = new ListBoxVM<_LayerItem>("#layerManagerDialog_layers");
-        _listbox.setSelectHandler(_selectHandler);
+        _listbox = new ListBoxVM("#layerManagerDialog_layers", onSelect: _selectHandler);
 
-        _layerVisible = new CheckBoxVM("#infoDialog_layerVisible", false);
+        _layerVisible = new CheckBoxVM("#layerManager_layerVisible", false);
 
-        register(_listbox);
-        register(_layerVisible);
-
-        _hub.events.AddLayerCompleted.subscribe(_handleAddLayerCompleted);
-        _hub.events.RemoveLayerCompleted.subscribe(_handleRemoveLayerCompleted);
+        _register(_listbox);
+        _register(_layerVisible);
     }
 
     @override
     void _show() {
         _listbox.clear();
 
-        var names = _layers.keys.toList();
+        Map layers = _hub.layerManager.layers;
+        var names = layers.keys.toList();
         names.sort();
 
         for (var name in names) {
-            var item = new _LayerItem(_layers[name]);
-            _listbox.add(item);
+            _listbox.add(name);
         }
 
-        _listbox.value = null;
+        _listbox.value = names.length == 0 ? "" : names[0]; // TODO: handle no layers yet loaded
+        _selectHandler(null);
     }
 
     @override
     void _hide() {
-        _effectLayerVisibility();
-    }
 
-    void _handleAddLayerCompleted(Layer layer) {
-        _layers[layer.name] = layer;
-    }
-
-    void _handleRemoveLayerCompleted(String name) {
-        _layers.remove(name);
-    }
-
-    void _effectLayerVisibility() {
         var item = _listbox.value;
         if (item == null) return;
-        Layer layer = item.layer;
+
+        Layer layer = _hub.layerManager.layers[item];
 
         if (layer is VisibilityControl) {
             VisibilityControl vc = layer as VisibilityControl;
@@ -71,13 +53,14 @@ class LayerManagerDialogVM extends DialogVM {
         }
     }
 
-    Layer get currentSelection => _listbox.value.layer;
+    // used by the child Info dialog
+    String get currentSelection => _listbox.value;
 
     void _selectHandler(_) {
         var item = _listbox.value;
         if (item == null) return;
 
-        Layer layer = item.layer;
+        Layer layer = _hub.layerManager.layers[item];
 
         log("${layer.name} selected");
 
@@ -88,14 +71,4 @@ class LayerManagerDialogVM extends DialogVM {
             _layerVisible.disabled = true;
         }
     }
-}
-
-
-
-class _LayerItem {
-    Layer layer;
-
-    _LayerItem(Layer this.layer);
-
-    String toString() => "${layer.name}";
 }
