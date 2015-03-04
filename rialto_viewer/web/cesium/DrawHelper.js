@@ -14,9 +14,9 @@ var DrawHelper = (function() {
     var ellipsoid = Cesium.Ellipsoid.WGS84;
 
     // constructor
-    function _(cesiumWidget) {
-        this._scene = cesiumWidget.scene;
-        this._tooltip = createTooltip(cesiumWidget.container);
+    function _(scene, element) {
+        this._scene = scene;
+        this._tooltip = createTooltip(element);
         this._surfaces = [];
 
         this.initialiseHandlers();
@@ -1661,7 +1661,7 @@ var DrawHelper = (function() {
             var _self = this;
 
             var toolbar = document.createElement('DIV');
-            toolbar.className = "toolbar";
+            toolbar.className = "drawHelperToolbar";
             options.container.appendChild(toolbar);
 
             function addIcon(id, url, title, callback) {
@@ -1784,7 +1784,7 @@ var DrawHelper = (function() {
             this._title = title;
 
             // add to frame div and display coordinates
-            frameDiv.appendChild(div);
+            //////////frameDiv.appendChild(div);
         }
 
         tooltip.prototype.setVisible = function(visible) {
@@ -1875,4 +1875,3 @@ var DrawHelper = (function() {
 
     return _;
 })();
-

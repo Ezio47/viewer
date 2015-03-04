@@ -52,20 +52,20 @@
 css rules for the draw helper components
 */
 
-.toolbar {
+.drawHelperToolbar {
     margin: 0px;
     padding: 0px;
     background: white;
 }
 
-.toolbar > .button {
+.drawHelperToolbar > .button {
     margin: 5px;
     padding: 5px;
     border: 1px solid #eee;
     cursor: pointer;
 }
 
-.toolbar > .button:hover {
+.drawHelperToolbar > .button:hover {
     background: #eee;
 }
 
