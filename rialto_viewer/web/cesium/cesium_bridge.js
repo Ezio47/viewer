@@ -153,6 +153,14 @@ var CesiumBridge = function (element) {
     }
 
 
+    this.cartographicDistance = function(lon1, lat1, lon2, lat2) {
+        var p = Cesium.Cartesian3.fromDegrees(lon1, lat1);
+        var q = Cesium.Cartesian3.fromDegrees(lon2, lat2);
+        var radius = Cesium.Cartesian3.distance(p, q);
+        return radius;
+    }
+
+
     //---------------------------------------------------------------------------------------------
     //
     // imagery provider utils

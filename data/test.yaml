@@ -1,6 +1,7 @@
 - layers:
     - bing:
         type: bing_base_imagery
+        style: Road
 
 #    - oossmm:
 #        type: wms_imagery
@@ -13,7 +14,6 @@
         url: http://localhost:12345/file/tiles/tiledserp18
 #        url: http://localhost:12345/file/tiles/autzen-thin-srs-18
 
-#- wps:
-#    proxy: http://localhost:12345/proxy
-#    url: http://localhost:12348/geoserver/ows
-#    description: "la la la"
+- wps:
+    proxy: http://localhost:12345/proxy
+    url: http://localhost:12348/geoserver/ows

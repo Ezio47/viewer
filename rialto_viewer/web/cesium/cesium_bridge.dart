@@ -351,6 +351,10 @@ class CesiumBridge {
     //
     //--------------------------------------------------------------------------------------------
 
+    double cartographicDistance(double lon1, double lat1, double lon2, double lat2) {
+        return _bridge.callMethod('cartographicDistance', [lon1, lat1, lon2, lat2]);
+    }
+
     static bool _isValidLatLon(Cartographic3 v) {
         final lonOk = (v.longitude >= -180.0 && v.longitude <= 180.0);
         if (!lonOk) return false;
