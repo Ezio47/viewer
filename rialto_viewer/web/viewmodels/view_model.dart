@@ -18,3 +18,32 @@ abstract class ViewModel {
         }
     }
 }
+
+
+abstract class IForm {
+    List<MStateControl> controls = new List();
+    register(MStateControl c) => controls.add(c);
+    void saveState() => controls.forEach((c) => c.saveState());
+    void restoreState() => controls.forEach((c) => c.restoreState());
+    bool get anyStateChanged => controls.any((c) => c.stateChanged);
+}
+
+
+abstract class MStateControl<T> {
+    T _startingValue;
+
+    void saveState() {
+        _startingValue = value;
+    }
+
+    void restoreState() {
+        value = _startingValue;
+    }
+
+    bool get stateChanged {
+        return (_startingValue != value);
+    }
+
+    T get value;
+    set value(T);
+}

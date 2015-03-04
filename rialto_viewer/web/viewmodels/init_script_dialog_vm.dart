@@ -27,8 +27,7 @@ class InitScriptDialogVM extends DialogVM {
     void _show() {}
 
     @override
-    void _hide(bool okay) {
-        if (!okay) return;
+    void _hide() {
 
         var s = _serverName.value + _scriptName.value;
         var u = Uri.parse(s);

@@ -5,31 +5,21 @@
 part of rialto.viewer;
 
 
-class TextInputVM extends ViewModel {
+class TextInputVM extends ViewModel with MStateControl<String> {
     InputElement _inputElement;
     String defaultValue;
-    String _startingValue;
 
     TextInputVM(String id, String this.defaultValue) : super(id) {
         _inputElement = _element;
         value = defaultValue;
     }
 
-    void clearState() {
-        _startingValue = value;
-    }
+    @override
+    String get value => _inputElement.value;
 
-    bool get changed {
-        return (_startingValue != value);
-    }
+    @override
+    set value(String value) => _inputElement.value = value;
 
-    String get value {
-        return _inputElement.value;
-    }
-
-    set value(String value) {
-        _inputElement.value = value;
-    }
 
     // returns a double or null
     double get valueAsDouble {

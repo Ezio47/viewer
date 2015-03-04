@@ -6,10 +6,10 @@ part of rialto.viewer;
 
 
 class InfoVM extends DialogVM {
-    Hub _hub;
     LayerManagerDialogVM _parent;
 
     InfoVM(String id, LayerManagerDialogVM this._parent) : super(id, hasCancelButton: false);
+
     @override
     void _show() {
         int numPoints;
@@ -54,7 +54,4 @@ class InfoVM extends DialogVM {
         querySelector("#infoDialog_maxY").text = maxy.toStringAsFixed(3);
         querySelector("#infoDialog_maxZ").text = maxz.toStringAsFixed(3);
     }
-
-    @override
-    void _hide(bool okay) {}
 }

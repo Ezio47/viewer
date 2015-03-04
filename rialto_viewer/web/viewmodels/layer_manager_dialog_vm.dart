@@ -6,26 +6,26 @@ part of rialto.viewer;
 
 class LayerManagerDialogVM extends DialogVM {
     ListBoxVM<_LayerItem> _listbox;
-    bool hasData;
-    var selection;
-    //bool selectionEnabled = true;
-    Hub _hub;
-    ColorizerDialogVM _colorizer;
-    InfoVM _info;
-    Map<String, Layer> _layers = new Map<String, Layer>();
     CheckBoxVM _layerVisible;
 
+    ColorizerDialogVM _colorizer;
+    InfoVM _info;
+
+    Map<String, Layer> _layers = new Map<String, Layer>();
+
     LayerManagerDialogVM(String id) : super(id) {
-        _hub = Hub.root;
+
+        _colorizer = new ColorizerDialogVM("#colorizerDialog");
+
+        _info = new InfoVM("#infoDialog", this);
 
         _listbox = new ListBoxVM<_LayerItem>("#layerManagerDialog_layers");
         _listbox.setSelectHandler(_selectHandler);
 
-        _colorizer = new ColorizerDialogVM("#colorizerDialog");
-        _info = new InfoVM("#infoDialog", this);
-
         _layerVisible = new CheckBoxVM("#infoDialog_layerVisible", false);
-        _layerVisible.setClickHandler(_layerVisibleHandler);
+
+        register(_listbox);
+        register(_layerVisible);
 
         _hub.events.AddLayerCompleted.subscribe(_handleAddLayerCompleted);
         _hub.events.RemoveLayerCompleted.subscribe(_handleRemoveLayerCompleted);
@@ -43,11 +43,13 @@ class LayerManagerDialogVM extends DialogVM {
             _listbox.add(item);
         }
 
-        _layerVisible.clearState();
+        _listbox.value = null;
     }
 
     @override
-    void _hide(bool okay) {}
+    void _hide() {
+        _effectLayerVisibility();
+    }
 
     void _handleAddLayerCompleted(Layer layer) {
         _layers[layer.name] = layer;
@@ -57,11 +59,10 @@ class LayerManagerDialogVM extends DialogVM {
         _layers.remove(name);
     }
 
-    void _layerVisibleHandler(var e) {
-        List<_LayerItem> items = _listbox.getCurrentSelection();
-        if (items == null) return;
-        if (items[0] == null) return;
-        Layer layer = items[0].layer;
+    void _effectLayerVisibility() {
+        var item = _listbox.value;
+        if (item == null) return;
+        Layer layer = item.layer;
 
         if (layer is VisibilityControl) {
             VisibilityControl vc = layer as VisibilityControl;
@@ -70,39 +71,23 @@ class LayerManagerDialogVM extends DialogVM {
         }
     }
 
-    void _selectHandler(_) {
-        List<_LayerItem> items = _listbox.getCurrentSelection();
-        if (items == null) return;
-        if (items[0] == null) return;
+    Layer get currentSelection => _listbox.value.layer;
 
-        Layer layer = items[0].layer;
+    void _selectHandler(_) {
+        var item = _listbox.value;
+        if (item == null) return;
+
+        Layer layer = item.layer;
 
         log("${layer.name} selected");
 
         if (layer is VisibilityControl) {
-            _layerVisible.disabled = true;
-        } else {
             _layerVisible.disabled = false;
-        }
-
-        if (layer is VisibilityControl) {
             _layerVisible.value = (layer as VisibilityControl).visible;
+        } else {
+            _layerVisible.disabled = true;
         }
     }
-
-    Layer get currentSelection {
-        var list = _listbox.getCurrentSelection();
-        if (list == null || list.isEmpty || list[0] == null) return null;
-        return list[0].layer;
-    }
-
-    /*
-    void toggleLayer(Event e, var detail, Node target) {
-        var checkbox = target as InputElement;
-        var item = _listbox.list[int.parse(checkbox.id)].data;
-        _hub.eventRegistry.DisplayLayer.fire(new DisplayLayerData(item.layer.name, checkbox.checked));
-    }
-    */
 }
 
 

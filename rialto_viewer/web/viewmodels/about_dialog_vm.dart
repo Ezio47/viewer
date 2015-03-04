@@ -6,15 +6,5 @@ part of rialto.viewer;
 
 
 class AboutVM extends DialogVM {
-
-    Hub _hub;
-
-    AboutVM(String id) : super(id, hasCancelButton: false) {
-    }
-
-    @override
-    void _show() {}
-
-    @override
-    void _hide(bool okay) {}
+    AboutVM(String id) : super(id, hasCancelButton: false);
 }

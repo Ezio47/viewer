@@ -18,11 +18,7 @@ class CameraSettingsDialogVM extends DialogVM {
     TextInputVM _upY;
     TextInputVM _upZ;
 
-    Hub _hub;
-
     CameraSettingsDialogVM(String id) : super(id) {
-
-        _hub = Hub.root;
 
         _eyeLon = new TextInputVM("#cameraSettingsDialog_eyeLon", "0.0");
         _eyeLat = new TextInputVM("#cameraSettingsDialog_eyeLat", "0.0");
@@ -34,39 +30,24 @@ class CameraSettingsDialogVM extends DialogVM {
         _upX = new TextInputVM("#cameraSettingsDialog_upX", "0.0");
         _upY = new TextInputVM("#cameraSettingsDialog_upY", "0.0");
         _upZ = new TextInputVM("#cameraSettingsDialog_upZ", "1.0");
+
+        register(_eyeLon);
+        register(_eyeLat);
+        register(_eyeHeight);
+        register(_targetLon);
+        register(_targetLat);
+        register(_targetHeight);
+        register(_fov);
+        register(_upX);
+        register(_upY);
+        register(_upZ);
     }
 
     @override
-    void _show() {
-        _eyeLon.clearState();
-        _eyeLat.clearState();
-        _eyeHeight.clearState();
-        _targetLon.clearState();
-        _targetLat.clearState();
-        _targetHeight.clearState();
-        _fov.clearState();
-        _upX.clearState();
-        _upY.clearState();
-        _upZ.clearState();
-    }
+    void _show() {}
 
     @override
-    void _hide(bool okay) {
-        if (!okay) return;
-
-        _performCameraWork();
-    }
-
-    void _performCameraWork() {
-        bool eyeChanged = (_eyeLon.changed || _eyeLat.changed || _eyeHeight.changed);
-        bool targetChanged = (_targetLon.changed || _targetLat.changed || _targetHeight.changed);
-        bool upChanged = (_upX.changed || _upY.changed || _upZ.changed);
-        bool fovChanged = (_fov.changed);
-
-        if (!eyeChanged && !targetChanged && !upChanged && !fovChanged) {
-            return;
-        }
-
+    void _hide() {
         var eyeLon = _eyeLon.valueAsDouble;
         var eyeLat = _eyeLat.valueAsDouble;
         var eyeHeight = _eyeHeight.valueAsDouble;

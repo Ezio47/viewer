@@ -24,15 +24,12 @@ class ColorizerDialogVM extends DialogVM {
     void _show() {}
 
     @override
-    void _hide(bool okay) {
-        if (!okay) return;
+    void _hide() {
 
-        List<String> list = _listbox.getCurrentSelection();
-        if (list.length == 0) return;
+        String item = _listbox.value;
+        if (item == null) return;
 
-        assert(list.length==1);
-
-        String rampName = list[0];
+        String rampName = item;
 
         _hub.commands.colorizeLayers(new ColorizerData(rampName, "Z"));
     }

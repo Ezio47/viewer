@@ -7,10 +7,9 @@ part of rialto.viewer;
 
 // TODO: make check to see if data has changed or not
 
-class CheckBoxVM extends ViewModel {
+class CheckBoxVM extends ViewModel with MStateControl<bool> {
     InputElement _inputElement;
     bool _defaultValue;
-    bool _startingValue;
     bool _disabled;
 
     CheckBoxVM(String id, bool this._defaultValue)
@@ -26,21 +25,11 @@ class CheckBoxVM extends ViewModel {
         _inputElement.onClick.listen((e) => f(e));
     }
 
-    void clearState() {
-        _startingValue = value;
-    }
+    @override
+    bool get value => _inputElement.checked;
 
-    bool get changed {
-        return (_startingValue != value);
-    }
-
-    bool get value {
-        return _inputElement.checked;
-    }
-
-    set value(bool value) {
-        _inputElement.checked = value;
-    }
+    @override
+    set value(bool value) => _inputElement.checked = value;
 
     bool get disabled => _disabled;
     set disabled(bool v) {

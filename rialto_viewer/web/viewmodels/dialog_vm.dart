@@ -4,14 +4,15 @@
 
 part of rialto.viewer;
 
-abstract class DialogVM extends ViewModel {
+abstract class DialogVM extends ViewModel with IForm {
     bool _hasCancelButton;
     HtmlElement _dialogElement;
     var _dialogProxy;
     Hub _hub;
 
-    DialogVM(String id, {bool hasCancelButton: true}): super(id),
-            _hasCancelButton = hasCancelButton {
+    DialogVM(String id, {bool hasCancelButton: true})
+            : super(id),
+              _hasCancelButton = hasCancelButton {
 
         _hub = Hub.root;
 
@@ -42,16 +43,22 @@ abstract class DialogVM extends ViewModel {
 
     void show() {
         _hub.js.showDialog(_dialogProxy);
+        saveState();
         _show();
     }
 
     void hide(bool okay) {
-        _hide(okay);
+        if (!okay) {
+            restoreState();
+        } else {
+            if (anyStateChanged) {
+                _hide();
+            }
+        }
         _hub.js.hideDialog(_dialogProxy);
-        return;
     }
 
-    // derived dialogs implement these
-    void _show();
-    void _hide(bool okay);
+    // derived dialogs may reimplement these
+    void _show() {}
+    void _hide() {} // only called on OK, not Cancel
 }
