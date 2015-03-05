@@ -137,7 +137,7 @@ void signalTest() {
         // TODO: we can't check that ev==5 is never called, since we have nothing to wait on for it...
     }
 
-    // test1();
-    // test2();
+    test1();
+    test2();
     test3();
 }

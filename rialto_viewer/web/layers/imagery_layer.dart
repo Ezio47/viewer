@@ -7,7 +7,6 @@ part of rialto.viewer;
 abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, ColorCorrectionControl {
 
     dynamic _layer;
-    Uri _url;
     List<num> _rectangle;
 
     bool _visible;
