@@ -74,4 +74,11 @@ class OwsService {
 
         return c.future;
     }
+
+    String dump() {
+        String s = "";
+        s += "Service: $service\n";
+        s += "Server: $server\n";
+        return s;
+    }
 }

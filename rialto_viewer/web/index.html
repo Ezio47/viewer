@@ -17,22 +17,6 @@
             .small-dialog {
                 width: 400px;
             }
-            .message-panel-bar {
-                position: absolute;
-                z-index: 1;
-                display: table;
-            }
-            .message-panel-row {
-                display: table-row;
-            }
-            .message-panel {
-                padding: 0;
-                display: table-cell;
-            }
-            .message-panel-gap {
-                padding: 0;
-                display: table-cell;
-            }
         </style>
 
         <script src="3rd-party/jquery-2.1.3.min.js"></script>
@@ -110,25 +94,14 @@
         </div>
 
 
-        <div class="uk-position-bottom uk-margin-small-bottom message-panel-bar">
-            <div class="message-panel-row">
+        <div class="uk-position-bottom uk-margin-small-bottom ">
+                <button id="textMouseCoords" disabled class="uk-button uk-button-mini uk-align-right" type="button"
+                         style="width:130px; margin: 0px 5px 0px 0px">
+                </button>
 
-                <div class="message-panel-gap" style="width: 77%"></div>
-
-                <div class="uk-panel uk-panel-box uk-text-small uk-text-center"
-                style="padding: 0; display: table-cell; width:10%;">
-                     <span id="textWpsJobStatus"> </span>
-                </div>
-
-                <div class="message-panel-gap" style="width:1%"></div>
-
-                <div class="uk-panel uk-panel-box uk-text-small uk-text-center"
-                     style="padding: 0; display: table-cell; width: 10%">
-                    <span id="textMouseCoords"> </span>
-                </div>
-
-                <div class="message-panel-gap" style="width:1%"></div>
-            </div>
+                <button id="wpsStatusDialog_open" class="uk-button uk-button-mini uk-align-right" type="button"
+                         style="width:100px; margin: 0px 5px 0px 0px">
+                </button>
         </div>
 
 
@@ -415,6 +388,23 @@
 
                 <div class="uk-modal-footer uk-text-right">
                     <button id="infoDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="wpsStatusDialog" class="uk-modal">
+            <div class="uk-modal-dialog small-dialog">
+                <div class="uk-modal-header" id="wpsStatusDialog_header">
+                    WPS Job Status
+                </div>
+
+                <div class="uk-scrollable-text">
+                    <pre id="wpsStatusDialog_body"></pre>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="wpsStatusDialog_okay" class="uk-button uk-modal-close">Close</button>
                 </div>
             </div>
         </div>

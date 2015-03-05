@@ -6,7 +6,7 @@ part of rialto.viewer;
 
 class RialtoElement {
     Hub _hub;
-    SpanElement _mouseCoords;
+    Element _mouseCoords;
 
     ViewModeCode viewMode = ViewModeCode.mode3D;
 
@@ -43,14 +43,16 @@ class RialtoElement {
 
         new AboutVM("#aboutRialtoDialog");
         new AboutVM("#aboutCesiumDialog");
+        new AboutVM("#wpsStatusDialog");
 
         _mouseCoords = querySelector("#textMouseCoords");
         _hub.events.MouseMove.subscribe(_handleUpdateCoords);
 
-        _textWpsJobStatus = querySelector("#textWpsJobStatus");
-        _hub.events.WpsJobUpdate.subscribe(_handleWpsJobUpdate);
-
         new ColorizerDialogVM("#colorizerDialog");
+
+        _textWpsJobStatus = querySelector("#wpsStatusDialog_open");
+        _handleWpsJobUpdate();
+        _hub.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";
@@ -67,7 +69,7 @@ class RialtoElement {
         _mouseCoords.text = s;
     }
 
-    void _handleWpsJobUpdate(WpsJobUpdateData data) {
+    void _handleWpsJobUpdate() {
         final int numActive = _hub.wpsJobManager.numActive;
 
         if (numActive < 0) {
@@ -84,6 +86,12 @@ class RialtoElement {
             }
         }
 
-        _textWpsJobStatus.text = "WPS jobs: $numActive";
+        _textWpsJobStatus.text = "Active jobs: ${_hub.wpsJobManager.numActive}";
+
+        String s = "";
+        s += "Job count: ${_hub.wpsJobManager.map.length}\n";
+
+        _hub.wpsJobManager.map.keys.forEach((id) => s += "\n----\n" + _hub.wpsJobManager.map[id].dump());
+        querySelector("#wpsStatusDialog_body").text = s;
     }
 }

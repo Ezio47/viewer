@@ -152,4 +152,31 @@ class WpsJob {
     }
 
     void _signalJobChange() => _hub.events.WpsJobUpdate.fire(new WpsJobUpdateData(id));
+
+    String dump() {
+        String s = "";
+        s += service.dump();
+        s += "Id: $id\n";
+        s += "Status location: $statusLocation\n";
+        s += "Creation time: $processCreationTime\n";
+        s += "Status: $code\n";
+
+        s += "Exception texts: ";
+        if (exceptionTexts != null && exceptionTexts.length > 0) {
+            s += "\n";
+            exceptionTexts.forEach((t) => s += "  $t\n");
+        } else {
+            s += "(none)\n";
+        }
+
+        s += "Response document: ";
+        if (responseDocument != null) {
+            s += "\n";
+            s += responseDocument.dump(2);
+        } else {
+            s += "(none)\n";
+        }
+
+        return s;
+    }
 }
