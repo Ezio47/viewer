@@ -33,13 +33,16 @@ final Map tests = {
 };
 
 
+final String demo = "- layers:\n    - bing:\n        type: bing_base_imagery\n        style: Aerial\n";
+
 void main() {
     var hub = new Hub();
 
     try {
-        String s = "http://localhost:12345/file/" + tests[0];
-        var uri = Uri.parse(s);
-        hub.commands.loadScript(uri);
+        //String s = "http://localhost:12345/file/" + tests[0];
+        //var uri = Uri.parse(s);
+        //hub.commands.loadScriptFromUrl(uri);
+        hub.commands.loadScriptFromString(demo);
     } catch (e) {
         Hub.error("Top-level exception caught", object: e);
     }

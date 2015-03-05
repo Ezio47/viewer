@@ -1,7 +1,7 @@
 - layers:
     - bing:
         type: bing_base_imagery
-        style: Road
+        style: Aerial
 
 #    - oossmm:
 #        type: wms_imagery
@@ -9,9 +9,9 @@
 #        layers: osm-group
 #        proxy: http://localhost:12345/proxy
 
-    - cloud:
-        type: pointcloud
-        url: http://localhost:12345/file/tiles/tiledserp18
+#    - cloud:
+#        type: pointcloud
+#        url: http://localhost:12345/file/tiles/tiledserp18
 #        url: http://localhost:12345/file/tiles/autzen-thin-srs-18
 
 #    - z:

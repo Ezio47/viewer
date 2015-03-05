@@ -27,7 +27,7 @@ class LoadConfigurationDialogVM extends DialogVM {
         String value = _urlControl.value;
         if (value != null) {
             var url = Uri.parse(value); // TODO: handle error
-            _hub.commands.loadScript(url);
+            _hub.commands.loadScriptFromUrl(url);
         }
     }
 }

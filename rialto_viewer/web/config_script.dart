@@ -7,26 +7,35 @@ part of rialto.viewer;
 
 class ConfigScript {
     Hub _hub;
-    final Uri _url;
 
-    ConfigScript(Uri this._url) : _hub = Hub.root;
+    ConfigScript() : _hub = Hub.root;
 
-    Future<List<dynamic>> run() {
+    Future<List<dynamic>> loadFromUrl(Uri url) {
         var c = new Completer<List<dynamic>>();
 
-        Comms.httpGet(_url).then((Http.Response response) {
+        Comms.httpGet(url).then((Http.Response response) {
             String yamlText = response.body;
-            List<Map<String, Map>> commands = loadYaml(yamlText);
-
-            Future<List<dynamic>> results = Commands.run(_executeCommandAsync, commands);
-            results.then((_) {
-                // we don't eactually use the results...
-                Hub.root.events.LoadScriptCompleted.fire(_url);
-                c.complete(results);
-            });
+            _runInner(yamlText, c, url.toString());
         });
 
         return c.future;
+    }
+
+    Future<List<dynamic>> loadFromString(String yamlText) {
+        var c = new Completer<List<dynamic>>();
+
+        _runInner(yamlText, c, "");
+
+        return c.future;
+    }
+
+    void _runInner(String yamlText, Completer c, String urlString) {
+        List<Map<String, Map>> commands = loadYaml(yamlText);
+
+        Commands.run(_executeCommandAsync, commands).then((results) {
+            Hub.root.events.LoadScriptCompleted.fire(urlString);
+            c.complete(results);
+        });
     }
 
     Future<dynamic> _executeCommandAsync(Map command) {
