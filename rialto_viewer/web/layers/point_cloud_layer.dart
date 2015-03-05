@@ -32,7 +32,7 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
 
             numPoints = _hub.cesium.getNumPointsFromProvider(_provider);
 
-            var list = _hub.cesium.getTileBboxFromProvider(_provider);
+            //var list = _hub.cesium.getTileBboxFromProvider(_provider);
 
             var xStats = _hub.cesium.getStatsFromProvider(_provider, "X");
             var yStats = _hub.cesium.getStatsFromProvider(_provider, "Y");

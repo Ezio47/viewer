@@ -47,7 +47,7 @@ class WpsJob {
     Uri statusLocation;
     DateTime processCreationTime;
     Uri proxyUri;
-    int code; // from OgcStatus_55 enums
+    OgcStatusCodes code;
     List<String> exceptionTexts;
     OgcExecuteResponseDocument_54 responseDocument;
     final DateTime _startTime;
@@ -60,7 +60,7 @@ class WpsJob {
 
     WpsJob(WpsService this.service, int this.id, {WpsJobResultHandler successHandler: null,
             WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
-            : code = OgcStatus_55.STATUS_NOTYETSUBMITTED,
+            : code = OgcStatusCodes.notYetSubmitted,
               _startTime = new DateTime.now(),
               _successHandler = successHandler,
               _errorHandler = errorHandler,
@@ -78,7 +78,7 @@ class WpsJob {
     startPolling() => new Timer(WpsJobManager.pollingDelay, _poll);
 
     stopPolling() {
-        if (code == OgcStatus_55.STATUS_TIMEOUT) {
+        if (code == OgcStatusCodes.timeout) {
             if (_timeoutHandler != null) {
                 _timeoutHandler(this);
             }
@@ -106,7 +106,7 @@ class WpsJob {
 
         var now = new DateTime.now();
         if (now.isAfter(_timeoutTime)) {
-            code = OgcStatus_55.STATUS_TIMEOUT;
+            code = OgcStatusCodes.timeout;
             exceptionTexts = ["process timed out"];
 
             stopPolling();
@@ -120,7 +120,7 @@ class WpsJob {
             //log(ogcDoc.dump(0));
 
             if (ogcDoc.isException) {
-                code = OgcStatus_55.STATUS_SYSTEMFAILURE;
+                code = OgcStatusCodes.systemFailure;
                 exceptionTexts = ogcDoc.exceptionTexts;
 
                 stopPolling();
@@ -128,7 +128,7 @@ class WpsJob {
             }
 
             if (ogcDoc is! OgcExecuteResponseDocument_54) {
-                code = OgcStatus_55.STATUS_SYSTEMFAILURE;
+                code = OgcStatusCodes.systemFailure;
                 exceptionTexts = ["polled response neither exception report not response document"];
 
                 stopPolling();

@@ -15,7 +15,7 @@ class AnnotationController implements IController {
         _hub = Hub.root;
         isRunning = false;
 
-        _hub.modeController.register(this, ModeData.ANNOTATION);
+        _hub.modeController.register(this, ModeDataCodes.annotation);
 
         _hub.events.MouseMove.subscribe(_handleMouseMove);
         _hub.events.MouseDown.subscribe(_handleMouseDown);

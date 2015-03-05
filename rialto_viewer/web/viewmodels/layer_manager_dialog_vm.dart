@@ -8,11 +8,9 @@ class LayerManagerDialogVM extends DialogVM {
     ListBoxVM _listbox;
     CheckBoxVM _layerVisible;
 
-    InfoVM _info;
-
     LayerManagerDialogVM(String id) : super(id) {
 
-        _info = new InfoVM("#infoDialog", this);
+        new InfoVM("#infoDialog", this);
 
         _listbox = new ListBoxVM("#layerManagerDialog_layers", onSelect: _selectHandler);
 

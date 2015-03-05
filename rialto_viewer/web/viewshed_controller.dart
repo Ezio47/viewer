@@ -15,7 +15,7 @@ class ViewshedController implements IController {
         _hub = Hub.root;
         isRunning = false;
 
-        _hub.modeController.register(this, ModeData.VIEWSHED);
+        _hub.modeController.register(this, ModeDataCodes.viewshed);
 
         _hub.events.MouseMove.subscribe(_handleMouseMove);
         _hub.events.MouseDown.subscribe(_handleMouseDown);
@@ -64,7 +64,7 @@ class ViewshedController implements IController {
         log("viewshed center: ${Utils.toString_Cartographic3(point1)}");
         log("viewshed radius: $radius");
 
-        Viewshed a = new Viewshed(point1, point2);
+        new Viewshed(point1, point2);
 
         _callWps(point1.longitude, point1.latitude, radius);
 

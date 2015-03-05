@@ -7,16 +7,8 @@ part of rialto.viewer;
 class RialtoElement {
     Hub _hub;
     SpanElement _mouseCoords;
-    LoadConfigurationDialogVM _loadConfigurationDialog;
-    LayerManagerDialogVM _layerManager;
-    CameraSettingsDialogVM _cameraSettingsDialog;
-    AdvancedSettingsDialogVM _advancedSettingsDialog;
-    ModalButtonsVM _modalButtons;
-    AboutVM _aboutRialto;
-    AboutVM _aboutCesium;
-    ColorizerDialogVM _colorizerDialog;
 
-    int viewMode = ViewModeData.MODE_3D;
+    ViewModeCode viewMode = ViewModeCode.mode3D;
 
     Element _textWpsJobStatus;
 
@@ -25,32 +17,32 @@ class RialtoElement {
 
         querySelector(
                 "#homeWorldButton").onClick.listen(
-                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraData.WORLDVIEW_MODE)));
+                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraViewMode.worldviewMode)));
         querySelector(
                 "#homeDataButton").onClick.listen(
-                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraData.DATAVIEW_MODE)));
+                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraViewMode.dataviewMode)));
 
         var modeButton2D = querySelector("#modeButton2D");
         var modeButton25D = querySelector("#modeButton25D");
         var modeButton3D = querySelector("#modeButton3D");
-        modeButton2D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(0)));
-        modeButton25D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(1)));
-        modeButton3D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(2)));
+        modeButton2D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
+        modeButton25D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
+        modeButton3D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
 
-        _modalButtons = new ModalButtonsVM({
-            querySelector("#viewModeButton"): new ModeData(ModeData.VIEW),
-            querySelector("#annotateModeButton"): new ModeData(ModeData.ANNOTATION),
-            querySelector("#measureModeButton"): new ModeData(ModeData.MEASUREMENT),
-            querySelector("#viewshedModeButton"): new ModeData(ModeData.VIEWSHED)
+        new ModalButtonsVM({
+            querySelector("#viewModeButton"): new ModeData(ModeDataCodes.view),
+            querySelector("#annotateModeButton"): new ModeData(ModeDataCodes.annotation),
+            querySelector("#measureModeButton"): new ModeData(ModeDataCodes.measurement),
+            querySelector("#viewshedModeButton"): new ModeData(ModeDataCodes.viewshed)
         }, querySelector("#viewModeButton"));
 
-        _loadConfigurationDialog = new LoadConfigurationDialogVM("#loadConfigurationDialog");
-        _layerManager = new LayerManagerDialogVM("#layerManagerDialog");
-        _cameraSettingsDialog = new CameraSettingsDialogVM("#cameraSettingsDialog");
-        _advancedSettingsDialog = new AdvancedSettingsDialogVM("#advancedSettingsDialog");
+        new LoadConfigurationDialogVM("#loadConfigurationDialog");
+        new LayerManagerDialogVM("#layerManagerDialog");
+        new CameraSettingsDialogVM("#cameraSettingsDialog");
+        new AdvancedSettingsDialogVM("#advancedSettingsDialog");
 
-        _aboutRialto = new AboutVM("#aboutRialtoDialog");
-        _aboutCesium = new AboutVM("#aboutCesiumDialog");
+        new AboutVM("#aboutRialtoDialog");
+        new AboutVM("#aboutCesiumDialog");
 
         _mouseCoords = querySelector("#textMouseCoords");
         _hub.events.MouseMove.subscribe(_handleUpdateCoords);
@@ -58,10 +50,10 @@ class RialtoElement {
         _textWpsJobStatus = querySelector("#textWpsJobStatus");
         _hub.events.WpsJobUpdate.subscribe(_handleWpsJobUpdate);
 
-        _colorizerDialog = new ColorizerDialogVM("#colorizerDialog");
+        new ColorizerDialogVM("#colorizerDialog");
     }
 
-    String get viewModeString => "Mode / ${ViewModeData.name(viewMode)}";
+    String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";
 
     void _handleUpdateCoords(MouseData d) {
         var v = _hub.cesium.getMouseCoordinates(d.x, d.y);
@@ -74,8 +66,6 @@ class RialtoElement {
 
         _mouseCoords.text = s;
     }
-
-    String _wpsStatusString(int count) => "WPS pending: $count";
 
     void _handleWpsJobUpdate(WpsJobUpdateData data) {
         final int numActive = _hub.wpsJobManager.numActive;

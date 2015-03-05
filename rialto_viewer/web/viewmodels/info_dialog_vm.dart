@@ -48,7 +48,7 @@ class InfoVM extends DialogVM {
         }
 
         querySelector("#infoDialog_name").text = name;
-        querySelector("#infoDialog_type").text = layer.type;
+        querySelector("#infoDialog_type").text = type;
         querySelector("#infoDialog_url").text = url;
         querySelector("#infoDialog_proxy").text = proxy;
         querySelector("#infoDialog_description").text = description;

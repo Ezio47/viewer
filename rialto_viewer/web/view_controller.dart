@@ -12,7 +12,7 @@ class ViewController implements IController {
         _hub = Hub.root;
         isRunning = false;
 
-        _hub.modeController.register(this, ModeData.VIEW);
+        _hub.modeController.register(this, ModeDataCodes.view);
 
         // TODO
         //_hub.eventRegistry.MouseMove.subscribe(_handleMouseMove);

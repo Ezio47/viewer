@@ -48,16 +48,16 @@ class Camera {
         assert(data != null);
 
         switch (data.viewMode) {
-            case CameraData.NORMAL_MODE:
+            case CameraViewMode.normalMode:
                 _eyePosition = data.eye;
                 _targetPosition = data.target;
                 _upDirection = data.up;
                 _cameraFov = data.fov;
                 break;
-            case CameraData.WORLDVIEW_MODE:
+            case CameraViewMode.worldviewMode:
                 _hub.cesium.goHome();
                 return new Future((){});
-            case CameraData.DATAVIEW_MODE:
+            case CameraViewMode.dataviewMode:
                 _eyePosition = _defaultCameraEyePosition;
                 _targetPosition = _defaultTargetPosition;
                 _upDirection = _defaultUpDirection;

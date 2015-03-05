@@ -125,14 +125,14 @@ class WpsService extends OwsService {
         _executeProcess(name, inputs, outputs).then((ogcDoc) {
 
             if (ogcDoc == null) {
-                request.code = OgcStatus_55.STATUS_SYSTEMFAILURE;
+                request.code = OgcStatusCodes.systemFailure;
                 request.stopPolling();
                 c.complete(request);
                 return;
             }
 
             if (ogcDoc is OgcExceptionReportDocument) {
-                request.code = OgcStatus_55.STATUS_FAILED;
+                request.code = OgcStatusCodes.failed;
                 request.exceptionTexts = ogcDoc.exceptionTexts;
                 request.stopPolling();
                 c.complete(request);

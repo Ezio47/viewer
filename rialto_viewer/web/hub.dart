@@ -31,10 +31,6 @@ class Hub {
     int displayPrecision = 5;
 
     // privates
-    ViewController _viewController;
-    AnnotationController _annotationController;
-    MeasurementController _measurementController;
-    ViewshedController _viewshedController;
     BboxShape _bboxShape;
 
     // TODO: make private
@@ -62,7 +58,7 @@ class Hub {
 
         cesium = new CesiumBridge('cesiumContainer');
 
-        var rialtoElement = new RialtoElement();
+        new RialtoElement();
 
         cesium.onMouseMove((num x, num y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
         cesium.onMouseDown((num x, num y, int b) => events.MouseDown.fire(new MouseData.fromXyb(x, y, b)));
@@ -74,14 +70,14 @@ class Hub {
 
         events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
 
-        _viewController = new ViewController();
-        _annotationController = new AnnotationController();
-        _measurementController = new MeasurementController();
-        _viewshedController = new ViewshedController();
+        new ViewController();
+        new AnnotationController();
+        new MeasurementController();
+        new ViewshedController();
 
         camera = new Camera();
 
-        commands.changeMode(new ModeData(ModeData.VIEW));
+        commands.changeMode(new ModeData(ModeDataCodes.view));
 
         events.AdvancedSettingsChanged.subscribe((data) => _bboxShape.isVisible = data.showBbox);
         events.AdvancedSettingsChanged.subscribe((data) => displayPrecision = data.displayPrecision);

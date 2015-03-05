@@ -8,12 +8,12 @@ part of rialto.viewer;
 
 class ModeController {
     Hub _hub;
-    Map<int, IController> _modes;
+    Map<ModeDataCodes, IController> _modes;
     IController _currentMode;
 
     ModeController()
             : _hub = Hub.root,
-              _modes = new Map<int, IController>(),
+              _modes = new Map<ModeDataCodes, IController>(),
               _currentMode = null;
 
     Future doChangeMode(ModeData ev) {
@@ -39,7 +39,7 @@ class ModeController {
 
     bool isEnabled(IController thing) => (_currentMode == thing);
 
-    void register(IController thing, int type) {
+    void register(IController thing, ModeDataCodes type) {
         if (_modes.containsValue(thing)) return;
 
         _modes[type] = thing;
@@ -56,7 +56,7 @@ class ModeController {
     }
 
     // inverse mapping
-    int _lookupType(IController mode) {
+    ModeDataCodes _lookupType(IController mode) {
         for (var k in _modes.keys) {
             IController m = _modes[k];
             if (m == mode) return k;

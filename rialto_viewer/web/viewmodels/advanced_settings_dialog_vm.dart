@@ -7,7 +7,6 @@ part of rialto.viewer;
 
 class AdvancedSettingsDialogVM extends DialogVM {
 
-    bool _bboxChecked;
     CheckBoxVM _bboxEnabled;
 
     TextInputVM _displayPrecision;
@@ -17,7 +16,6 @@ class AdvancedSettingsDialogVM extends DialogVM {
         _displayPrecision = new TextInputVM("#advancedSettingsDialog_displayPrecision", "5");
 
         _hub.events.AdvancedSettingsChanged.subscribe(_handleChange);
-        _bboxChecked = false;
         _bboxEnabled = new CheckBoxVM("#advancedSettingsDialog_bboxEnabled", true);
 
         _register(_bboxEnabled);
@@ -25,7 +23,6 @@ class AdvancedSettingsDialogVM extends DialogVM {
     }
 
     void _handleChange(AdvancedSettingsChangedData data) {
-        _bboxChecked = data.showBbox;
         _displayPrecision.value = data.displayPrecision.toString();
     }
 

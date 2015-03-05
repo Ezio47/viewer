@@ -14,16 +14,16 @@ class OgcDocumentTests {
 
     static void test() {
         var ex = OgcDocument.parseString(generalException);
-        //log(ex);
+        log(ex);
 
         var proc = OgcDocument.parseString(describeProcess);
-        //log(proc);
+        log(proc);
 
         var exp = OgcDocument.parseString(describeProcessError);
-        //log(exp);
+        log(exp);
 
         var wpsCaps = OgcDocument.parseString(capabilities);
-        //log(wpsCaps);
+        log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
         var proxyUri = Uri.parse("http://localhost:12345/proxy");
