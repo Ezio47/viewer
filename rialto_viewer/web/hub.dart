@@ -10,6 +10,11 @@ void log(obj) {
     } else {
         window.console.log(obj.toString());
     }
+
+    var e = querySelector("#logDialog_body");
+    if (e != null) {
+        e.text += obj.toString() + "\n";
+    }
 }
 
 
@@ -46,7 +51,7 @@ class Hub {
         assert(_root == null);
         _root = this;
 
-        js = new JsBridge();
+        js = new JsBridge(log);
 
         wpsJobManager = new WpsJobManager();
 
@@ -104,7 +109,7 @@ class Hub {
         }
 
         if (info != null) {
-            info.forEach((k,v) => s+= "$k: $v\n");
+            info.forEach((k, v) => s += "$k: $v\n");
         }
 
         if (object != null) {
@@ -114,5 +119,10 @@ class Hub {
         window.console.log(s);
 
         window.alert(s);
+
+        var e = querySelector("#logDialog_body");
+        if (e != null) {
+            e.text += s + "\n";
+        }
     }
 }

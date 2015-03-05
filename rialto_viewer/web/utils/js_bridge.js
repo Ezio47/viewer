@@ -3,8 +3,12 @@
 // license found in the accompanying LICENSE.txt file.
 
 
-var JsBridge = function () {
+var mylogger = null;
+
+var JsBridge = function (logger) {
     'use strict';
+
+    mylogger = logger;
 
     // dialogId must include leading '#'
     this.registerDialog = function (dialogId) {
@@ -19,6 +23,8 @@ var JsBridge = function () {
     this.hideDialog = function (dialog, ret) {
         dialog.hide(ret);
     }
+
+    mylog("yow");
 }
 
 
@@ -56,5 +62,9 @@ var myerror = function (s, t) {
 var mylog = function (s) {
     "use strict";
 
-    console.log(s);
+    if (mylogger != null) {
+        mylogger(s);
+    } else {
+        console.log(s);
+    }
 };

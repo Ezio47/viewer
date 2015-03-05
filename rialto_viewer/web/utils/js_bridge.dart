@@ -8,8 +8,8 @@ part of rialto.viewer;
 class JsBridge {
     JsObject _bridge;
 
-    JsBridge() {
-        _bridge = new JsObject(context['JsBridge'], []);
+    JsBridge(logger) {
+        _bridge = new JsObject(context['JsBridge'], [logger]);
     }
 
     dynamic registerDialog(String dialogId) {

@@ -44,6 +44,7 @@ class RialtoElement {
         new AboutVM("#aboutRialtoDialog");
         new AboutVM("#aboutCesiumDialog");
         new AboutVM("#wpsStatusDialog");
+        new AboutVM("#logDialog");
 
         _mouseCoords = querySelector("#textMouseCoords");
         _hub.events.MouseMove.subscribe(_handleUpdateCoords);
