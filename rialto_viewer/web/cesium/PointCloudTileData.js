@@ -57,17 +57,17 @@
      * });
      */
     var PointCloudTileData = function PointCloudTileData(options) {
-        //>>includeStart('debug', pragmas.debug);
-        if (!defined(options) || !defined(options.buffer)) {
-            throw new DeveloperError('options.buffer is required.');
+        "use strict";
+
+        if (!Cesium.defined(options) || !defined(options.buffer)) {
+            throw new Cesium.DeveloperError('options.buffer is required.');
         }
-        if (!defined(options.width)) {
-            throw new DeveloperError('options.width is required.');
+        if (!Cesium.defined(options.width)) {
+            throw new Cesium.DeveloperError('options.width is required.');
         }
-        if (!defined(options.height)) {
-            throw new DeveloperError('options.height is required.');
+        if (!Cesium.defined(options.height)) {
+            throw new Cesium.DeveloperError('options.height is required.');
         }
-        //>>includeEnd('debug');
 
         this._buffer = options.buffer;
         this._width = options.width;
@@ -76,7 +76,7 @@
 
         var defaultStructure = HeightmapTessellator.DEFAULT_STRUCTURE;
         var structure = options.structure;
-        if (!defined(structure)) {
+        if (!Cesium.defined(structure)) {
             structure = defaultStructure;
         } else if (structure !== defaultStructure) {
             structure.heightScale = defaultValue(structure.heightScale, defaultStructure.heightScale);
@@ -103,7 +103,7 @@
     });
 
 
-    var taskProcessor = new TaskProcessor('createVerticesFromPointCloudTile');
+    var taskProcessor = new Cesium.TaskProcessor('createVerticesFromPointCloudTile');
 
 
 
@@ -119,20 +119,20 @@
      *          be retried later.
      */
     PointCloudTileData.prototype.createMesh = function(tilingScheme, x, y, level) {
-        //>>includeStart('debug', pragmas.debug);
-        if (!defined(tilingScheme)) {
-            throw new DeveloperError('tilingScheme is required.');
+        "use strict";
+
+        if (!Cesium.defined(tilingScheme)) {
+            throw new Cesium.DeveloperError('tilingScheme is required.');
         }
-        if (!defined(x)) {
-            throw new DeveloperError('x is required.');
+        if (!Cesium.defined(x)) {
+            throw new Cesium.DeveloperError('x is required.');
         }
-        if (!defined(y)) {
-            throw new DeveloperError('y is required.');
+        if (!Cesium.defined(y)) {
+            throw new Cesium.DeveloperError('y is required.');
         }
-        if (!defined(level)) {
-            throw new DeveloperError('level is required.');
+        if (!Cesium.defined(level)) {
+            throw new Cesium.DeveloperError('level is required.');
         }
-        //>>includeEnd('debug');
 
         var ellipsoid = tilingScheme.ellipsoid;
         var nativeRectangle = tilingScheme.tileXYToNativeRectangle(x, y, level);
@@ -159,12 +159,12 @@
             isGeographic : tilingScheme instanceof GeographicTilingScheme
         });
 
-        if (!defined(verticesPromise)) {
+        if (!Cesium.defined(verticesPromise)) {
             // Postponed
             return undefined;
         }
 
-        return when(verticesPromise, function(result) {
+        return Cesium.when(verticesPromise, function(result) {
             return new TerrainMesh(
                     center,
                     new Float32Array(result.vertices),
@@ -179,20 +179,20 @@
 
 
     PointCloudTileData.prototype.isChildAvailable = function(thisX, thisY, childX, childY) {
-        //>>includeStart('debug', pragmas.debug);
-        if (!defined(thisX)) {
-            throw new DeveloperError('thisX is required.');
+        "use strict";
+
+        if (!Cesium.defined(thisX)) {
+            throw new Cesium.DeveloperError('thisX is required.');
         }
-        if (!defined(thisY)) {
-            throw new DeveloperError('thisY is required.');
+        if (!Cesium.defined(thisY)) {
+            throw new Cesium.DeveloperError('thisY is required.');
         }
-        if (!defined(childX)) {
-            throw new DeveloperError('childX is required.');
+        if (!Cesium.defined(childX)) {
+            throw new Cesium.DeveloperError('childX is required.');
         }
-        if (!defined(childY)) {
-            throw new DeveloperError('childY is required.');
+        if (!Cesium.defined(childY)) {
+            throw new Cesium.DeveloperError('childY is required.');
         }
-        //>>includeEnd('debug');
 
         var bitNumber = 2; // northwest child
         if (childX !== thisX * 2) {

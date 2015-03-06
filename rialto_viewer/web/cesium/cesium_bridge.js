@@ -342,13 +342,23 @@ var CesiumBridge = function (element) {
     this._createTileProvider2Async = function(urlarg, colorizeRamp, colorizeDimension, visible) {
         var deferred = Cesium.when.defer();
 
-        var provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
+        if (false) {
 
-        provider.readHeaderAsync().then(function(provider) {
+            var options = { url: urlarg };
+            var provider = new PointCloudTileProvider(options);
             deferred.resolve(provider);
-        }).otherwise(function (error) {
-            myerror("Unable to read point cloud header: " + urlarg, error);
-        });
+
+        } else {
+
+            var provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
+
+            provider.readHeaderAsync().then(function(provider) {
+                deferred.resolve(provider);
+            }).otherwise(function (error) {
+                myerror("Unable to read point cloud header: " + urlarg, error);
+            });
+
+        }
 
         return deferred.promise;
     }

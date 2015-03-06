@@ -1,4 +1,6 @@
 function createVerticesFromPointCloudTile(parameters, transferableObjects) {
+    "use strict";
+
     var numberOfAttributes = 6;
 
     var arrayWidth = parameters.width;
