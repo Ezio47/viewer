@@ -81,7 +81,7 @@ class ViewshedController implements IController {
             "fovEnd": 360.0,
             "eyeHeight": 1.5,
             "radius": radius,
-            "inputDem": "foobarbaz.tif",
+            "inputDem": "N48W114.hgt",
             "serverInputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/inputs",
             "serverOutputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/outputs",
             "serverOutputUrl": "http://localhost:12345/file/wps-scratch/outputs",

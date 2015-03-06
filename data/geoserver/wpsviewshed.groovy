@@ -29,12 +29,27 @@ def run(input) {
     def outputFile3 = input.serverOutputPath + '/' + millis + "-tiles"
     def outputUrl = input.serverOutputUrl + '/' + millis + "-tiles"
     
+    def myStdout = ""
+    def myStderr = ""
+
     //
+    // DEBUG
+    //
+    def cmd0 = ['printenv'];
+    def proc0 = cmd0.execute()
+    proc0.waitFor()
+    
+    myStdout += "==== DEBUG stdout ====\n\n" + proc0.in.text
+    myStderr += "==== DEBUG stderr ====\n\n" + proc0.err.text
+    
+        //
     // VIEWSHED
     //
-    def cmd = [
-        "./data_dir/scripts/wps/xyzzy.sh", 
-        "--input-dem", inputFile,
+    def cmd1 = [
+        "./data_dir/scripts/wps/runcmd.sh", 
+        //////"./data_dir/scripts/wps/xyzzy.sh", 
+        "/Users/mgerlek/work/dev/ossim-scratch/bin/ossim-viewshed", 
+        "--dem", inputFile,
         "--fov", (input.fovStart as String), (input.fovEnd as String),
         "--hgt-of-eye", (input.eyeHeight as String),
         "--radius", (input.radius as String),
@@ -42,11 +57,11 @@ def run(input) {
         outputFile  
     ]
 
-    def proc = cmd.execute()
-    proc.waitFor()
+    def proc1 = cmd1.execute()
+    proc1.waitFor()
     
-    def myStdout = "==== VIEWSHED stdout ====\n\n" + proc.in.text
-    def myStderr = "==== VIEWSHED stderr ====\n\n" + proc.err.text
+    myStdout += "==== VIEWSHED stdout ====\n\n" + proc1.in.text
+    myStderr += "==== VIEWSHED stderr ====\n\n" + proc1.err.text
     
     //
     // GDAL_TRANSLATE
@@ -54,6 +69,7 @@ def run(input) {
     // gdal2tiles seems to only like 3-band images, so convert the tif
     //
     def cmd2 = [
+        "./data_dir/scripts/wps/runcmd.sh", 
         "/usr/local/bin/gdal_translate", "-b", "1", "-b", "1", "-b", "1",
         outputFile, outputFile2
     ]
@@ -68,6 +84,7 @@ def run(input) {
     // GDAL2TILES
     //
     def cmd3 = [
+        "./data_dir/scripts/wps/runcmd.sh", 
         "/usr/local/bin/gdal2tiles.py", "-z", "5-12", "--webviewer=none",
         outputFile2, outputFile3
     ]
