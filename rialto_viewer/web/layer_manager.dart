@@ -144,8 +144,8 @@ class LayerManager {
                 layer = new WmsImageryLayer(name, map);
                 break;
 
-            case "wtms_imagery":
-                layer = new WtmsImageryLayer(name, map);
+            case "tms_imagery":
+                layer = new TmsImageryLayer(name, map);
                 break;
 
             case "single_imagery":

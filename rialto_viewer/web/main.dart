@@ -29,7 +29,7 @@ final Map tests = {
     17: "unittests/terrain.yaml",                           // grand canyon, base imagery with terrain
     18: "unittests/wms_imagery.yaml",                       // just dots on white world
     19: "unittests/wps.yaml",                               // just pointcloud, plus output to console
-    20: "unittests/wtms_imagery.yaml",                      // world at night
+    20: "unittests/tms_imagery.yaml",                      // world at night
 };
 
 
@@ -39,10 +39,10 @@ void main() {
     var hub = new Hub();
 
     try {
-        //String s = "http://localhost:12345/file/" + tests[0];
-        //var uri = Uri.parse(s);
-        //hub.commands.loadScriptFromUrl(uri);
-        hub.commands.loadScriptFromString(demo);
+        String s = "http://localhost:12345/file/" + tests[0];
+        var uri = Uri.parse(s);
+        hub.commands.loadScriptFromUrl(uri);
+        //hub.commands.loadScriptFromString(demo);
     } catch (e) {
         Hub.error("Top-level exception caught", object: e);
     }

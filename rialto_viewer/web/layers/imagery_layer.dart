@@ -125,20 +125,23 @@ class WmsImageryLayer extends ImageryLayer {
 }
 
 
-class WtmsImageryLayer extends ImageryLayer {
-    String _layers;
+class TmsImageryLayer extends ImageryLayer {
     int _maximumLevel;
+    bool _gdal2Tiles;
 
-    WtmsImageryLayer(String name, Map map)
-            : super("wtms_imagery", name, map),
-              _maximumLevel = YamlUtils.getOptionalSettingAsInt(map, "maximumLevel", 18) {
+    TmsImageryLayer(String name, Map map)
+            : super("tms_imagery", name, map),
+              _maximumLevel = YamlUtils.getOptionalSettingAsInt(map, "maximumLevel", 18),
+              _gdal2Tiles = YamlUtils.getOptionalSettingAsBool(map, "gdal2Tiles", false) {
         _requireUrl();
     }
 
     @override
     Future load() {
         var f = new Future(() {
-            _layer = _hub.cesium.addTileMapServiceImageryProvider(urlString, _rectangle, _maximumLevel, proxyString);
+
+            _layer =
+                    _hub.cesium.addTileMapServiceImageryProvider(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
 
             _forceUpdates();
         });

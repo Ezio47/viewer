@@ -229,12 +229,14 @@ var CesiumBridge = function (element) {
     }
 
 
-    this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel, proxy) {
+    this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel, gdal2Tiles, proxy) {
+
         var options = {
             url: url,
             rectangle: rect == null ? undefined : rect,
             maximumLevel: maximumLevel,
-            proxy: proxy == null ? undefined : proxy
+            proxy: proxy == null ? undefined : proxy,
+            gdal2Tiles: gdal2Tiles
         };
         return new Cesium.TileMapServiceImageryProvider(options);
     }
