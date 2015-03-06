@@ -306,19 +306,6 @@ class CesiumBridge {
         return prim;
     }
 
-    dynamic createCloud(int numPoints, Float64List xArray, Float64List yArray, Float64List zArray,
-            Uint8List rgbaArray) {
-        assert(numPoints >= 0);
-        assert(xArray.length == numPoints);
-        assert(rgbaArray.length == numPoints * 4);
-
-
-
-                //var prim = _bridge.callMethod('createCloud', [numPoints, xArray.buffer, yArray.buffer, zArray.buffer, rgbaArray.buffer]);
-        var prim = _bridge.callMethod('createCloud', [numPoints, xArray, yArray, zArray, rgbaArray]);
-        return prim;
-    }
-
     void remove(dynamic primitive) {
         _bridge.callMethod('removePrimitive', [primitive]);
     }
