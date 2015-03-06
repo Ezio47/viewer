@@ -8,9 +8,11 @@ outfile=${12}
 echo Input: $infile
 echo Output: $outfile
 
-echo "vvvv" > $outfile
-cat $infile >> $outfile
-echo $@ >> $outfile
-echo "^^^^" >> $outfile
+cp $infile $outfile
+
+#echo "vvvv" > $outfile
+#cat $infile >> $outfile
+#echo $@ >> $outfile
+#echo "^^^^" >> $outfile
 
 echo Bye.

@@ -52,7 +52,7 @@ class WpsServiceTest {
             OgcExecuteResponseDocument_54 resp = doc;
             var status = resp.status.processSucceeded;
             assert(status != null);
-            OgcDataType_46 datatype = resp.processOutputs.outputData[0].data;
+            OgcDataType_46 datatype = resp.processOutputs.outputDataList[0].data;
             OgcLiteralData_48 literalData = datatype.literalData;
             //log(literalData.dump(0));
             assert(literalData.value == "28.0");
@@ -80,7 +80,7 @@ class WpsServiceTest {
             OgcExecuteResponseDocument_54 resp = doc;
             var status = resp.status.processSucceeded;
             assert(status != null);
-            OgcDataType_46 datatype = resp.processOutputs.outputData[0].data;
+            OgcDataType_46 datatype = resp.processOutputs.outputDataList[0].data;
             OgcLiteralData_48 literalData = datatype.literalData;
             //log(literalData.dump(0));
             assert(double.parse(literalData.value) == (alpha + beta + duration));

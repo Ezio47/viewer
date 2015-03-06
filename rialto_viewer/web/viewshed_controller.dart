@@ -81,7 +81,7 @@ class ViewshedController implements IController {
             "fovEnd": 360.0,
             "eyeHeight": 1.5,
             "radius": radius,
-            "inputDem": "foobarbaz",
+            "inputDem": "foobarbaz.tif",
             "serverInputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/inputs",
             "serverOutputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/outputs",
             "serverOutputUrl": "http://localhost:12345/file/wps-scratch/outputs",
@@ -89,8 +89,18 @@ class ViewshedController implements IController {
         params[2] = ["outputUrl", "stdoutText", "stderrText"];
 
         var yes = (WpsJob job) {
-            log("SUCCESS!");
-            log(job.responseDocument.dump(0));
+            OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
+            log(ogcDoc.dump(0));
+            var url = ogcDoc.getProcessOutput("outputUrl");
+            log("SUCCESS: $url");
+
+            var layerData = new LayerData("viewshed", {
+                "type": "tms_imagery",
+                "url": url,
+                "gdal2Tiles": true,
+                "maximumLevel": 12
+            });
+            _hub.commands.addLayer(layerData).then((_) => log("layer added!"));
         };
 
         var no = (WpsJob job) {
@@ -194,4 +204,3 @@ class Viewshed {
     //
     // output-image-file          ** used by thge server script **
 ****/
-

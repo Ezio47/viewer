@@ -2,14 +2,14 @@
     - bing:
         type: bing_base_imagery
         style: Aerial
-    - y:
-        type: tms_imagery
-        url: http://cesiumjs.org/blackmarble
-        maximumLevel : 8
+  #  - y:
+   #     type: tms_imagery
+    #    url: http://cesiumjs.org/blackmarble
+     #   maximumLevel : 8
 
     - z:
         type: tms_imagery
-        url: http://localhost:12345/file/d
+        url: http://localhost:12345/file/wps-scratch/outputs/1425659259231-tiles
         gdal2Tiles: true
         maximumLevel : 11
 
