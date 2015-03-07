@@ -154,12 +154,34 @@ PointCloudTileProvider.prototype.getLevelMaximumGeometricError = function(level)
 };
 
 
+// taken from Cartesian3.fromDegreesArrayHeights
+PointCloudTileProvider.prototype.Cartesian3_fromDegreesArrayHeights_merge = function (x, y, z, cnt, ellipsoid) {
+    "use strict";
+
+    var xyz = new Float64Array(cnt * 3);
+
+    var i;
+    var lon, lat, alt, result;
+    for (i = 0; i < cnt; i++) {
+        lon = Cesium.Math.toRadians(x[i]);
+        lat = Cesium.Math.toRadians(y[i]);
+        alt = z[i];
+
+        result = Cesium.Cartesian3.fromRadians(lon, lat, alt, ellipsoid);
+
+        xyz[i*3] = result.x;
+        xyz[i*3+1] = result.y;
+        xyz[i*3+2] = result.z;
+    }
+
+    return xyz;
+};
+
+
 // x,y,z as F64 arrays
 // rgba as U8 array
 PointCloudTileProvider.prototype.createPrimitive = function (cnt, dims) {
-    "use strict";mylog("dffffffffffffffffffffffffffff");
-mylog("cnt="+cnt);
-mylog("dims="+dims.length);
+
     if (cnt == 0) {
         return null;
     }
@@ -171,7 +193,6 @@ mylog("dims="+dims.length);
 
     var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z, cnt);
 
-    myassert(this.numPoints == cnt, 39);
     myassert(xyz.length == cnt * 3, 40);
     myassert(rgba.length == cnt * 4, 41);
 
@@ -188,6 +209,7 @@ mylog("dims="+dims.length);
         appearance : new Cesium.PointAppearance()
     });
 
+    mylog("made prim!");
     return prim;
 };
 
@@ -196,7 +218,26 @@ mylog("dims="+dims.length);
 PointCloudTileProvider.prototype.loadTile = function(context, frameState, tile) {
 var that=this;
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
-        mylog("asking for " + tile.x + " " + tile.y + " " + tile.level);
+
+        mylog("asking for " + tile.level + " " + tile.x + " " + tile.y);
+
+        if (tile.parent != undefined && tile.parent != null) {
+            mylog("  has parent");
+            if (tile.parent.data == undefined || tile.parent.data == null) {
+                mylog("*****************ERROR**************");
+            }
+            var mask = tile.parent.data.childMask;
+            var px = tile.parent.x;
+            var py = tile.parent.y;
+            var cx = tile.x;
+            var cy = tile.y;
+            var thisChildIsAvailable = this.isChildAvailable(mask, px, py, cx, cy);
+            if (thisChildIsAvailable) {
+                mylog(" is available");
+            } else {
+                mylog(" IS NOT AVAILABLE");
+            }
+        }
 
         tile.data = {
             primitive : undefined,
@@ -209,10 +250,10 @@ var that=this;
         };
 
         function success(data) {
-                    mylog("aaaa");
 
-            tile.data.primitive = that.createPrimitive(tile.numPoints, tile.dimensions);
-            mylog("bbbb");
+            this.data = data;
+
+            tile.data.primitive = that.createPrimitive(data.numPoints, data.dimensions);
 
             tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
             tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
@@ -234,13 +275,46 @@ var that=this;
 
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING) {
 
-        tile.data.primitive.update(context, frameState, []);
-        if (tile.data.primitive.ready) {
-            tile.state = Cesium.QuadtreeTileLoadState.DONE;
-            tile.renderable = true;
+        if (tile.data.primitive == null) {
+                tile.state = Cesium.QuadtreeTileLoadState.DONE;
+                tile.renderable = true;
+        } else {
+            tile.data.primitive.update(context, frameState, []);
+            if (tile.data.primitive.ready) {
+                tile.state = Cesium.QuadtreeTileLoadState.DONE;
+                tile.renderable = true;
+            }
         }
     }
 };
+
+
+ PointCloudTileProvider.prototype.isChildAvailable = function(mask, thisX, thisY, childX, childY) {
+                if (!Cesium.defined(thisX)) {
+            throw new Cesium.DeveloperError('thisX is required.');
+        }
+        if (!Cesium.defined(thisY)) {
+            throw new Cesium.DeveloperError('thisY is required.');
+        }
+        if (!Cesium.defined(childX)) {
+            throw new Cesium.DeveloperError('childX is required.');
+        }
+        if (!Cesium.defined(childY)) {
+            throw new Cesium.DeveloperError('childY is required.');
+        }
+
+        var bitNumber = 2; // northwest child
+        if (childX !== thisX * 2) {
+            ++bitNumber; // east child
+        }
+        if (childY !== thisY * 2) {
+            bitNumber -= 2; // south child
+        }
+
+        return (mask & (1 << bitNumber)) !== 0;
+    };
+
+
 
 PointCloudTileProvider.prototype.computeTileVisibility = function(tile, frameState, occluders) {
     var boundingSphere;
@@ -254,7 +328,9 @@ PointCloudTileProvider.prototype.computeTileVisibility = function(tile, frameSta
 };
 
 PointCloudTileProvider.prototype.showTileThisFrame = function(tile, context, frameState, commandList) {
-    tile.data.primitive.update(context, frameState, commandList);
+    if (tile.data.primitive != null) {
+        tile.data.primitive.update(context, frameState, commandList);
+    }
 };
 
 var subtractScratch = new Cesium.Cartesian3();

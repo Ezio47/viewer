@@ -32,6 +32,7 @@ var myassert = function (condition, message) {
     "use strict";
 
     if (!condition) {
+    myerror(message);
         message = message || "Assertion failed";
         if (typeof Error !== "undefined") {
             throw new Error(message);
