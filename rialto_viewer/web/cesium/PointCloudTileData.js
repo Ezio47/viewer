@@ -1,109 +1,150 @@
-    /* @param {Object} options Object with the following properties:
-     * @param {TypedArray} options.buffer The buffer containing height data.
-     * @param {Number} options.width The width (longitude direction) of the heightmap, in samples.
-     * @param {Number} options.height The height (latitude direction) of the heightmap, in samples.
-     * @param {Number} [options.childTileMask=15] A bit mask indicating which of this tile's four children exist.
-     *                 If a child's bit is set, geometry will be requested for that tile as well when it
-     *                 is needed.  If the bit is cleared, the child tile is not requested and geometry is
-     *                 instead upsampled from the parent.  The bit values are as follows:
-     *                 <table>
-     *                  <tr><th>Bit Position</th><th>Bit Value</th><th>Child Tile</th></tr>
-     *                  <tr><td>0</td><td>1</td><td>Southwest</td></tr>
-     *                  <tr><td>1</td><td>2</td><td>Southeast</td></tr>
-     *                  <tr><td>2</td><td>4</td><td>Northwest</td></tr>
-     *                  <tr><td>3</td><td>8</td><td>Northeast</td></tr>
-     *                 </table>
-     * @param {Object} [options.structure] An object describing the structure of the height data.
-     * @param {Number} [options.structure.heightScale=1.0] The factor by which to multiply height samples in order to obtain
-     *                 the height above the heightOffset, in meters.  The heightOffset is added to the resulting
-     *                 height after multiplying by the scale.
-     * @param {Number} [options.structure.heightOffset=0.0] The offset to add to the scaled height to obtain the final
-     *                 height in meters.  The offset is added after the height sample is multiplied by the
-     *                 heightScale.
-     * @param {Number} [options.structure.elementsPerHeight=1] The number of elements in the buffer that make up a single height
-     *                 sample.  This is usually 1, indicating that each element is a separate height sample.  If
-     *                 it is greater than 1, that number of elements together form the height sample, which is
-     *                 computed according to the structure.elementMultiplier and structure.isBigEndian properties.
-     * @param {Number} [options.structure.stride=1] The number of elements to skip to get from the first element of
-     *                 one height to the first element of the next height.
-     * @param {Number} [options.structure.elementMultiplier=256.0] The multiplier used to compute the height value when the
-     *                 stride property is greater than 1.  For example, if the stride is 4 and the strideMultiplier
-     *                 is 256, the height is computed as follows:
-     *                 `height = buffer[index] + buffer[index + 1] * 256 + buffer[index + 2] * 256 * 256 + buffer[index + 3] * 256 * 256 * 256`
-     *                 This is assuming that the isBigEndian property is false.  If it is true, the order of the
-     *                 elements is reversed.
-     * @param {Boolean} [options.structure.isBigEndian=false] Indicates endianness of the elements in the buffer when the
-     *                  stride property is greater than 1.  If this property is false, the first element is the
-     *                  low-order element.  If it is true, the first element is the high-order element.
-     * @param {Boolean} [options.createdByUpsampling=false] True if this instance was created by upsampling another instance;
-     *                  otherwise, false.
-     *
-     * @see TerrainData
-     * @see QuantizedMeshTerrainData
-     *
-     * @example
-     * var buffer = ...
-     * var heightBuffer = new Uint16Array(buffer, 0, that._heightmapWidth * that._heightmapWidth);
-     * var childTileMask = new Uint8Array(buffer, heightBuffer.byteLength, 1)[0];
-     * var waterMask = new Uint8Array(buffer, heightBuffer.byteLength + 1, buffer.byteLength - heightBuffer.byteLength - 1);
-     * var structure = Cesium.HeightmapTessellator.DEFAULT_STRUCTURE;
-     * var terrainData = new Cesium.HeightmapTerrainData({
-     *   buffer : heightBuffer,
-     *   width : 65,
-     *   height : 65,
-     *   childTileMask : childTileMask,
-     *   structure : structure,
-     *   waterMask : waterMask
-     * });
-     */
-    var PointCloudTileData = function PointCloudTileData(options) {
-        "use strict";
+var PointCloudTileData = function PointCloudTileData(dataview, childMask, header) {
+    "use strict";
+    this._dataview = dataview;
+    this._childMask = childMask;
 
-        if (!Cesium.defined(options) || !defined(options.buffer)) {
-            throw new Cesium.DeveloperError('options.buffer is required.');
+    this._header = header;
+
+    this.numPoints = 0;
+
+    this._buildDimensionArrays();
+};
+
+
+PointCloudTileData.prototype._buildDimensionArrays = function () {
+    "use strict";
+
+    var numBytes = this._dataview.byteLength;
+
+    var headerDims = this._header.dimensions;
+    var i;
+    var datatype,
+        offset,
+        stride,
+        name,
+        v;
+
+    if (numBytes == 0) {
+        this.numPoints = 0;
+    } else {
+        this.numPoints = numBytes / this._header.pointSizeInBytes;
+        myassert(this.numPoints * this._header.pointSizeInBytes == numBytes, 71);
+    }
+
+    this.dimensions = {};
+
+    mylog("num points in tile: " + this.numPoints);
+
+    for (i = 0; i < headerDims.length; i += 1) {
+        datatype = headerDims[i].datatype;
+        offset = headerDims[i].offset;
+        name = headerDims[i].name;
+        stride = this._header.pointSizeInBytes;
+
+        if (this.numPoints == 0) {
+            v = null;
+        } else {
+            v = this._extractDimensionArray(this._dataview, datatype, offset, stride, this.numPoints);
         }
-        if (!Cesium.defined(options.width)) {
-            throw new Cesium.DeveloperError('options.width is required.');
+        this.dimensions[name] = v;
+    }
+
+   // this is the array used to colorize each point
+    var rgba = new Uint8Array(this.numPoints * 4);
+    for (i = 0; i < this.numPoints * 4; i += 1) {
+        rgba[i] = 255;
+    }
+    name = "rgba";
+    this.dimensions[name] = rgba;
+};
+
+
+// Dataview is an array-of-structs: x0, y0, z0, t0, x1, y1, ...
+// Create an array of all the elements from one of the struct fields
+PointCloudTileData.prototype._extractDimensionArray = function (dataview, datatype, offset, stride, len) {
+    "use strict";
+
+    var dst, dstIndex, dvIndex;
+
+    switch (datatype) {
+    case "uint8_t":
+        dst = new Uint8Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getUint8(dvIndex);
         }
-        if (!Cesium.defined(options.height)) {
-            throw new Cesium.DeveloperError('options.height is required.');
+        break;
+    case "int8_t":
+        dst = new Int8Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getInt8(dvIndex);
         }
-
-        this._buffer = options.buffer;
-        this._width = options.width;
-        this._height = options.height;
-        this._childTileMask = defaultValue(options.childTileMask, 15);
-
-        var defaultStructure = HeightmapTessellator.DEFAULT_STRUCTURE;
-        var structure = options.structure;
-        if (!Cesium.defined(structure)) {
-            structure = defaultStructure;
-        } else if (structure !== defaultStructure) {
-            structure.heightScale = defaultValue(structure.heightScale, defaultStructure.heightScale);
-            structure.heightOffset = defaultValue(structure.heightOffset, defaultStructure.heightOffset);
-            structure.elementsPerHeight = defaultValue(structure.elementsPerHeight, defaultStructure.elementsPerHeight);
-            structure.stride = defaultValue(structure.stride, defaultStructure.stride);
-            structure.elementMultiplier = defaultValue(structure.elementMultiplier, defaultStructure.elementMultiplier);
-            structure.isBigEndian = defaultValue(structure.isBigEndian, defaultStructure.isBigEndian);
+        break;
+    case "uint16_t":
+        dst = new Uint16Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getUint16(dvIndex, true);
         }
-
-        this._structure = structure;
-        this._createdByUpsampling = defaultValue(options.createdByUpsampling, false);
-        this._waterMask = options.waterMask;
-    };
-
-
-
-    Object.defineProperties(PointCloudTileData.prototype, {
-        waterMask : {
-            get : function() {
-                return this._waterMask;
-            }
+        break;
+    case "int16_t":
+        dst = new Int16Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getInt16(dvIndex, true);
         }
-    });
+        break;
+    case "uint32_t":
+        dst = new Uint32Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getUint32(dvIndex, true);
+        }
+        break;
+    case "int32_t":
+        dst = new Int32Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getInt32(dvIndex, true);
+        }
+        break;
+    case "uint64_t":
+        dst = new Uint64Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getUint64(dvIndex, true);
+        }
+        break;
+    case "int64_t":
+        dst = new Int64Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getInt64(dvIndex, true);
+        }
+        break;
+    case "float":
+        dst = new Float32Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getFloat32(dvIndex, true);
+        }
+        break;
+    case "double":
+        dst = new Float64Array(len);
+        for (dstIndex = 0, dvIndex = offset; dstIndex < len; dstIndex += 1, dvIndex += stride) {
+            dst[dstIndex] = dataview.getFloat64(dvIndex, true);
+        }
+        break;
+    default:
+        myassert(false, 70);
+        break;
+    }
+    return dst;
+};
 
 
-    var taskProcessor = new Cesium.TaskProcessor('createVerticesFromPointCloudTile');
+Object.defineProperties(PointCloudTileData.prototype, {
+    waterMask : {
+        get : function() {
+            return this._waterMask;
+        }
+    }
+});
+
+
+var taskProcessor = new Cesium.TaskProcessor('createVerticesFromPointCloudTile');
 
 
 

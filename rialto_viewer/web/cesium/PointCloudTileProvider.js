@@ -92,6 +92,8 @@ PointCloudTileProvider.prototype.readHeaderAsync = function () {
 
         provider.header = data;
 
+        provider.header.pointSizeInBytes = that._computePointSize();
+
         that._ready = true;
         deferred.resolve(provider);
 
@@ -103,12 +105,42 @@ PointCloudTileProvider.prototype.readHeaderAsync = function () {
 };
 
 
+PointCloudTileProvider.prototype._computePointSize = function () {
+    "use strict";
+
+    var dims = this.header.dimensions;
+    var tot = 0;
+    var i;
+
+    var sizes = {
+        "uint8_t": 1,
+        "int8_t": 1,
+        "uint16_t": 2,
+        "int16_t": 2,
+        "uint32_t": 4,
+        "int32_t": 4,
+        "uint64_t": 8,
+        "int64_t": 8,
+        "float": 4,
+        "double": 8
+    };
+
+    for (i = 0; i < dims.length; i += 1) {
+        dims[i].offset = tot;
+        myassert(sizes[dims[i].datatype] != undefined);
+        tot += sizes[dims[i].datatype];
+    }
+
+    return tot;
+};
+
+
 PointCloudTileProvider.prototype.beginUpdate = function(context, frameState, commandList) {
-}
+};
 
 
 PointCloudTileProvider.prototype.endUpdate = function(context, frameState, commandList) {
-}
+};
 
 
 
@@ -122,13 +154,49 @@ PointCloudTileProvider.prototype.getLevelMaximumGeometricError = function(level)
 };
 
 
-PointCloudTileProvider.prototype.loadTile = function(context, frameState, tile) {
+// x,y,z as F64 arrays
+// rgba as U8 array
+PointCloudTileProvider.prototype.createPrimitive = function (cnt, dims) {
+    "use strict";mylog("dffffffffffffffffffffffffffff");
+mylog("cnt="+cnt);
+mylog("dims="+dims.length);
+    if (cnt == 0) {
+        return null;
+    }
 
+    var x = dims["X"];
+    var y = dims["Y"];
+    var z = dims["Z"];
+    var rgba = dims["rgba"];
+
+    var xyz = this.Cartesian3_fromDegreesArrayHeights_merge(x, y, z, cnt);
+
+    myassert(this.numPoints == cnt, 39);
+    myassert(xyz.length == cnt * 3, 40);
+    myassert(rgba.length == cnt * 4, 41);
+
+    var pointInstance = new Cesium.GeometryInstance({
+        geometry : new Cesium.PointGeometry({
+            positionsTypedArray: xyz,
+            colorsTypedArray: rgba
+        }),
+        id : 'point'
+    });
+
+    var prim = new Cesium.Primitive({
+        geometryInstances : [pointInstance],
+        appearance : new Cesium.PointAppearance()
+    });
+
+    return prim;
+};
+
+
+
+PointCloudTileProvider.prototype.loadTile = function(context, frameState, tile) {
+var that=this;
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
         mylog("asking for " + tile.x + " " + tile.y + " " + tile.level);
-
-        // returns a promise of a PointCloudData
-        this.requestTileGeometry(tile.x, tile.y, tile.level);
 
         tile.data = {
             primitive : undefined,
@@ -139,30 +207,33 @@ PointCloudTileProvider.prototype.loadTile = function(context, frameState, tile) 
                 }
             }
         };
-        var color = Cesium.Color.fromBytes(255, 0, 0, 255);
 
-        tile.data.primitive = new Cesium.Primitive({
-            geometryInstances : new Cesium.GeometryInstance({
-                geometry : new Cesium.RectangleOutlineGeometry({
-                    rectangle : tile.rectangle
-                }),
-                attributes : {
-                    color : Cesium.ColorGeometryInstanceAttribute.fromColor(color)
-                }
-            }),
-            appearance : new Cesium.PerInstanceColorAppearance({
-                flat : true
-            })
-        });
+        function success(data) {
+                    mylog("aaaa");
 
-        tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
-        tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
-        Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
+            tile.data.primitive = that.createPrimitive(tile.numPoints, tile.dimensions);
+            mylog("bbbb");
 
-        tile.state = Cesium.QuadtreeTileLoadState.LOADING;
+            tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
+            tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
+            Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
+
+
+            tile.state = Cesium.QuadtreeTileLoadState.LOADING;
+        };
+
+
+        function failure(e) {
+            myassert(false, 100);
+        };
+
+        // returns a promise of a PointCloudData
+        var thing = this.requestTileGeometry(tile.x, tile.y, tile.level);
+        Cesium.when(thing, success, failure);
     }
 
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING) {
+
         tile.data.primitive.update(context, frameState, []);
         if (tile.data.primitive.ready) {
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
@@ -220,17 +291,10 @@ PointCloudTileProvider.prototype._getRequestHeader = function() {
 PointCloudTileProvider.prototype._createPointCloudTileData = function(buffer, level, x, y) {
     "use strict";
 
-    mylog("IIIIIIIIIIIIIIIIIIIIIIIIIIIIII: " + buffer);
+     var dataview = new DataView(buffer, 0, buffer.byteLength - 1);
+     var childMask = new Uint8Array(buffer, buffer.byteLength-1, 1)[0];
 
-    var heightBuffer = new Uint16Array(buffer, 0, provider._heightmapWidth * provider._heightmapWidth);
-
-    return new PointCloudTileData({
-        buffer : heightBuffer,
-        childTileMask : new Uint8Array(buffer, heightBuffer.byteLength, 1)[0],
-        width : provider._heightmapWidth,
-        height : provider._heightmapWidth,
-        structure : provider._heightmapStructure
-    });
+     return new PointCloudTileData(dataview, childMask, this.header);
 };
 
 
@@ -267,7 +331,9 @@ PointCloudTileProvider.prototype.requestTileGeometry = function(x, y, level, thr
     }
 
     return Cesium.when(promise, function(buffer) {
-        return that._createPointCloudTileData(buffer, level, x, y);
+
+        var r= that._createPointCloudTileData(buffer, level, x, y);
+         return r;
     });
 };
 
