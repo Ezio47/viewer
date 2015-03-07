@@ -342,23 +342,20 @@ var CesiumBridge = function (element) {
     this._createTileProvider2Async = function(urlarg, colorizeRamp, colorizeDimension, visible) {
         var deferred = Cesium.when.defer();
 
+        var provider;
+
         if (false) {
-
             var options = { url: urlarg };
-            var provider = new PointCloudTileProvider(options);
-            deferred.resolve(provider);
-
+            provider = new PointCloudTileProvider(options);
         } else {
-
-            var provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
-
-            provider.readHeaderAsync().then(function(provider) {
-                deferred.resolve(provider);
-            }).otherwise(function (error) {
-                myerror("Unable to read point cloud header: " + urlarg, error);
-            });
-
+            provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
         }
+
+        provider.readHeaderAsync().then(function(provider) {
+            deferred.resolve(provider);
+        }).otherwise(function (error) {
+            myerror("Unable to read point cloud header: " + urlarg, error);
+        });
 
         return deferred.promise;
     }
@@ -378,6 +375,8 @@ var CesiumBridge = function (element) {
             primitives.add(new Cesium.QuadtreePrimitive({
                 tileProvider : provider
             }));
+
+            mylog("----------" + provider.header.numPoints);
 
             completer(provider);
             return;
