@@ -344,14 +344,13 @@ var CesiumBridge = function (element) {
 
         var provider;
 
-        if (false) {
-            var options = { url: urlarg };
-            provider = new PointCloudTileProvider(options);
+        if (true) {
+            provider = new PPCCProvider(urlarg, colorizeRamp, colorizeDimension, visible);
         } else {
             provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
         }
-
-        provider.readHeaderAsync().then(function(provider) {
+        mylog(provider);
+        provider.readHeaderAsync().then(function(header) {
             deferred.resolve(provider);
         }).otherwise(function (error) {
             myerror("Unable to read point cloud header: " + urlarg, error);
@@ -376,7 +375,7 @@ var CesiumBridge = function (element) {
                 tileProvider : provider
             }));
 
-            mylog("----------" + provider.header.numPoints);
+            mylog("----------" + provider.header.info.numPoints);
 
             completer(provider);
             return;
@@ -400,7 +399,7 @@ var CesiumBridge = function (element) {
     this.getDimensionNamesFromProvider = function (provider) {
         var ret = [];
 
-        var dims = provider.header.dimensions;
+        var dims = provider.header.info.dimensions;
         for (var i=0; i<dims.length; i++) {
             ret.push(dims[i].name);
         }
@@ -410,19 +409,19 @@ var CesiumBridge = function (element) {
 
 
     this.getNumPointsFromProvider = function (provider) {
-        var n = provider.header.numPoints;
+        var n = provider.header.info.numPoints;
         return n;
     }
 
 
     this.getTileBboxFromProvider = function (provider) {
-        var b = provider.header.tilebbox;
+        var b = provider.header.info.tilebbox;
         return b;
     }
 
 
     this.getStatsFromProvider = function (provider, dimName) {
-        var dims = provider.header.dimensions;
+        var dims = provider.header.info.dimensions;
         for (var i=0; i<dims.length; i++) {
             if (dims[i].name == dimName) {
                 var list = [dims[i].min, dims[i].mean, dims[i].max];
