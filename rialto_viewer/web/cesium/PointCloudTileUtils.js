@@ -2,6 +2,11 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
+var tilename = function(tile) {
+    var s = "[" + tile.level + "," + tile.x + "," + tile.y + "]";
+    return s;
+}
+
 
 var PPCCProvider = function PPCCProvider(urlarg, colorizeRamp, colorizeDimension, visible) {
     this._url = urlarg;
@@ -71,8 +76,70 @@ PPCCProvider.prototype.getLevelMaximumGeometricError = function(level) {
 
 
 PPCCProvider.prototype.loadTile = function(context, frameState, tile) {
+    //mylog("?: " + tilename(tile));
+
+    // first, see if we even have the file we need
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
-        mylog("START: " + tile.level + tile.x + tile.y);
+
+        // only one of these will be true
+        var fileDoesNotExist = false;
+        var fileDoesExist = false;
+        var fileMightExist = false;
+
+        if (tile.parent == undefined || tile.parent == null) {
+            // root tile, file will always be present
+            fileDoesExist = true;
+        } else {
+            //mylog("parent of: " + tilename(tile) + " is " + tilename(tile.parent));
+            if (tile.parent.data == undefined || tile.parent.data.ppcc == undefined || !tile.parent.data.ppcc.ready) {
+                // parent not available for us to ask it
+                //fileMightExist = true;
+                fileDoesNotExist = true;
+            } else {
+                var pX = tile.parent.x;
+                var pY = tile.parent.y;
+                var hasChild = tile.parent.data.ppcc.isChildAvailable(pX, pY, tile.x, tile.y);
+                if (hasChild) {
+                    fileDoesExist = true;
+                } else {
+                    fileDoesNotExist = true;
+                }
+            }
+        }
+
+        myassert((fileDoesExist && !fileDoesNotExist && !fileMightExist) ||
+                 (!fileDoesExist && fileDoesNotExist && !fileMightExist) ||
+                 (!fileDoesExist && !fileDoesNotExist && fileMightExist));
+
+        if (fileDoesExist) {
+            // just drop through to below
+            //mylog("OK to start: " + tilename(tile));
+        } else if (fileDoesNotExist) {
+            tile.renderable = true;
+            tile.state = Cesium.QuadtreeTileLoadState.DONE;
+        tile.data = {
+            primitive : undefined,
+            freeResources : function() {
+                if (Cesium.defined(this.primitive)) {
+                    this.primitive.destroy();
+                    this.primitive = undefined;
+                }
+            }
+        };
+        tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
+        tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
+        Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
+            //mylog("DONE/dne: " + tilename(tile));
+            return;
+        } else {
+            // state unknown right now
+            //mylog("UNK: " + tilename(tile));
+            return;
+        }
+    }
+
+    if (tile.state === Cesium.QuadtreeTileLoadState.START) {
+        //mylog("START: " + tilename(tile));
 
         tile.data = {
             primitive : undefined,
@@ -105,23 +172,22 @@ PPCCProvider.prototype.loadTile = function(context, frameState, tile) {
         Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
         tile.state = Cesium.QuadtreeTileLoadState.LOADING;
         myassert(tile.data.ppcc != null);
-        mylog("LOADING: " + tile.level + tile.x + tile.y);
+        //mylog("LOADING: " + tilename(tile));
     }
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING && tile.data.ppcc.ready) {
-        mylog("?: " + tile.level + tile.x + tile.y);
 
         tile.data.primitive = tile.data.ppcc.primitive;
 
         if (tile.data.primitive == null) {
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
-            tile.renderable = false;
-            mylog("DONE/false: " + tile.level + tile.x + tile.y);
+            tile.renderable = true;
+            //mylog("DONE/0: " + tilename(tile));
         } else {
             tile.data.primitive.update(context, frameState, []);
             if (tile.data.primitive.ready) {
                 tile.state = Cesium.QuadtreeTileLoadState.DONE;
                 tile.renderable = true;
-                mylog("DONE/true: " + tile.level + tile.x + tile.y);
+                //mylog("DONE/ok: " + tilename(tile));
             }
         }
     }
@@ -140,6 +206,8 @@ PPCCProvider.prototype.computeTileVisibility = function(tile, frameState, occlud
 
 
 PPCCProvider.prototype.showTileThisFrame = function(tile, context, frameState, commandList) {
+    //mylog("prim update: " + tilename(tile));
+    if (tile.data.primitive != null)
     tile.data.primitive.update(context, frameState, commandList);
 };
 
@@ -284,6 +352,7 @@ var PPCCTile = function PPCCTile(header, level, x, y) {
     this.se = false;
     this.nw = false;
     this.ne = false;
+    this._childTileMask = undefined;
 
     this._ready = false;
 }
@@ -329,7 +398,7 @@ Object.defineProperties(PPCCTile.prototype, {
 PPCCTile.prototype.load = function() {
    "use strict";
 
-    //mylog("loading " + this.level + this.x + this.y);
+    //mylog("loading " + tilename(this));
 
     var that = this;
 
@@ -343,7 +412,7 @@ PPCCTile.prototype.load = function() {
             that.colorize();
             that._primitive = that.createPrimitive(that.numPoints, that.dimensions);
             that._ready = true;
-            mylog("ready: " + that.level + that.x + that.y);
+            //mylog("ready: " + tilename(that));
         });
         reader.readAsArrayBuffer(blob);
 
@@ -355,8 +424,6 @@ PPCCTile.prototype.load = function() {
 
 PPCCTile.prototype._loadFromBuffer = function (buffer) {
     "use strict";
-
-    //mylog("addding " + t.level + t.x + t.y);
 
     var level = this.level;
     var x = this.x;
@@ -504,6 +571,8 @@ PPCCTile.prototype._extractDimensionArray = function (dataview, datatype, offset
 PPCCTile.prototype._setChildren = function (mask) {
     //mylog("mask is " + mask);
 
+    this._childTileMask = mask;
+
     var level = this.level;
     var x = this.x;
     var y = this.y;
@@ -524,6 +593,13 @@ PPCCTile.prototype._setChildren = function (mask) {
         // (level + 1, 2 * x, 2 * y);
         this.nw = true;
     }
+
+    myassert(this.isChildAvailable(x, y, x*2, y*2+1) == this.sw, "SW");
+    myassert(this.isChildAvailable(x, y, x*2+1, y*2+1) == this.se, "SE");
+    myassert(this.isChildAvailable(x, y, x*2+1, y*2) == this.ne, "NE");
+    myassert(this.isChildAvailable(x, y, x*2, y*2) == this.nw, "NW");
+
+    //mylog("children of " + tilename(this) + ": " + this.sw + this.se + this.ne + this.nw);
 }
 
 
@@ -609,3 +685,26 @@ PPCCTile.prototype.colorize = function () {
 
     doColorize(this._header.rampName, dataArray, this.numPoints, min, max, rgbaArray);
 };
+
+
+PPCCTile.prototype.isChildAvailable = function(thisX, thisY, childX, childY) {
+
+    var x = thisX;
+    var y = thisY;
+
+    if (childX == x*2 && childY == y*2+1) return this.sw;
+    if (childX == x*2+1 && childY == y*2+1) return this.se;
+    if (childX == x*2+1 && childY == y*2) return this.ne;
+    if (childX == x*2 && childY == y*2) return this.nw;
+    return false;
+
+        var bitNumber = 2; // northwest child
+        if (childX !== thisX * 2) {
+            ++bitNumber; // east child
+        }
+        if (childY !== thisY * 2) {
+            bitNumber -= 2; // south child
+        }
+
+        return (this._childTileMask & (1 << bitNumber)) !== 0;
+    };
