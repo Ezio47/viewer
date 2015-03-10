@@ -375,7 +375,7 @@ var CesiumBridge = function (element) {
                 tileProvider : provider
             }));
 
-            mylog("----------" + provider.header.numPoints);
+            //mylog("----------" + provider.header.numPoints);
 
             completer(provider);
             return;

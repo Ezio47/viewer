@@ -12,6 +12,7 @@ var PointCloudTile = function PointCloudTile(provider, level, x, y) {
     this._primitive = undefined;
     this.url = this._provider._url + "/" + level + "/" + x + "/" + y + ".ria";
     this.dimensions = undefined; // list of arrays of dimension data
+
     this.sw = false;
     this.se = false;
     this.nw = false;
@@ -54,6 +55,12 @@ Object.defineProperties(PointCloudTile.prototype, {
             "use strict";
             return this._y;
         }
+    },
+    name : {
+        get : function () {
+            "use strict";
+            return "[" + tile.level + "," + tile.x + "," + tile.y + "]";
+        }
     }
 });
 
@@ -62,7 +69,7 @@ Object.defineProperties(PointCloudTile.prototype, {
 PointCloudTile.prototype.load = function() {
    "use strict";
 
-    //mylog("loading " + tilename(this));
+    //mylog("loading " + this.name);
 
     var that = this;
 
@@ -76,7 +83,7 @@ PointCloudTile.prototype.load = function() {
             that.colorize();
             that._primitive = that.createPrimitive(that.numPoints, that.dimensions);
             that._ready = true;
-            //mylog("ready: " + tilename(that));
+            //mylog("ready: " + that.name);
         });
         reader.readAsArrayBuffer(blob);
 
@@ -263,7 +270,7 @@ PointCloudTile.prototype._setChildren = function (mask) {
     myassert(this.isChildAvailable(x, y, x*2+1, y*2) == this.ne, "NE");
     myassert(this.isChildAvailable(x, y, x*2, y*2) == this.nw, "NW");
 
-    //mylog("children of " + tilename(this) + ": " + this.sw + this.se + this.ne + this.nw);
+    //mylog("children of " + this.name + ": " + this.sw + this.se + this.ne + this.nw);
 }
 
 
@@ -348,33 +355,18 @@ PointCloudTile.prototype.colorize = function () {
     var rgbaArray = this.dimensions[rgba];
 
     doColorize(this._provider.rampName, dataArray, this.numPoints, min, max, rgbaArray);
-};
+}
 
 
-PointCloudTile.prototype.isChildAvailable = function(thisX, thisY, childX, childY) {
+PointCloudTile.prototype.isChildAvailable = function(parentX, parentY, childX, childY) {
 
-    var x = thisX;
-    var y = thisY;
+    if (childX == parentX * 2) {
+        if (childY == parentY * 2) return this.nw;
+        if (childY == parentY * 2 + 1) return this.sw;
+    } else if (childX == parentX * 2 + 1) {
+        if (childY == parentY * 2) return this.ne;
+        if (childY == parentY * 2 + 1) return this.se;
+    }
 
-    if (childX == x*2 && childY == y*2+1) return this.sw;
-    if (childX == x*2+1 && childY == y*2+1) return this.se;
-    if (childX == x*2+1 && childY == y*2) return this.ne;
-    if (childX == x*2 && childY == y*2) return this.nw;
     return false;
-
-        var bitNumber = 2; // northwest child
-        if (childX !== thisX * 2) {
-            ++bitNumber; // east child
-        }
-        if (childY !== thisY * 2) {
-            bitNumber -= 2; // south child
-        }
-
-        return (this._childTileMask & (1 << bitNumber)) !== 0;
-};
-
-
-var tilename = function(tile) {
-    var s = "[" + tile.level + "," + tile.x + "," + tile.y + "]";
-    return s;
 };

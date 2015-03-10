@@ -54,27 +54,9 @@ Object.defineProperties(PointCloudProvider.prototype, {
 });
 
 
-PointCloudProvider.prototype.readHeaderAsync = function() {
-
-    var deferred = Cesium.when.defer();
-
-    var that = this;
-
-    this.readHeaderAsync2().then(function(hdr) {
-        deferred.resolve(hdr);
-
-    }).otherwise(function() {
-        myassert(false);
-    });
-
-    return deferred.promise;
-}
-
-
-
 // will set this.ready when done
 // returns a promise of this header
-PointCloudProvider.prototype.readHeaderAsync2 = function () {
+PointCloudProvider.prototype.readHeaderAsync = function () {
     "use strict";
 
     var deferred = Cesium.when.defer();
@@ -95,7 +77,6 @@ PointCloudProvider.prototype.readHeaderAsync2 = function () {
 
     return deferred.promise;
 };
-
 
 
 PointCloudProvider.prototype.setColorization = function (rampName, dimensionName) {
@@ -158,105 +139,107 @@ PointCloudProvider.prototype.getLevelMaximumGeometricError = function(level) {
 };
 
 
+// returns:
+//   true - file does exist
+//   false - file does not exist
+//   null - file might or might not exist
+PointCloudProvider.prototype.checkExistence = function(tile) {
+
+    // only one of these will be true
+    var fileDoesNotExist = false;
+    var fileDoesExist = false;
+    var fileMightExist = false;
+
+    if (tile.parent == undefined || tile.parent == null) {
+        // root tile, file will always be present
+        fileDoesExist = true;
+    } else {
+        //mylog("parent of: " + tile.name + " is " + tile.parent.name);
+        if (tile.parent.data == undefined || tile.parent.data.ppcc == undefined || !tile.parent.data.ppcc.ready) {
+            // parent not available for us to ask it
+            //fileMightExist = true;
+            fileDoesNotExist = true;
+        } else {
+            var pX = tile.parent.x;
+            var pY = tile.parent.y;
+            var hasChild = tile.parent.data.ppcc.isChildAvailable(pX, pY, tile.x, tile.y);
+            if (hasChild) {
+                fileDoesExist = true;
+            } else {
+                fileDoesNotExist = true;
+            }
+        }
+    }
+
+    myassert((fileDoesExist && !fileDoesNotExist && !fileMightExist) ||
+             (!fileDoesExist && fileDoesNotExist && !fileMightExist) ||
+             (!fileDoesExist && !fileDoesNotExist && fileMightExist));
+
+    if (fileDoesExist) return true;
+    if (fileDoesNotExist) return false;
+    return null;
+}
+
+
+PointCloudProvider.prototype.initTileData = function(tile) {
+
+    tile.data = {
+        primitive : undefined,
+        freeResources : function() {
+            if (Cesium.defined(this.primitive)) {
+                this.primitive.destroy();
+                this.primitive = undefined;
+            }
+        }
+    };
+
+    tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
+    tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
+    Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
+}
+
+
 PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
-    //mylog("?: " + tilename(tile));
+    //mylog("?: " + tile.name);
 
     // first, see if we even have the file we need
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
+        var exists = this.checkExistence(tile);
 
-        // only one of these will be true
-        var fileDoesNotExist = false;
-        var fileDoesExist = false;
-        var fileMightExist = false;
-
-        if (tile.parent == undefined || tile.parent == null) {
-            // root tile, file will always be present
-            fileDoesExist = true;
-        } else {
-            //mylog("parent of: " + tilename(tile) + " is " + tilename(tile.parent));
-            if (tile.parent.data == undefined || tile.parent.data.ppcc == undefined || !tile.parent.data.ppcc.ready) {
-                // parent not available for us to ask it
-                //fileMightExist = true;
-                fileDoesNotExist = true;
-            } else {
-                var pX = tile.parent.x;
-                var pY = tile.parent.y;
-                var hasChild = tile.parent.data.ppcc.isChildAvailable(pX, pY, tile.x, tile.y);
-                if (hasChild) {
-                    fileDoesExist = true;
-                } else {
-                    fileDoesNotExist = true;
-                }
-            }
+        if (exists == null) {
+            // state unknown right now
+            //mylog("UNK: " + tile.name);
+            return;
         }
 
-        myassert((fileDoesExist && !fileDoesNotExist && !fileMightExist) ||
-                 (!fileDoesExist && fileDoesNotExist && !fileMightExist) ||
-                 (!fileDoesExist && !fileDoesNotExist && fileMightExist));
-
-        if (fileDoesExist) {
-            // just drop through to below
-            //mylog("OK to start: " + tilename(tile));
-        } else if (fileDoesNotExist) {
+        if (exists == false) {
+            this.initTileData(tile);
             tile.renderable = true;
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
-        tile.data = {
-            primitive : undefined,
-            freeResources : function() {
-                if (Cesium.defined(this.primitive)) {
-                    this.primitive.destroy();
-                    this.primitive = undefined;
-                }
-            }
-        };
-        tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
-        tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
-        Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
-            //mylog("DONE/dne: " + tilename(tile));
-            return;
-        } else {
-            // state unknown right now
-            //mylog("UNK: " + tilename(tile));
+
+            //mylog("DONE/dne: " + tile.name);
             return;
         }
+
+        myassert(exists == true);
+        // just drop through to below
+
+        //mylog("OK to start: " + tile.name);
     }
 
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
-        //mylog("START: " + tilename(tile));
+        //mylog("START: " + tile.name);
 
-        tile.data = {
-            primitive : undefined,
-            freeResources : function() {
-                if (Cesium.defined(this.primitive)) {
-                    this.primitive.destroy();
-                    this.primitive = undefined;
-                }
-            }
-        };
-        /*var color = Cesium.Color.fromBytes(255, 0, 0, 255);
-        tile.data.primitive = new Cesium.Primitive({
-            geometryInstances : new Cesium.GeometryInstance({
-                geometry : new Cesium.RectangleOutlineGeometry({
-                    rectangle : tile.rectangle
-                }),
-                attributes : {
-                    color : Cesium.ColorGeometryInstanceAttribute.fromColor(color)
-                }
-            }),
-            appearance : new Cesium.PerInstanceColorAppearance({
-                flat : true
-            })
-        });*/
+        this.initTileData(tile);
+
         tile.data.ppcc = new PointCloudTile(this, tile.level, tile.x, tile.y);
         tile.data.ppcc.load();
 
-        tile.data.boundingSphere3D = Cesium.BoundingSphere.fromRectangle3D(tile.rectangle);
-        tile.data.boundingSphere2D = Cesium.BoundingSphere.fromRectangle2D(tile.rectangle, frameState.mapProjection);
-        Cesium.Cartesian3.fromElements(tile.data.boundingSphere2D.center.z, tile.data.boundingSphere2D.center.x, tile.data.boundingSphere2D.center.y, tile.data.boundingSphere2D.center);
         tile.state = Cesium.QuadtreeTileLoadState.LOADING;
         myassert(tile.data.ppcc != null);
-        //mylog("LOADING: " + tilename(tile));
+        //mylog("LOADING: " + tile.name);
     }
+
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING && tile.data.ppcc.ready) {
 
         tile.data.primitive = tile.data.ppcc.primitive;
@@ -264,13 +247,13 @@ PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
         if (tile.data.primitive == null) {
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
             tile.renderable = true;
-            //mylog("DONE/0: " + tilename(tile));
+            //mylog("DONE/0: " + tile.name);
         } else {
             tile.data.primitive.update(context, frameState, []);
             if (tile.data.primitive.ready) {
                 tile.state = Cesium.QuadtreeTileLoadState.DONE;
                 tile.renderable = true;
-                //mylog("DONE/ok: " + tilename(tile));
+                //mylog("DONE/ok: " + tile.name);
             }
         }
     }
@@ -289,9 +272,10 @@ PointCloudProvider.prototype.computeTileVisibility = function(tile, frameState, 
 
 
 PointCloudProvider.prototype.showTileThisFrame = function(tile, context, frameState, commandList) {
-    //mylog("prim update: " + tilename(tile));
-    if (tile.data.primitive != null)
-    tile.data.primitive.update(context, frameState, commandList);
+    //mylog("prim update: " + tile.name);
+    if (tile.data.primitive != null) {
+        tile.data.primitive.update(context, frameState, commandList);
+    }
 };
 
 
