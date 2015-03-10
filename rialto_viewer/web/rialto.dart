@@ -17,25 +17,17 @@ import 'package:vector_math/vector_math.dart';
 import 'package:yaml/yaml.dart';
 import 'package:xml/xml.dart' as Xml;
 
-part 'annotation_controller.dart';
 part 'commands.dart';
 part 'comms.dart';
 part 'config_script.dart';
 part 'event_registry.dart';
 part 'hub.dart';
 part 'layer_manager.dart';
-part 'measurement_controller.dart';
-part 'mode_controller.dart';
-part 'view_controller.dart';
-part 'viewshed_controller.dart';
+part 'viewshedder.dart';
 
-part 'cesium/annotation_shape.dart';
 part 'cesium/bbox_shape.dart';
 part 'cesium/camera.dart';
 part 'cesium/cesium_bridge.dart';
-part 'cesium/measurement_shape.dart';
-part 'cesium/shape.dart';
-part 'cesium/viewshed_shape.dart';
 
 part 'layers/layer.dart';
 part 'layers/base_imagery_layer.dart';
@@ -69,7 +61,6 @@ part 'viewmodels/dialog_vm.dart';
 part 'viewmodels/load_configuration_dialog_vm.dart';
 part 'viewmodels/info_dialog_vm.dart';
 part 'viewmodels/list_box_vm.dart';
-part 'viewmodels/modal_buttons_vm.dart';
 part 'viewmodels/layer_manager_dialog_vm.dart';
 part 'viewmodels/rialto_element.dart';
 part 'viewmodels/text_input_vm.dart';

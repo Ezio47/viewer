@@ -181,7 +181,7 @@ PointCloudProvider.prototype.checkExistence = function(tile) {
 }
 
 
-PointCloudProvider.prototype.initTileData = function(tile) {
+PointCloudProvider.prototype.initTileData = function(tile, frameState) {
 
     tile.data = {
         primitive : undefined,
@@ -213,7 +213,7 @@ PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
         }
 
         if (exists == false) {
-            this.initTileData(tile);
+            this.initTileData(tile, frameState);
             tile.renderable = true;
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
 
@@ -230,7 +230,7 @@ PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
         //mylog("START: " + tile.name);
 
-        this.initTileData(tile);
+        this.initTileData(tile, frameState);
 
         tile.data.ppcc = new PointCloudTile(this, tile.level, tile.x, tile.y);
         tile.data.ppcc.load();

@@ -4,16 +4,27 @@
 
 part of rialto.viewer;
 
+class BboxShape {
+    Hub _hub;
 
-class BboxShape extends Shape {
+    var primitive;
+
     Cartographic3 _point1, _point2;
 
-    BboxShape(Cartographic3 this._point1, Cartographic3 this._point2) : super("bbox") {
+    BboxShape(this._point1, this._point2) {
+        _hub = Hub.root;
         primitive = _createCesiumObject();
     }
 
-    @override
+    bool get isVisible => _hub.cesium.isPrimitiveVisible(primitive);
+
+    set isVisible(bool value) => _hub.cesium.setPrimitiveVisible(primitive, value);
+
     dynamic _createCesiumObject() {
         return _hub.cesium.createBbox(_point1, _point2);
+    }
+
+    void remove() {
+        _hub.cesium.remove(primitive);
     }
 }

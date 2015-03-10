@@ -22,19 +22,34 @@ class RialtoElement {
                 "#homeDataButton").onClick.listen(
                         (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraViewMode.dataviewMode)));
 
+        querySelector(
+                 "#viewshedCircleButton").onClick.listen(
+                        (ev) => _hub.commands.createViewshedCircle());
+        querySelector(
+                 "#viewshedComputeButton").onClick.listen(
+                        (ev) => _hub.commands.computeViewshed());
+
+        querySelector(
+                 "#linearMeasurementButton").onClick.listen(
+                        (ev) => _hub.commands.computeLinearMeasurement());
+        querySelector(
+                 "#areaMeasurementButton").onClick.listen(
+                        (ev) => _hub.commands.computeAreaMeasurement());
+
+        querySelector(
+                 "#dropPinButton").onClick.listen(
+                        (ev) => _hub.commands.dropPin());
+
+        querySelector(
+                 "#drawExtentButton").onClick.listen(
+                        (ev) => _hub.commands.drawExtent());
+
         var modeButton2D = querySelector("#modeButton2D");
         var modeButton25D = querySelector("#modeButton25D");
         var modeButton3D = querySelector("#modeButton3D");
         modeButton2D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
         modeButton25D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
         modeButton3D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
-
-        new ModalButtonsVM({
-            querySelector("#viewModeButton"): new ModeData(ModeDataCodes.view),
-            querySelector("#annotateModeButton"): new ModeData(ModeDataCodes.annotation),
-            querySelector("#measureModeButton"): new ModeData(ModeDataCodes.measurement),
-            querySelector("#viewshedModeButton"): new ModeData(ModeDataCodes.viewshed)
-        }, querySelector("#viewModeButton"));
 
         new LoadConfigurationDialogVM("#loadConfigurationDialog");
         new LayerManagerDialogVM("#layerManagerDialog");

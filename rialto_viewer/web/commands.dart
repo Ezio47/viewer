@@ -11,6 +11,48 @@ class Commands {
 
   Commands() : _hub = Hub.root;
 
+  void createViewshedCircle() {
+    _hub.cesium.drawCircle(
+        (longitude, latitude, height, radius) => _hub.viewshedCircles.add([longitude, latitude, height, radius]));
+  }
+
+  void computeViewshed() {
+    for (var v in _hub.viewshedCircles) {
+      double obsLon = v[0];
+      double obsLat = v[1];
+      //double obsHeight = v[2];
+      var radius = v[3];
+
+      Viewshedder.callWps(obsLon, obsLat, radius);
+    }
+  }
+
+  void computeLinearMeasurement() {
+      _hub.cesium.drawPolyline((positions) {
+          log("Length: " + positions);
+          _hub.computeLength(positions);
+      });
+  }
+
+  void computeAreaMeasurement() {
+      _hub.cesium.drawPolygon((positions) {
+          log("Area: " + positions);
+          _hub.computeArea(positions);
+      });
+  }
+
+  void dropPin() {
+      _hub.cesium.drawMarker((position) {
+          log("Pin: " + position);
+      });
+  }
+
+  void drawExtent() {
+      _hub.cesium.drawExtent((n, s, e,w) {
+          log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
+      });
+  }
+
   Future<Layer> addLayer(LayerData data) {
     return _hub.layerManager.doAddLayer(data);
   }
@@ -76,11 +118,6 @@ class Commands {
     return new Future(() {});
   }
 
-  Future changeMode(ModeData data) {
-    _hub.modeController.doChangeMode(data);
-    return new Future(() {});
-  }
-
   // given a list of things, run a function F against each one, in order
   // and with an explicit wait between each one
   //
@@ -137,21 +174,6 @@ class LayerData {
   String name;
   Map map;
   LayerData(String this.name, Map this.map);
-}
-
-enum ModeDataCodes { invalid, measurement, view, annotation, viewshed }
-
-class ModeData {
-  static final name = {
-    ModeDataCodes.measurement: "measurement",
-    ModeDataCodes.view: "view",
-    ModeDataCodes.annotation: "annotation",
-    ModeDataCodes.viewshed: "viewshed"
-  };
-
-  ModeDataCodes type;
-
-  ModeData(ModeDataCodes this.type);
 }
 
 class WpsExecuteProcessData {

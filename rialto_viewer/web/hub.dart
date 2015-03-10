@@ -25,7 +25,6 @@ class Hub {
     // globals
     EventRegistry events;
     Commands commands;
-    ModeController modeController;
     CesiumBridge cesium;
     JsBridge js;
     WpsService wps;
@@ -38,9 +37,7 @@ class Hub {
     // privates
     BboxShape _bboxShape;
 
-    // TODO: make private
-    List<Annotation> annotations = new List<Annotation>();
-    List<Measurement> measurements = new List<Measurement>();
+    List viewshedCircles = new List();
 
     static Hub get root {
         assert(_root != null);
@@ -59,30 +56,16 @@ class Hub {
         commands = new Commands();
 
         layerManager = new LayerManager();
-        modeController = new ModeController();
 
         cesium = new CesiumBridge('cesiumContainer');
 
         new RialtoElement();
 
         cesium.onMouseMove((num x, num y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
-        cesium.onMouseDown((num x, num y, int b) => events.MouseDown.fire(new MouseData.fromXyb(x, y, b)));
-        cesium.onMouseUp((num x, num y, int b) => events.MouseUp.fire(new MouseData.fromXyb(x, y, b)));
-        cesium.onMouseWheel((num d) => events.MouseWheel.fire(new WheelData.fromD(d)));
-        // onKeyDown...
-        // onKeyUp...
-        // onResize...
 
         events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
 
-        new ViewController();
-        new AnnotationController();
-        new MeasurementController();
-        new ViewshedController();
-
         camera = new Camera();
-
-        commands.changeMode(new ModeData(ModeDataCodes.view));
 
         events.AdvancedSettingsChanged.subscribe((data) => _bboxShape.isVisible = data.showBbox);
         events.AdvancedSettingsChanged.subscribe((data) => displayPrecision = data.displayPrecision);
@@ -98,6 +81,14 @@ class Hub {
     void displayBbox(bool v) {
         if (_bboxShape == null) return;
         _bboxShape.isVisible = v;
+    }
+
+    void computeLength(var positions) {
+
+    }
+
+    void computeArea(var positions) {
+
     }
 
     static void error(String text, {Map<String, dynamic> info: null, Object object: null}) {

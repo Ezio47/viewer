@@ -48,24 +48,97 @@ var CesiumBridge = function (element) {
     //
     //---------------------------------------------------------------------------------------------
 
-    this.createDrawHelper = function (element) {
+    this.drawCircle = function(cb) {
         var scene = this.viewer.scene;
 
-        var loggingMessage = mylog;
+        var f = function(center, radius) {
+            var circle = new DrawHelper.CirclePrimitive({
+                center: center,
+                radius: radius,
+                material: Cesium.Material.fromType(Cesium.Material.RimLightingType)
+            });
+            scene.primitives.add(circle);
+            circle.setEditable();
 
-        var drawHelper = new DrawHelper(scene, element);
+            if (cb) {
+                var ellipsoid = scene.globe.ellipsoid;
+                var cartographic = ellipsoid.cartesianToCartographic(center);
+                var lon = Cesium.Math.toDegrees(cartographic.longitude);
+                var lat = Cesium.Math.toDegrees(cartographic.latitude);
+                var h = cartographic.height;
+                cb(lon, lat, h, radius);
+            }
+        };
 
-        var toolbar = drawHelper.addToolbar(document.getElementById("drawHelperToolbar"), {
-            buttons: ['marker', 'polyline', 'polygon', 'circle', 'extent']
+        this.drawHelper.startDrawingCircle({
+            callback:f
         });
-        toolbar.addListener('markerCreated', function(event) {
-            loggingMessage('Marker created at ' + event.position.toString());
-            // create one common billboard collection for all billboards
+    }
+
+    var flattenCartesianList = function(list) {
+        var result = [];
+        for (var i=0; i<list.length; i++) {
+            result.push(list[i].x);
+            result.push(list[i].y);
+            result.push(list[i].z);
+        }
+        return result;
+    }
+
+    this.drawPolyline = function(cb) {
+        var scene = this.viewer.scene;
+
+        var f = function (positions) {
+            var polyline = new DrawHelper.PolylinePrimitive({
+                positions: positions,
+                width: 5,
+                geodesic: true
+            });
+            scene.primitives.add(polyline);
+            polyline.setEditable();
+
+            if (cb) {
+                var p = flattenCartesianList(positions);
+                cb(p);
+            }
+        };
+
+        this.drawHelper.startDrawingPolyline({
+            callback:f
+        });
+    }
+
+    this.drawPolygon = function(cb) {
+        var scene = this.viewer.scene;
+
+        var f = function (positions) {
+             var polygon = new DrawHelper.PolygonPrimitive({
+                positions: positions,
+                material : Cesium.Material.fromType('Checkerboard')
+            });
+            scene.primitives.add(polygon);
+            polygon.setEditable();
+
+            if (cb) {
+                var p = flattenCartesianList(positions);
+                cb(p);
+            }
+        };
+
+        this.drawHelper.startDrawingPolygon({
+            callback:f
+        });
+    }
+
+    this.drawMarker = function(cb) {
+        var scene = this.viewer.scene;
+
+        var f = function (position) {
             var b = new Cesium.BillboardCollection();
             scene.primitives.add(b);
             var billboard = b.add({
                 show : true,
-                position : event.position,
+                position : position,
                 pixelOffset : new Cesium.Cartesian2(0, 0),
                 eyeOffset : new Cesium.Cartesian3(0.0, 0.0, 0.0),
                 horizontalOrigin : Cesium.HorizontalOrigin.CENTER,
@@ -75,58 +148,45 @@ var CesiumBridge = function (element) {
                 color : new Cesium.Color(1.0, 1.0, 1.0, 1.0)
             });
             billboard.setEditable();
+
+            if (cb) {
+                cb(position);
+            }
+        };
+
+        this.drawHelper.startDrawingMarker({
+            callback:f
         });
-        toolbar.addListener('polylineCreated', function(event) {
-            loggingMessage('Polyline created with ' + event.positions.length + ' points');
-            var polyline = new DrawHelper.PolylinePrimitive({
-                positions: event.positions,
-                width: 5,
-                geodesic: true
-            });
-            scene.primitives.add(polyline);
-            polyline.setEditable();
-            polyline.addListener('onEdited', function(event) {
-                loggingMessage('Polyline edited, ' + event.positions.length + ' points');
-            });
-        });
-        toolbar.addListener('polygonCreated', function(event) {
-            loggingMessage('Polygon created with ' + event.positions.length + ' points');
-            var polygon = new DrawHelper.PolygonPrimitive({
-                positions: event.positions,
-                material : Cesium.Material.fromType('Checkerboard')
-            });
-            scene.primitives.add(polygon);
-            polygon.setEditable();
-            polygon.addListener('onEdited', function(event) {
-                loggingMessage('Polygon edited, ' + event.positions.length + ' points');
-            });
-        });
-        toolbar.addListener('circleCreated', function(event) {
-            loggingMessage('Circle created: center is ' + event.center.toString() + ' and radius is ' + event.radius.toFixed(1) + ' meters');
-            var circle = new DrawHelper.CirclePrimitive({
-                center: event.center,
-                radius: event.radius,
-                material: Cesium.Material.fromType(Cesium.Material.RimLightingType)
-            });
-            scene.primitives.add(circle);
-            circle.setEditable();
-            circle.addListener('onEdited', function(event) {
-                loggingMessage('Circle edited: radius is ' + event.radius.toFixed(1) + ' meters');
-            });
-        });
-        toolbar.addListener('extentCreated', function(event) {
-            var extent = event.extent;
-            loggingMessage('Extent created (N: ' + extent.north.toFixed(3) + ', E: ' + extent.east.toFixed(3) + ', S: ' + extent.south.toFixed(3) + ', W: ' + extent.west.toFixed(3) + ')');
+    }
+
+    this.drawExtent = function(cb) {
+        var scene = this.viewer.scene;
+
+        var f = function (extent) {
             var extentPrimitive = new DrawHelper.ExtentPrimitive({
                 extent: extent,
                 material: Cesium.Material.fromType(Cesium.Material.StripeType)
             });
             scene.primitives.add(extentPrimitive);
             extentPrimitive.setEditable();
-            extentPrimitive.addListener('onEdited', function(event) {
-                loggingMessage('Extent edited: extent is (N: ' + event.extent.north.toFixed(3) + ', E: ' + event.extent.east.toFixed(3) + ', S: ' + event.extent.south.toFixed(3) + ', W: ' + event.extent.west.toFixed(3) + ')');
-            });
+
+            if (cb) {
+                cb(extent.north, extent.south, extent.east, extent.west);
+            }
+        };
+
+        this.drawHelper.startDrawingExtent({
+            callback:f
         });
+    }
+
+
+    this.createDrawHelper = function (element) {
+        var scene = this.viewer.scene;
+
+        var loggingMessage = mylog;
+
+        this.drawHelper = new DrawHelper(scene, element);
     }
 
 
@@ -503,74 +563,7 @@ var CesiumBridge = function (element) {
 
 
     this.setPrimitiveVisible = function(primitive, value) {
-        //mylog("was " + primitive.show);
         primitive.show = value;
-        //mylog("now " + primitive.show);
-    }
-
-
-    this.createRectangle = function(x1, y1, x2, y2, colorR, colorG, colorB) {
-        var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
-        var scene = this.viewer.scene;
-        var primitives = scene.primitives;
-        var solidWhite = Cesium.ColorGeometryInstanceAttribute.fromColor(color);
-
-        var rectangle = Cesium.Rectangle.fromDegrees(x1, y1, x2, y2);
-
-        var rectangleInstance = new Cesium.GeometryInstance({
-                geometry : new Cesium.RectangleOutlineGeometry({
-                rectangle : rectangle
-            }),
-            attributes : {
-                color : solidWhite
-            }
-        });
-        var appearance = new Cesium.PerInstanceColorAppearance({
-                    flat : true,
-                    translucent : false,
-                    renderState : {
-                        lineWidth : Math.min(2.0, scene.maximumAliasedLineWidth)
-                    }
-                });
-        var prim = primitives.add(new Cesium.Primitive({
-                geometryInstances : [rectangleInstance],
-                appearance : appearance
-        }));
-        return prim;
-    }
-
-
-    this.createCircle = function(centerLon, centerLat, pointLon, pointLat, colorR, colorG, colorB) {
-        var center = Cesium.Cartesian3.fromDegrees(centerLon, centerLat);
-        var point = Cesium.Cartesian3.fromDegrees(pointLon, pointLat);
-        var radius = Cesium.Cartesian3.distance(center, point);
-
-        var color = new Cesium.Color(colorR, colorG, colorB, 0.5);
-        var scene = this.viewer.scene;
-        var primitives = scene.primitives;
-        var solidWhite = Cesium.ColorGeometryInstanceAttribute.fromColor(color);
-
-        var circleInstance = new Cesium.GeometryInstance({
-                geometry : new Cesium.CircleGeometry({
-                center: center,
-                radius: radius
-            }),
-            attributes : {
-                color : solidWhite
-            }
-        });
-        var appearance = new Cesium.PerInstanceColorAppearance({
-                    flat : true,
-                    translucent : true,
-                    renderState : {
-                        lineWidth : Math.min(2.0, scene.maximumAliasedLineWidth)
-                    }
-                });
-        var prim = primitives.add(new Cesium.Primitive({
-                geometryInstances : [circleInstance],
-                appearance : appearance
-        }));
-        return prim;
     }
 
 
@@ -580,12 +573,11 @@ var CesiumBridge = function (element) {
         primitives.remove(prim);
     }
 
-
     this._createLineInstance = function(x0, y0, z0, x1, y1, z1, color) {
-      var p1 = Cesium.Cartesian3.fromDegrees(x0, y0, z0);
-      var p2 = Cesium.Cartesian3.fromDegrees(x1, y1, z1);
-      var vertices = [p1, p2];
-      var geom = new Cesium.PolylineGeometry({
+        var p1 = Cesium.Cartesian3.fromDegrees(x0, y0, z0);
+        var p2 = Cesium.Cartesian3.fromDegrees(x1, y1, z1);
+        var vertices = [p1, p2];
+        var geom = new Cesium.PolylineGeometry({
             positions : vertices,
             width : 1.0,
             vertexFormat : Cesium.PolylineColorAppearance.VERTEX_FORMAT,
@@ -601,20 +593,6 @@ var CesiumBridge = function (element) {
 
         return instance;
     }
-
-
-    this.createLine = function(x0, y0, z0, x1, y1, z1, colorR, colorG, colorB) {
-        var color = new Cesium.Color(colorR, colorG, colorB, 1.0);
-        var inst = this._createLineInstance(x0, y0, z0, x1, y1, z1, color);
-        var prim = new Cesium.Primitive({
-            geometryInstances : [inst],
-            appearance : new Cesium.PolylineColorAppearance()
-        });
-
-        this.viewer.scene.primitives.add(prim);
-        return prim;
-    }
-
 
     this.createBbox = function(x0, y0, z0, x1, y1, z1) {
         var red1 = this._createLineInstance(x0, y0, z0, x1, y0, z0, Cesium.Color.RED);

@@ -4,74 +4,11 @@
 
 part of rialto.viewer;
 
-class ViewshedController implements IController {
-    Hub _hub;
-    bool isRunning;
+class Viewshedder {
 
-    Cartographic3 point1;
-    Cartographic3 point2;
+    static void callWps(double obsLon, double obsLat, double radius) {
+        var hub = Hub.root;
 
-    ViewshedController() {
-        _hub = Hub.root;
-        isRunning = false;
-
-        _hub.modeController.register(this, ModeDataCodes.viewshed);
-
-        _hub.events.MouseMove.subscribe(_handleMouseMove);
-        _hub.events.MouseDown.subscribe(_handleMouseDown);
-        _hub.events.MouseUp.subscribe(_handleMouseUp);
-    }
-
-    void startMode() {
-        point1 = point2 = null;
-    }
-
-    void endMode() {
-    }
-
-    void _handleMouseMove(MouseData data) {
-    }
-
-    void _handleMouseDown(MouseData data) {
-        if (!isRunning) return;
-
-        assert(isRunning);
-
-        if (point1 == null) {
-
-            point1 = _hub.cesium.getMouseCoordinates(data.x, data.y);
-            if (point1 == null) return;
-
-        } else if (point2 == null) {
-            point2 = _hub.cesium.getMouseCoordinates(data.x, data.y);
-            if (point2 == null) return;
-
-        } else {
-            // already have point, do nothing
-        }
-    }
-
-    void _handleMouseUp(MouseData data) {
-        if (!isRunning) return;
-
-        if (point1 == null || point2 == null) {
-            return;
-        }
-
-        double radius =
-                _hub.cesium.cartographicDistance(point1.longitude, point1.latitude, point2.longitude, point2.latitude);
-
-        log("viewshed center: ${Utils.toString_Cartographic3(point1)}");
-        log("viewshed radius: $radius");
-
-        new Viewshed(point1, point2);
-
-        _callWps(point1.longitude, point1.latitude, radius);
-
-        point1 = point2 = null;
-    }
-
-    void _callWps(double obsLon, double obsLat, double radius) {
         var params = new List(3);
         params[0] = "groovy:wpsviewshed";
         params[1] = {
@@ -100,7 +37,7 @@ class ViewshedController implements IController {
                 "gdal2Tiles": true,
                 "maximumLevel": 12
             });
-            _hub.commands.addLayer(layerData).then((_) => log("layer added!"));
+            hub.commands.addLayer(layerData).then((_) => log("layer added!"));
         };
 
         var no = (WpsJob job) {
@@ -119,27 +56,9 @@ class ViewshedController implements IController {
         };
 
         var data = new WpsExecuteProcessData(params, successHandler: yes, errorHandler: no, timeoutHandler: time);
-        _hub.commands.wpsExecuteProcess(data);
+        hub.commands.wpsExecuteProcess(data);
     }
 }
-
-class Viewshed {
-    ViewshedShape shape;
-    Cartographic3 _point1;
-    Cartographic3 _point2;
-
-    Viewshed(Cartographic3 point1, Cartographic3 point2) {
-        _point1 = point1;
-        _point2 = point2;
-
-        _makeShape();
-    }
-
-    void _makeShape() {
-        shape = new ViewshedShape(_point1, _point2);
-    }
-}
-
 
 
 /****

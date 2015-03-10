@@ -19,9 +19,36 @@ class CesiumBridge {
     CesiumBridge(String elementName) {
         _bridge = new JsObject(context['CesiumBridge'], [elementName]);
 
-        ///_bridge.callMethod('createDrawHelper', [elementName]);
+        _bridge.callMethod('createDrawHelper', [elementName]);
+
     }
 
+
+    //---------------------------------------------------------------------------------------------
+    //
+    // annotations
+    //
+    //---------------------------------------------------------------------------------------------
+
+    void drawMarker(Function callback) {
+        _bridge.callMethod('drawMarker', [callback]);
+    }
+
+    void drawExtent(Function callback) {
+        _bridge.callMethod('drawExtent', [callback]);
+    }
+
+    void drawCircle(Function callback) {
+        _bridge.callMethod('drawCircle', [callback]);
+    }
+
+    void drawPolyline(Function callback) {
+        _bridge.callMethod('drawPolyline', [callback]);
+    }
+
+    void drawPolygon(Function callback) {
+        _bridge.callMethod('drawPolygon', [callback]);
+    }
 
     //---------------------------------------------------------------------------------------------
     //
@@ -261,48 +288,12 @@ class CesiumBridge {
         _bridge.callMethod('setPrimitiveVisible', [primitive, value]);
     }
 
-    // the geometry construction functions return the primitive we made (as an opaque pointer)
-    dynamic createRectangle(Cartographic3 point1, Cartographic3 point2, double colorR, double colorG, double colorB) {
-        assert(_isValidLatLon(point1));
-        assert(_isValidLatLon(point2));
-        return _bridge.callMethod(
-                'createRectangle',
-                [point1.longitude, point1.latitude, point2.longitude, point2.latitude, colorR, colorG, colorB]);
-    }
-
-    dynamic createCircle(Cartographic3 center, Cartographic3 point, double colorR, double colorG, double colorB) {
-        assert(_isValidLatLon(center));
-        assert(_isValidLatLon(point));
-        return _bridge.callMethod(
-                'createCircle',
-                [center.longitude, center.latitude, point.longitude, point.latitude, colorR, colorG, colorB]);
-    }
-
     dynamic createBbox(Cartographic3 point1, Cartographic3 point2) {
         assert(_isValidLatLon(point1));
         assert(_isValidLatLon(point2));
         var prim = _bridge.callMethod(
                 'createBbox',
                 [point1.longitude, point1.latitude, point1.height, point2.longitude, point2.latitude, point2.height]);
-        return prim;
-    }
-
-    dynamic createLine(Cartographic3 point1, Cartographic3 point2, double colorR, double colorG, double colorB) {
-        assert(_isValidLatLon(point1));
-        assert(_isValidLatLon(point2));
-        var prim = _bridge.callMethod(
-                'createLine',
-                [
-                        point1.longitude,
-                        point1.latitude,
-                        point1.height,
-                        point2.longitude,
-                        point2.latitude,
-                        point2.height,
-                        colorR,
-                        colorG,
-                        colorB]);
-        assert(prim != null);
         return prim;
     }
 
