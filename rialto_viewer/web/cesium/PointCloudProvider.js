@@ -186,7 +186,7 @@ PointCloudProvider.prototype.initTileData = function(tile, frameState) {
     tile.data = {
         primitive : undefined,
         freeResources : function() {
-            if (Cesium.defined(this.primitive)) {
+            if (Cesium.defined(this.primitive) && this.primitive != null) {
                 this.primitive.destroy();
                 this.primitive = undefined;
             }

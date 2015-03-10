@@ -402,13 +402,7 @@ var CesiumBridge = function (element) {
     this._createTileProvider2Async = function(urlarg, colorizeRamp, colorizeDimension, visible) {
         var deferred = Cesium.when.defer();
 
-        var provider;
-
-        if (true) {
-            provider = new PointCloudProvider(urlarg, colorizeRamp, colorizeDimension, visible);
-        } else {
-            provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
-        }
+        var provider = new PointCloudProvider(urlarg, colorizeRamp, colorizeDimension, visible);
 
         provider.readHeaderAsync().then(function(header) {
             deferred.resolve(provider);
