@@ -23,8 +23,6 @@ var JsBridge = function (logger) {
     this.hideDialog = function (dialog, ret) {
         dialog.hide(ret);
     }
-
-    mylog("yow");
 }
 
 

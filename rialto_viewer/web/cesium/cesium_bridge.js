@@ -345,11 +345,11 @@ var CesiumBridge = function (element) {
         var provider;
 
         if (true) {
-            provider = new PPCCProvider(urlarg, colorizeRamp, colorizeDimension, visible);
+            provider = new PointCloudProvider(urlarg, colorizeRamp, colorizeDimension, visible);
         } else {
             provider = new PCTileProvider(urlarg, colorizeRamp, colorizeDimension, visible);
         }
-        mylog(provider);
+
         provider.readHeaderAsync().then(function(header) {
             deferred.resolve(provider);
         }).otherwise(function (error) {
@@ -375,7 +375,7 @@ var CesiumBridge = function (element) {
                 tileProvider : provider
             }));
 
-            mylog("----------" + provider.header.info.numPoints);
+            mylog("----------" + provider.header.numPoints);
 
             completer(provider);
             return;
@@ -399,7 +399,7 @@ var CesiumBridge = function (element) {
     this.getDimensionNamesFromProvider = function (provider) {
         var ret = [];
 
-        var dims = provider.header.info.dimensions;
+        var dims = provider.header.dimensions;
         for (var i=0; i<dims.length; i++) {
             ret.push(dims[i].name);
         }
@@ -409,19 +409,19 @@ var CesiumBridge = function (element) {
 
 
     this.getNumPointsFromProvider = function (provider) {
-        var n = provider.header.info.numPoints;
+        var n = provider.header.numPoints;
         return n;
     }
 
 
     this.getTileBboxFromProvider = function (provider) {
-        var b = provider.header.info.tilebbox;
+        var b = provider.header.tilebbox;
         return b;
     }
 
 
     this.getStatsFromProvider = function (provider, dimName) {
-        var dims = provider.header.info.dimensions;
+        var dims = provider.header.dimensions;
         for (var i=0; i<dims.length; i++) {
             if (dims[i].name == dimName) {
                 var list = [dims[i].min, dims[i].mean, dims[i].max];
