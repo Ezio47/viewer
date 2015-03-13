@@ -8,7 +8,7 @@
 ############################################################################
 
 function base_setup {
-    BASE_PKGS="subversion software-properties-common cmake git g++"
+    BASE_PKGS="subversion software-properties-common cmake git g++ wget unzip"
     DEV_PKGS="libgeos-dev libproj-dev libgdal-dev libtiff-dev libexpat-dev \
     libgeotiff-dev libopenthreads-dev libfreetype6-dev libzip-dev \
     libboost-all-dev libgeos++-dev libgdal-dev"
@@ -114,15 +114,83 @@ function ossim_setup {
         -DBUILD_RUNTIME_DIR=bin \
         -DBUILD_SHARED_LIBS=ON \
         -DBUILD_WMS=ON \
-        -DPDAL_INCLUDE_DIR=/usr/local/include \
-        -DPDAL_LIBRARY=/usr/local/lib/libpdalcpp.so \
         -DCMAKE_INCLUDE_PATH=${OSSIM_SRC_DIR}/ossim/include \
-        -DCMAKE_INSTALL_PREFIX=${OSSIM_BUILD_DIR} \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
         -DCMAKE_LIBRARY_PATH=${OSSIM_BUILD_DIR}/lib \
         -DCMAKE_MODULE_PATH=${OSSIM_SRC_DIR}/ossim_package_support/cmake/CMakeModules \
         -DOSSIM_COMPILE_WITH_FULL_WARNING=ON \
         -DOSSIM_DEV_HOME=${OSSIM_SRC_DIR} \
         ${OSSIM_SRC_DIR}
+        
+        make
+        make install
+}
+
+
+############################################################################
+#
+# tomcat
+#
+############################################################################
+
+function tomcat_setup {
+    GEOSERVER_DIR=$WORKDIR-geoserver
+    if [ ! -e $GEOSERVER_DIR ]; then
+        mkdir $GEOSERVER_DIR
+    fi
+    cd $GEOSERVER_DIR
+    
+    apt-get -y install default-jdk    
+    export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+    export JRE_HOME=$JAVA_HOME/jre
+
+    echo "exit 0" > /usr/sbin/policy-rc.d
+    mkdir -p /var/lib/tomcat7/temp
+    export CATALINA_HOME=/usr/share/tomcat7
+    export CATALINA_BASE=/var/lib/tomcat7
+    apt-get -y install wget tomcat7 tomcat7-admin # tomcat7-docs tomcat7-examples 
+    
+    # verify!
+    # ** reload env vars **
+    # $CATALINA_HOME/bin/startup.sh
+    # wget http://localhost:8080/index.html    
+}
+
+function tomcat_start
+{
+    export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
+    export JRE_HOME=$JAVA_HOME/jre
+    export CATALINA_HOME=/usr/share/tomcat7
+    export CATALINA_BASE=/var/lib/tomcat7
+
+    $CATALINA_HOME/bin/startup.sh
+    sleep 5
+    rm index.html
+    wget http://localhost:8080/index.html
+    if [ ! -e index.html ] ; then
+        echo SERVER FAIL, NOT RUNNING
+        exit 1
+    else
+        echo SERVER OKAY
+    fi
+}
+
+
+############################################################################
+#
+# geoserver
+#
+############################################################################
+
+function geoserver_setup {
+    GEOSERVER_DIR=$WORKDIR-geoserver
+    cd $GEOSERVER_DIR
+    
+    wget http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/geoserver-2.6.2-war.zip
+    unzip geoserver-2.6.2-war.zip
+
+    cp geoserver.war /var/lib/tomcat7/webapps/
+    
 }
 
 
@@ -134,4 +202,6 @@ fi
 #base_setup
 #laszip_setup
 #pdal_setup
-ossim_setup
+#ossim_setup
+tomcat_setup
+geoserver_setup
