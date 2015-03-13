@@ -3,6 +3,7 @@
 // license found in the accompanying LICENSE.txt file.
 
 import 'dart:core';
+import 'dart:html';
 import 'rialto.dart';
 
 final Map tests = {
@@ -36,11 +37,19 @@ final Map tests = {
 final String demo = "- layers:\n    - bing:\n        type: bing_base_imagery\n        style: Aerial\n";
 
 void main() {
+    final params = Uri.parse(window.location.href).queryParameters;
+
+    String config = null;
+    if (params.containsKey("config")) {
+        config = params["config"];
+    } else {
+        config = "http://localhost:12345/file/" + tests[0];
+    }
+
     var hub = new Hub();
 
     try {
-        String s = "http://localhost:12345/file/" + tests[0];
-        var uri = Uri.parse(s);
+        final uri = Uri.parse(config);
         hub.commands.loadScriptFromUrl(uri);
         //hub.commands.loadScriptFromString(demo);
     } catch (e) {
