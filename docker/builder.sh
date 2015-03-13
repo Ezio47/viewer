@@ -191,6 +191,16 @@ function geoserver_setup {
 
     cp geoserver.war /var/lib/tomcat7/webapps/
     
+    export PLUGIN_DIR=/var/lib/tomcat7/webapps/geoserver/WEB-INF/lib/
+    
+    # WPS
+    wget http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/extensions/geoserver-2.6.2-wps-plugin.zip
+    unzip -o -d $PLUGIN_DIR geoserver-2.6.2-wps-plugin.zip
+
+    # Groovy scripting
+    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
+    wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip
+    
 }
 
 
