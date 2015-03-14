@@ -72,8 +72,8 @@ ENV OSSIM_BUILD_DIR $HOME/ossim-build
 RUN svn checkout https://svn.osgeo.org/ossim/trunk ossim
 
 WORKDIR $OSSIM_SRC_DIR
-ADD ossim.patch .
-RYB patch -p0 < ./ossim.patch 
+ADD ossim.patch ./
+RUN patch -p0 < ./ossim.patch 
 
 RUN cp -f $OSSIM_SRC_DIR/ossim_package_support/cmake/CMakeLists.txt $OSSIM_SRC_DIR/
 
@@ -150,19 +150,8 @@ ENV CATALINA_HOME /usr/share/tomcat7
 ENV CATALINA_BASE /var/lib/tomcat7
 RUN apt-get -y install wget tomcat7 tomcat7-admin # tomcat7-docs tomcat7-examples 
     
-    # verify!
-    # ** reload env vars **
-    # $CATALINA_HOME/bin/startup.sh
-    # wget http://localhost:8080/index.html    
-
-#    export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
-#    export JRE_HOME=$JAVA_HOME/jre
-#    export CATALINA_HOME=/usr/share/tomcat7
-#    export CATALINA_BASE=/var/lib/tomcat7
-
-RUN    $CATALINA_HOME/bin/startup.sh
-RUN    sleep 5
-RUN    wget http://localhost:8080/index.html
+    
+RUN    sleep 5 ; $CATALINA_HOME/bin/startup.sh ; sleep 5 ; wget http://localhost:8080/index.html
 RUN    if [ ! -e index.html ] ; then echo SERVER FAIL && exit 1 ; else echo SERVER OK ; fi
 
 
@@ -180,6 +169,10 @@ RUN    unzip geoserver-2.6.2-war.zip
 
 RUN    cp geoserver.war /var/lib/tomcat7/webapps/
     
+RUN    sleep 5 ; $CATALINA_HOME/bin/startup.sh ; sleep 5 ; wget http://localhost:8080/index.html
+RUN    if [ ! -e index.html ] ; then echo SERVER FAIL && exit 1 ; else echo SERVER OK ; fi
+
+
 ENV    PLUGIN_DIR /var/lib/tomcat7/webapps/geoserver/WEB-INF/lib/
     
     # WPS
