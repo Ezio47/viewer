@@ -32,8 +32,9 @@ function base_setup {
 
 function laszip_setup {
     cd $WORKDIR
-    git clone https://github.com/LASzip/LASzip.git
-    cd $WORKDIR/pdal
+    rm -fr laszip
+    git clone https://github.com/LASzip/LASzip.git laszip
+    cd $WORKDIR/laszip
     cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/
     make
     make install
@@ -48,10 +49,11 @@ function laszip_setup {
 
 function pdal_setup {
     cd $WORKDIR
+    rm -fr pdal
     git clone https://github.com/PDAL/PDAL.git pdal
     cd $WORKDIR/pdal
     cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/
-    make
+    make -j 3
     make install
 }
 
@@ -64,17 +66,19 @@ function pdal_setup {
 
 function ossim_setup {
     cd $WORKDIR
-#    svn checkout https://svn.osgeo.org/ossim/trunk ossim
-
     OSSIM_SRC_DIR=$WORKDIR/ossim
-
     OSSIM_BUILD_DIR=$WORKDIR/ossim-build
-    if [ ! -e $OSSIM_BUILD_DIR ]; then
-        mkdir $OSSIM_BUILD_DIR
-    fi
+    
+    rm -fr $OSSIM_SRC_DIR $OSSIM_BUILD_DIR
+    svn checkout https://svn.osgeo.org/ossim/trunk ossim
 
+    cd $OSSIM_SRC_DIR
+    patch -p0 < /opt/rialto/ossim.patch 
+    cd $WORKDIR
+    
     cp -f $OSSIM_SRC_DIR/ossim_package_support/cmake/CMakeLists.txt $OSSIM_SRC_DIR/
 
+    mkdir $OSSIM_BUILD_DIR
     cd $OSSIM_BUILD_DIR
     rm -f CMakeCache.txt
 
@@ -122,7 +126,7 @@ function ossim_setup {
         -DOSSIM_DEV_HOME=${OSSIM_SRC_DIR} \
         ${OSSIM_SRC_DIR}
         
-        make
+        make -j 3
         make install
 }
 
@@ -135,11 +139,11 @@ function ossim_setup {
 
 function tomcat_setup {
     GEOSERVER_DIR=$WORKDIR-geoserver
-    if [ ! -e $GEOSERVER_DIR ]; then
-        mkdir $GEOSERVER_DIR
-    fi
-    cd $GEOSERVER_DIR
     
+    rm -fr $GEOSERVER_DIR
+    mkdir $GEOSERVER_DIR
+    cd $GEOSERVER_DIR
+
     apt-get -y install default-jdk    
     export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64
     export JRE_HOME=$JAVA_HOME/jre
@@ -198,9 +202,8 @@ function geoserver_setup {
     unzip -o -d $PLUGIN_DIR geoserver-2.6.2-wps-plugin.zip
 
     # Groovy scripting
-    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
     wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip
-    
+    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 }
 
 
@@ -209,9 +212,10 @@ if [ ! -e $WORKDIR ] ; then
   mkdir $WORKDIR
 fi
 
-#base_setup
-#laszip_setup
-#pdal_setup
-#ossim_setup
+base_setup
+laszip_setup
+pdal_setup
+ossim_setup
 tomcat_setup
+tomcat_start
 geoserver_setup
