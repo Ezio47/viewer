@@ -33,6 +33,6 @@
 #        url: http://localhost:12345/file/o41078a4.png
 #        rectangle: [ -75.0, 28.0, -67.0, 29.75 ]
 
-#- wps:
-#    proxy: http://localhost:12345/proxy
-#    url: http://localhost:12348/geoserver/ows
+- wps:
+    #proxy: http://localhost:12345/proxy
+    url: http://192.168.59.103:12346/geoserver/ows
