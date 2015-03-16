@@ -183,5 +183,4 @@ RUN    wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoser
 RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 
 #############
-RUN $CATALINA_HOME/bin/shutdown.sh
-#RUN    $CATALINA_HOME/bin/startup.sh
+CMD /bin/bash $CATALINA_HOME/bin/catalina.sh run
