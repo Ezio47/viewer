@@ -18,15 +18,14 @@ ENV DEV_PKGS libgeos-dev libproj-dev libgdal-dev libtiff-dev libexpat-dev \
               libgeotiff-dev libopenthreads-dev libfreetype6-dev libzip-dev \
               libboost-all-dev libgeos++-dev libgdal-dev vim
 
-RUN apt-get upgrade
-RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y update
 
 RUN apt-get -y install $BASE_PKGS
 RUN apt-get -y install $DEV_PKGS
 
-RUN apt-get upgrade
-RUN apt-get update
-
+RUN apt-get -y upgrade
+RUN apt-get -y update
 
 
 ############################################################################
@@ -70,7 +69,7 @@ ENV OSSIM_SRC_DIR $HOME/ossim
 ENV OSSIM_BUILD_DIR $HOME/ossim-build
     
 RUN svn checkout https://svn.osgeo.org/ossim/trunk ossim
-
+RUN ls
 WORKDIR $OSSIM_SRC_DIR
 ADD ossim.patch ./
 RUN patch -p0 < ./ossim.patch 
@@ -126,7 +125,7 @@ RUN cmake -G "Unix Makefiles" \
         
 RUN make -j 3
 RUN make install
-
+RUN ls
 
 
 ############################################################################
@@ -151,8 +150,8 @@ ENV CATALINA_BASE /var/lib/tomcat7
 RUN apt-get -y install wget tomcat7 tomcat7-admin # tomcat7-docs tomcat7-examples 
     
     
-RUN    sleep 5 ; $CATALINA_HOME/bin/startup.sh ; sleep 5 ; wget http://localhost:8080/index.html
-RUN    if [ ! -e index.html ] ; then echo SERVER FAIL && exit 1 ; else echo SERVER OK ; fi
+#RUN    sleep 5 ; $CATALINA_HOME/bin/startup.sh ; sleep 5 ; wget http://localhost:8080/index.html
+#RUN    if [ ! -e index.html ] ; then echo SERVER FAIL && exit 1 ; else echo SERVER OK ; fi
 
 
 ############################################################################
@@ -164,41 +163,25 @@ RUN    if [ ! -e index.html ] ; then echo SERVER FAIL && exit 1 ; else echo SERV
 ENV GEOSERVER_DIR $HOME/geoserver
 WORKDIR $GEOSERVER_DIR
     
-RUN    wget http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/geoserver-2.6.2-war.zip
+RUN    wget -q http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/geoserver-2.6.2-war.zip
 RUN    unzip geoserver-2.6.2-war.zip
 
 RUN    cp geoserver.war /var/lib/tomcat7/webapps/
-    
+
+RUN ls
 RUN    sleep 5 ; $CATALINA_HOME/bin/startup.sh ; sleep 5 ; wget http://localhost:8080/index.html
 RUN    if [ ! -e index.html ] ; then echo SERVER FAIL && exit 1 ; else echo SERVER OK ; fi
 
 ENV    PLUGIN_DIR /var/lib/tomcat7/webapps/geoserver/WEB-INF/lib/
     
 # WPS
-RUN    wget http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/extensions/geoserver-2.6.2-wps-plugin.zip
+RUN    wget -q http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/extensions/geoserver-2.6.2-wps-plugin.zip
 RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6.2-wps-plugin.zip
 
 # Groovy scripting
 RUN    wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 
-
-############################################################################
-#
-# RIA data files
-#
-############################################################################
-
-RUN mkdir $HOME/data
-WORKDIR $HOME/data
-
-RUN wget http://github.com/radiantbluetechnologies/tuple-data/tiledserp18.tgz
-RUN wget http://github.com/radiantbluetechnologies/tuple-data/config1.yaml
-
-RUN mkdir /var/lib/tomcat7/webapps/data
-WORKDIR /var/lib/tomcat7/webapps/data
-
-RUN tar xvzf $HOME/data/tiledserp18.tgz
-RUN cp $HOME/data/config1.yaml .
-
-RUN apt-get install vim
+#############
+RUN $CATALINA_HOME/bin/shutdown.sh
+#RUN    $CATALINA_HOME/bin/startup.sh
