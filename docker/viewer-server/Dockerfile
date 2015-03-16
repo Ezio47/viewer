@@ -13,7 +13,7 @@ WORKDIR $HOME
 RUN apt-get -y update
 RUN apt-get -y upgrade
 
-RUN apt-get -y install apt-transport-https curl apt-utils git
+RUN apt-get -y install apt-transport-https curl apt-utils git vim
 
 
 #########################################################
@@ -66,8 +66,10 @@ RUN apt-get -y install dart
 WORKDIR $HOME
 RUN git clone https://github.com/radiantbluetechnologies/tuple.git tuple
 
+# copy built Cesium into the Rialto project
 RUN cp -r cesium/Build tuple/rialto_viewer/web/cesium-build
 
+# use pubcache because "pub get" (via pub build) doesn't work from within docker
 COPY ./pubcache.tgz ./pubcache.tgz
 RUN tar xvzf ./pubcache.tgz
 
@@ -77,7 +79,7 @@ RUN /usr/lib/dart/bin/pub build
 
 #########################################################
 #
-# nginx server
+# deploy Rialto to web
 #
 #########################################################
 

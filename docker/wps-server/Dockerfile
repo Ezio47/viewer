@@ -16,7 +16,7 @@ WORKDIR $HOME
 ENV BASE_PKGS subversion software-properties-common cmake git g++ wget unzip
 ENV DEV_PKGS libgeos-dev libproj-dev libgdal-dev libtiff-dev libexpat-dev \
               libgeotiff-dev libopenthreads-dev libfreetype6-dev libzip-dev \
-              libboost-all-dev libgeos++-dev libgdal-dev
+              libboost-all-dev libgeos++-dev libgdal-dev vim
 
 RUN apt-get upgrade
 RUN apt-get update
@@ -172,14 +172,13 @@ RUN    cp geoserver.war /var/lib/tomcat7/webapps/
 RUN    sleep 5 ; $CATALINA_HOME/bin/startup.sh ; sleep 5 ; wget http://localhost:8080/index.html
 RUN    if [ ! -e index.html ] ; then echo SERVER FAIL && exit 1 ; else echo SERVER OK ; fi
 
-
 ENV    PLUGIN_DIR /var/lib/tomcat7/webapps/geoserver/WEB-INF/lib/
     
-    # WPS
+# WPS
 RUN    wget http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/extensions/geoserver-2.6.2-wps-plugin.zip
 RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6.2-wps-plugin.zip
 
-    # Groovy scripting
+# Groovy scripting
 RUN    wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 
@@ -190,10 +189,16 @@ RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 #
 ############################################################################
 
-WORKDIR $HOME
-#RUN wget http://appliedimagery.com/downloads/sampledata/Serpent%20Mound%20Model%20LAS%20Data.las
-#ADD ./SerpentMound.las foo.las
-COPY serp.tgz ./serp.tgz
+RUN mkdir $HOME/data
+WORKDIR $HOME/data
+
+RUN wget http://github.com/radiantbluetechnologies/tuple-data/tiledserp18.tgz
+RUN wget http://github.com/radiantbluetechnologies/tuple-data/config1.yaml
+
 RUN mkdir /var/lib/tomcat7/webapps/data
 WORKDIR /var/lib/tomcat7/webapps/data
-RUN tar xvf $HOME/serp.tgz
+
+RUN tar xvzf $HOME/data/tiledserp18.tgz
+RUN cp $HOME/data/config1.yaml .
+
+RUN apt-get install vim
