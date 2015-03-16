@@ -182,3 +182,18 @@ RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6.2-wps-plugin.zip
     # Groovy scripting
 RUN    wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
+
+
+############################################################################
+#
+# RIA data files
+#
+############################################################################
+
+WORKDIR $HOME
+#RUN wget http://appliedimagery.com/downloads/sampledata/Serpent%20Mound%20Model%20LAS%20Data.las
+#ADD ./SerpentMound.las foo.las
+COPY serp.tgz ./serp.tgz
+RUN mkdir /var/lib/tomcat7/webapps/data
+WORKDIR /var/lib/tomcat7/webapps/data
+RUN tar xvf $HOME/serp.tgz
