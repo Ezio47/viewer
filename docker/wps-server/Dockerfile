@@ -183,4 +183,14 @@ RUN    wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoser
 RUN    unzip -o -d $PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip
 
 #############
+
+WORKDIR $HOME
+COPY ./wpsviewshed.groovy ./runcmd.sh $HOME/
+
+#RUN mkdir /var/lib/tomcat7/webapps/geoserver/data/
+#RUN mkdir /var/lib/tomcat7/webapps/geoserver/data/scripts/
+RUN mkdir -p /var/lib/tomcat7/webapps/geoserver/data/scripts/wps/
+RUN cp $HOME/wpsviewshed.groovy $HOME/runcmd.sh /var/lib/tomcat7/webapps/geoserver/data/scripts/wps
+
+#############
 CMD /bin/bash $CATALINA_HOME/bin/catalina.sh run

@@ -108,10 +108,12 @@ RUN cp -r $HOME/tuple/rialto_viewer/build/web $SERVERROOT/rialto
 
 WORKDIR $HOME
 RUN rm -rf tuple-data
-COPY ./tiledserp18.tgz ./config1.yaml tuple-data/
+COPY ./tiledserp18.tgz ./config1.yaml default.conf tuple-data/
 
 WORKDIR $SERVERROOT
 
 RUN tar xzf $HOME/tuple-data/tiledserp18.tgz
 
 RUN cp $HOME/tuple-data/config1.yaml .
+
+RUN cp $HOME/tuple-data/default.conf /etc/nginx/conf.d/

@@ -30,7 +30,10 @@ class OwsService {
 
         Completer c = new Completer<OgcDocument>();
 
-        String s = Uri.encodeComponent(server.toString() + operation);
+        String s = server.toString() + operation;
+        if (proxyUri != null) {
+            s = Uri.encodeComponent(s);
+        }
 
         var uri = Uri.parse(s);
 

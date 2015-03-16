@@ -6,5 +6,8 @@
     - cloud:
         type: pointcloud
         url: http://192.168.59.103:12345/tiles/tiledserp18
-#        url: http://localhost:12345/file/tiles/tiledserp18
-#        url: http://localhost:12345/file/tiles/autzen-thin-srs-18
+
+- wps:
+    #proxy: http://localhost:12345/proxy
+    url: http://192.168.59.103:12346/geoserver/ows
+
