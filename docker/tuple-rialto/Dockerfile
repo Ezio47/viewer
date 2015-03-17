@@ -6,29 +6,23 @@ ENV SERVERROOT /usr/share/nginx/html
 
 WORKDIR $HOME
 
-
+RUN apt-get -y update && \
+    apt-get -y upgrade && \
+    apt-get -y install apt-transport-https apt-utils && \
+    apt-get -y update && \
+    apt-get -y upgrade
+    
 #########################################################
 #
 # prep
 #
 #########################################################
 
-RUN apt-get -y update
-RUN apt-get -y upgrade
+RUN apt-get -y install curl git vim 
 
-RUN apt-get -y install apt-transport-https curl apt-utils git vim
-
-
-#########################################################
-#
-# cesium prep
-#
-#########################################################
-
-RUN curl -sL https://deb.nodesource.com/setup | bash -
-RUN apt-get -y install nodejs
-
-RUN apt-get -y install ant
+# needed for apt-getting nodejs
+RUN curl -sL https://deb.nodesource.com/setup | bash - && \
+    apt-get -y install nodejs ant
 
 
 #########################################################
@@ -37,19 +31,10 @@ RUN apt-get -y install ant
 #
 #########################################################
 
-RUN rm -fr $HOME/cesium 
-WORKDIR $HOME
-
-RUN git clone https://github.com/mpgerlek/cesium.git cesium
-#RUN git init
-#RUN git remote add origin https://github.com/mpgerlek/cesium
-##RUN git config pack.windowMemory 10m
-##RUN git config pack.packSizeLimit 20m
-#RUN git pull
-WORKDIR $HOME/cesium
-RUN git checkout 1.5-mpg
-
-RUN ant combine
+RUN git clone https://github.com/mpgerlek/cesium.git cesium && \
+    cd cesium && \
+    git checkout 1.5-mpg && \
+    ant combine
 
 
 #########################################################
@@ -58,14 +43,12 @@ RUN ant combine
 #
 #########################################################
 
-RUN sh -c 'curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
-RUN sh -c 'curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
-RUN sh -c 'curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_unstable.list > /etc/apt/sources.list.d/dart_unstable.list'
-
-RUN apt-get -y update
-RUN apt-get -y upgrade
-
-RUN apt-get -y install dart
+RUN sh -c 'curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -' && \
+    sh -c 'curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list' && \
+    sh -c 'curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_unstable.list > /etc/apt/sources.list.d/dart_unstable.list' && \
+    apt-get -y update && \
+    apt-get -y upgrade && \
+    apt-get -y install dart
 
 
 #########################################################
@@ -77,15 +60,15 @@ RUN apt-get -y install dart
 WORKDIR $HOME
 
 COPY ./pub-cache.tgz ./pub-cache.tgz
-RUN tar xzf pub-cache.tgz
-
-RUN rm -rf $HOME/tuple
-#RUN git clone https://github.com/radiantbluetechnologies/tuple.git tuple
 COPY ./rialto_viewer.tgz ./rialto_viewer.tgz
-RUN tar xzf rialto_viewer.tgz
 
-# copy built Cesium into the Rialto project
-RUN cp -r cesium/Build tuple/rialto_viewer/web/cesium-build
+RUN tar xzf pub-cache.tgz && \
+    rm -f pub-cache.tgz && \
+    tar xzf rialto_viewer.tgz && \
+    rm -fr $HOME/tuple/rialto_viewer/web/cesium-build && \
+    cp -r cesium/Build tuple/rialto_viewer/web/cesium-build && \
+    rm -f rialto_viewer.tgz && \
+    rm -fr $HOME/cesium
 
 WORKDIR $HOME/tuple/rialto_viewer
 RUN /usr/lib/dart/bin/pub build
@@ -98,23 +81,14 @@ RUN /usr/lib/dart/bin/pub build
 #########################################################
 
 WORKDIR $HOME
-RUN ls
-RUN cp -r $HOME/tuple/rialto_viewer/build/web $SERVERROOT/rialto
-
-############################################################################
-#
-# RIA data files
-#
-############################################################################
-
-WORKDIR $HOME
-RUN rm -rf tuple-data
 COPY ./tiledserp18.tgz ./config1.yaml default.conf tuple-data/
 
 WORKDIR $SERVERROOT
 
-RUN tar xzf $HOME/tuple-data/tiledserp18.tgz
+RUN cp -r $HOME/tuple/rialto_viewer/build/web ./rialto && \
+    tar xzf $HOME/tuple-data/tiledserp18.tgz && \
+    cp $HOME/tuple-data/config1.yaml . && \
+    cp $HOME/tuple-data/default.conf /etc/nginx/conf.d/ && \
+    rm -f $HOME/tuple-data/tiledserp18.tgz
 
-RUN cp $HOME/tuple-data/config1.yaml .
-
-RUN cp $HOME/tuple-data/default.conf /etc/nginx/conf.d/
+CMD /usr/sbin/nginx
