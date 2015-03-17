@@ -75,16 +75,17 @@ RUN apt-get -y install dart
 #########################################################
 
 WORKDIR $HOME
-RUN ls
-RUN rm -rf tuple
-RUN git clone https://github.com/radiantbluetechnologies/tuple.git tuple
+
+COPY ./pub-cache.tgz ./pub-cache.tgz
+RUN tar xzf pub-cache.tgz
+
+RUN rm -rf $HOME/tuple
+#RUN git clone https://github.com/radiantbluetechnologies/tuple.git tuple
+COPY ./rialto_viewer.tgz ./rialto_viewer.tgz
+RUN tar xzf rialto_viewer.tgz
 
 # copy built Cesium into the Rialto project
 RUN cp -r cesium/Build tuple/rialto_viewer/web/cesium-build
-
-# use pubcache because "pub get" (via pub build) doesn't work from within docker
-#COPY ./pubcache.tgz ./pubcache.tgz
-#RUN tar xzf ./pubcache.tgz
 
 WORKDIR $HOME/tuple/rialto_viewer
 RUN /usr/lib/dart/bin/pub build

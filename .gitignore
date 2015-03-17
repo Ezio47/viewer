@@ -39,3 +39,13 @@ data/wps-scratch
 
 
 docker/viewer-server/tiledserp18.tgz
+
+docker/viewer-server/pub-cache.tgz
+
+docker/viewer-server/rialto_viewer.tgz
+
+docker/tuple-rialto/pub-cache.tgz
+
+docker/tuple-rialto/rialto_viewer.tgz
+
+docker/tuple-rialto/tiledserp18.tgz
