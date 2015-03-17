@@ -57,21 +57,11 @@ RUN sh -c 'curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key 
 #
 #########################################################
 
-WORKDIR $HOME
-
-COPY ./pub-cache.tgz ./pub-cache.tgz
-COPY ./rialto_viewer.tgz ./rialto_viewer.tgz
-
-RUN tar xzf pub-cache.tgz && \
-    rm -f pub-cache.tgz && \
-    tar xzf rialto_viewer.tgz && \
-    rm -fr $HOME/tuple/rialto_viewer/web/cesium-build && \
-    cp -r cesium/Build tuple/rialto_viewer/web/cesium-build && \
-    rm -f rialto_viewer.tgz && \
-    rm -fr $HOME/cesium
+RUN git clone https://github.com/radiantbluetechnologies/tuple.git tuple
 
 WORKDIR $HOME/tuple/rialto_viewer
 RUN /usr/lib/dart/bin/pub build
+WORKDIR $HOME
 
 
 #########################################################
@@ -80,15 +70,12 @@ RUN /usr/lib/dart/bin/pub build
 #
 #########################################################
 
-WORKDIR $HOME
-COPY ./tiledserp18.tgz ./config1.yaml default.conf tuple-data/
+RUN git clone https://github.com/radiantbluetechnologies/tuple-data.git
 
-WORKDIR $SERVERROOT
+COPY ./config1.yaml default.conf tuple-data/
 
-RUN cp -r $HOME/tuple/rialto_viewer/build/web ./rialto && \
-    tar xzf $HOME/tuple-data/tiledserp18.tgz && \
-    cp $HOME/tuple-data/config1.yaml . && \
-    cp $HOME/tuple-data/default.conf /etc/nginx/conf.d/ && \
-    rm -f $HOME/tuple-data/tiledserp18.tgz
+RUN cp -r $HOME/tuple/rialto_viewer/build/web $SERVERROOT/rialto && \
+    cp $HOME/tuple-data/config1.yaml $SERVERROOT/ && \
+    cp $HOME/tuple-data/default.conf /etc/nginx/conf.d/
 
 CMD /usr/sbin/nginx
