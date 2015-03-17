@@ -29,15 +29,18 @@ class Commands {
 
   void computeLinearMeasurement() {
       _hub.cesium.drawPolyline((positions) {
-          log("Length: " + positions);
-          _hub.computeLength(positions);
+          log("Length of ...");// + positions);
+          var dist = _hub.computeLength(positions);
+          var mi = dist / 1609.34;
+          window.alert("Distance: ${dist.toStringAsFixed(1)} meters (${mi.toStringAsFixed(1)} miles)");
       });
   }
 
   void computeAreaMeasurement() {
       _hub.cesium.drawPolygon((positions) {
-          log("Area: " + positions);
-          _hub.computeArea(positions);
+          log("Area of ...");// + positions);
+          var area = _hub.computeArea(positions);
+          window.alert("Area: ${area.toStringAsFixed(1)} m^2");
       });
   }
 
