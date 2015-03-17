@@ -42,6 +42,12 @@ def run(input) {
     myStdout += "==== DEBUG stdout ====\n\n" + proc0.in.text
     myStderr += "==== DEBUG stderr ====\n\n" + proc0.err.text
     
+    myStdout += "inputFile: " + inputFile + "\n"
+    myStdout += "outputFile: " + outputFile + "\n"
+    myStdout += "outputFile2: " + outputFile2 + "\n"
+    myStdout += "outputFile3: " + outputFile3 + "\n"
+    myStdout += "outputUrl: " + outputUrl + "\n"
+    
         //
     // VIEWSHED
     //
