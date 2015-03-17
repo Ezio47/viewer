@@ -1,6 +1,4 @@
-# Tuple Rialto
+# Tuple Build Container
 
-This repo contains three docker directories, one for building, one for serving, and one for something I don't know.
-
-This needs more here!
+@TODO Document specifics for building the build container.
 
