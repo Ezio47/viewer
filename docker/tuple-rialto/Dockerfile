@@ -8,6 +8,8 @@ RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noar
 
 ADD nginx.conf /etc/nginx/nginx.conf
 ADD rialto-tuple.conf /etc/nginx/conf.d/rialto-tuple.conf
+
+# @TODO This needs to be an actual path to the rialto docroot
 ADD TUPLEDOCROOT /usr/share/nginx/html/rialto/
 
 EXPOSE 80
