@@ -5,7 +5,7 @@
 
     - cloud:
         type: pointcloud
-        url: http://rialto1.dev.ossim.org/tiles/tiledserp18
+        url: http://rialto01.dev.ossim.org/tiles/tiledserp18
 
 - wps:
     url: http://rialto.dev.ossim.org/geoserver/ows
