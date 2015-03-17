@@ -1,37 +1,19 @@
 - layers:
     - bing:
         type: bing_base_imagery
-        style: Aerial
-  #  - y:
-   #     type: tms_imagery
-    #    url: http://cesiumjs.org/blackmarble
-     #   maximumLevel : 8
+        style: Road
+        #style: Aerial
 
-#    - z:
-#        type: tms_imagery
-#        url: http://localhost:12345/file/wps-scratch/outputs/1425659259231-tiles
-#        gdal2Tiles: true
-#        maximumLevel : 11
+    - cs:
+        type: cesium_stk_base_terrain
 
     - alberta_poly:
         type: geojson
         url: http://localhost:12345/file/alberta.json
 
-#    - oossmm:
-#        type: wms_imagery
-#        url: http://52.0.52.104/geoserver/ged/wms
-#        layers: osm-group
-#        proxy: http://localhost:12345/proxy
-
     - cloud:
         type: pointcloud
         url: http://localhost:12345/file/tiles/tiledserp18
-#        url: http://localhost:12345/file/tiles/autzen-thin-srs-18
-
-#    - z:
-#        type: single_imagery
-#        url: http://localhost:12345/file/o41078a4.png
-#        rectangle: [ -75.0, 28.0, -67.0, 29.75 ]
 
 - wps:
     proxy: http://localhost:12345/proxy
