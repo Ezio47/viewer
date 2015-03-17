@@ -46,7 +46,7 @@ class Commands {
 
   void dropPin() {
       _hub.cesium.drawMarker((position) {
-          log("Pin: " + position);
+          log("Pin...");// + position);
       });
   }
 
