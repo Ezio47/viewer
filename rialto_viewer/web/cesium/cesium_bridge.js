@@ -52,10 +52,13 @@ var CesiumBridge = function (element) {
         var scene = this.viewer.scene;
 
         var f = function(center, radius) {
+            var material = Cesium.Material.fromType('Color');
+            material.uniforms.color = new Cesium.Color(1.0, 1.0, 0.0, 0.10);
             var circle = new DrawHelper.CirclePrimitive({
                 center: center,
                 radius: radius,
-                material: Cesium.Material.fromType(Cesium.Material.RimLightingType)
+                //material: Cesium.Material.fromType(Cesium.Material.RimLightingType)
+                material: material
             });
             scene.primitives.add(circle);
             circle.setEditable();
