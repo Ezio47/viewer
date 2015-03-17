@@ -184,10 +184,10 @@ var DrawHelper = (function() {
     });
 
 //    Cesium.Polygon.prototype.setStrokeStyle = setStrokeStyle;
-//    
+//
 //    Cesium.Polygon.prototype.drawOutline = drawOutline;
 //
-    
+
     var ChangeablePrimitive = (function() {
         function _() {
         }
@@ -377,7 +377,7 @@ var DrawHelper = (function() {
     })();
 
     _.PolygonPrimitive = (function() {
-    	
+
         function _(options) {
 
             options = copyOptions(options, defaultSurfaceOptions);
@@ -424,7 +424,7 @@ var DrawHelper = (function() {
     })();
 
     _.CirclePrimitive = (function() {
-    	
+
         function _(options) {
 
             if(!(Cesium.defined(options.center) && Cesium.defined(options.radius))) {
@@ -566,7 +566,7 @@ var DrawHelper = (function() {
     })();
 
     _.PolylinePrimitive = (function() {
-    	
+
         function _(options) {
 
             options = copyOptions(options, defaultPolylineOptions);
@@ -602,7 +602,7 @@ var DrawHelper = (function() {
         };
 
         _.prototype.getGeometry = function() {
-        	
+
             if (!Cesium.defined(this.positions) || this.positions.length < 2) {
                 return;
             }
@@ -615,7 +615,7 @@ var DrawHelper = (function() {
                     ellipsoid : this.ellipsoid
                 });
         }
-        
+
         return _;
     })();
 
@@ -1157,7 +1157,7 @@ var DrawHelper = (function() {
             enhanceWithListeners(billboard);
 
         }
-        
+
         function setHighlighted(highlighted) {
 
             var scene = drawHelper._scene;
@@ -1429,7 +1429,7 @@ var DrawHelper = (function() {
                             function (movement) {
                                 var pickedObject = scene.pick(movement.position);
                                 // disable edit if pickedobject is different or not an object
-                                if(!(pickedObject && !pickedObject.isDestroyed() && pickedObject.primitive)) {
+                                if(!(pickedObject && /*!pickedObject.isDestroyed() &&*/ pickedObject.primitive)) {
                                     extent.setEditMode(false);
                                 }
                             }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
@@ -1822,7 +1822,7 @@ var DrawHelper = (function() {
 
         return to;
     }
-    
+
     function fillOptions(options, defaultOptions) {
         options = options || {};
         var option;
