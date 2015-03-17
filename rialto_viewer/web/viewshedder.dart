@@ -31,11 +31,12 @@ class Viewshedder {
             var url = ogcDoc.getProcessOutput("outputUrl");
             log("SUCCESS: $url");
 
-            var layerData = new LayerData("viewshed", {
+            var layerData = new LayerData("viewshed-${job.id}", {
                 "type": "tms_imagery",
                 "url": url,
                 "gdal2Tiles": true,
-                "maximumLevel": 12
+                "maximumLevel": 12,
+                //"alpha": 0.5
             });
             hub.commands.addLayer(layerData).then((_) => log("layer added!"));
         };

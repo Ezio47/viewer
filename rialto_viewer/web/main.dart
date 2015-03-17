@@ -44,7 +44,7 @@ void main() {
         config = params["config"];
     } else {
         config = "http://localhost:12345/file/" + tests[0];
-        config="http://192.168.59.103:12345/config1.yaml";
+        //config="http://192.168.59.103:12345/config1.yaml";
     }
 
     var hub = new Hub();
