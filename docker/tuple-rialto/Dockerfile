@@ -1,5 +1,4 @@
 FROM centos:centos6
-
 MAINTAINER mpg@flaxen.com
 
 ADD nginx.repo /etc/yum.repos.d/
