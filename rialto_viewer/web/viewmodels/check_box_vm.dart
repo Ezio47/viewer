@@ -31,6 +31,7 @@ class CheckBoxVM extends ViewModel with MStateControl<bool> {
     @override
     set value(bool value) => _inputElement.checked = value;
 
+    // TODO: this should also disable the associated label
     bool get disabled => _disabled;
     set disabled(bool v) {
         _disabled = v;

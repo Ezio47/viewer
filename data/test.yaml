@@ -4,7 +4,7 @@
         style: Road
         #style: Aerial
 
-    - cs:
+    - terrain:
         type: cesium_stk_base_terrain
 
     - alberta_poly:
