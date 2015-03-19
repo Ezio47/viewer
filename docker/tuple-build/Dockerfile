@@ -25,3 +25,4 @@ CMD pushd /tmp/tuple/rialto_viewer \
 && /tmp/dart-sdk/bin/pub build \
 && popd \
 && cp -pr /tmp/tuple/rialto_viewer/build/web/ /rialto-viewer
+
