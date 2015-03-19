@@ -4,5 +4,5 @@
     $ docker build --tag=rialto-build:latest .
     
 ## Running
-    $ docker run -d -v /LOCALPATHFORRIALTOOUT:/rialto-viewer --name="rialto-build" rialto-build:latest
+    $ docker run -d -v /vagrant/tuple-out/:/rialto-viewer --name="tuple-builder" radiantblue/tuple-build:latest
 
