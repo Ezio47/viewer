@@ -1,4 +1,8 @@
 # Tuple Build Container
 
-@TODO Document specifics for building the build container.
+## Building
+    $ docker build --tag=rialto-build:latest .
+    
+## Running
+    $ docker run -d -v /LOCALPATHFORRIALTOOUT:/rialto-viewer --name="rialto-build" rialto-build:latest
 
