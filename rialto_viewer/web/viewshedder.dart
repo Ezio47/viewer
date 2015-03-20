@@ -18,10 +18,7 @@ class Viewshedder {
             "fovEnd": 360.0,
             "eyeHeight": 1.5,
             "radius": radius,
-            "inputDem": "N48W114.hgt",
-            "serverInputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/inputs",
-            "serverOutputPath": "/Users/mgerlek/work/dev/tuple/data/wps-scratch/outputs",
-            "serverOutputUrl": "http://localhost:12345/file/wps-scratch/outputs",
+            "inputDem": "N48W114.hgt"
         };
         params[2] = ["outputUrl", "stdoutText", "stderrText"];
 

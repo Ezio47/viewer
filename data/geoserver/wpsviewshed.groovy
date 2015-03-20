@@ -2,9 +2,6 @@ title = 'GeoScriptViewshed'
 description = 'Compute the Viewshed a la Oscar'
 
 inputs = [
-    serverInputPath: [name: 'serverInputPath', description: '(root path for input files)', type: String.class],
-    serverOutputPath: [name: 'serverOutputPath', description: '(root path for output files)', type: String.class],
-    serverOutputUrl: [name: 'serverOutputUrl', description: '(URL prefix for output files)', type: String.class],
 	obsLat: [name: 'obsLat', description: 'observer latitude', type: Double.class],
     obsLon: [name: 'obsLon', description: 'observer longitude', type: Double.class],
     fovStart: [name: 'fovStart', description: 'field of view start (degrees)', type: Double.class],
@@ -23,11 +20,27 @@ outputs = [
 def run(input) {
     def millis = System.currentTimeMillis() as String
     
-    def inputFile = input.serverInputPath + '/' + (input.inputDem as String)
-    def outputFile = input.serverOutputPath + '/' + millis + ".tif"
-    def outputFile2 = input.serverOutputPath + '/' + millis + "-3.tif"
-    def outputFile3 = input.serverOutputPath + '/' + millis + "-tiles"
-    def outputUrl = input.serverOutputUrl + '/' + millis + "-tiles"
+    // required: value is used as a prefix to the "input dem" filename
+    //   example: /user/alice/data
+    String inputPathPrefix = env['TUPLE_INPUT_PREFIX']
+
+    // required: value is used as a prefix to the "output image file" filename
+    //   example: /opt/geoserver/www/wps/datadir/wps-outputs
+    String outputPathPrefix = env['TUPLE_OUTPUT_PREFIX']
+    
+    // required: value is used as the root URL where data files are stored
+    //   example: http://rialto.dev.ossim.org/files
+    String outputUrl = env['TUPLE_URL_PREFIX']
+    
+    // required: value is used as the prefix to the "ossim-viewshed" filename
+    //   example: /user/alice/dev/ossim/build/ossim
+    String binDir = env['OSSIM_INSTALL_PREFIX']
+    
+    def inputFile = inputPathPrefix + '/' + (input.inputDem as String)
+    def outputFile = outputPathPrefix + '/' + millis + ".tif"
+    def outputFile2 = outputPathPrefix + '/' + millis + "-3.tif"
+    def outputFile3 = outputPathPrefix + '/' + millis + "-tiles"
+    def outputUrl = outputUrl + '/' + millis + "-tiles"
     
     def myStdout = ""
     def myStderr = ""
@@ -48,13 +61,11 @@ def run(input) {
     myStdout += "outputFile3: " + outputFile3 + "\n"
     myStdout += "outputUrl: " + outputUrl + "\n"
     
-        //
+    //
     // VIEWSHED
     //
     def cmd1 = [
-        "./data_dir/scripts/wps/runcmd.sh", 
-        //////"./data_dir/scripts/wps/xyzzy.sh", 
-        "/Users/mgerlek/work/dev/ossim-scratch/bin/ossim-viewshed", 
+        binDir + "/" + "ossim-viewshed", 
         "--dem", inputFile,
         "--fov", (input.fovStart as String), (input.fovEnd as String),
         "--hgt-of-eye", (input.eyeHeight as String),
