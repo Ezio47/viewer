@@ -81,12 +81,9 @@ class ConfigScript {
     Future _doCommand_camera(Map data) {
         assert(data.containsKey("eye"));
         assert(data.containsKey("target"));
-        if (!data.containsKey("up")) {
-            data["up"] = [0.0, 0.0, 1.0];
-        }
-        if (!data.containsKey("fov")) {
-            data["fov"] = 60.0;
-        }
+        data.putIfAbsent("up", () => [0.0, 0.0, 1.0]);
+
+        data.putIfAbsent("fov", () => 60.0);
 
         List<num> eyelist = data["eye"];
         var eye = new Cartographic3.fromList(eyelist);

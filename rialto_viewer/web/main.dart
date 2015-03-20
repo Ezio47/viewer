@@ -39,10 +39,8 @@ final String demo = "- layers:\n    - bing:\n        type: bing_base_imagery\n  
 void main() {
     final params = Uri.parse(window.location.href).queryParameters;
 
-    String config = null;
-    if (params.containsKey("config")) {
-        config = params["config"];
-    } else {
+    String config = params["config"];
+    if (config == null) {
         config = "http://localhost:12345/file/" + tests[0];
         //config="http://192.168.59.103:12345/config1.yaml";
     }

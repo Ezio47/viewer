@@ -38,13 +38,9 @@ class CheckBoxVM extends ViewModel with MStateControl<bool> {
 
         var attrs = _inputElement.attributes;
         if (v) {
-            if (!attrs.containsKey("disabled")) {
-                attrs["disabled"] = "true";
-            }
+            attrs.putIfAbsent("disabled", ()=>"true");
         } else {
-            if (attrs.containsKey("disabled")) {
-                attrs.remove("disabled");
-            }
+            attrs.remove("disabled");
         }
     }
 }

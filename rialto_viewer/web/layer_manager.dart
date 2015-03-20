@@ -66,10 +66,7 @@ class LayerManager {
     }
 
     Layer lookupLayer(String name) {
-        if (_layerMap.containsKey(name)) {
-            return _layerMap[name];
-        }
-        return null;
+        return _layerMap[name];
     }
 
     Future doRemoveLayer(Layer layer) {
