@@ -24,5 +24,7 @@ VOLUME /rialto-viewer
 
 CMD pushd /rialto-viewer \
 && /tmp/dart-sdk/bin/pub build \
+&& mkdir /rialto-viewer/web/cesium-build/ && \
+&& cp -r /tmp/Cesium/Build/Cesium /rialto-viewer/web/cesium-build \
 && popd 
 
