@@ -17,15 +17,12 @@ RUN yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.no
 && curl -L https://storage.googleapis.com/dart-archive/channels/dev/release/44550/sdk/dartsdk-linux-x64-release.zip -o /tmp/dartsdk-linux-x64-release.zip \
 && pushd /tmp \
 && unzip /tmp/dartsdk-linux-x64-release.zip \
-&& curl -L https://api.github.com/repos/radiantbluetechnologies/tuple/tarball -o /tmp/tuple.tar.gz \
-&& tar xvf /tmp/tuple.tar.gz -C /tmp \
-&& mv /tmp/radiantbluetechnologies-tuple-4ee2291 /tmp/tuple \
+&& rm -rf /tmp/dartsdk-linux-x64-release.zip \
 && mkdir /rialto-viewer
 
 VOLUME /rialto-viewer
 
-CMD pushd /tmp/tuple/rialto_viewer \
+CMD pushd /rialto-viewer \
 && /tmp/dart-sdk/bin/pub build \
-&& popd \
-&& cp -pr /tmp/tuple/rialto_viewer/build/web/ /rialto-viewer
+&& popd 
 
