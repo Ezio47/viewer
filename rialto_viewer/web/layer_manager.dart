@@ -7,7 +7,8 @@ part of rialto.viewer;
 
 class LayerManager {
     Hub _hub;
-    Map<String, Layer> layers = new Map<String, Layer>();
+    List<Layer> layers = new List<Layer>();
+    Map<String, Layer> _layerMap = new Map<String, Layer>();
     CartographicBbox bbox = new CartographicBbox.empty();
     bool _hasBaseImagery = false;
 
@@ -16,7 +17,7 @@ class LayerManager {
     Future doColorizeLayers(ColorizerData data) {
         var futures = new List<Future>();
 
-        for (var layer in layers.values) {
+        for (var layer in _hub.layerManager.layers) {
             if (layer is PointCloudLayer) {
                 (layer as ColorizerControl).colorizerData = data;
                 Future f = layer.colorizeAsync();
@@ -34,7 +35,7 @@ class LayerManager {
 
         var c = new Completer<Layer>();
 
-        if (layers.containsKey(name)) {
+        if (_layerMap.containsKey(name)) {
             Hub.error("Layer $name already loaded.");
             c.complete(null);
             return c.future;
@@ -48,7 +49,8 @@ class LayerManager {
         }
 
         layer.load().then((_) {
-            layers[layer.name] = layer;
+            layers.add(layer);
+            _layerMap[layer.name] = layer;
 
             if (layer.bbox != null) {
                 bbox.unionWith(layer.bbox);
@@ -63,18 +65,25 @@ class LayerManager {
         return c.future;
     }
 
-    Future doRemoveLayer(String name) {
-        assert(layers.containsKey(name));
-        Layer layer = layers[name];
+    Layer lookupLayer(String name) {
+        if (_layerMap.containsKey(name)) {
+            return _layerMap[name];
+        }
+        return null;
+    }
+
+    Future doRemoveLayer(Layer layer) {
         assert(layer != null);
+        assert(layers.contains(layer));
 
         var bboxAffected = (layer.bbox != null);
 
-        layers.remove(layer.name);
+        _layerMap.remove(layer.name);
+        layers.remove(layer);
 
         if (bboxAffected) {
             bbox = new CartographicBbox.empty();
-            for (var layer in layers.values) {
+            for (var layer in layers) {
                 if (layer.bbox != null) {
                     bbox.unionWith(layer.bbox);
                 }
@@ -82,14 +91,18 @@ class LayerManager {
             _hub.events.LayersBboxChanged.fire(bbox);
         }
 
-        _hub.events.RemoveLayerCompleted.fire(name);
+        _hub.events.RemoveLayerCompleted.fire(layer);
 
         return new Future(() {});
     }
 
     Future doRemoveAllLayers() {
-        var items = layers.values.toList();
-        items.forEach((layer) => _hub.commands.removeLayer(layer.name));
+        var items = layers.toList();
+        items.forEach((layer) => _hub.commands.removeLayer(layer));
+
+        layers.clear();
+        _layerMap.clear();
+
         _hub.events.RemoveAllLayersCompleted.fire0();
 
         return new Future(() {});

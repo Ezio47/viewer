@@ -26,8 +26,8 @@ class ColorizerDialogVM extends DialogVM {
         _rampsListBox.value = ramps[0];
 
         var dims = new Set<String>();
-        var layers = _hub.layerManager.layers.values;
-        for (var layer in layers) {
+
+        for (var layer in _hub.layerManager.layers) {
             if (layer is PointCloudLayer) {
                 dims.addAll(layer.dimensions);
             }

@@ -21,7 +21,8 @@ class LayerManagerDialogVM extends DialogVM {
 
         _addButton = new ButtonVM("#layerManagerDialog_add", (_) => log("add layer"));
         _removeButton = new ButtonVM("#layerManagerDialog_remove", (_) => log("remove layer: ${_listbox.value.name}"));
-        _customizeButton = new ButtonVM("#layerManagerDialog_customize", (_) => log("customize layer: ${_listbox.value.name}"));
+        _customizeButton =
+                new ButtonVM("#layerManagerDialog_customize", (_) => log("customize layer: ${_listbox.value.name}"));
 
         _detailsButton = new ButtonVM("#layerManagerDialog_details", (_) {
             _infoDialog.target = _listbox.value;
@@ -45,12 +46,7 @@ class LayerManagerDialogVM extends DialogVM {
     void _show() {
         _listbox.clear();
 
-        Map layers = _hub.layerManager.layers;
-        var names = layers.keys.toList();
-        names.sort();
-
-        for (var name in names) {
-            Layer layer = layers[name];
+        for (var layer in _hub.layerManager.layers) {
             _listbox.add(layer);
         }
 
@@ -59,13 +55,7 @@ class LayerManagerDialogVM extends DialogVM {
     }
 
     @override
-    void _hide() {
-
-        var item = _listbox.value;
-        if (item == null) return;
-
-        Layer layer = _hub.layerManager.layers[item];
-    }
+    void _hide() {}
 
     void _updateButtons([_ = null]) {
         final disabled = (_listbox.value == null);

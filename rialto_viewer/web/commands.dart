@@ -64,7 +64,7 @@ class Commands {
     return _hub.layerManager.doColorizeLayers(data);
   }
 
-  Future removeLayer(String layer) {
+  Future removeLayer(Layer layer) {
     return _hub.layerManager.doRemoveLayer(layer);
   }
 
