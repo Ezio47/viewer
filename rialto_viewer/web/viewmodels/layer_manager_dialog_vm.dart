@@ -20,7 +20,12 @@ class LayerManagerDialogVM extends DialogVM {
         _infoDialog = new InfoDialogVM("#infoDialog");
 
         _addButton = new ButtonVM("#layerManagerDialog_add", (_) => log("add layer"));
-        _removeButton = new ButtonVM("#layerManagerDialog_remove", (_) => log("remove layer: ${_listbox.value.name}"));
+
+        _removeButton = new ButtonVM("#layerManagerDialog_remove", (_) {
+            _hub.commands.removeLayer(_listbox.value);
+            _listbox.remove(_listbox.value);
+        });
+
         _customizeButton =
                 new ButtonVM("#layerManagerDialog_customize", (_) => log("customize layer: ${_listbox.value.name}"));
 
@@ -156,7 +161,6 @@ class BetterListBoxVM extends ViewModel {
         throw new ArgumentError("bad layer name");
     }
 
-
     void add(Layer layer) {
         var item = new BetterListBoxItem(layer);
         _itemsList.add(item);
@@ -165,6 +169,16 @@ class BetterListBoxVM extends ViewModel {
         _layerToItemMap[layer] = item;
 
         item.element.onClick.listen(_selectHandler);
+    }
+
+    void remove(Layer layer) {
+        var item = _layerToItemMap[layer];
+
+        _itemsList.remove(item);
+        _layerToItemMap.remove(item.layer);
+        _divToItemMap.remove(item.element);
+
+        _ulElement.children.remove(item.element);
     }
 
     void clear() {

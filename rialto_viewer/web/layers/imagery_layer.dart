@@ -71,6 +71,16 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
     }
     @override double get gamma => _gamma;
 
+    @override
+     Future unload() {
+
+         var f = new Future(() {
+             _hub.cesium.removeImageryLayer(_layer);
+         });
+
+         return f;
+     }
+
     void _forceUpdates() {
         visible = _visible;
         alpha = _alpha;
@@ -94,7 +104,7 @@ class SingleImageryLayer extends ImageryLayer {
     Future load() {
         var f = new Future(() {
 
-            _layer = _hub.cesium.addSingleTileImageryProvider(urlString, _rectangle, proxyString);
+            _layer = _hub.cesium.addSingleTileImageryLayer(urlString, _rectangle, proxyString);
 
             _forceUpdates();
         });
@@ -116,7 +126,7 @@ class WmsImageryLayer extends ImageryLayer {
     Future load() {
         var f = new Future(() {
 
-            _layer = _hub.cesium.addWebMapServiceImageryProvider(urlString, _layers, _rectangle, proxyString);
+            _layer = _hub.cesium.addWebMapServiceImageryLayer(urlString, _layers, _rectangle, proxyString);
 
             _forceUpdates();
         });
@@ -141,7 +151,7 @@ class TmsImageryLayer extends ImageryLayer {
         var f = new Future(() {
 
             _layer =
-                    _hub.cesium.addTileMapServiceImageryProvider(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
+                    _hub.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
 
             _forceUpdates();
         });

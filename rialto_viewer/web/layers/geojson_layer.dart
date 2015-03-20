@@ -29,7 +29,7 @@ class GeoJsonLayer extends Layer implements VisibilityControl {
     Future load() {
         Completer c = new Completer();
 
-        _hub.cesium.addGeoJson(name, urlString).then((ds) {
+        _hub.cesium.addGeoJsonDataSource(name, urlString).then((ds) {
             _dataSource = ds;
 
             _forceUpdates();
@@ -38,5 +38,12 @@ class GeoJsonLayer extends Layer implements VisibilityControl {
         });
 
         return c.future;
+    }
+
+    @override
+    Future unload() {
+        return new Future(() {
+            _hub.cesium.removeDataSource(_dataSource);
+        });
     }
 }

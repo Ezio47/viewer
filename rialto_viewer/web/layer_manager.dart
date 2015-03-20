@@ -78,6 +78,8 @@ class LayerManager {
         _layerMap.remove(layer.name);
         layers.remove(layer);
 
+        layer.unload();
+
         if (bboxAffected) {
             bbox = new CartographicBbox.empty();
             for (var layer in layers) {

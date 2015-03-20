@@ -230,11 +230,6 @@ var CesiumBridge = function (element) {
     //
     //---------------------------------------------------------------------------------------------
 
-
-    this.addImageryProvider = function(provider) {
-        return this.viewer.imageryLayers.addImageryProvider(provider);
-    }
-
     this.setLayerVisible = function (layer, v) {
         layer.show = v;
     }
@@ -270,17 +265,18 @@ var CesiumBridge = function (element) {
     //
     //---------------------------------------------------------------------------------------------
 
-    this.newSingleTileImageryProvider = function (url, rect, proxy) {
+    this.addSingleTileImageryLayer = function (url, rect, proxy) {
         var options = {
             url: url,
             rectangle: rect == null ? undefined : rect,
             proxy: proxy == null ? undefined : proxy
         };
-        return new Cesium.SingleTileImageryProvider(options);
+        var provider = Cesium.SingleTileImageryProvider(options);
+        return this.viewer.imageryLayers.addImageryProvider(provider);
     }
 
 
-    this.newWebMapServiceImageryProvider = function (url, layers, rect, proxy) {
+    this.addWebMapServiceImageryLayer = function (url, layers, rect, proxy) {
         var options = {
             url: url,
             layers: layers,
@@ -288,11 +284,12 @@ var CesiumBridge = function (element) {
             proxy: proxy == null ? undefined : proxy
         };
         myassert(proxy != null);
-        return new Cesium.WebMapServiceImageryProvider(options);
+        var provider = new Cesium.WebMapServiceImageryProvider(options);
+        return this.viewer.imageryLayers.addImageryProvider(provider);
     }
 
 
-    this.newTileMapServiceImageryProvider = function(url, rect, maximumLevel, gdal2Tiles, proxy) {
+    this.addTileMapServiceImageryLayer = function(url, rect, maximumLevel, gdal2Tiles, proxy) {
 
         var options = {
             url: url,
@@ -301,9 +298,13 @@ var CesiumBridge = function (element) {
             proxy: proxy == null ? undefined : proxy,
             gdal2Tiles: gdal2Tiles
         };
-        return new Cesium.TileMapServiceImageryProvider(options);
+        var provider = new Cesium.TileMapServiceImageryProvider(options);
+        return this.viewer.imageryLayers.addImageryProvider(provider);
     }
 
+    this.removeImageryLayer = function(layer) {
+        this.viewer.imageryLayers.remove(layer);
+    }
 
     //---------------------------------------------------------------------------------------------
     //
@@ -312,51 +313,46 @@ var CesiumBridge = function (element) {
     //---------------------------------------------------------------------------------------------
 
 
-    this.setCesiumTerrainProvider = function (url) {
-        var provider = new Cesium.CesiumTerrainProvider({
-            url: url,
-        });
+    this.setCesiumTerrainProvider = function (options) {
+        var provider = new Cesium.CesiumTerrainProvider(options);
         this.viewer.terrainProvider = provider;
         return provider;
     }
 
 
-    this.setEllipsoidBaseTerrainProvider = function () {
-        var provider = new Cesium.EllipsoidTerrainProvider();
+    this.setEllipsoidBaseTerrainProvider = function (options) {
+        var provider = new Cesium.EllipsoidTerrainProvider(options);
         this.viewer.terrainProvider = provider;
         return provider;
     }
 
 
-    this.setVrTheWorldBaseTerrainProvider = function (url) {
-        var provider = new Cesium.VRTheWorldTerrainProvider({
-            url: url
-        });
+    this.setVrTheWorldBaseTerrainProvider = function (options) {
+        var provider = new Cesium.VRTheWorldTerrainProvider(options);
         this.viewer.terrainProvider = provider;
         return provider;
     }
 
 
-    this.setCesiumBaseTerrainProvider = function (url, credit) {
-        if (credit == null) {
-            credit = undefined;
-        }
-        var provider = new Cesium.CesiumTerrainProvider({
-            url: url,
-            credit: credit
-        });
+    this.setCesiumBaseTerrainProvider = function (options) {
+        var provider = new Cesium.CesiumTerrainProvider(options);
         this.viewer.terrainProvider = provider;
         return provider;
     }
 
 
-    this.setArcGisBaseTerrainProvider = function (apiKey) {
-        var provider = new Cesium.ArcGisImageServerTerrainProvider({
-            url : '//elevation.arcgisonline.com/ArcGIS/rest/services/WorldElevation/DTMEllipsoidal/ImageServer',
-            token : apiKey
-        });
+    this.setArcGisBaseTerrainProvider = function (options) {
+        var provider = new Cesium.ArcGisImageServerTerrainProvider(options);
         this.viewer.terrainProvider = provider;
         return provider;
+    }
+
+    this.unsetBaseTerrainProvider = function () {
+        this.viewer.terrainProvider = null;
+    }
+
+    this.unsetTerrainProvider = function () {
+        this.viewer.terrainProvider = null;
     }
 
 
@@ -367,28 +363,22 @@ var CesiumBridge = function (element) {
     //---------------------------------------------------------------------------------------------
 
 
-    this.setBingBaseImageryProvider = function(apiKey, style) {
-        var provider = new Cesium.BingMapsImageryProvider({
-            url : '//dev.virtualearth.net',
-            key : apiKey,
-            mapStyle : style
-        });
+    this.setBingBaseImageryProvider = function(options) {
+        var provider = new Cesium.BingMapsImageryProvider(options);
         var layer = this.viewer.imageryLayers.addImageryProvider(provider);
         return layer;
     }
 
 
-    this.setOsmBaseImageryProvider = function() {
-        var provider = new Cesium.OpenStreetMapImageryProvider({});
+    this.setOsmBaseImageryProvider = function(options) {
+        var provider = new Cesium.OpenStreetMapImageryProvider(options);
         var layer = this.viewer.imageryLayers.addImageryProvider(provider);
         return layer;
     }
 
 
-    this.setArcGisBaseImageryProvider = function() {
-        var provider = new Cesium.ArcGisMapServerImageryProvider({
-            url: '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
-        });
+    this.setArcGisBaseImageryProvider = function(options) {
+        var provider = new Cesium.ArcGisMapServerImageryProvider(options);
         var layer = this.viewer.imageryLayers.addImageryProvider(provider);
         return layer;
     }
@@ -527,7 +517,7 @@ var CesiumBridge = function (element) {
         }
     }
 
-    this.addGeoJson = function(name, url, completer) {
+    this.addGeoJsonDataSource = function(name, url, completer) {
         var viewer = this.viewer;
 
         var ds = new Cesium.GeoJsonDataSource(name);

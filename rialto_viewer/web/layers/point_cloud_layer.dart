@@ -49,6 +49,13 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
     }
 
     @override
+    Future unload() {
+        return new Future(() {
+            _hub.cesium.unloadTileProvider(_provider);
+        });
+    }
+
+    @override
     set visible(bool v) {
         _visible = v;
         _hub.cesium.unloadTileProvider(_provider);
