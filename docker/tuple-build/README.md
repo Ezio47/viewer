@@ -1,7 +1,7 @@
 # Tuple Build Container
 
 ## Building
-    $ docker build --tag=rialto-build:latest .
+    $ docker build --tag=radiantblue/rialto-build:latest .
     
 ## Running
     $ docker run -v /ABSOLUTE/PATH/TO/tuple/rialto_viewer/:/rialto-viewer --name="tuple-builder" radiantblue/tuple-build:latest
