@@ -1,10 +1,8 @@
-# TUPLE WPS
 from centos:centos6
 
 MAINTAINER Ben Hosmer <ben.hosmer@gmail.com>
 
 ENV JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk.x86_64/
-#ENV GEOSERVER_DATA_DIR /geoserver-data
 ADD ossim.repo /etc/yum.repos.d/
  
 RUN yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm \
@@ -20,7 +18,6 @@ java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && popd \
 && mkdir /tmp/geoserver \
 && curl -L http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/geoserver-2.6.2-war.zip -o /tmp/geoserver/geoserver-2.6.2-war.zip \
-#&& pushd /tmp/geoserver \
 && pushd /tmp/geoserver \
 && unzip geoserver-2.6.2-war.zip \
 && mkdir /tmp/geoserver/geoserver-war \
@@ -38,9 +35,8 @@ java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && unzip /tmp/geoserver-wps/geoserver-2.6.2-wps-plugin.zip \
 && popd \
 && cp -pr /tmp/geoserver-wps/*.jar /tomcat/webapps/geoserver/WEB-INF/lib/ \
-&& rm -rf /tmp/geoserver-wps \
+&& rm -rf /tmp/geoserver-wps 
 
-#VOLUME /geoserver-data
 CMD /bin/bash /tomcat/bin/catalina.sh run
 
 EXPOSE 8080
