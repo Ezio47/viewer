@@ -1,7 +1,0 @@
-- layers:
-    - esri:
-        type: arcgis_base_imagery
-    - z:
-        type: single_imagery
-        url: http://localhost:12345/file/unittests/images/fan.jpg
-        rectangle: [ -75.0, 28.0, -67.0, 29.75 ]
