@@ -5,10 +5,10 @@
 part of rialto.viewer;
 
 
-class LoadConfigurationDialogVM extends DialogVM {
+class LoadConfigurationDialog extends DialogVM {
     TextInputVM _urlControl;
 
-    LoadConfigurationDialogVM(String id) : super(id) {
+    LoadConfigurationDialog(String id) : super(id) {
 
         _urlControl = new TextInputVM("#loadConfigurationDialog_urlControl", "");
 
@@ -18,7 +18,7 @@ class LoadConfigurationDialogVM extends DialogVM {
     @override
     void _show() {
         if (_urlControl.value == null || _urlControl.value.isEmpty) {
-            _urlControl.value = "http://localhost:12345/file/test.yaml";
+            _urlControl.value = "http://www.example.com:8080/file/config.yaml";
         }
     }
 

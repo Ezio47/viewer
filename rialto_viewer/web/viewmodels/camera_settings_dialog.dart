@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 
-class CameraSettingsDialogVM extends DialogVM {
+class CameraSettingsDialog extends DialogVM {
 
     TextInputVM _eyeLon;
     TextInputVM _eyeLat;
@@ -18,7 +18,7 @@ class CameraSettingsDialogVM extends DialogVM {
     TextInputVM _upY;
     TextInputVM _upZ;
 
-    CameraSettingsDialogVM(String id) : super(id) {
+    CameraSettingsDialog(String id) : super(id) {
 
         _eyeLon = new TextInputVM("#cameraSettingsDialog_eyeLon", "0.0");
         _eyeLat = new TextInputVM("#cameraSettingsDialog_eyeLat", "0.0");

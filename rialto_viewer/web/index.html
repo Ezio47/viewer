@@ -50,10 +50,11 @@
                     </li>
 
                     <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
-                        <a href="">Sources <i class="uk-icon-caret-down"></i></a>
+                        <a href="">Layers <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class="uk-active"><a id="layerManagerDialog_open">Manage sources...</a></li>
+                                <li class="uk-active"><a id="layerManagerDialog_open">Manage layers...</a></li>
+                                <li class="uk-active"><a id="layerAdderDialog_open">Add layer...</a></li>
                                 <li class="uk-active"><a id="loadConfigurationDialog_open">Load configuration...</a></li>
                             </ul>
                         </div>
@@ -63,8 +64,6 @@
                         <a href="">Tools <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class=""><a id="colorizerDialog_open">Colorize points...</a></li>
-                                <li class="uk-nav-divider"></li>
                                 <li class=""><a id="viewshedCircleButton">Make viewshed circle</a></li>
                                 <li class=""><a id="viewshedComputeButton">Compute viewshed</a></li>
                                 <li class=""><a id="linearMeasurementButton">Linear measurement</a></li>
@@ -127,6 +126,21 @@
                  <div class="uk-modal-footer uk-text-right">
                     <button id="loadConfigurationDialog_okay" class="uk-button uk-modal-close">Okay</button>
                     <button id="loadConfigurationDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+           </div>
+        </div>
+
+
+        <div id="layerAdderDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Add Layer
+                </div>
+
+
+                 <div class="uk-modal-footer uk-text-right">
+                    <button id="layerAdderDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="layerAdderDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
                 </div>
            </div>
         </div>
@@ -313,36 +327,7 @@
         </div>
 
 
-        <div id="colorizerDialog" class="uk-modal">
-            <div class="uk-modal-dialog">
-                <div class="uk-modal-header">
-                    Colorizer Dialog
-                </div>
-
-                <div>
-                    <form class="uk-form uk-form-horizontal">
-                        <div class="uk-form-select" data-uk-form-select>
-                            <span></span>
-                            <select id="colorizerDialog_ramps" class="uk-form-large">
-                            </select>
-                        </div>
-                        <div class="uk-form-select" data-uk-form-select>
-                            <span></span>
-                            <select id="colorizerDialog_dims" class="uk-form-large">
-                            </select>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="uk-modal-footer uk-text-right">
-                    <button id="colorizerDialog_okay" class="uk-button uk-modal-close">Okay</button>
-                    <button id="colorizerDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
-                </div>
-            </div>
-        </div>
-
-
-         <div id="infoDialog" class="uk-modal">
+         <div id="layerInfoDialog" class="uk-modal">
             <div class="uk-modal-dialog">
                 <div class="uk-modal-header">
                     Layer Information
@@ -398,7 +383,35 @@
                 </div>
 
                 <div class="uk-modal-footer uk-text-right">
-                    <button id="infoDialog_okay" class="uk-button uk-modal-close">Close</button>
+                    <button id="layerInfoDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+         <div id="layerCustomizationDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Layer Customization
+                </div>
+
+                <div>
+                    <form class="uk-form uk-form-horizontal">
+                        <div class="uk-form-select" data-uk-form-select>
+                            <span></span>
+                            <select id="colorizerDialog_ramps" class="uk-form">
+                            </select>
+                        </div>
+                        <div class="uk-form-select" data-uk-form-select>
+                            <span></span>
+                            <select id="colorizerDialog_dims" class="uk-form">
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="layerCustomizationDialog_okay" class="uk-button uk-modal-close">Close</button>
                 </div>
             </div>
         </div>

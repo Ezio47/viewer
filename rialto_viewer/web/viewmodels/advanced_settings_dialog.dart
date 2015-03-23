@@ -5,13 +5,13 @@
 part of rialto.viewer;
 
 
-class AdvancedSettingsDialogVM extends DialogVM {
+class AdvancedSettingsDialog extends DialogVM {
 
     CheckBoxVM _bboxEnabled;
 
     TextInputVM _displayPrecision;
 
-    AdvancedSettingsDialogVM(String id) : super(id) {
+    AdvancedSettingsDialog(String id) : super(id) {
 
         _displayPrecision = new TextInputVM("#advancedSettingsDialog_displayPrecision", "5");
 

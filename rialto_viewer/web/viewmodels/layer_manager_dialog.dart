@@ -4,7 +4,7 @@
 
 part of rialto.viewer;
 
-class LayerManagerDialogVM extends DialogVM {
+class LayerManagerDialog extends DialogVM {
     BetterListBoxVM _listbox;
 
     ButtonVM _addButton;
@@ -13,11 +13,13 @@ class LayerManagerDialogVM extends DialogVM {
     CheckBoxVM _hideButton;
     ButtonVM _detailsButton;
 
-    InfoDialogVM _infoDialog;
+    LayerInfoDialog _layerInfoDialog;
+    LayerCustomizationDialog _layerCustomizationDialog;
 
-    LayerManagerDialogVM(String id) : super(id, hasCancelButton: false) {
+    LayerManagerDialog(String id) : super(id, hasCancelButton: false) {
 
-        _infoDialog = new InfoDialogVM("#infoDialog");
+        _layerInfoDialog = new LayerInfoDialog("#layerInfoDialog");
+        _layerCustomizationDialog = new LayerCustomizationDialog("#layerCustomizationDialog");
 
         _addButton = new ButtonVM("#layerManagerDialog_add", (_) => log("add layer"));
 
@@ -27,11 +29,14 @@ class LayerManagerDialogVM extends DialogVM {
         });
 
         _customizeButton =
-                new ButtonVM("#layerManagerDialog_customize", (_) => log("customize layer: ${_listbox.value.name}"));
+                new ButtonVM("#layerManagerDialog_customize", (_) {
+            _layerCustomizationDialog.target = _listbox.value;
+            _layerCustomizationDialog.show();
+        });
 
         _detailsButton = new ButtonVM("#layerManagerDialog_details", (_) {
-            _infoDialog.target = _listbox.value;
-            _infoDialog.show();
+            _layerInfoDialog.target = _listbox.value;
+            _layerInfoDialog.show();
         });
 
         _hideButton = new CheckBoxVM("#layerManagerDialog_hide", true);

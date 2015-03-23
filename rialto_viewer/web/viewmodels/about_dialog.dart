@@ -5,6 +5,6 @@
 part of rialto.viewer;
 
 
-class AboutVM extends DialogVM {
-    AboutVM(String id) : super(id, hasCancelButton: false);
+class AboutDialog extends DialogVM {
+    AboutDialog(String id) : super(id, hasCancelButton: false);
 }

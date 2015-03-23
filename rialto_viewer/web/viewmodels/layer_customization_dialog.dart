@@ -1,23 +1,26 @@
-// Copyright (c) 2014, RadiantBlue Technologies, Inc.
+// Copyright (c) 2015, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
 part of rialto.viewer;
 
 
-class ColorizerDialogVM extends DialogVM {
-
+class LayerCustomizationDialog extends DialogVM {
+    Layer _target;
     ListBoxVM _rampsListBox;
     ListBoxVM _dimsListBox;
 
-    ColorizerDialogVM(String id) : super(id) {
+    LayerCustomizationDialog(String id) : super(id, hasCancelButton: false) {
 
         _rampsListBox = new ListBoxVM("#colorizerDialog_ramps");
         _dimsListBox = new ListBoxVM("#colorizerDialog_dims");
 
         _register(_rampsListBox);
         _register(_dimsListBox);
+
     }
+
+    set target(Layer layer) => _target = layer;
 
     @override
     void _show() {

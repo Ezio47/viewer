@@ -51,20 +51,19 @@ class RialtoElement {
         modeButton25D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
         modeButton3D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
 
-        new LoadConfigurationDialogVM("#loadConfigurationDialog");
-        new LayerManagerDialogVM("#layerManagerDialog");
-        new CameraSettingsDialogVM("#cameraSettingsDialog");
-        new AdvancedSettingsDialogVM("#advancedSettingsDialog");
+        new LoadConfigurationDialog("#loadConfigurationDialog");
+        new LayerManagerDialog("#layerManagerDialog");
+        new LayerAdderDialog("#layerAdderDialog");
+        new CameraSettingsDialog("#cameraSettingsDialog");
+        new AdvancedSettingsDialog("#advancedSettingsDialog");
 
-        new AboutVM("#aboutRialtoDialog");
-        new AboutVM("#aboutCesiumDialog");
-        new AboutVM("#wpsStatusDialog");
-        new AboutVM("#logDialog");
+        new AboutDialog("#aboutRialtoDialog");
+        new AboutDialog("#aboutCesiumDialog");
+        new AboutDialog("#wpsStatusDialog");
+        new AboutDialog("#logDialog");
 
         _mouseCoords = querySelector("#textMouseCoords");
         _hub.events.MouseMove.subscribe(_handleUpdateCoords);
-
-        new ColorizerDialogVM("#colorizerDialog");
 
         _textWpsJobStatus = querySelector("#wpsStatusDialog_open");
         _handleWpsJobUpdate();

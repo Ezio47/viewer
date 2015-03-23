@@ -1,8 +1,8 @@
 - layers:
     - bing:
         type: bing_base_imagery
-        style: Road
-        #style: Aerial
+        #style: Road
+        style: Aerial
 
     - terrain:
         type: cesium_stk_base_terrain

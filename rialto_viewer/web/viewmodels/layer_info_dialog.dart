@@ -5,10 +5,10 @@
 part of rialto.viewer;
 
 
-class InfoDialogVM extends DialogVM {
+class LayerInfoDialog extends DialogVM {
     Layer _target;
 
-    InfoDialogVM(String id) : super(id, hasCancelButton: false);
+    LayerInfoDialog(String id) : super(id, hasCancelButton: false);
 
     set target(Layer layer) => _target = layer;
 
