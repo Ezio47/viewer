@@ -9,11 +9,14 @@ class LayerCustomizationDialog extends DialogVM {
     Layer _target;
     ListBoxVM _rampsListBox;
     ListBoxVM _dimsListBox;
+    CheckBoxVM _visibilityButton;
 
     LayerCustomizationDialog(String id) : super(id, hasCancelButton: false) {
 
-        _rampsListBox = new ListBoxVM("#colorizerDialog_ramps");
-        _dimsListBox = new ListBoxVM("#colorizerDialog_dims");
+        _rampsListBox = new ListBoxVM("#layerCustomizationDialog_colorRamps");
+        _dimsListBox = new ListBoxVM("#layerCustomizationDialog_colorDims");
+
+        _visibilityButton = new CheckBoxVM("#layerCustomizationDialog_visibility", true);
 
         _register(_rampsListBox);
         _register(_dimsListBox);
@@ -24,23 +27,40 @@ class LayerCustomizationDialog extends DialogVM {
 
     @override
     void _show() {
-        var ramps = _hub.cesium.getColorRampNames();
-        ramps.forEach((s) => _rampsListBox.add(s));
-        _rampsListBox.value = ramps[0];
+        final bool colorizer = (_target is PointCloudLayer);
+        final bool visibility = (_target is VisibilityControl);
 
-        var dims = new Set<String>();
+        if (colorizer) {
+            var ramps = _hub.cesium.getColorRampNames();
+            ramps.forEach((s) => _rampsListBox.add(s));
+            _rampsListBox.value = ramps[0];
 
-        for (var layer in _hub.layerManager.layers) {
-            if (layer is PointCloudLayer) {
-                dims.addAll(layer.dimensions);
+            var dims = new Set<String>();
+            if (_target is PointCloudLayer) {
+                dims.addAll((_target as PointCloudLayer).dimensions);
             }
+
+            dims = dims.toList();
+            dims.sort();
+
+            dims.forEach((d) => _dimsListBox.add(d));
+            _dimsListBox.value = dims[0];
+
+            _rampsListBox.disabled = false;
+            _dimsListBox.disabled = false;
+        } else {
+            _rampsListBox.disabled = true;
+            _dimsListBox.disabled = true;
         }
 
-        dims = dims.toList();
-        dims.sort();
-
-        dims.forEach((d) => _dimsListBox.add(d));
-        _dimsListBox.value = dims[0];
+        if (visibility) {
+            _visibilityButton.disabled = false;
+            _visibilityButton.setClickHandler((_) {
+                (_target as VisibilityControl).visible = _visibilityButton.value;
+            });
+        } else {
+            _visibilityButton.disabled = true;
+        }
     }
 
     @override

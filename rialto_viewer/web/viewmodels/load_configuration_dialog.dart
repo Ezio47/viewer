@@ -6,28 +6,62 @@ part of rialto.viewer;
 
 
 class LoadConfigurationDialog extends DialogVM {
-    TextInputVM _urlControl;
+    static final _defaultUrl = "http://localhost:12345/file/test.yaml";
+    final String _defaultScript = """- layers:
+    - bing:
+        type: bing_base_imagery
+        #style: Road
+        style: Aerial
+""";
 
-    LoadConfigurationDialog(String id) : super(id) {
+    TextInputVM _urlText;
+    ButtonVM _urlButton;
+    TextAreaInputVM _scriptText;
+    ButtonVM _scriptButton;
 
-        _urlControl = new TextInputVM("#loadConfigurationDialog_urlControl", "");
+    LoadConfigurationDialog(String id) : super(id, hasCancelButton: false) {
 
-        _register(_urlControl);
+        _urlText = new TextInputVM("#loadConfigurationDialog_urlText", "");
+        _urlButton = new ButtonVM("#loadConfigurationDialog_urlButton", _loadUrl);
+
+        _scriptText = new TextAreaInputVM("#loadConfigurationDialog_scriptText", "");
+        _scriptButton = new ButtonVM("#loadConfigurationDialog_scriptButton", _loadScript);
+
+        _register(_urlText);
+    }
+
+    void _loadUrl(_) {
+        String value = _urlText.value;
+        if (value != null) {
+            var url = Uri.parse(value); // TODO: handle error
+
+            _hub.commands.removeAllLayers().then((_) {
+                _hub.commands.loadScriptFromUrl(url);
+            });
+        }
+    }
+
+    void _loadScript(_) {
+        String value = _scriptText.value;
+        if (value != null) {
+            _hub.commands.removeAllLayers().then((_) {
+                _hub.commands.loadScriptFromString(value);
+            });
+        }
     }
 
     @override
     void _show() {
-        if (_urlControl.value == null || _urlControl.value.isEmpty) {
-            _urlControl.value = "http://www.example.com:8080/file/config.yaml";
+        if (_urlText.value == null || _urlText.value.isEmpty) {
+            _urlText.value = "http://localhost:12345/file/test.yaml";
+        }
+
+        if (_scriptText.value == null || _scriptText.value.isEmpty) {
+            _scriptText.value = _defaultScript;
         }
     }
 
     @override
     void _hide() {
-        String value = _urlControl.value;
-        if (value != null) {
-            var url = Uri.parse(value); // TODO: handle error
-            _hub.commands.loadScriptFromUrl(url);
-        }
     }
 }

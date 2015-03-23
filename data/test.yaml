@@ -4,8 +4,8 @@
         #style: Road
         style: Aerial
 
-    - terrain:
-        type: cesium_stk_base_terrain
+#    - terrain:
+#        type: cesium_stk_base_terrain
 
     - alberta_poly:
         type: geojson

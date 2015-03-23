@@ -41,3 +41,20 @@ class TextInputVM extends ViewModel with MStateControl<String> {
 
     //TODO: add validation for data type of input string
 }
+
+
+class TextAreaInputVM extends ViewModel with MStateControl<String> {
+    TextAreaElement _inputElement;
+    String defaultValue;
+
+    TextAreaInputVM(String id, String this.defaultValue) : super(id) {
+        _inputElement = _element;
+        value = defaultValue;
+    }
+
+    @override
+    String get value => _inputElement.value;
+
+    @override
+    set value(String value) => _inputElement.value = value;
+}

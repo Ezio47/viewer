@@ -114,18 +114,26 @@
                     Configuration Script Loader
                 </div>
 
-                <form class="uk-form ">
+                <form class="uk-form">
+                    <label class="uk-form-label" for="loadConfigurationDialog_urlText">URL:</label>
+                    <div class="uk-form-controls">
+                        <input id="loadConfigurationDialog_urlText" type="text" class="uk-form-width-large">
+                        <button id="loadConfigurationDialog_urlButton" class="uk-button uk-modal-close">Load</button>
+                    </div>
+                 </form>
 
-                        <label class="uk-form-label" for="loadConfigurationDialog_urlControl">URL:</label>
-                        <div class="uk-form-controls">
-                            <input id="loadConfigurationDialog_urlControl" type="text" class="uk-form-width-large">
-                        </div>
+                <hr>
 
+                <form class="uk-form">
+                    <label class="uk-form-label" for="loadConfigurationDialog_scriptText">Script:</label>
+                    <div class="uk-form-controls">
+                        <textarea id="loadConfigurationDialog_scriptText" class="uk-form-width-large" style="height:150px;"></textarea>
+                        <button id="loadConfigurationDialog_scriptButton" class="uk-button uk-modal-close">Load</button>
+                    </div>
                  </form>
 
                  <div class="uk-modal-footer uk-text-right">
-                    <button id="loadConfigurationDialog_okay" class="uk-button uk-modal-close">Okay</button>
-                    <button id="loadConfigurationDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                    <button id="loadConfigurationDialog_okay" class="uk-button uk-modal-close">Close</button>
                 </div>
            </div>
         </div>
@@ -171,17 +179,10 @@
 
                     <div class="uk-width-1-3 uk-flex-column">
                         <div>
-                            <button id="layerManagerDialog_add" class="uk-button uk-margin-small-bottom">Add...</button>
-                        </div>
-                        <div>
                             <button id="layerManagerDialog_remove" class="uk-button uk-margin-small-bottom">Remove</button>
                         </div>
                         <div>
                             <button id="layerManagerDialog_customize" class="uk-button uk-margin-small-bottom">Customize...</button>
-                        </div>
-                        <div>
-                            <label class="uk-form-label" for="layerManagerDialog_hide">Visible:</label>
-                            <input id="layerManagerDialog_hide" type="checkbox">
                         </div>
                         <div>
                             <button id="layerManagerDialog_details" class="uk-button uk-margin-small-bottom">Details...</button>
@@ -396,19 +397,30 @@
                 </div>
 
                 <div>
+                    Visibility
+                    <form class="uk-form uk-form-horizontal">
+                            <label class="uk-form-label" for="layerCustomizationDialog_visible">Visible:</label>
+                            <input id="layerCustomizationDialog_visibility" type="checkbox">
+                    </form>
+                </div>
+                <hr>
+
+                <div>
+                    Colorization
                     <form class="uk-form uk-form-horizontal">
                         <div class="uk-form-select" data-uk-form-select>
                             <span></span>
-                            <select id="colorizerDialog_ramps" class="uk-form">
+                            <select id="layerCustomizationDialog_colorRamps" class="uk-form">
                             </select>
                         </div>
                         <div class="uk-form-select" data-uk-form-select>
                             <span></span>
-                            <select id="colorizerDialog_dims" class="uk-form">
+                            <select id="layerCustomizationDialog_colorDims" class="uk-form">
                             </select>
                         </div>
                     </form>
                 </div>
+                <hr>
 
                 <div class="uk-modal-footer uk-text-right">
                     <button id="layerCustomizationDialog_okay" class="uk-button uk-modal-close">Close</button>
