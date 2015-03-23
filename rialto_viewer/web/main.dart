@@ -4,6 +4,7 @@
 
 import 'dart:core';
 import 'dart:html';
+//import 'dart:isolate';
 import 'rialto.dart';
 
 final Map tests = {
@@ -43,6 +44,12 @@ final String demo = """- layers:
 
 
 void main() {
+
+    // TODO: addErrorListener not yet implemented in Dart SDK...
+    //ReceivePort errPort = new ReceivePort();
+    //Isolate.current.addErrorListener(errPort.sendPort);
+    //errPort.listen((d) => log("bonk: $d"));
+
     String config;
 
     // The Rules:
@@ -77,7 +84,6 @@ void main() {
         try {
             final uri = Uri.parse(config);
             hub.commands.loadScriptFromUrl(uri);
-            //hub.commands.loadScriptFromString(demo);
         } catch (e) {
             Hub.error("Top-level exception caught", object: e);
         }
