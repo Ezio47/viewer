@@ -1,0 +1,16 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "bhosmer/centos6.6-minimal"
+  config.vm.hostname = "rialto.dev"
+
+  config.vm.network "private_network", ip: "192.168.33.19"
+
+  config.vm.synced_folder ".", "/vagrant", type: "nfs"
+  config.vm.provider "virtualbox" do |vb|
+     vb.memory = "4096"
+  end
+  config.vm.provision "shell", inline:
+    "yum -y update && rpm -Uvh http://elgis.argeo.org/repos/6/elgis-release-6-6_0.noarch.rpm && yum -y install docker-io && service iptables stop"
+end
