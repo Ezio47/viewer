@@ -1,5 +1,0 @@
-- layers:
-    - y:
-        type: tms_imagery
-        url: http://cesiumjs.org/blackmarble
-        maximumLevel : 8
