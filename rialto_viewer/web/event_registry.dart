@@ -30,7 +30,7 @@ class EventRegistry {
 
     SignalFunctions<Layer> AddLayerCompleted = new SignalFunctions<Layer>();
     SignalFunctions<Layer> AddAllLayersCompleted = new SignalFunctions<Layer>();
-    SignalFunctions<String> RemoveLayerCompleted = new SignalFunctions<String>();
+    SignalFunctions<Layer> RemoveLayerCompleted = new SignalFunctions<Layer>();
     SignalFunctions RemoveAllLayersCompleted = new SignalFunctions();
 
     SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();

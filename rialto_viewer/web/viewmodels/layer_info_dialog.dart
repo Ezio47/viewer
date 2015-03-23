@@ -5,17 +5,17 @@
 part of rialto.viewer;
 
 
-class InfoVM extends DialogVM {
-    LayerManagerDialogVM _parent;
+class LayerInfoDialog extends DialogVM {
+    Layer _target;
 
-    InfoVM(String id, LayerManagerDialogVM this._parent) : super(id, hasCancelButton: false);
+    LayerInfoDialog(String id) : super(id, hasCancelButton: false);
+
+    set target(Layer layer) => _target = layer;
 
     @override
     void _show() {
-        assert(_parent.currentSelection != null);
-
-        final layer = _hub.layerManager.layers[_parent.currentSelection];
-        assert(layer != null);
+        assert(_target != null);
+        Layer layer = _target;
 
         final name = layer.name;
         final type = layer.type;

@@ -55,6 +55,9 @@ class ListBoxVM extends ViewModel with MStateControl<String> {
         value = "";
     }
 
+    set disabled(bool v) => _selectElement.disabled = v;
+    bool get disabled => _selectElement.disabled;
+
     // only use for item iteration, no modification
 //    List<ListBoxItem<T>> get list => _list;
 }

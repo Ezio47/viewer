@@ -17,8 +17,18 @@ class TerrainLayer extends Layer {
     @override
     Future load() {
         var f = new Future(() {
+            var options = {
+                'url': urlString
+            };
+            _provider = _hub.cesium.setCesiumTerrainProvider(options);
+        });
+        return f;
+    }
 
-            _provider = _hub.cesium.setCesiumTerrainProvider(urlString);
+    @override
+    Future unload() {
+        var f = new Future(() {
+            _hub.cesium.unsetTerrainProvider();
         });
         return f;
     }

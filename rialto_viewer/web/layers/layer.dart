@@ -33,7 +33,8 @@ abstract class Layer {
     String get urlString => url.toString();
     String get proxyString => (proxy == null) ? null : proxy.toString();
 
-    Future load();
+    Future load(); // "add"
+    Future unload(); // "remove"
 
     CartographicBbox get bbox => _bbox;
 

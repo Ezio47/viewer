@@ -56,33 +56,32 @@ class CesiumBridge {
     //
     //---------------------------------------------------------------------------------------------
 
-    dynamic addSingleTileImageryProvider(String url, List<num> rectList, String proxyUrl) {
+    dynamic addSingleTileImageryLayer(String url, List<num> rectList, String proxyUrl) {
         var rect = (rectList == null || rectList == []) ?
                 null :
                 _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
-        var provider = _bridge.callMethod('newSingleTileImageryProvider', [url, rect, proxy]);
-        var layer = _bridge.callMethod('addImageryProvider', [provider]);
+        var layer = _bridge.callMethod('addSingleTileImageryLayer', [url, rect, proxy]);
         return layer;
     }
 
-    dynamic addWebMapServiceImageryProvider(String url, String layers, List<num> rectList, String proxyUrl) {
+    dynamic addWebMapServiceImageryLayer(String url, String layers, List<num> rectList, String proxyUrl) {
         var rect = (rectList == null || rectList == []) ?
                 null :
                 _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
-        var provider = _bridge.callMethod('newWebMapServiceImageryProvider', [url, layers, rect, proxy]);
-        var layer = _bridge.callMethod('addImageryProvider', [provider]);
+        var layer = _bridge.callMethod('addWebMapServiceImageryLayer', [url, layers, rect, proxy]);
         return layer;
     }
 
-    dynamic addTileMapServiceImageryProvider(String url, List<num> rectList, int maximumLevel, bool gdal2Tiles, String proxyUrl) {
+    dynamic addTileMapServiceImageryLayer(String url, List<num> rectList, int maximumLevel, bool gdal2Tiles,
+            String proxyUrl) {
         var rect = (rectList == null || rectList == []) ?
                 null :
                 _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
-        var provider = _bridge.callMethod('newTileMapServiceImageryProvider', [url, rect, maximumLevel, gdal2Tiles, proxy]);
-        var layer = _bridge.callMethod('addImageryProvider', [provider]);
+        var layer =
+                _bridge.callMethod('addTileMapServiceImageryLayer', [url, rect, maximumLevel, gdal2Tiles, proxy]);
         return layer;
     }
 
@@ -92,11 +91,6 @@ class CesiumBridge {
     // imagery layer support
     //
     //---------------------------------------------------------------------------------------------
-
-    // returns a layer
-    dynamic addImageryProvider(dynamic provider) {
-        return _bridge.callMethod('addImageryProvider', [provider]);
-    }
 
     void setLayerVisible(dynamic layer, bool v) => _bridge.callMethod('setLayerVisible', [layer, v]);
 
@@ -120,18 +114,23 @@ class CesiumBridge {
     //---------------------------------------------------------------------------------------------
 
     // returns a layer
-    dynamic setBingBaseImageryProvider(String apiKey, String style) {
-        return _bridge.callMethod('setBingBaseImageryProvider', [apiKey, style]);
+    dynamic addBingBaseImageryLayer(Map<String, String> options) {
+        return _bridge.callMethod('setBingBaseImageryProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a layer
-    dynamic setArcGisBaseImageryProvider() {
-        return _bridge.callMethod('setArcGisBaseImageryProvider', []);
+    dynamic addArcGisBaseImageryLayer(Map<String, String> options) {
+        return _bridge.callMethod('setArcGisBaseImageryProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a layer
-    dynamic setOsmBaseImageryProvider() {
-        return _bridge.callMethod('setOsmBaseImageryProvider', []);
+    dynamic addOsmBaseImageryLayer(Map<String, String> options) {
+
+        return _bridge.callMethod('setOsmBaseImageryProvider', [new JsObject.jsify(options)]);
+    }
+
+    void removeImageryLayer(dynamic layer) {
+        _bridge.callMethod('removeImageryLayer', [layer]);
     }
 
 
@@ -142,28 +141,36 @@ class CesiumBridge {
     //---------------------------------------------------------------------------------------------
 
     // returns a terrain provider
-    dynamic setCesiumTerrainProvider(String url) {
-        return _bridge.callMethod('setCesiumTerrainProvider', [url]);
+    dynamic setCesiumTerrainProvider(Map<String,String> options) {
+        return _bridge.callMethod('setCesiumTerrainProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a terrain provider
-    dynamic setEllipsoidBaseTerrainProvider() {
-        return _bridge.callMethod('setEllipsoidBaseTerrainProvider', []);
+    dynamic setEllipsoidBaseTerrainProvider(Map<String,String> options) {
+        return _bridge.callMethod('setEllipsoidBaseTerrainProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a terrain provider
-    dynamic setVrTheWorldBaseTerrainProvider(String url) {
-        return _bridge.callMethod('setVrTheWorldBaseTerrainProvider', [url]);
+    dynamic setVrTheWorldBaseTerrainProvider(Map<String,String> options) {
+        return _bridge.callMethod('setVrTheWorldBaseTerrainProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a terrain provider
-    dynamic setCesiumBaseTerrainProvider(String url, String credit) {
-        return _bridge.callMethod('setCesiumBaseTerrainProvider', [url, credit]);
+    dynamic setCesiumBaseTerrainProvider(Map<String,String> options) {
+        return _bridge.callMethod('setCesiumBaseTerrainProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a terrain provider
-    dynamic setArcGisBaseTerrainProvider(apiKey) {
-        return _bridge.callMethod('setArcGisBaseTerrainProvider', [apiKey]);
+    dynamic setArcGisBaseTerrainProvider(options) {
+        return _bridge.callMethod('setArcGisBaseTerrainProvider', [new JsObject.jsify(options)]);
+    }
+
+    void unsetTerrainProvider() {
+        _bridge.callMethod('unsetTerrainProvider', []);
+    }
+
+    void unsetBaseTerrainProvider() {
+        _bridge.callMethod('unsetBaseTerrainProvider', []);
     }
 
 
@@ -216,10 +223,6 @@ class CesiumBridge {
     //
     //--------------------------------------------------------------------------------------------
 
-    void addDataSource(var dataSource) {
-        _bridge.callMethod('addDataSource', [dataSource]);
-    }
-
     void removeDataSource(var dataSource) {
         _bridge.callMethod('removeDataSource', [dataSource]);
     }
@@ -228,14 +231,14 @@ class CesiumBridge {
         _bridge.callMethod('setDataSourceVisible', [dataSource, v]);
     }
 
-    Future<dynamic> addGeoJson(String name, String url) {
+    Future<dynamic> addGeoJsonDataSource(String name, String url) {
         var c = new Completer<dynamic>();
 
         var cb = (obj) {
             c.complete(obj);
         };
 
-        _bridge.callMethod('addGeoJson', [name, url, cb]);
+        _bridge.callMethod('addGeoJsonDataSource', [name, url, cb]);
 
         return c.future;
     }

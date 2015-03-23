@@ -70,6 +70,16 @@ abstract class BaseImageryLayer extends Layer implements VisibilityControl, Alph
     }
     @override double get gamma => _gamma;
 
+    @override
+    Future unload() {
+
+        var f = new Future(() {
+            _hub.cesium.removeImageryLayer(_layer);
+        });
+
+        return f;
+    }
+
     void _forceUpdates() {
         visible = _visible;
         alpha = _alpha;
@@ -104,7 +114,12 @@ class BingBaseImageryLayer extends BaseImageryLayer {
     Future load() {
 
         var f = new Future(() {
-            _layer = _hub.cesium.setBingBaseImageryProvider(_apiKey, _style);
+            var options = {
+                "key": _apiKey,
+                "mapStyle": _style,
+                "url": '//dev.virtualearth.net'
+            };
+            _layer = _hub.cesium.addBingBaseImageryLayer(options);
             _forceUpdates();
         });
 
@@ -121,7 +136,10 @@ class ArcGisBaseImageryLayer extends BaseImageryLayer {
     @override
     Future load() {
         var f = new Future(() {
-            _layer = _hub.cesium.setArcGisBaseImageryProvider();
+            var options = {
+                "url": '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+            };
+            _layer = _hub.cesium.addArcGisBaseImageryLayer(options);
             _forceUpdates();
         });
 
@@ -139,7 +157,8 @@ class OsmBaseImageryLayer extends BaseImageryLayer {
     Future load() {
 
         var f = new Future(() {
-            _layer = _hub.cesium.setOsmBaseImageryProvider();
+            var options = {};
+            _layer = _hub.cesium.addOsmBaseImageryLayer(options);
 
             _forceUpdates();
         });
