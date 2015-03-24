@@ -13,7 +13,7 @@ java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && curl -L http://apache.mesi.com.ar/tomcat/tomcat-7/v7.0.59/bin/apache-tomcat-7.0.59.tar.gz -o /tmp/apache-tomcat-7.0.59.tar.gz \
 && pushd /tmp \
 && tar xvf apache-tomcat-7.0.59.tar.gz \
-&& rm -rf apache-tomcat-7.0.597.tar.gz \
+&& rm -rf apache-tomcat-7.0.59.tar.gz \
 && mv apache-tomcat-7.0.59 /tomcat \
 && popd \
 && mkdir /tmp/geoserver \
@@ -35,7 +35,14 @@ java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && unzip /tmp/geoserver-wps/geoserver-2.6.2-wps-plugin.zip \
 && popd \
 && cp -pr /tmp/geoserver-wps/*.jar /tomcat/webapps/geoserver/WEB-INF/lib/ \
-&& rm -rf /tmp/geoserver-wps 
+&& rm -rf /tmp/geoserver-wps
+&&  mkdir /tmp/geoserver-grooy \ 
+&& curl -L http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip -o /tmp/geoserver-groovy/geoserver-2.6-SNAPSHOT-groovy-plugin.zip \
+&& pushd /tmp/geoserver-groovy \
+&& unzip geoserver-2.6-SNAPSHOT-groovy-plugin.zip \
+&& cp -pr /tmp/geoserver-groovy/*.jar /tomcat/webapps/geoserver/WEB-INF/lib/ \
+&& rm -rf /tmp/geoserver-groovy \
+&& popd
 
 CMD /bin/bash /tomcat/bin/catalina.sh run
 
