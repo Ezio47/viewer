@@ -26,11 +26,13 @@ java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && popd \
 && rm -f /tmp/geoserver-2.6.2-war.zip \
 && curl -L http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/extensions/geoserver-2.6.2-wps-plugin.zip -o /tmp/geoserver-2.6.2-wps-plugin.zip \
-&& unzip /tmp/geoserver-2.6.2-wps-plugin.zip -d /tomcat/webapps/geoserver/WEB-INF/lib \
+&& unzip -o /tmp/geoserver-2.6.2-wps-plugin.zip -d /tomcat/webapps/geoserver/WEB-INF/lib \
 && rm -rf /tmp/geoserver-2.6.2-wps-plugin.zip \
 && curl -L http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip -o /tmp/geoserver-2.6-SNAPSHOT-groovy-plugin.zip \
-&& unzip /tmp/geoserver-2.6-SNAPSHOT-groovy-plugin.zip -d /tomcat/webapps/geoserver/WEB-INF/lib \
+&& unzip -o /tmp/geoserver-2.6-SNAPSHOT-groovy-plugin.zip -d /tomcat/webapps/geoserver/WEB-INF/lib \
 && rm -rf /tmp/geoserver-2.6-SNAPSHOT-groovy-plugin.zip \
+
+COPY wpsviewshed.groovy /tomcat/webapps/geoserver/scripts/wps/wpsviewshed.groovy
 
 CMD /bin/bash /tomcat/bin/catalina.sh run
 
