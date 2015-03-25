@@ -39,15 +39,23 @@ class AdvancedSettingsChangedData {
 }
 
 
+enum MouseButton {
+    left,
+    middle,
+    right,
+}
+
 class MouseData {
     final double x;
     final double y;
     final bool altKey;
-    final int button; // 0==left, 1==middle, 2==right
+    final MouseButton button;
+
+    static final _buttonMap = {0: MouseButton.left, 1: MouseButton.middle, 2: MouseButton.right};
 
     MouseData(MouseEvent ev):
         altKey = ev.altKey,
-        button = ev.button,
+        button = _buttonMap[ev.button],
         x = ev.client.x.toDouble(),
         y = ev.client.y.toDouble();
 
@@ -57,7 +65,7 @@ class MouseData {
         x = nx.toDouble(),
         y = ny.toDouble();
 
-    MouseData.fromXyb(num nx, num ny, int this.button):
+    MouseData.fromXyb(num nx, num ny, MouseButton this.button):
         altKey = null,
         x = nx.toDouble(),
         y = ny.toDouble();
