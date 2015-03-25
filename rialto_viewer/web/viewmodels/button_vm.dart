@@ -22,7 +22,7 @@ class ButtonVM extends ViewModel {
     set disabled(bool v) {
         final attrs = _buttonElement.attributes;
         if (v) {
-            attrs.putIfAbsent("disabled", ()=>"true");
+            attrs.putIfAbsent("disabled", () => "true");
         } else {
             attrs.remove("disabled");
         }

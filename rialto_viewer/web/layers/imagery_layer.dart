@@ -72,14 +72,14 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
     @override double get gamma => _gamma;
 
     @override
-     Future unload() {
+    Future unload() {
 
-         var f = new Future(() {
-             _hub.cesium.removeImageryLayer(_layer);
-         });
+        var f = new Future(() {
+            _hub.cesium.removeImageryLayer(_layer);
+        });
 
-         return f;
-     }
+        return f;
+    }
 
     void _forceUpdates() {
         visible = _visible;

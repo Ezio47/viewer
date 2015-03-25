@@ -33,7 +33,7 @@ class Viewshedder {
                 "url": url,
                 "gdal2Tiles": true,
                 "maximumLevel": 12,
-                //"alpha": 0.5
+            //"alpha": 0.5
             });
             hub.commands.addLayer(layerData).then((_) {
                 //Hub.log("layer added!");

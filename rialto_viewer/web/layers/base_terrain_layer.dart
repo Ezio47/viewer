@@ -41,12 +41,13 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
 
     static const _defaultKey =
             'KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..';
-    static const _defaultUrl = '//elevation.arcgisonline.com/ArcGIS/rest/services/WorldElevation/DTMEllipsoidal/ImageServer';
+    static const _defaultUrl =
+            '//elevation.arcgisonline.com/ArcGIS/rest/services/WorldElevation/DTMEllipsoidal/ImageServer';
     String _arcGisApiKey;
 
     ArcGisBaseTerrainLayer(String name, Map map)
             : super("arcgis_base_terrain", name, map),
-            _arcGisApiKey = YamlUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultKey);
+              _arcGisApiKey = YamlUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultKey);
 
     @override
     Future load() {
@@ -86,9 +87,7 @@ class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
 class CesiumStkBaseTerrainLayer extends BaseTerrainLayer {
 
     CesiumStkBaseTerrainLayer(String name, Map map)
-            : super("cesium_stk_base_terrain", name, map) {
-    }
-
+            : super("cesium_stk_base_terrain", name, map);
     @override
     Future load() {
         var f = new Future(() {

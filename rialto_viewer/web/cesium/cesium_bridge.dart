@@ -80,8 +80,7 @@ class CesiumBridge {
                 null :
                 _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
         var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
-        var layer =
-                _bridge.callMethod('addTileMapServiceImageryLayer', [url, rect, maximumLevel, gdal2Tiles, proxy]);
+        var layer = _bridge.callMethod('addTileMapServiceImageryLayer', [url, rect, maximumLevel, gdal2Tiles, proxy]);
         return layer;
     }
 
@@ -141,22 +140,22 @@ class CesiumBridge {
     //---------------------------------------------------------------------------------------------
 
     // returns a terrain provider
-    dynamic setCesiumTerrainProvider(Map<String,String> options) {
+    dynamic setCesiumTerrainProvider(Map<String, String> options) {
         return _bridge.callMethod('setCesiumTerrainProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a terrain provider
-    dynamic setEllipsoidBaseTerrainProvider(Map<String,String> options) {
+    dynamic setEllipsoidBaseTerrainProvider(Map<String, String> options) {
         return _bridge.callMethod('setEllipsoidBaseTerrainProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a terrain provider
-    dynamic setVrTheWorldBaseTerrainProvider(Map<String,String> options) {
+    dynamic setVrTheWorldBaseTerrainProvider(Map<String, String> options) {
         return _bridge.callMethod('setVrTheWorldBaseTerrainProvider', [new JsObject.jsify(options)]);
     }
 
     // returns a terrain provider
-    dynamic setCesiumBaseTerrainProvider(Map<String,String> options) {
+    dynamic setCesiumBaseTerrainProvider(Map<String, String> options) {
         return _bridge.callMethod('setCesiumBaseTerrainProvider', [new JsObject.jsify(options)]);
     }
 

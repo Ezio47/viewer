@@ -6,10 +6,7 @@ part of rialto.viewer;
 
 class LayerAdderDialog extends DialogVM {
 
-    LayerAdderDialog(String id) : super(id, hasCancelButton: false) {
-
-    }
-
+    LayerAdderDialog(String id) : super(id, hasCancelButton: false);
     @override
     void _show() {
     }

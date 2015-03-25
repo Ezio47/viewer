@@ -15,34 +15,18 @@ class RialtoElement {
     RialtoElement() {
         _hub = Hub.root;
 
-        querySelector(
-                "#homeWorldButton").onClick.listen(
-                        (ev) => _hub.commands.zoomToWorld());
-        querySelector(
-                "#homeDataButton").onClick.listen(
-                        (ev) => _hub.commands.zoomToLayer(null));
+        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.commands.zoomToWorld());
+        querySelector("#homeDataButton").onClick.listen((ev) => _hub.commands.zoomToLayer(null));
 
-        querySelector(
-                 "#viewshedCircleButton").onClick.listen(
-                        (ev) => _hub.commands.createViewshedCircle());
-        querySelector(
-                 "#viewshedComputeButton").onClick.listen(
-                        (ev) => _hub.commands.computeViewshed());
+        querySelector("#viewshedCircleButton").onClick.listen((ev) => _hub.commands.createViewshedCircle());
+        querySelector("#viewshedComputeButton").onClick.listen((ev) => _hub.commands.computeViewshed());
 
-        querySelector(
-                 "#linearMeasurementButton").onClick.listen(
-                        (ev) => _hub.commands.computeLinearMeasurement());
-        querySelector(
-                 "#areaMeasurementButton").onClick.listen(
-                        (ev) => _hub.commands.computeAreaMeasurement());
+        querySelector("#linearMeasurementButton").onClick.listen((ev) => _hub.commands.computeLinearMeasurement());
+        querySelector("#areaMeasurementButton").onClick.listen((ev) => _hub.commands.computeAreaMeasurement());
 
-        querySelector(
-                 "#dropPinButton").onClick.listen(
-                        (ev) => _hub.commands.dropPin());
+        querySelector("#dropPinButton").onClick.listen((ev) => _hub.commands.dropPin());
 
-        querySelector(
-                 "#drawExtentButton").onClick.listen(
-                        (ev) => _hub.commands.drawExtent());
+        querySelector("#drawExtentButton").onClick.listen((ev) => _hub.commands.drawExtent());
 
         var modeButton2D = querySelector("#modeButton2D");
         var modeButton25D = querySelector("#modeButton25D");

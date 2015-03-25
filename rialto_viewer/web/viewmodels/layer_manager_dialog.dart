@@ -24,8 +24,7 @@ class LayerManagerDialog extends DialogVM {
             _listbox.remove(_listbox.value);
         });
 
-        _customizeButton =
-                new ButtonVM("#layerManagerDialog_customize", (_) {
+        _customizeButton = new ButtonVM("#layerManagerDialog_customize", (_) {
             _layerCustomizationDialog.target = _listbox.value;
             _layerCustomizationDialog.show();
         });

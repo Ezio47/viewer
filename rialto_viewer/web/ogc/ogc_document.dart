@@ -191,8 +191,8 @@ class OgcCapabilitiesDocument_7 extends OgcDocument {
     @override String dump(int indent) {
         String s = "";
         s += pad(indent) + "[CapabilitiesDocument7]\n";
-        s += pad(indent +1) + "Service: $service\n";
-        s += pad(indent+1) + "Version: $version\n";
+        s += pad(indent + 1) + "Service: $service\n";
+        s += pad(indent + 1) + "Version: $version\n";
         s += processOfferings.dump(indent + 1);
         return s;
     }
@@ -357,8 +357,8 @@ class OgcLiteralInput_25 extends OgcDocument {
     @override String dump(int indent) {
         String s = "";
         s += pad(indent) + "[LiteralInput25]\n";
-        s += pad(indent+1) + "Datatype: $datatype\n";
-        s += pad(indent+1)+ "DefaultValue: $defaultValue";
+        s += pad(indent + 1) + "Datatype: $datatype\n";
+        s += pad(indent + 1) + "DefaultValue: $defaultValue";
         return s;
     }
 }
@@ -421,7 +421,7 @@ class OgcLiteralOutput_37 extends OgcDocument {
     @override String dump(int indent) {
         String s = "";
         s += pad(indent) + "[LiteralOutput37]\n";
-        s += pad(indent+1)+ "Datatype: $datatype\n";
+        s += pad(indent + 1) + "Datatype: $datatype\n";
         return s;
     }
 }

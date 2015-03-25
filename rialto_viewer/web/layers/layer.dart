@@ -21,13 +21,10 @@ abstract class Layer {
             : _hub = Hub.root,
               url = YamlUtils.getOptionalSettingAsUrl(map, "url"),
               proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy"),
-              description = YamlUtils.getOptionalSettingAsString(map, "description") {
-        //log("New $type layer: $name");
-    }
-
+              description = YamlUtils.getOptionalSettingAsString(map, "description");
     _requireUrl() {
-        if (url != null)  return;
-         throw new ArgumentError("url not set in config file");
+        if (url != null) return;
+        throw new ArgumentError("url not set in config file");
     }
 
     String get urlString => url.toString();

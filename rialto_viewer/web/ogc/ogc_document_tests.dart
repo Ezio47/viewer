@@ -29,9 +29,15 @@ class OgcDocumentTests {
         var proxyUri = Uri.parse("http://localhost:12345/proxy");
         var wps = new WpsService(uri, proxyUri: proxyUri);
         wps.open();
-        wps.doOwsGetCapabilities().then((doc) { assert(doc is OgcCapabilitiesDocument_7); });
-        wps.doWpsDescribeProcess("org.ciesin.gis.wps.algorithms.PopStats").then((doc) { assert(doc is OgcProcessDescription_16); });
-        wps.doWpsDescribeProcess("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is OgcExceptionReportDocument); });
+        wps.doOwsGetCapabilities().then((doc) {
+            assert(doc is OgcCapabilitiesDocument_7);
+        });
+        wps.doWpsDescribeProcess("org.ciesin.gis.wps.algorithms.PopStats").then((doc) {
+            assert(doc is OgcProcessDescription_16);
+        });
+        wps.doWpsDescribeProcess("org.ciesin.gis.wps.algorithms.PopStat").then((doc) {
+            assert(doc is OgcExceptionReportDocument);
+        });
         wps.close();
 
         Hub.log("OGC tests done");
