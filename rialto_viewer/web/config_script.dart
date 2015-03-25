@@ -10,32 +10,38 @@ class ConfigScript {
 
     ConfigScript() : _hub = Hub.root;
 
-    Future<List<dynamic>> loadFromUrl(Uri url) {
+    Future<List<dynamic>> loadFromUrlAsync(Uri url) async {
         var c = new Completer<List<dynamic>>();
 
-        Comms.httpGet(url).then((Http.Response response) {
-            String yamlText = response.body;
-            _runInner(yamlText, c, url.toString());
-        });
+        Http.Response response = await Comms.httpGet(url);
+        String yamlText = response.body;
 
-        return c.future;
+        List<dynamic> results = await _runInner(yamlText, url.toString());
+        return results;
     }
 
-    Future<List<dynamic>> loadFromString(String yamlText) {
-        var c = new Completer<List<dynamic>>();
+    Future<List<dynamic>> loadFromStringAsync(String yamlText) async {
 
-        _runInner(yamlText, c, "");
+        List<dynamic> results = await _runInner(yamlText, "");
 
-        return c.future;
+        return results;
     }
 
-    void _runInner(String yamlText, Completer c, String urlString) {
-        List<Map<String, Map>> commands = loadYaml(yamlText);
+    Future<List<dynamic>> _runInner(String yamlText, String urlString) async {
 
-        Commands.run(_executeCommandAsync, commands).then((results) {
-            Hub.root.events.LoadScriptCompleted.fire(urlString);
-            c.complete(results);
-        });
+        List<Map<String, Map>> commands;
+        try {
+            commands = loadYaml(yamlText);
+        } catch (e) {
+            Hub.error("Unable to parse configuration", e);
+            return null;
+        }
+
+        List<dynamic> results = await Commands.run(_executeCommandAsync, commands);
+
+        Hub.root.events.LoadScriptCompleted.fire(urlString);
+
+        return results;
     }
 
     Future<dynamic> _executeCommandAsync(Map command) {
@@ -56,9 +62,7 @@ class ConfigScript {
                 return _doCommand_wps(data);
         }
 
-        Hub.error("Unrecognized command in configuration file", info: {
-            "Command": key
-        });
+        Hub.error("Unrecognized command in configuration file", "Command: $key");
         return null;
     }
 
@@ -96,16 +100,12 @@ class ConfigScript {
 
         double fov = data["fov"].toDouble();
 
-        var cameraData = new CameraData(eye, target, up, fov);
-        _hub.commands.updateCamera(cameraData);
+        _hub.commands.zoomTo(eye, target, up, fov);
 
         return new Future(() {});
     }
 
     Future _doCommand_display(Map data) {
-        if (data.containsKey("bbox")) {
-            _hub.commands.displayBbox(data["bbox"]);
-        }
         if (data.containsKey("colorize")) {
             Map colorizeData = data["colorize"];
             assert(colorizeData.containsKey("ramp"));

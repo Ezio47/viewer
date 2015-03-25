@@ -52,7 +52,7 @@ class OwsService {
                 var doc = OgcDocument.parseString(text);
                 c.complete(doc);
             } catch (e) {
-                Hub.error("Unable to parse server response", object: e);
+                Hub.error("Unable to parse server response", e);
                 c.complete(null);
             }
         });

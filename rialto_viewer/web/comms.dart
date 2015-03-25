@@ -22,7 +22,7 @@ class Comms {
         client.get(url).then((Http.Response response) {
             c.complete(response);
         }).catchError((e) {
-            Hub.error("Unable to load file", object: e, info: {"Path": url});
+            Hub.error("Unable to load file", "Path: $url");
         });
 
         return c.future;

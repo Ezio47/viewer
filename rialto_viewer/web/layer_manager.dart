@@ -9,7 +9,6 @@ class LayerManager {
     Hub _hub;
     List<Layer> layers = new List<Layer>();
     Map<String, Layer> _layerMap = new Map<String, Layer>();
-    CartographicBbox bbox = new CartographicBbox.empty();
     bool _hasBaseImagery = false;
 
     LayerManager() : _hub = Hub.root;
@@ -52,11 +51,6 @@ class LayerManager {
             layers.add(layer);
             _layerMap[layer.name] = layer;
 
-            if (layer.bbox != null) {
-                bbox.unionWith(layer.bbox);
-                _hub.events.LayersBboxChanged.fire(bbox);
-            }
-
             _hub.events.AddLayerCompleted.fire(layer);
 
             c.complete(layer);
@@ -79,16 +73,6 @@ class LayerManager {
         layers.remove(layer);
 
         layer.unload();
-
-        if (bboxAffected) {
-            bbox = new CartographicBbox.empty();
-            for (var layer in layers) {
-                if (layer.bbox != null) {
-                    bbox.unionWith(layer.bbox);
-                }
-            }
-            _hub.events.LayersBboxChanged.fire(bbox);
-        }
 
         _hub.events.RemoveLayerCompleted.fire(layer);
 
@@ -181,9 +165,7 @@ class LayerManager {
                 break;
 
             default:
-                Hub.error("Unrecognized layer type in configuration file", info: {
-                    "Layer type": type
-                });
+                Hub.error("Unrecognized layer type in configuration file", "Layer type: $type");
                 return null;
         }
 

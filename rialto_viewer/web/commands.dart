@@ -72,15 +72,15 @@ class Commands {
     return _hub.layerManager.doRemoveAllLayers();
   }
 
-  Future loadScriptFromUrl(Uri url) {
+  Future loadScriptFromUrlAsync(Uri url) {
     var s = new ConfigScript();
-    var f = s.loadFromUrl(url);
+    var f = s.loadFromUrlAsync(url);
     return f;
   }
 
-  Future loadScriptFromString(String yaml) {
+  Future loadScriptFromStringAsync(String yaml) {
     var s = new ConfigScript();
-    var f = s.loadFromString(yaml);
+    var f = s.loadFromStringAsync(yaml);
     return f;
   }
 
@@ -99,8 +99,16 @@ class Commands {
     return _hub.wps.doOwsGetCapabilities();
   }
 
-  Future updateCamera(CameraData data) {
-    return _hub.camera.doUpdateCamera(data);
+  Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
+    return _hub.camera.zoomTo(eyePosition, targetPosition, upDirection, fov);
+  }
+
+  Future zoomToLayer(Layer layer) {
+    return _hub.camera.zoomToLayer(layer);
+  }
+
+  Future zoomToWorld() {
+    return _hub.camera.zoomToWorld();
   }
 
   Future setViewMode(ViewModeData mode) {
@@ -113,11 +121,6 @@ class Commands {
     if (data.layer is VisibilityControl) {
       (data.layer as VisibilityControl).visible = data.visible;
     }
-    return new Future(() {});
-  }
-
-  Future displayBbox(bool v) {
-    _hub.displayBbox(v);
     return new Future(() {});
   }
 
@@ -158,19 +161,6 @@ class DisplayLayerData {
   Layer layer;
   bool visible;
   DisplayLayerData(this.layer, this.visible);
-}
-
-enum CameraViewMode { normalMode, worldviewMode, dataviewMode }
-
-class CameraData {
-  CameraViewMode viewMode;
-  Cartographic3 eye; // cartographic
-  Cartographic3 target; // cartographic
-  Cartesian3 up; // cartesian
-  double fov;
-  CameraData(this.eye, this.target, this.up, this.fov)
-      : viewMode = CameraViewMode.normalMode;
-  CameraData.fromMode(this.viewMode);
 }
 
 class LayerData {

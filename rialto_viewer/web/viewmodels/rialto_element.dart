@@ -17,10 +17,10 @@ class RialtoElement {
 
         querySelector(
                 "#homeWorldButton").onClick.listen(
-                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraViewMode.worldviewMode)));
+                        (ev) => _hub.commands.zoomToWorld());
         querySelector(
                 "#homeDataButton").onClick.listen(
-                        (ev) => _hub.commands.updateCamera(new CameraData.fromMode(CameraViewMode.dataviewMode)));
+                        (ev) => _hub.commands.zoomToLayer(null));
 
         querySelector(
                  "#viewshedCircleButton").onClick.listen(

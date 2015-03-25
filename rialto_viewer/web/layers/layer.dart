@@ -48,6 +48,12 @@ abstract class VisibilityControl {
 }
 
 
+abstract class BboxVisibilityControl {
+    bool get bboxVisible;
+    set bboxVisible(bool v);
+}
+
+
 abstract class AlphaControl {
     double get alpha;
     set alpha(double d);

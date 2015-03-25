@@ -36,7 +36,7 @@ class LoadConfigurationDialog extends DialogVM {
             var url = Uri.parse(value); // TODO: handle error
 
             _hub.commands.removeAllLayers().then((_) {
-                _hub.commands.loadScriptFromUrl(url);
+                _hub.commands.loadScriptFromUrlAsync(url);
             });
         }
     }
@@ -45,7 +45,7 @@ class LoadConfigurationDialog extends DialogVM {
         String value = _scriptText.value;
         if (value != null) {
             _hub.commands.removeAllLayers().then((_) {
-                _hub.commands.loadScriptFromString(value);
+                _hub.commands.loadScriptFromStringAsync(value);
             });
         }
     }

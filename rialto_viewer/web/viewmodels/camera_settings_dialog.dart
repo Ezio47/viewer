@@ -89,7 +89,6 @@ class CameraSettingsDialog extends DialogVM {
         Cartographic3 target = new Cartographic3(targetLon, targetLat, targetHeight);
         Cartesian3 up = new Cartesian3(upX, upY, upZ);
 
-        var data = new CameraData(eye, target, up, fov);
-        _hub.commands.updateCamera(data);
+        _hub.commands.zoomTo(eye, target, up, fov);
     }
 }

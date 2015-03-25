@@ -17,14 +17,6 @@ class EventRegistry {
     EventRegistry();
 
     SignalFunctions<MouseData> MouseMove = new SignalFunctions<MouseData>();
-    SignalFunctions<MouseData> MouseDown = new SignalFunctions<MouseData>();
-    SignalFunctions<MouseData> MouseUp = new SignalFunctions<MouseData>();
-    SignalFunctions<WheelData> MouseWheel = new SignalFunctions<WheelData>();
-
-    SignalFunctions<KeyboardData> KeyDown = new SignalFunctions<KeyboardData>();
-    SignalFunctions<KeyboardData> KeyUp = new SignalFunctions<KeyboardData>();
-
-    SignalFunctions<Vector3> MouseGeoCoords = new SignalFunctions<Vector3>();
 
     SignalFunctions<AdvancedSettingsChangedData> AdvancedSettingsChanged = new SignalFunctions<AdvancedSettingsChangedData>();
 
@@ -34,8 +26,6 @@ class EventRegistry {
     SignalFunctions RemoveAllLayersCompleted = new SignalFunctions();
 
     SignalFunctions<String> LoadScriptCompleted = new SignalFunctions<String>();
-
-    SignalFunctions<CartographicBbox> LayersBboxChanged = new SignalFunctions<CartographicBbox>();
 
     SignalFunctions<WpsJobUpdateData> WpsJobUpdate = new SignalFunctions<WpsJobUpdateData>();
 }

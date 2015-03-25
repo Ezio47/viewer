@@ -43,7 +43,8 @@ final String demo = """- layers:
 """;
 
 
-void main() {
+// TODO: fix all "/*void*/...async" after Dart 1.9 released
+/*void*/ main() async {
 
     // TODO: addErrorListener not yet implemented in Dart SDK...
     //ReceivePort errPort = new ReceivePort();
@@ -76,16 +77,16 @@ void main() {
 
     if (config == null) {
         try {
-            hub.commands.loadScriptFromString(demo);
+            await hub.commands.loadScriptFromStringAsync(demo);
         } catch (e) {
-            Hub.error("Top-level exception caught", object: e);
+            Hub.error("Top-level exception caught", e);
         }
     } else {
         try {
             final uri = Uri.parse(config);
-            hub.commands.loadScriptFromUrl(uri);
+            await hub.commands.loadScriptFromUrlAsync(uri);
         } catch (e) {
-            Hub.error("Top-level exception caught", object: e);
+            Hub.error("Top-level exception caught", e);
         }
     }
 }

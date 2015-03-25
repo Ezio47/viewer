@@ -29,14 +29,14 @@ class OgcDocument {
         try {
             xmlDoc = Xml.parse(text);
         } catch (e) {
-            Hub.error("failed to parse XML response", object: e);
+            Hub.error("failed to parse XML response", e);
             return null;
         }
 
         try {
             ogcDoc = parseXml(xmlDoc);
         } catch (e) {
-            Hub.error("failed to parse OWS response", object: e);
+            Hub.error("failed to parse OWS response", e);
             return null;
         }
 

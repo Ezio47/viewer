@@ -5,14 +5,16 @@
 part of rialto.viewer;
 
 
-class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
+class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl, BboxVisibilityControl {
     var _provider;
     int numPoints;
     List<String> dimensions;
+    BboxShape _bboxShape;
 
     ColorizerData _colorizerData = new ColorizerData("Spectral", "Z");
 
     bool _visible = true;
+    bool _bboxVisible = true;
 
     PointCloudLayer(String name, Map map)
             : super("pointcloud", name, map) {
@@ -42,6 +44,11 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
 
             dimensions = _hub.cesium.getDimensionNamesFromProvider(_provider);
 
+            if (_bboxShape != null) _bboxShape.remove();
+            if (_bboxVisible && bbox != null && bbox.isValid) {
+                _bboxShape = new BboxShape(bbox.minimum, bbox.maximum);
+            }
+
             c.complete();
         });
 
@@ -64,6 +71,12 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl {
 
     @override
     bool get visible => _visible;
+
+    @override
+    set bboxVisible(bool v) => _bboxShape.isVisible = v;
+
+    @override
+    bool get bboxVisible => _bboxShape.isVisible;
 
     ColorizerData get colorizerData => _colorizerData;
 

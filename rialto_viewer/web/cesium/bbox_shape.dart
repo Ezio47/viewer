@@ -7,24 +7,35 @@ part of rialto.viewer;
 class BboxShape {
     Hub _hub;
 
-    var primitive;
+    var _primitive;
+    bool _isVisible;
 
     Cartographic3 _point1, _point2;
 
-    BboxShape(this._point1, this._point2) {
+    BboxShape(this._point1, this._point2) : _isVisible = true {
         _hub = Hub.root;
-        primitive = _createCesiumObject();
+        _create();
     }
 
-    bool get isVisible => _hub.cesium.isPrimitiveVisible(primitive);
+    bool get isVisible => _isVisible;
 
-    set isVisible(bool value) => _hub.cesium.setPrimitiveVisible(primitive, value);
+    set isVisible(bool value) {
+        // TODO: why doesn't cesium.setPrimitiveVisible() work anymore?
+        if (value && !_isVisible) {
+            _create();
+        } else if (!value && _isVisible) {
+            remove();
+        }
+    }
 
-    dynamic _createCesiumObject() {
-        return _hub.cesium.createBbox(_point1, _point2);
+    void _create() {
+        _primitive = _hub.cesium.createBbox(_point1, _point2);
     }
 
     void remove() {
-        _hub.cesium.remove(primitive);
+        if (_primitive != null) {
+            _hub.cesium.remove(_primitive);
+            _primitive = null;
+        }
     }
 }

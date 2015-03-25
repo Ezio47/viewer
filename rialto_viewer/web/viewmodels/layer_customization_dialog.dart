@@ -10,6 +10,7 @@ class LayerCustomizationDialog extends DialogVM {
     ListBoxVM _rampsListBox;
     ListBoxVM _dimsListBox;
     CheckBoxVM _visibilityButton;
+    CheckBoxVM _bboxVisibilityButton;
 
     LayerCustomizationDialog(String id) : super(id, hasCancelButton: false) {
 
@@ -17,6 +18,7 @@ class LayerCustomizationDialog extends DialogVM {
         _dimsListBox = new ListBoxVM("#layerCustomizationDialog_colorDims");
 
         _visibilityButton = new CheckBoxVM("#layerCustomizationDialog_visibility", true);
+        _bboxVisibilityButton = new CheckBoxVM("#layerCustomizationDialog_bboxVisibility", true);
 
         _register(_rampsListBox);
         _register(_dimsListBox);
@@ -29,6 +31,7 @@ class LayerCustomizationDialog extends DialogVM {
     void _show() {
         final bool colorizer = (_target is PointCloudLayer);
         final bool visibility = (_target is VisibilityControl);
+        final bool bboxVisibility = (_target is BboxVisibilityControl);
 
         if (colorizer) {
             var ramps = _hub.cesium.getColorRampNames();
@@ -60,6 +63,15 @@ class LayerCustomizationDialog extends DialogVM {
             });
         } else {
             _visibilityButton.disabled = true;
+        }
+
+        if (bboxVisibility) {
+            _bboxVisibilityButton.disabled = false;
+            _bboxVisibilityButton.setClickHandler((_) {
+                (_target as BboxVisibilityControl).bboxVisible = _bboxVisibilityButton.value;
+            });
+        } else {
+            _bboxVisibilityButton.disabled = true;
         }
     }
 

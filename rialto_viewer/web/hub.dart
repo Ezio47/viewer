@@ -34,9 +34,6 @@ class Hub {
 
     int displayPrecision = 5;
 
-    // privates
-    BboxShape _bboxShape;
-
     List viewshedCircles = new List();
 
     static Hub get root {
@@ -63,34 +60,19 @@ class Hub {
 
         cesium.onMouseMove((num x, num y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
 
-        events.LayersBboxChanged.subscribe(_handleLayersBboxChanged);
-
         camera = new Camera();
 
-        events.AdvancedSettingsChanged.subscribe((data) => _bboxShape.isVisible = data.showBbox);
         events.AdvancedSettingsChanged.subscribe((data) => displayPrecision = data.displayPrecision);
-    }
-
-    void _handleLayersBboxChanged(CartographicBbox box) {
-        if (_bboxShape != null) _bboxShape.remove();
-        if (box.isValid) {
-            _bboxShape = new BboxShape(box.minimum, box.maximum);
-        }
-    }
-
-    void displayBbox(bool v) {
-        if (_bboxShape == null) return;
-        _bboxShape.isVisible = v;
     }
 
     double computeLength(var positions) {
         double dist = 0.0;
         var numPoints = positions.length / 3;
-        for (var i=0; i<numPoints - 1; i++) {
-            double x1 = positions[i*3];
-            double y1 = positions[i*3+1];
-            double x2 = positions[(i+1)*3];
-            double y2 = positions[(i+1)*3+1];
+        for (var i = 0; i < numPoints - 1; i++) {
+            double x1 = positions[i * 3];
+            double y1 = positions[i * 3 + 1];
+            double x2 = positions[(i + 1) * 3];
+            double y2 = positions[(i + 1) * 3 + 1];
             dist += cesium.cartographicDistance(x1, y1, x2, y2);
         }
         return dist;
@@ -99,12 +81,12 @@ class Hub {
     double computeArea(var positions) {
         var area = 0.0;
         var numPoints = positions.length / 3;
-        for (var i=0; i<numPoints; i++) {
-            var j = (i < numPoints - 1) ? i+1 : 0;
-            double x1 = positions[i*3];
-            double y1 = positions[i*3+1];
-            double x2 = positions[j*3];
-            double y2 = positions[j*3+1];
+        for (var i = 0; i < numPoints; i++) {
+            var j = (i < numPoints - 1) ? i + 1 : 0;
+            double x1 = positions[i * 3];
+            double y1 = positions[i * 3 + 1];
+            double x2 = positions[j * 3];
+            double y2 = positions[j * 3 + 1];
             var t = x1 * y2 - y1 * x2;
             area += t;
         }
@@ -114,20 +96,16 @@ class Hub {
 
     }
 
-    static void error(String text, {Map<String, dynamic> info: null, Object object: null}) {
+    static void error(String text, [Object details = null]) {
 
-        String s = text;
+        String s = "Error: $text";
 
         if (!s.endsWith("\n")) {
             s += "\n";
         }
 
-        if (info != null) {
-            info.forEach((k, v) => s += "$k: $v\n");
-        }
-
-        if (object != null) {
-            s += 'Details: $object\n';
+        if (details != null) {
+            s += 'Details: $details\n';
         }
 
         window.console.log(s);

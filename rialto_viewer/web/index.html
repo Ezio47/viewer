@@ -40,7 +40,7 @@
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
                                 <li class="uk-active"><a id="homeWorldButton">Home (world)</a></li>
-                                <li class="uk-active"><a id="homeDataButton">Zoom to points</a></li>
+                                <li class="uk-active"><a id="homeDataButton">Zoom to layer</a></li>
                                 <li class="uk-nav-header">Projection</li>
                                 <li class="uk-active"><a id="modeButton2D">2D</a></li>
                                 <li class="uk-active"><a id="modeButton25D">2.5D</a></li>
@@ -426,8 +426,17 @@
                 <div>
                     Visibility
                     <form class="uk-form uk-form-horizontal">
-                            <label class="uk-form-label" for="layerCustomizationDialog_visible">Visible:</label>
+                            <label class="uk-form-label" for="layerCustomizationDialog_visible">Enabled:</label>
                             <input id="layerCustomizationDialog_visibility" type="checkbox">
+                    </form>
+                </div>
+                <hr>
+
+                <div>
+                    Bounding Box Visibility
+                    <form class="uk-form uk-form-horizontal">
+                            <label class="uk-form-label" for="layerCustomizationDialog_bboxVisible">Enabled:</label>
+                            <input id="layerCustomizationDialog_bboxVisibility" type="checkbox">
                     </form>
                 </div>
                 <hr>
