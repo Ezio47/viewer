@@ -72,15 +72,15 @@ class Commands {
     return _hub.layerManager.doRemoveAllLayers();
   }
 
-  Future loadScriptFromUrlAsync(Uri url) {
+  Future loadScriptFromUrl(Uri url) {
     var s = new ConfigScript();
-    var f = s.loadFromUrlAsync(url);
+    var f = s.loadFromUrl(url);
     return f;
   }
 
   Future loadScriptFromStringAsync(String yaml) {
     var s = new ConfigScript();
-    var f = s.loadFromStringAsync(yaml);
+    var f = s.loadFromString(yaml);
     return f;
   }
 

@@ -84,7 +84,7 @@ final String demo = """- layers:
     } else {
         try {
             final uri = Uri.parse(config);
-            await hub.commands.loadScriptFromUrlAsync(uri);
+            await hub.commands.loadScriptFromUrl(uri);
         } catch (e) {
             Hub.error("Top-level exception caught", e);
         }

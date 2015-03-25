@@ -10,17 +10,16 @@ class ConfigScript {
 
     ConfigScript() : _hub = Hub.root;
 
-    Future<List<dynamic>> loadFromUrlAsync(Uri url) async {
+    Future<List<dynamic>> loadFromUrl(Uri url) async {
         var c = new Completer<List<dynamic>>();
 
         Http.Response response = await Comms.httpGet(url);
         String yamlText = response.body;
 
-        List<dynamic> results = await _runInner(yamlText, url.toString());
-        return results;
+        return _runInner(yamlText, url.toString());
     }
 
-    Future<List<dynamic>> loadFromStringAsync(String yamlText) async {
+    Future<List<dynamic>> loadFromString(String yamlText) async {
 
         List<dynamic> results = await _runInner(yamlText, "");
 
@@ -37,11 +36,11 @@ class ConfigScript {
             return null;
         }
 
-        List<dynamic> results = await Commands.run(_executeCommandAsync, commands);
+        var f = Commands.run(_executeCommandAsync, commands);
 
-        Hub.root.events.LoadScriptCompleted.fire(urlString);
+        f.then((_) => Hub.root.events.LoadScriptCompleted.fire(urlString));
 
-        return results;
+        return f;
     }
 
     Future<dynamic> _executeCommandAsync(Map command) {
