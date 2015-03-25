@@ -100,15 +100,15 @@ class Commands {
   }
 
   Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
-    return _hub.camera.zoomTo(eyePosition, targetPosition, upDirection, fov);
+    return _hub.zoomTo(eyePosition, targetPosition, upDirection, fov);
   }
 
   Future zoomToLayer(Layer layer) {
-    return _hub.camera.zoomToLayer(layer);
+    return _hub.zoomToLayer(layer);
   }
 
   Future zoomToWorld() {
-    return _hub.camera.zoomToWorld();
+    return _hub.zoomToWorld();
   }
 
   Future setViewMode(ViewModeData mode) {

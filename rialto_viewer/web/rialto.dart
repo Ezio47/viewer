@@ -26,7 +26,6 @@ part 'layer_manager.dart';
 part 'viewshedder.dart';
 
 part 'cesium/bbox_shape.dart';
-part 'cesium/camera.dart';
 part 'cesium/cesium_bridge.dart';
 
 part 'layers/layer.dart';

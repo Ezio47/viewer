@@ -29,7 +29,6 @@ class Hub {
     JsBridge js;
     WpsService wps;
     LayerManager layerManager;
-    Camera camera;
     WpsJobManager wpsJobManager;
 
     int displayPrecision = 5;
@@ -59,8 +58,6 @@ class Hub {
         new RialtoElement();
 
         cesium.onMouseMove((num x, num y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
-
-        camera = new Camera();
 
         events.AdvancedSettingsChanged.subscribe((data) => displayPrecision = data.displayPrecision);
     }
@@ -95,6 +92,55 @@ class Hub {
         return area;
 
     }
+
+    Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
+
+         cesium.lookAt(eyePosition, targetPosition, upDirection, fov);
+
+         return new Future.value();
+     }
+
+     Future zoomToLayer(Layer layer) {
+         if (layer == null) {
+             layer = layerManager.layers.last;
+         }
+
+         if (layer == null || layer.bbox == null) {
+             return new Future.value();
+         }
+
+         // _eyePosition = data.eye;
+         // _targetPosition = data.target;
+         // _upDirection = data.up;
+         // _cameraFov = data.fov;
+
+         var bbox = layer.bbox;
+         double west = bbox.west;
+         double south = bbox.south;
+         double east = bbox.east;
+         double north = bbox.north;
+
+         double centerLon = east + (west - east) / 2.0;
+         double centerLat = south + (north - south) / 2.0;
+
+         var targetPosition = new Cartographic3(centerLon, centerLat, 0.0);
+
+         var h = max(west - east, north - south) * 1000.0;
+         var eyePosition = new Cartographic3(centerLon, centerLat, h);
+
+
+         final Cartesian3 upDirection = new Cartesian3(0.0, 0.0, 1.0);
+         final double fov = 60.0;
+
+         cesium.lookAt(eyePosition, targetPosition, upDirection, fov);
+
+         return new Future.value();
+     }
+
+     Future zoomToWorld() {
+         cesium.goHome();
+         return new Future(() {});
+     }
 
     static void error(String text, [Object details = null]) {
 
