@@ -22,7 +22,7 @@ abstract class Layer {
               url = YamlUtils.getOptionalSettingAsUrl(map, "url"),
               proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy"),
               description = YamlUtils.getOptionalSettingAsString(map, "description") {
-        log("New $type layer: $name");
+        //log("New $type layer: $name");
     }
 
     _requireUrl() {

@@ -102,7 +102,7 @@ class WpsJob {
     void _poll() {
 
         var secs = new DateTime.now().difference(_startTime).inSeconds;
-        log("poll #$_pollCount, $secs seconds elapsed");
+        Hub.log("poll #$_pollCount, $secs seconds elapsed");
 
         var now = new DateTime.now();
         if (now.isAfter(_timeoutTime)) {
@@ -140,7 +140,7 @@ class WpsJob {
             responseDocument = resp;
 
             if (OgcStatus_55.isComplete(code)) {
-                log("done!");
+                //Hub.log("done!");
 
                 stopPolling();
                 return;

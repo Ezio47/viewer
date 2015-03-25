@@ -24,9 +24,9 @@ class Viewshedder {
 
         var yes = (WpsJob job) {
             OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
-            log(ogcDoc.dump(0));
+            Hub.log(ogcDoc.dump(0));
             var url = ogcDoc.getProcessOutput("outputUrl");
-            log("SUCCESS: $url");
+            Hub.log("SUCCESS: $url");
 
             var layerData = new LayerData("viewshed-${job.id}", {
                 "type": "tms_imagery",
@@ -35,17 +35,19 @@ class Viewshedder {
                 "maximumLevel": 12,
                 //"alpha": 0.5
             });
-            hub.commands.addLayer(layerData).then((_) => log("layer added!"));
+            hub.commands.addLayer(layerData).then((_) {
+                //Hub.log("layer added!");
+            });
         };
 
         var no = (WpsJob job) {
-            log("FAILURE");
+            Hub.log("FAILURE");
             assert(job.responseDocument != null || job.exceptionTexts != null);
             if (job.responseDocument != null) {
-                log(job.responseDocument.dump(0));
+                Hub.log(job.responseDocument.dump(0));
             }
             if (job.exceptionTexts != null) {
-                log(job.exceptionTexts);
+                Hub.log(job.exceptionTexts);
             }
         };
 

@@ -14,16 +14,16 @@ class OgcDocumentTests {
 
     static void test() {
         var ex = OgcDocument.parseString(generalException);
-        log(ex);
+        Hub.log(ex);
 
         var proc = OgcDocument.parseString(describeProcess);
-        log(proc);
+        Hub.log(proc);
 
         var exp = OgcDocument.parseString(describeProcessError);
-        log(exp);
+        Hub.log(exp);
 
         var wpsCaps = OgcDocument.parseString(capabilities);
-        log(wpsCaps);
+        Hub.log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
         var proxyUri = Uri.parse("http://localhost:12345/proxy");
@@ -34,7 +34,7 @@ class OgcDocumentTests {
         wps.doWpsDescribeProcess("org.ciesin.gis.wps.algorithms.PopStat").then((doc) { assert(doc is OgcExceptionReportDocument); });
         wps.close();
 
-        log("OGC tests done");
+        Hub.log("OGC tests done");
     }
 
 

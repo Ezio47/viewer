@@ -48,7 +48,7 @@ class ConfigScript {
         String key = command.keys.first;
         Object data = command[key];
 
-        log("Script command: $key");
+        //log("Script command: $key");
 
         switch (key) {
             case "layers":

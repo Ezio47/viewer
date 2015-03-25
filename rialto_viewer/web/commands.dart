@@ -29,7 +29,7 @@ class Commands {
 
   void computeLinearMeasurement() {
       _hub.cesium.drawPolyline((positions) {
-          log("Length of ...");// + positions);
+          Hub.log("Length of ...");// + positions);
           var dist = _hub.computeLength(positions);
           var mi = dist / 1609.34;
           window.alert("Distance: ${dist.toStringAsFixed(1)} meters (${mi.toStringAsFixed(1)} miles)");
@@ -38,7 +38,7 @@ class Commands {
 
   void computeAreaMeasurement() {
       _hub.cesium.drawPolygon((positions) {
-          log("Area of ...");// + positions);
+          Hub.log("Area of ...");// + positions);
           var area = _hub.computeArea(positions);
           window.alert("Area: ${area.toStringAsFixed(1)} m^2");
       });
@@ -46,13 +46,13 @@ class Commands {
 
   void dropPin() {
       _hub.cesium.drawMarker((position) {
-          log("Pin...");// + position);
+          Hub.log("Pin...");// + position);
       });
   }
 
   void drawExtent() {
       _hub.cesium.drawExtent((n, s, e,w) {
-          log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
+          Hub.log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
       });
   }
 

@@ -56,7 +56,7 @@ class OgcDocument {
                     case "ExecuteResponse":
                         return new OgcExecuteResponseDocument_54(elem);
                     default:
-                        log("Unhandled top-level doc type: ${elem.name.local}");
+                        Hub.log("Unhandled top-level doc type: ${elem.name.local}");
                         assert(false);
                         break;
                 }
@@ -122,12 +122,12 @@ class OgcDocument {
     void _ignoreElement(Xml.XmlElement e) {}
 
     void _errorAttribute(Xml.XmlAttribute t) {
-        log("attribute not yet handled: $t");
+        Hub.log("attribute not yet handled: $t");
         assert(false);
     }
 
     void _errorElement(Xml.XmlElement e) {
-        log("element not yet handled: $e");
+        Hub.log("element not yet handled: $e");
         assert(false);
     }
 

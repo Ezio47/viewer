@@ -4,19 +4,6 @@
 
 part of rialto.viewer;
 
-void log(obj) {
-    if (obj == null) {
-        window.console.log("** null passed to log() **");
-    } else {
-        window.console.log(obj.toString());
-    }
-
-    var e = querySelector("#logDialog_body");
-    if (e != null) {
-        e.text += obj.toString() + "\n";
-    }
-}
-
 
 class Hub {
     // singleton
@@ -163,4 +150,18 @@ class Hub {
             e.text += s + "\n";
         }
     }
+
+    static void log(dynamic obj) {
+        if (obj == null) {
+            window.console.log("** null passed to log() **");
+        } else {
+            window.console.log(obj.toString());
+        }
+
+        var e = querySelector("#logDialog_body");
+        if (e != null) {
+            e.text += obj.toString() + "\n";
+        }
+    }
+
 }
