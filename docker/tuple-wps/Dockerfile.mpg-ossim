@@ -1,0 +1,59 @@
+FROM mpg-pdal
+MAINTAINER mpg@flaxen.com
+
+ENV HOME /root/work
+WORKDIR $HOME
+
+ENV OSSIM_SRC_DIR $HOME/ossim
+ENV OSSIM_BUILD_DIR $HOME/ossim-build
+
+RUN svn export https://svn.osgeo.org/ossim/trunk $OSSIM_SRC_DIR && \
+    cp -f $OSSIM_SRC_DIR/ossim_package_support/cmake/CMakeLists.txt $OSSIM_SRC_DIR
+
+RUN mkdir $OSSIM_BUILD_DIR && \
+    cd $OSSIM_BUILD_DIR && \
+    cmake -G "Unix Makefiles" \
+        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_VERBOSE_MAKEFILE=ON \
+        -DBUILD_CSMAPI=OFF \
+        -DBUILD_LIBRARY_DIR=lib \
+        -DBUILD_OMS=ON \
+        -DBUILD_OSSIM=ON \
+        -DBUILD_OSSIM_PLUGIN=OFF  \
+        -DBUILD_OSSIM_TEST_APPS=ON \
+        -DBUILD_OSSIMCONTRIB_PLUGIN=OFF \
+        -DBUILD_OSSIMCSM_PLUGIN=OFF \
+        -DBUILD_OSSIMGDAL_PLUGIN=ON \
+        -DBUILD_OSSIMGEOPDF_PLUGIN=OFF \
+        -DBUILD_OSSIMHDF4_PLUGIN=OFF \
+        -DBUILD_OSSIMHDF5_PLUGIN=OFF \
+        -DBUILD_OSSIMJNI=ON \
+        -DBUILD_OSSIMKAKADU_PLUGIN=OFF \
+        -DBUILD_OSSIMKMLSUPEROVERLAY_PLUGIN=OFF \
+        -DBUILD_OSSIMLAS_PLUGIN=ON \
+        -DBUILD_OSSIMLIBRAW_PLUGIN=OFF \
+        -DBUILD_OSSIMMRSID_PLUGIN=OFF \
+        -DBUILD_OSSIMNDF_PLUGIN=OFF \
+        -DBUILD_OSSIMPDAL_PLUGIN=ON \
+        -DBUILD_OSSIMPNG_PLUGIN=ON \
+        -DBUILD_OSSIMREGISTRATION_PLUGIN=OFF \
+        -DBUILD_OSSIMQT4=OFF \
+        -DBUILD_OSSIMGUI=OFF \
+        -DBUILD_OSSIM_MPI_SUPPORT=OFF \
+        -DBUILD_OSSIMPLANET=OFF \
+        -DBUILD_OSSIMPLANETQT=OFF \
+        -DBUILD_OSSIMPREDATOR=OFF \
+        -DBUILD_RUNTIME_DIR=bin \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_WMS=ON \
+        -DCMAKE_INCLUDE_PATH=${OSSIM_SRC_DIR}/ossim/include \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_LIBRARY_PATH=${OSSIM_BUILD_DIR}/lib \
+        -DCMAKE_MODULE_PATH=${OSSIM_SRC_DIR}/ossim_package_support/cmake/CMakeModules \
+        -DOSSIM_COMPILE_WITH_FULL_WARNING=ON \
+        -DOSSIM_DEV_HOME=${OSSIM_SRC_DIR} \
+        ${OSSIM_SRC_DIR}
+
+RUN cd $OSSIM_BUILD_DIR && \
+    make -j 3 && \
+    make install

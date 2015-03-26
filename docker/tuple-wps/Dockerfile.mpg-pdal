@@ -1,0 +1,32 @@
+FROM mpg-base
+MAINTAINER mpg@flaxen.com
+
+WORKDIR /root/work
+
+#
+# laszip
+#
+RUN rm -rf master.zip LASzip-master && \
+    wget https://github.com/LASzip/LASzip/archive/master.zip && \
+    unzip master.zip && \
+    cd LASzip-master && \
+    cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local && \
+    make && \
+    make install && \
+    rm -rf $HOME/master.zip $HOME/LASzip-master
+
+
+#
+# pdal
+#
+RUN rm -rf master.zip PDAL-master && \
+    wget https://github.com/PDAL/PDAL/archive/master.zip && \
+    unzip master.zip && \
+    cd PDAL-master && \
+    cmake -G "Unix Makefiles" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \
+      -DWITH_GEOTIFF=TRUE -DGEOTIFF_INCLUDE_DIR=/usr/local/include && \
+    make -j 3 && \
+    make install && \
+    rm -rf $HOME/master.zip $HOME/PDAL-master

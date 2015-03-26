@@ -1,0 +1,42 @@
+FROM mpg-ossim
+MAINTAINER mpg@flaxen.com
+
+ENV HOME /root/work
+WORKDIR $HOME
+
+
+RUN yum -y install java-1.7.0-openjdk-devel
+ENV JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk
+ENV JRE_HOME $JAVA_HOME/jre
+
+
+RUN wget http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/geoserver-2.6.2-bin.zip && \
+    cd /usr/local && \
+    unzip $HOME/geoserver-2.6.2-bin.zip && \
+    rm -f $HOME/geoserver-2.6.2-bin.zip && \
+    ln -s geoserver-2.6.2 geoserver
+
+ENV GEOSERVER_HOME /usr/local/geoserver
+ENV GEOSERVER_PLUGIN_DIR $GEOSERVER_HOME/webapps/geoserver/WEB-INF/lib/
+
+
+# this dir normally gets created when server is first run,
+# but we haven't run the server yet
+RUN mkdir -p $GEOSERVER_HOME/webapps/geoserver/data/scripts/wps/
+
+
+# WPS extension
+RUN wget -q http://sourceforge.net/projects/geoserver/files/GeoServer/2.6.2/extensions/geoserver-2.6.2-wps-plugin.zip && \
+    unzip -o -d $GEOSERVER_PLUGIN_DIR geoserver-2.6.2-wps-plugin.zip && \
+    rm -f geoserver-2.6.2-wps-plugin.zip
+
+# Groovy scripting extension
+RUN wget http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip && \
+    unzip -o -d $GEOSERVER_PLUGIN_DIR geoserver-2.6-SNAPSHOT-groovy-plugin.zip && \
+    rm -f geoserver-2.6-SNAPSHOT-groovy-plugin.zip
+
+
+ENV LD_LIBRARY_PATH /usr/lib64:/usr/local/lib64:/usr/local/lib
+
+## docker run -d -p 12345:8080 mpg-wps /usr/local/geoserver/bin/startup.sh
+## http://192.168.59.103:12345/geoserver/ows?service=wps&version=1.0.0&request=GetCapabilities
