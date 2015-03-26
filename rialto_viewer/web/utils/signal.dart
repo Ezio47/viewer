@@ -94,7 +94,7 @@ void signalTest() {
         MyEvent.fire(17);
         c1.future.then((i) {
             assert(i == 17);
-            Hub.log("pass");
+            Rialto.log("pass");
         });
     }
 
@@ -115,7 +115,7 @@ void signalTest() {
         MyEvent2.fire(1);
         MyEvent2.fire(2);
         Future.wait([c2a.future, c2b.future, c2c.future, c2d.future]).then((cs) {
-            Hub.log("pass");
+            Rialto.log("pass");
         });
     }
 
@@ -131,7 +131,7 @@ void signalTest() {
         MyEvent3.fire(5);
         c.future.then((cs) {
             assert(cs == 3);
-            Hub.log("pass");
+            Rialto.log("pass");
         });
 
         // TODO: we can't check that ev==5 is never called, since we have nothing to wait on for it...

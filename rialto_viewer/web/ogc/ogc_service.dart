@@ -10,10 +10,10 @@ class OwsService {
     final Uri server;
     final Uri proxyUri;
     final String description;
-    Hub _hub;
+    Rialto _hub;
 
     OwsService(String this.service, Uri this.server, {Uri this.proxyUri: null, String this.description: null})
-            : _hub = Hub.root;
+            : _hub = Rialto.root;
 
     void open() {
     }
@@ -39,9 +39,9 @@ class OwsService {
 
         //log("ows server request: $uri");
 
-        Comms.httpGet(uri, proxyUri: proxyUri).then((Http.Response response) {
+        Utils.httpGet(uri, proxyUri: proxyUri).then((Http.Response response) {
             if (response.statusCode != 200) {
-                Hub.error("server request failed");
+                Rialto.error("server request failed");
                 c.complete(null);
                 return;
             }
@@ -52,7 +52,7 @@ class OwsService {
                 var doc = OgcDocument.parseString(text);
                 c.complete(doc);
             } catch (e) {
-                Hub.error("Unable to parse server response", e);
+                Rialto.error("Unable to parse server response", e);
                 c.complete(null);
             }
         });
@@ -67,7 +67,7 @@ class OwsService {
         _sendKvpServerRequest("GetCapabilities", []).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
-                Hub.error("Error parsing OWS Capabilities response document");
+                Rialto.error("Error parsing OWS Capabilities response document");
                 c.complete(null);
                 return;
             }

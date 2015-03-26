@@ -2,67 +2,195 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-library rialto.viewer;
+part of rialto.viewer;
 
-import 'dart:async';
-//import 'dart:convert';
-import 'dart:html';
-import 'dart:math';
-import 'dart:typed_data';
-import 'dart:js';
 
-import 'package:http/browser_client.dart' as BHttp;
-import 'package:http/http.dart' as Http;
-import 'package:vector_math/vector_math.dart';
-import 'package:yaml/yaml.dart';
-import 'package:xml/xml.dart' as Xml;
+/// Main, public class for the viewer
+///
+/// All external calls to the Rialto viewer, e.g. from main or from the UI pieces,
+/// should go through this object.
+///
+/// This is explcitly a singleton.
+///
+/// (this class formerly known as "Hub", and some references to it still use that name)
+class Rialto {
+    // singleton holder
+    static Rialto _root;
 
-part 'commands.dart';
-part 'comms.dart';
-part 'config_script.dart';
-part 'event_registry.dart';
-part 'hub.dart';
-part 'layer_manager.dart';
-part 'viewshedder.dart';
+    // globals
+    EventRegistry events;
+    Commands commands;
+    CesiumBridge cesium;
+    JsBridge js;
+    WpsService wps;
+    LayerManager layerManager;
+    WpsJobManager wpsJobManager;
 
-part 'cesium/bbox_shape.dart';
-part 'cesium/cesium_bridge.dart';
+    int displayPrecision = 5;
 
-part 'layers/layer.dart';
-part 'layers/base_imagery_layer.dart';
-part 'layers/base_terrain_layer.dart';
-part 'layers/imagery_layer.dart';
-part 'layers/point_cloud_layer.dart';
-part 'layers/terrain_layer.dart';
-part 'layers/geojson_layer.dart';
+    List viewshedCircles = new List();
 
-part 'ogc/ogc_document.dart';
-part 'ogc/ogc_document_tests.dart';
-part 'ogc/ogc_service.dart';
-part 'ogc/wps_job_manager.dart';
-part 'ogc/wps_service.dart';
-part 'ogc/wps_service_tests.dart';
+    /// Returns the singlton instance
+    static Rialto get root {
+        assert(_root != null);
+        return _root;
+    }
 
-part 'utils/cartesian3.dart';
-part 'utils/cartographic3.dart';
-part 'utils/color.dart';
-part 'utils/js_bridge.dart';
-part 'utils/signal.dart';
-part 'utils/utils.dart';
-part 'utils/yaml_utils.dart';
+    /// Creates the singleton instance of the viewer.
+    Rialto() {
+        assert(_root == null);
+        _root = this;
 
-part 'viewmodels/about_dialog.dart';
-part 'viewmodels/advanced_settings_dialog.dart';
-part 'viewmodels/button_vm.dart';
-part 'viewmodels/camera_settings_dialog.dart';
-part 'viewmodels/check_box_vm.dart';
-part 'viewmodels/dialog_vm.dart';
-part 'viewmodels/layer_adder_dialog.dart';
-part 'viewmodels/layer_customization_dialog.dart';
-part 'viewmodels/layer_info_dialog.dart';
-part 'viewmodels/load_configuration_dialog.dart';
-part 'viewmodels/list_box_vm.dart';
-part 'viewmodels/layer_manager_dialog.dart';
-part 'viewmodels/rialto_element.dart';
-part 'viewmodels/text_input_vm.dart';
-part 'viewmodels/view_model.dart';
+        js = new JsBridge(log);
+
+        wpsJobManager = new WpsJobManager();
+
+        events = new EventRegistry();
+        commands = new Commands();
+
+        layerManager = new LayerManager();
+
+        cesium = new CesiumBridge('cesiumContainer');
+
+        new RialtoElement();
+
+        cesium.onMouseMove((num x, num y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
+
+        events.AdvancedSettingsChanged.subscribe((data) => displayPrecision = data.displayPrecision);
+    }
+
+    /// Compute linear length of a set of points
+    ///
+    /// Stub for future work
+    double computeLength(var positions) {
+        double dist = 0.0;
+        var numPoints = positions.length / 3;
+        for (var i = 0; i < numPoints - 1; i++) {
+            double x1 = positions[i * 3];
+            double y1 = positions[i * 3 + 1];
+            double x2 = positions[(i + 1) * 3];
+            double y2 = positions[(i + 1) * 3 + 1];
+            dist += cesium.cartographicDistance(x1, y1, x2, y2);
+        }
+        return dist;
+    }
+
+    /// Compute area of a set of points
+    ///
+    /// Stub for future work.
+    double computeArea(var positions) {
+        var area = 0.0;
+        var numPoints = positions.length / 3;
+        for (var i = 0; i < numPoints; i++) {
+            var j = (i < numPoints - 1) ? i + 1 : 0;
+            double x1 = positions[i * 3];
+            double y1 = positions[i * 3 + 1];
+            double x2 = positions[j * 3];
+            double y2 = positions[j * 3 + 1];
+            var t = x1 * y2 - y1 * x2;
+            area += t;
+        }
+        area = area / 2.0;
+        if (area < 0.0) area = -area;
+        return area;
+
+    }
+
+    /// Zooms the viewer to the given position
+    Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
+
+        cesium.lookAt(eyePosition, targetPosition, upDirection, fov);
+
+        return new Future.value();
+    }
+
+    /// Zooms the viewer to the given [layer]
+    ///
+    /// Zooms to the last layer in the system, if [layer] is null.
+    ///
+    /// If [layer] can't be zoomed to, e.g. because it doesn't have an explicit bbox,
+    /// the function does nothing and returns.
+    ///
+    /// Note we have hard-coded some arbitrary rules as to how to position the camera relative to
+    /// the bbox of the [layer].
+    Future zoomToLayer(Layer layer) {
+        if (layer == null) {
+            layer = layerManager.layers.last;
+        }
+
+        if (layer == null || layer.bbox == null) {
+            return new Future.value();
+        }
+
+        var bbox = layer.bbox;
+        double west = bbox.west;
+        double south = bbox.south;
+        double east = bbox.east;
+        double north = bbox.north;
+
+        double centerLon = east + (west - east) / 2.0;
+        double centerLat = south + (north - south) / 2.0;
+
+        var targetPosition = new Cartographic3(centerLon, centerLat, 0.0);
+
+        var h = max(west - east, north - south) * 1000.0;
+        var eyePosition = new Cartographic3(centerLon, centerLat, h);
+
+
+        final Cartesian3 upDirection = new Cartesian3(0.0, 0.0, 1.0);
+        final double fov = 60.0;
+
+        cesium.lookAt(eyePosition, targetPosition, upDirection, fov);
+
+        return new Future.value();
+    }
+
+    /// Zooms the viewer to a global view, positioned somewhere above the western hemisphere.
+    Future zoomToWorld() {
+        cesium.goHome();
+        return new Future.value();
+    }
+
+    /// Error reporting function for all of Rialto
+    ///
+    /// Prints the string [text] plus the string represention of [details] (if present).
+    ///
+    /// Output goes to the console, the browser's alert box, and the log element in the HTML.
+    static void error(String text, [dynamic details = null]) {
+
+        String s = "Error: $text";
+
+        if (!s.endsWith("\n")) {
+            s += "\n";
+        }
+
+        if (details != null) {
+            s += 'Details: $details\n';
+        }
+
+        window.console.log(s);
+
+        window.alert(s);
+
+        var e = querySelector("#logDialog_body");
+        if (e != null) {
+            e.text += s + "\n";
+        }
+    }
+
+    /// Logging function for all of Rialto
+    ///
+    /// Prints the string representation of [obj] to the console and the log element in the HTML.
+    static void log(dynamic obj) {
+        if (obj == null) {
+            window.console.log("** null passed to log() **");
+        } else {
+            window.console.log(obj.toString());
+        }
+
+        var e = querySelector("#logDialog_body");
+        if (e != null) {
+            e.text += obj.toString() + "\n";
+        }
+    }
+}

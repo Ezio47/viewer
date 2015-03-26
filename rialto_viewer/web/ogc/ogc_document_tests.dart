@@ -14,16 +14,16 @@ class OgcDocumentTests {
 
     static void test() {
         var ex = OgcDocument.parseString(generalException);
-        Hub.log(ex);
+        Rialto.log(ex);
 
         var proc = OgcDocument.parseString(describeProcess);
-        Hub.log(proc);
+        Rialto.log(proc);
 
         var exp = OgcDocument.parseString(describeProcessError);
-        Hub.log(exp);
+        Rialto.log(exp);
 
         var wpsCaps = OgcDocument.parseString(capabilities);
-        Hub.log(wpsCaps);
+        Rialto.log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
         var proxyUri = Uri.parse("http://localhost:12345/proxy");
@@ -40,7 +40,7 @@ class OgcDocumentTests {
         });
         wps.close();
 
-        Hub.log("OGC tests done");
+        Rialto.log("OGC tests done");
     }
 
 

@@ -2,10 +2,10 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
+
 import 'dart:core';
 import 'dart:html';
-//import 'dart:isolate';
-import 'rialto.dart';
+import 'rialto_library.dart';
 
 final Map tests = {
     0: "test.yaml",
@@ -43,15 +43,19 @@ final String demo = """- layers:
 """;
 
 
-// TODO: fix all "/*void*/...async" after Dart 1.9 released
+/// Main entry point for running the viewer
+///
+/// Called from inside index.html. Creates the viewer, reads in the configuration file, and
+/// runs the commands in it to create the layers
 /*void*/ main() async {
+    // TODO: fix all "/*void*/...async" after Dart 1.9 released
 
     // TODO: addErrorListener not yet implemented in Dart SDK...
     //ReceivePort errPort = new ReceivePort();
     //Isolate.current.addErrorListener(errPort.sendPort);
     //errPort.listen((d) => log("bonk: $d"));
 
-    String config;
+    var rialto = new Rialto();
 
     // The Rules:
     //
@@ -66,6 +70,7 @@ final String demo = """- layers:
     //     use the referenced config file
     // endif
 
+    String config;
     if (window.location.href == "http://localhost:8080/index.html") {
         config = "http://localhost:12345/file/" + tests[0];
     } else {
@@ -73,20 +78,18 @@ final String demo = """- layers:
         config = params["config"];
     }
 
-    var hub = new Hub();
-
     if (config == null) {
         try {
-            await hub.commands.loadScriptFromStringAsync(demo);
+            await rialto.commands.loadScriptFromStringAsync(demo);
         } catch (e) {
-            Hub.error("Top-level exception caught", e);
+            Rialto.error("Top-level exception caught", e);
         }
     } else {
         try {
             final uri = Uri.parse(config);
-            await hub.commands.loadScriptFromUrl(uri);
+            await rialto.commands.loadScriptFromUrl(uri);
         } catch (e) {
-            Hub.error("Top-level exception caught", e);
+            Rialto.error("Top-level exception caught", e);
         }
     }
 }

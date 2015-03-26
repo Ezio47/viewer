@@ -4,11 +4,13 @@
 
 part of rialto.viewer;
 
-//
-// All components should register themselves with the hub and then
-// express interest in whatever events they care about.
-//
-
+/// Event handlers for the several events in the system.
+///
+/// The [Rialto] singleton contains exactly one instance of this class. This registry contains
+/// each type of event that the system uses.
+///
+/// Components within the viewer may register their interest in an event (via subscribe())
+/// or cause an event to happen (via fire()).
 class EventRegistry {
 
     // TODO: note you can't unsubscribe a handler that is an anonymous lambda
@@ -104,8 +106,9 @@ class KeyboardData {
 }
 
 
+/// indicates that some change has happened with respect to the given job
 class WpsJobUpdateData {
-    final int jobId; // some change has happened with respect to this job
+    final int jobId;
 
     WpsJobUpdateData(int this.jobId);
 }

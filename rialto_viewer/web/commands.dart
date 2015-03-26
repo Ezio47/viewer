@@ -4,20 +4,25 @@
 
 part of rialto.viewer;
 
-typedef Future<dynamic> ChainCommndFunction(dynamic);
-
+/// Entry point to execute a Rialto viewer public function/operation
+///
+/// The [Rialto] singleton contains exactly one [Commands] object. External clients invoke
+/// viewer operations by calling one of the functions in this class.
 class Commands {
-    Hub _hub;
+    Rialto _rialto;
 
-    Commands() : _hub = Hub.root;
+    /// Create the commands object
+    Commands() : _rialto = Rialto.root;
 
+    /// Allow user to draw a circle to be used for a viewshed analysis
     void createViewshedCircle() {
-        _hub.cesium.drawCircle(
-                (longitude, latitude, height, radius) => _hub.viewshedCircles.add([longitude, latitude, height, radius]));
+        _rialto.cesium.drawCircle(
+                (longitude, latitude, height, radius) => _rialto.viewshedCircles.add([longitude, latitude, height, radius]));
     }
 
+    /// Run the viewshed analysis for each viewshed circle
     void computeViewshed() {
-        for (var v in _hub.viewshedCircles) {
+        for (var v in _rialto.viewshedCircles) {
             double obsLon = v[0];
             double obsLat = v[1];
             //double obsHeight = v[2];
@@ -27,146 +32,156 @@ class Commands {
         }
     }
 
+    /// Allow user to draw a polyline and compute the linear length
+    ///
+    /// stub for future work
     void computeLinearMeasurement() {
-        _hub.cesium.drawPolyline((positions) {
-            Hub.log("Length of ...");// + positions);
-            var dist = _hub.computeLength(positions);
+        _rialto.cesium.drawPolyline((positions) {
+            Rialto.log("Length of ...");// + positions);
+            var dist = _rialto.computeLength(positions);
             var mi = dist / 1609.34;
             window.alert("Distance: ${dist.toStringAsFixed(1)} meters (${mi.toStringAsFixed(1)} miles)");
         });
     }
 
+    /// Allow user to draw a polygone and compute the area
+    ///
+    /// stub for future work
     void computeAreaMeasurement() {
-        _hub.cesium.drawPolygon((positions) {
-            Hub.log("Area of ...");// + positions);
-            var area = _hub.computeArea(positions);
+        _rialto.cesium.drawPolygon((positions) {
+            Rialto.log("Area of ...");// + positions);
+            var area = _rialto.computeArea(positions);
             window.alert("Area: ${area.toStringAsFixed(1)} m^2");
         });
     }
 
+    /// Allow the user to add a "marker" to the viewer.
+    ///
+    /// stub for future work
     void dropPin() {
-        _hub.cesium.drawMarker((position) {
-            Hub.log("Pin...");// + position);
+        _rialto.cesium.drawMarker((position) {
+            Rialto.log("Pin...");// + position);
         });
     }
 
+    /// Allow the user to draw a bounding box
+    ///
+    /// stub for future work
     void drawExtent() {
-        _hub.cesium.drawExtent((n, s, e, w) {
-            Hub.log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
+        _rialto.cesium.drawExtent((n, s, e, w) {
+            Rialto.log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
         });
     }
 
+    /// Asynchronously adds a new layer to the viewer
+    ///
+    /// Returns a Future with the new [Layer] object.
     Future<Layer> addLayer(LayerData data) {
-        return _hub.layerManager.doAddLayer(data);
+        return _rialto.layerManager.addLayer(data);
     }
 
+    /// Asynchronously colorizes all the (point cloud) layers
+    ///
+    /// Returns an empty future when done.
     Future colorizeLayers(ColorizerData data) {
-        return _hub.layerManager.doColorizeLayers(data);
+        return _rialto.layerManager.colorizeLayers(data);
     }
 
+    /// Asynchronously removes [layer] from the viewer
+    ///
+    /// Returns an empty future when done.
     Future removeLayer(Layer layer) {
-        return _hub.layerManager.doRemoveLayer(layer);
+        return _rialto.layerManager.removeLayer(layer);
     }
 
+    /// Asynchronously removes all layers from the viewer
+    ///
+    /// Returns an empty future when done.
     Future removeAllLayers() {
-        return _hub.layerManager.doRemoveAllLayers();
+        return _rialto.layerManager.removeAllLayers();
     }
 
-    Future loadScriptFromUrl(Uri url) {
+    /// Asynchronously reads in and execute a configuration script at the URL
+    ///
+    /// All current layers will be removed first.
+    ///
+    /// Returns a list with the results of each command.
+    Future<List<dynamic>> loadScriptFromUrl(Uri url) {
         var s = new ConfigScript();
         var f = s.loadFromUrl(url);
         return f;
     }
 
-    Future loadScriptFromStringAsync(String yaml) {
+    /// Asynchronously reads in and executes a configuration script in the string [yaml]
+    ///
+    /// All current layers will be removed first.
+    ///
+    /// Returns a list with the results of each command.
+    Future<List<dynamic>> loadScriptFromStringAsync(String yaml) {
         var s = new ConfigScript();
         var f = s.loadFromString(yaml);
         return f;
     }
 
-    Future wpsExecuteProcess(WpsExecuteProcessData data) {
-        return _hub.wps.doWpsExecuteProcess(
+    /// Asynchronously executes an arbitrary WPS process
+    Future<WpsJob> wpsExecuteProcess(WpsExecuteProcessData data) {
+        return _rialto.wps.doWpsExecuteProcess(
                 data,
                 successHandler: data.successHandler,
                 errorHandler: data.errorHandler,
                 timeoutHandler: data.timeoutHandler);
     }
 
-    Future wpsDescribeProcess(String processName) {
-        return _hub.wps.doWpsDescribeProcess(processName);
+    /// Asynchronously requests description of a WPS function
+    ///
+    /// Returns the response document.
+    Future<OgcDocument> wpsDescribeProcess(String processName) {
+        return _rialto.wps.doWpsDescribeProcess(processName);
     }
 
+    /// Asynchronously requests an OGC capabilities document.
+    ///
+    /// Returns the response document.
     Future owsGetCapabilities() {
-        return _hub.wps.doOwsGetCapabilities();
+        return _rialto.wps.doOwsGetCapabilities();
     }
 
+    /// Zooms to the given point
+    ///
+    /// Returns an empty future when done.
     Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
-        return _hub.zoomTo(eyePosition, targetPosition, upDirection, fov);
+        return _rialto.zoomTo(eyePosition, targetPosition, upDirection, fov);
     }
 
+    /// Zooms to the given layer.
+    ///
+    /// If [layer] is null, zooms to the last layer in the [LayerManager].
+    ///
+    /// Returns an empty future when done.
     Future zoomToLayer(Layer layer) {
-        return _hub.zoomToLayer(layer);
+        return _rialto.zoomToLayer(layer);
     }
 
+    /// Zooms out to show the whole globe
+    ///
+    /// Returns an empty future when done.
     Future zoomToWorld() {
-        return _hub.zoomToWorld();
+        return _rialto.zoomToWorld();
     }
 
+    /// Sets the view mode to 2D, 2.5D, or 3D
+    ///
+    /// Returns an empty future when done.
     Future setViewMode(ViewModeData mode) {
-        _hub.cesium.setViewMode(mode.mode.index);
-        return new Future(() {});
+        _rialto.cesium.setViewMode(mode.mode.index);
+        return new Future.value();
     }
-
-    Future displayLayerData(DisplayLayerData data) {
-        assert(data.layer != null);
-        if (data.layer is VisibilityControl) {
-            (data.layer as VisibilityControl).visible = data.visible;
-        }
-        return new Future(() {});
-    }
-
-    // given a list of things, run a function F against each one, in order
-    // and with an explicit wait between each one
-    //
-    // and return a Future with the list of the results from each F
-    static Future<List<dynamic>> run(ChainCommndFunction f, List<dynamic> inputs) {
-        List<dynamic> outputs = [];
-        var c = new Completer();
-
-        _executeNextCommand(f, inputs, 0, outputs, c).then((_) {});
-
-        return c.future;
-    }
-
-    static Future _executeNextCommand(ChainCommndFunction f, List<dynamic> inputs, int index, List<dynamic> outputs,
-            Completer c) {
-        dynamic input = inputs[index];
-
-        f(input).then((dynamic result) {
-            outputs.add(result);
-
-            if (index + 1 != inputs.length) {
-                _executeNextCommand(f, inputs, index + 1, outputs, c);
-            } else {
-                c.complete(outputs);
-                return;
-            }
-        });
-
-        return c.future;
-    }
-}
-
-class DisplayLayerData {
-    Layer layer;
-    bool visible;
-    DisplayLayerData(this.layer, this.visible);
 }
 
 class LayerData {
     String name;
-    Map map;
-    LayerData(String this.name, Map this.map);
+    Map options;
+    LayerData(String this.name, Map this.options);
 }
 
 class WpsExecuteProcessData {

@@ -64,24 +64,24 @@ class CameraSettingsDialog extends DialogVM {
 
         final eyeOkay = (eyeLon != null && eyeLat != null && eyeHeight != null);
         if (!eyeOkay) {
-            Hub.error("Invalid camera settings (eye position)");
+            Rialto.error("Invalid camera settings (eye position)");
             return;
         }
 
         final targetOkay = (targetLon != null && targetLat != null && targetHeight != null);
         if (!targetOkay) {
-            Hub.error("Invalid camera settings (target position)");
+            Rialto.error("Invalid camera settings (target position)");
             return;
         }
 
         bool upOkay = (upX != null && upY != null && upZ != null);
         if (!upOkay) {
-            Hub.error("Invalid camera settings (up direction)");
+            Rialto.error("Invalid camera settings (up direction)");
             return;
         }
         final fovOkay = (fov != null);
         if (!fovOkay) {
-            Hub.error("Invalid camera settings (fov value)");
+            Rialto.error("Invalid camera settings (fov value)");
             return;
         }
 

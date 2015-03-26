@@ -17,7 +17,7 @@ class WpsService extends OwsService {
         _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"]).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
-                Hub.error("Error parsing WPS process description response document");
+                Rialto.error("Error parsing WPS process description response document");
                 c.complete(null);
                 return;
             }
@@ -29,7 +29,7 @@ class WpsService extends OwsService {
             }
 
             if (ogcDoc is! OgcProcessDescriptions_15) {
-                Hub.error("Error parsing WPS process description response document");
+                Rialto.error("Error parsing WPS process description response document");
                 c.complete(null);
                 return;
             }
@@ -38,7 +38,7 @@ class WpsService extends OwsService {
             var descList = descs.descriptions.where((d) => d.identifier == processName).toList();
 
             if (descList == null || descList.isEmpty || descList.length > 1) {
-                Hub.error("Error parsing OWS Process Description response document");
+                Rialto.error("Error parsing OWS Process Description response document");
             }
 
             var desc = descList[0];
@@ -82,7 +82,7 @@ class WpsService extends OwsService {
         _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
-                Hub.error("Error parsing WPS process execution response document");
+                Rialto.error("Error parsing WPS process execution response document");
                 c.complete(null);
                 return;
             }
@@ -93,7 +93,7 @@ class WpsService extends OwsService {
             }
 
             if (ogcDoc is! OgcExecuteResponseDocument_54) {
-                Hub.error("Error parsing WPS process execution response document");
+                Rialto.error("Error parsing WPS process execution response document");
                 c.complete(ogcDoc);
                 return;
             }

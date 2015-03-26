@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 class RialtoElement {
-    Hub _hub;
+    Rialto _hub;
     Element _mouseCoords;
 
     ViewModeCode viewMode = ViewModeCode.mode3D;
@@ -13,7 +13,7 @@ class RialtoElement {
     Element _textWpsJobStatus;
 
     RialtoElement() {
-        _hub = Hub.root;
+        _hub = Rialto.root;
 
         querySelector("#homeWorldButton").onClick.listen((ev) => _hub.commands.zoomToWorld());
         querySelector("#homeDataButton").onClick.listen((ev) => _hub.commands.zoomToLayer(null));

@@ -5,7 +5,7 @@
 part of rialto.viewer;
 
 class BboxShape {
-    Hub _hub;
+    Rialto _hub;
 
     var _primitive;
     bool _isVisible;
@@ -13,7 +13,7 @@ class BboxShape {
     Cartographic3 _point1, _point2;
 
     BboxShape(this._point1, this._point2) : _isVisible = true {
-        _hub = Hub.root;
+        _hub = Rialto.root;
         _create();
     }
 

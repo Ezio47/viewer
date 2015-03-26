@@ -12,11 +12,11 @@ class WpsJobManager {
     static final Duration pollingDelay = new Duration(seconds: 2);
     static final Duration pollingTimeout = new Duration(minutes: 5);
 
-    Hub _hub;
+    Rialto _hub;
     Map<int, WpsJob> map = new Map<int, WpsJob>();
     int _jobId = 0;
 
-    WpsJobManager() : _hub = Hub.root;
+    WpsJobManager() : _hub = Rialto.root;
 
     WpsJob createStatusObject(WpsService service, {WpsJobResultHandler successHandler: null,
             WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null}) {
@@ -41,7 +41,7 @@ class WpsJobManager {
 
 
 class WpsJob {
-    Hub _hub = Hub.root;
+    Rialto _hub = Rialto.root;
     final WpsService service;
     final int id;
     Uri statusLocation;
@@ -102,7 +102,7 @@ class WpsJob {
     void _poll() {
 
         var secs = new DateTime.now().difference(_startTime).inSeconds;
-        Hub.log("poll #$_pollCount, $secs seconds elapsed");
+        Rialto.log("poll #$_pollCount, $secs seconds elapsed");
 
         var now = new DateTime.now();
         if (now.isAfter(_timeoutTime)) {
@@ -115,7 +115,7 @@ class WpsJob {
 
         assert(statusLocation != null);
 
-        Comms.httpGet(statusLocation, proxyUri: proxyUri).then((Http.Response response) {
+        Utils.httpGet(statusLocation, proxyUri: proxyUri).then((Http.Response response) {
             var ogcDoc = OgcDocument.parseString(response.body);
             //log(ogcDoc.dump(0));
 

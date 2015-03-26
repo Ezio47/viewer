@@ -6,7 +6,7 @@ part of rialto.viewer;
 
 
 abstract class Layer {
-    final Hub _hub;
+    final Rialto _hub;
 
     final String type;
     final String name;
@@ -18,7 +18,7 @@ abstract class Layer {
     CartographicBbox _bbox;
 
     Layer(String this.type, String this.name, Map map)
-            : _hub = Hub.root,
+            : _hub = Rialto.root,
               url = YamlUtils.getOptionalSettingAsUrl(map, "url"),
               proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy"),
               description = YamlUtils.getOptionalSettingAsString(map, "description");

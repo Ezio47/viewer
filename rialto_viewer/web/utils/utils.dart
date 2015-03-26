@@ -136,4 +136,26 @@ class Utils {
         assert(toSI(1000000) == "1M");
         assert(toSI(1000000000) == "1G");
     }
+
+    static Future<Http.Response> httpGet(Uri url, {Uri proxyUri: null}) {
+
+        var c = new Completer<dynamic>();
+
+        String s = url.toString();
+
+        if (proxyUri != null) {
+            s = proxyUri.toString() + "?" + s;
+            url = Uri.parse(s);
+        }
+
+        Http.Client client = new BHttp.BrowserClient();
+
+        client.get(url).then((Http.Response response) {
+            c.complete(response);
+        }).catchError((e) {
+            Rialto.error("Unable to load file", "Path: $url");
+        });
+
+        return c.future;
+    }
 }

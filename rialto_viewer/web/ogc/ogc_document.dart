@@ -29,14 +29,14 @@ class OgcDocument {
         try {
             xmlDoc = Xml.parse(text);
         } catch (e) {
-            Hub.error("failed to parse XML response", e);
+            Rialto.error("failed to parse XML response", e);
             return null;
         }
 
         try {
             ogcDoc = parseXml(xmlDoc);
         } catch (e) {
-            Hub.error("failed to parse OWS response", e);
+            Rialto.error("failed to parse OWS response", e);
             return null;
         }
 
@@ -56,7 +56,7 @@ class OgcDocument {
                     case "ExecuteResponse":
                         return new OgcExecuteResponseDocument_54(elem);
                     default:
-                        Hub.log("Unhandled top-level doc type: ${elem.name.local}");
+                        Rialto.log("Unhandled top-level doc type: ${elem.name.local}");
                         assert(false);
                         break;
                 }
@@ -122,12 +122,12 @@ class OgcDocument {
     void _ignoreElement(Xml.XmlElement e) {}
 
     void _errorAttribute(Xml.XmlAttribute t) {
-        Hub.log("attribute not yet handled: $t");
+        Rialto.log("attribute not yet handled: $t");
         assert(false);
     }
 
     void _errorElement(Xml.XmlElement e) {
-        Hub.log("element not yet handled: $e");
+        Rialto.log("element not yet handled: $e");
         assert(false);
     }
 

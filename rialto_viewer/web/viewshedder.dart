@@ -4,10 +4,18 @@
 
 part of rialto.viewer;
 
+///
+/// Interface to the viewshed analysis, via WPF
+///
 class Viewshedder {
 
+    /// Starts an asynchronous job to run the viewshed analysis via WPS
+    ///
+    /// Invokes the general WPS execution function to starts an asynchronous
+    /// WPS job to run the viewshed analysis using the given observer
+    /// position and radius.
     static void callWps(double obsLon, double obsLat, double radius) {
-        var hub = Hub.root;
+        var hub = Rialto.root;
 
         var params = new List(3);
         params[0] = "groovy:wpsviewshed";
@@ -24,9 +32,9 @@ class Viewshedder {
 
         var yes = (WpsJob job) {
             OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
-            Hub.log(ogcDoc.dump(0));
+            Rialto.log(ogcDoc.dump(0));
             var url = ogcDoc.getProcessOutput("outputUrl");
-            Hub.log("SUCCESS: $url");
+            Rialto.log("SUCCESS: $url");
 
             var layerData = new LayerData("viewshed-${job.id}", {
                 "type": "tms_imagery",
@@ -41,18 +49,18 @@ class Viewshedder {
         };
 
         var no = (WpsJob job) {
-            Hub.log("FAILURE");
+            Rialto.log("FAILURE");
             assert(job.responseDocument != null || job.exceptionTexts != null);
             if (job.responseDocument != null) {
-                Hub.log(job.responseDocument.dump(0));
+                Rialto.log(job.responseDocument.dump(0));
             }
             if (job.exceptionTexts != null) {
-                Hub.log(job.exceptionTexts);
+                Rialto.log(job.exceptionTexts);
             }
         };
 
         var time = (WpsJob job) {
-            Hub.error("wps request timed out!");
+            Rialto.error("wps request timed out!");
         };
 
         var data = new WpsExecuteProcessData(params, successHandler: yes, errorHandler: no, timeoutHandler: time);
@@ -62,6 +70,8 @@ class Viewshedder {
 
 
 /****
+ Notes on the command line tool invocation:
+ 
     double obsLat, obsLon;
 
     // --fov <start> <end>
