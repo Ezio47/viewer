@@ -43,6 +43,15 @@ part 'ogc/wps_job_manager.dart';
 part 'ogc/wps_service.dart';
 part 'ogc/wps_service_tests.dart';
 
+part 'ui_components/about_dialog.dart';
+part 'ui_components/advanced_settings_dialog.dart';
+part 'ui_components/camera_settings_dialog.dart';
+part 'ui_components/layer_adder_dialog.dart';
+part 'ui_components/layer_customization_dialog.dart';
+part 'ui_components/layer_info_dialog.dart';
+part 'ui_components/load_configuration_dialog.dart';
+part 'ui_components/layer_manager_dialog.dart';
+
 part 'utils/cartesian3.dart';
 part 'utils/cartographic3.dart';
 part 'utils/color.dart';
@@ -51,18 +60,10 @@ part 'utils/signal.dart';
 part 'utils/utils.dart';
 part 'utils/config_utils.dart';
 
-part 'viewmodels/about_dialog.dart';
-part 'viewmodels/advanced_settings_dialog.dart';
-part 'viewmodels/button_vm.dart';
-part 'viewmodels/camera_settings_dialog.dart';
 part 'viewmodels/check_box_vm.dart';
 part 'viewmodels/dialog_vm.dart';
-part 'viewmodels/layer_adder_dialog.dart';
-part 'viewmodels/layer_customization_dialog.dart';
-part 'viewmodels/layer_info_dialog.dart';
-part 'viewmodels/load_configuration_dialog.dart';
+part 'viewmodels/button_vm.dart';
 part 'viewmodels/list_box_vm.dart';
-part 'viewmodels/layer_manager_dialog.dart';
 part 'viewmodels/rialto_element.dart';
 part 'viewmodels/text_input_vm.dart';
 part 'viewmodels/view_model.dart';
