@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.viewer;
+part of rialto.frontend;
 
 
 /// UI component that allows for one-line text entry

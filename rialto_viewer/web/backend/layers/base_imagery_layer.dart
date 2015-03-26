@@ -3,7 +3,7 @@
 // license found in the accompanying LICENSE.txt file.
 
 
-part of rialto.viewer;
+part of rialto.backend;
 
 
 abstract class BaseImageryLayer extends Layer implements VisibilityControl, AlphaControl, ColorCorrectionControl {

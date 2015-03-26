@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.viewer;
+part of rialto.backend;
 
 
 /// General system for sending "signals", i.e. "events", using Dart streams

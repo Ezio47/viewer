@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.viewer;
+part of rialto.backend;
 
 
 /// Static helper functions for dealing with YAML viewer config files

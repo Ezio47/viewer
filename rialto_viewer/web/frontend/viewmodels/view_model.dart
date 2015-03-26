@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.viewer;
+part of rialto.frontend;
 
 
 /// base class for Rialto's notion of a UI component
@@ -19,7 +19,7 @@ abstract class ViewModel {
         assert(id.startsWith("#"));
 
         _backend = _frontend.backend;
-        
+
         _element = querySelector(id);
         if (_element == null) {
             throw new ArgumentError("HTML element with id=$id not found");

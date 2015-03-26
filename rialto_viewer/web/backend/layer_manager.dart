@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.viewer;
+part of rialto.backend;
 
 /// Holds all the layers loaded into the viewer.
 ///
