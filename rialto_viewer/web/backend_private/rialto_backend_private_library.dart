@@ -2,12 +2,10 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-/// Imports all the parts of the viewer.
 
 library rialto.backend.private;
 
 import 'dart:async';
-import 'dart:html';
 import 'dart:js';
 import 'dart:math';
 import 'dart:typed_data';
