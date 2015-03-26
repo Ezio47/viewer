@@ -20,9 +20,7 @@ final String demo = """- layers:
 ///
 /// Called from inside index.html. Creates the viewer, reads in the configuration file, and
 /// runs the commands in it to create the layers
-/*void*/ main() {
-    // TODO: fix all "/*void*/...async" after Dart 1.9 released
-
+void main() {
     // TODO: addErrorListener not yet implemented in Dart SDK...
     //ReceivePort errPort = new ReceivePort();
     //Isolate.current.addErrorListener(errPort.sendPort);
