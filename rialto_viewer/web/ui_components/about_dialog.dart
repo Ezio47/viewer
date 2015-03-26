@@ -6,5 +6,5 @@ part of rialto.viewer;
 
 
 class AboutDialog extends DialogVM {
-    AboutDialog(String id) : super(id, hasCancelButton: false);
+    AboutDialog(RialtoFrontend frontend, String id) : super(frontend, id, hasCancelButton: false);
 }

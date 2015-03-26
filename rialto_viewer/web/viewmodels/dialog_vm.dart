@@ -10,15 +10,12 @@ abstract class DialogVM extends ViewModel with IForm {
     bool _hasCancelButton;
     HtmlElement _dialogElement;
     var _dialogProxy;
-    Rialto _hub;
 
-    DialogVM(String id, {bool hasCancelButton: true})
-            : super(id),
+    DialogVM(RialtoFrontend frontend, String id, {bool hasCancelButton: true})
+            : super(frontend, id),
               _hasCancelButton = hasCancelButton {
 
-        _hub = Rialto.root;
-
-        _dialogProxy = _hub.js.registerDialog(id);
+        _dialogProxy = _backend.js.registerDialog(id);
 
         _dialogElement = _element;
         assert(_dialogElement != null);
@@ -44,7 +41,7 @@ abstract class DialogVM extends ViewModel with IForm {
     String get cancelButtonId => id + "_cancel";
 
     void show() {
-        _hub.js.showDialog(_dialogProxy);
+        _backend.js.showDialog(_dialogProxy);
         saveState();
         _show();
     }
@@ -57,7 +54,7 @@ abstract class DialogVM extends ViewModel with IForm {
                 _hide();
             }
         }
-        _hub.js.hideDialog(_dialogProxy);
+        _backend.js.hideDialog(_dialogProxy);
     }
 
     // derived dialogs may reimplement these

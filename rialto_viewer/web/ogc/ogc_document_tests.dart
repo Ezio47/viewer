@@ -14,23 +14,26 @@ part of rialto.viewer;
 
 
 class OgcDocumentTests {
+    RialtoBackend _backend;
 
-    static void test() {
+    OgcDocumentTests(RialtoBackend this._backend);
+
+    void test() {
         var ex = OgcDocument.parseString(generalException);
-        Rialto.log(ex);
+        RialtoBackend.log(ex);
 
         var proc = OgcDocument.parseString(describeProcess);
-        Rialto.log(proc);
+        RialtoBackend.log(proc);
 
         var exp = OgcDocument.parseString(describeProcessError);
-        Rialto.log(exp);
+        RialtoBackend.log(exp);
 
         var wpsCaps = OgcDocument.parseString(capabilities);
-        Rialto.log(wpsCaps);
+        RialtoBackend.log(wpsCaps);
 
         var uri = Uri.parse("http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService");
         var proxyUri = Uri.parse("http://localhost:12345/proxy");
-        var wps = new WpsService(uri, proxyUri: proxyUri);
+        var wps = new WpsService(_backend, uri, proxyUri: proxyUri);
         wps.open();
         wps.doOwsGetCapabilities().then((doc) {
             assert(doc is OgcCapabilitiesDocument_7);
@@ -43,7 +46,7 @@ class OgcDocumentTests {
         });
         wps.close();
 
-        Rialto.log("OGC tests done");
+        RialtoBackend.log("OGC tests done");
     }
 
 

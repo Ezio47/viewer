@@ -8,8 +8,8 @@ part of rialto.viewer;
 /// Unit tests for WPS operations
 class WpsServiceTest {
 
-    static void test(WpsService wps) {
-        OgcDocumentTests.test();
+    static void test(RialtoBackend backend, WpsService wps) {
+        new OgcDocumentTests(backend).test();
         testCapabilities(wps);
         testDescribeSummation(wps);
         testExecuteSummation(wps);

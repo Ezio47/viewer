@@ -21,7 +21,7 @@ import 'package:yaml/yaml.dart';
 part 'commands.dart';
 part 'config_script.dart';
 part 'event_registry.dart';
-part 'rialto.dart';
+part 'rialto_backend.dart';
 part 'layer_manager.dart';
 part 'viewshedder.dart';
 
@@ -64,6 +64,6 @@ part 'viewmodels/check_box_vm.dart';
 part 'viewmodels/dialog_vm.dart';
 part 'viewmodels/button_vm.dart';
 part 'viewmodels/list_box_vm.dart';
-part 'viewmodels/rialto_element.dart';
+part 'viewmodels/rialto_frontend.dart';
 part 'viewmodels/text_input_vm.dart';
 part 'viewmodels/view_model.dart';

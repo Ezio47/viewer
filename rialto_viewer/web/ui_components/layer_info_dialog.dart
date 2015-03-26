@@ -8,7 +8,7 @@ part of rialto.viewer;
 class LayerInfoDialog extends DialogVM {
     Layer _target;
 
-    LayerInfoDialog(String id) : super(id, hasCancelButton: false);
+    LayerInfoDialog(RialtoFrontend frontend, String id) : super(frontend, id, hasCancelButton: false);
 
     set target(Layer layer) => _target = layer;
 
@@ -32,7 +32,7 @@ class LayerInfoDialog extends DialogVM {
         String minx, miny, minz;
         String maxx, maxy, maxz;
         if (layer.bbox != null) {
-            final precision = _hub.displayPrecision;
+            final precision = _backend.displayPrecision;
 
             minx = layer.bbox.minimum.longitude.toStringAsFixed(precision);
             miny = layer.bbox.minimum.latitude.toStringAsFixed(precision);

@@ -13,10 +13,7 @@ part of rialto.viewer;
 /// This is explcitly a singleton.
 ///
 /// (this class formerly known as "Hub", and some references to it still use that name)
-class Rialto {
-    // singleton holder
-    static Rialto _root;
-
+class RialtoBackend {
     // globals
     EventRegistry events;
     Commands commands;
@@ -30,29 +27,18 @@ class Rialto {
 
     List viewshedCircles = new List();
 
-    /// Returns the singlton instance
-    static Rialto get root {
-        assert(_root != null);
-        return _root;
-    }
-
-    /// Creates the singleton instance of the viewer.
-    Rialto() {
-        assert(_root == null);
-        _root = this;
-
+    /// Creates the instance of the viewer backend
+    RialtoBackend() {
         js = new JsBridge(log);
 
-        wpsJobManager = new WpsJobManager();
+        wpsJobManager = new WpsJobManager(this);
 
         events = new EventRegistry();
-        commands = new Commands();
+        commands = new Commands(this);
 
-        layerManager = new LayerManager();
+        layerManager = new LayerManager(this);
 
         cesium = new CesiumBridge('cesiumContainer');
-
-        new RialtoElement();
 
         cesium.onMouseMove((num x, num y) => events.MouseMove.fire(new MouseData.fromXy(x, y)));
 

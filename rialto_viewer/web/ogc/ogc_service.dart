@@ -15,10 +15,9 @@ class OgcService {
     final Uri server;
     final Uri proxyUri;
     final String description;
-    Rialto _hub;
+    RialtoBackend _backend;
 
-    OgcService(String this.service, Uri this.server, {Uri this.proxyUri: null, String this.description: null})
-            : _hub = Rialto.root;
+    OgcService(RialtoBackend this._backend, String this.service, Uri this.server, {Uri this.proxyUri: null, String this.description: null});
 
     void open() {
     }
@@ -46,7 +45,7 @@ class OgcService {
 
         Utils.httpGet(uri, proxyUri: proxyUri).then((Http.Response response) {
             if (response.statusCode != 200) {
-                Rialto.error("server request failed");
+                RialtoBackend.error("server request failed");
                 c.complete(null);
                 return;
             }
@@ -57,7 +56,7 @@ class OgcService {
                 var doc = OgcDocument.parseString(text);
                 c.complete(doc);
             } catch (e) {
-                Rialto.error("Unable to parse server response", e);
+                RialtoBackend.error("Unable to parse server response", e);
                 c.complete(null);
             }
         });
@@ -72,7 +71,7 @@ class OgcService {
         _sendKvpServerRequest("GetCapabilities", []).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
-                Rialto.error("Error parsing OWS Capabilities response document");
+                RialtoBackend.error("Error parsing OWS Capabilities response document");
                 c.complete(null);
                 return;
             }

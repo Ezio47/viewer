@@ -9,14 +9,14 @@ class GeoJsonLayer extends Layer implements VisibilityControl {
     dynamic _dataSource;
     bool _visible;
 
-    GeoJsonLayer(String name, Map map)
+    GeoJsonLayer(RialtoBackend backend, String name, Map map)
             : _visible = ConfigUtils.getOptionalSettingAsBool(map, "visible", true),
-              super("geojson", name, map) {
+              super(backend, "geojson", name, map) {
         _requireUrl();
     }
 
     @override set visible(bool v) {
-        _hub.cesium.setDataSourceVisible(_dataSource, v);
+        _backend.cesium.setDataSourceVisible(_dataSource, v);
         _visible = v;
     }
     @override bool get visible => _visible;
@@ -29,7 +29,7 @@ class GeoJsonLayer extends Layer implements VisibilityControl {
     Future load() {
         Completer c = new Completer();
 
-        _hub.cesium.addGeoJsonDataSource(name, urlString).then((ds) {
+        _backend.cesium.addGeoJsonDataSource(name, urlString).then((ds) {
             _dataSource = ds;
 
             _forceUpdates();
@@ -43,7 +43,7 @@ class GeoJsonLayer extends Layer implements VisibilityControl {
     @override
     Future unload() {
         return new Future(() {
-            _hub.cesium.removeDataSource(_dataSource);
+            _backend.cesium.removeDataSource(_dataSource);
         });
     }
 }

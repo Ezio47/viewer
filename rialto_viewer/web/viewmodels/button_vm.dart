@@ -11,8 +11,8 @@ part of rialto.viewer;
 class ButtonVM extends ViewModel {
     ButtonElement _buttonElement;
 
-    ButtonVM(String id, Function onClick)
-            : super(id) {
+    ButtonVM(RialtoFrontend frontend, String id, Function onClick)
+            : super(frontend, id) {
         _buttonElement = _element;
         _buttonElement.onClick.listen((e) => onClick(e));
         disabled = false;

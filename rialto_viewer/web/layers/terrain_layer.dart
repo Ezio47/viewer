@@ -9,8 +9,8 @@ class TerrainLayer extends Layer {
 
     dynamic _provider;
 
-    TerrainLayer(String name, Map map)
-            : super("terrain", name, map) {
+    TerrainLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "terrain", name, map) {
         _requireUrl();
     }
 
@@ -20,7 +20,7 @@ class TerrainLayer extends Layer {
             var options = {
                 'url': urlString
             };
-            _provider = _hub.cesium.setCesiumTerrainProvider(options);
+            _provider = _backend.cesium.setCesiumTerrainProvider(options);
         });
         return f;
     }
@@ -28,7 +28,7 @@ class TerrainLayer extends Layer {
     @override
     Future unload() {
         var f = new Future(() {
-            _hub.cesium.unsetTerrainProvider();
+            _backend.cesium.unsetTerrainProvider();
         });
         return f;
     }

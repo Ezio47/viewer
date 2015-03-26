@@ -9,12 +9,12 @@ abstract class BaseTerrainLayer extends Layer {
 
     dynamic _provider;
 
-    BaseTerrainLayer(String type, String name, Map map) : super(type, name, map);
+    BaseTerrainLayer(RialtoBackend backend, String type, String name, Map map) : super(backend, type, name, map);
 
     @override
     Future unload() {
         var f = new Future(() {
-            _hub.cesium.unsetBaseTerrainProvider();
+            _backend.cesium.unsetBaseTerrainProvider();
         });
         return f;
     }
@@ -23,14 +23,14 @@ abstract class BaseTerrainLayer extends Layer {
 
 class EllipsoidBaseTerrainLayer extends BaseTerrainLayer {
 
-    EllipsoidBaseTerrainLayer(String name, Map map)
-            : super("ellipsoid_base_terrain", name, map);
+    EllipsoidBaseTerrainLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "ellipsoid_base_terrain", name, map);
 
     @override
     Future load() {
         var f = new Future(() {
             var options = {};
-            _provider = _hub.cesium.setEllipsoidBaseTerrainProvider(options);
+            _provider = _backend.cesium.setEllipsoidBaseTerrainProvider(options);
         });
         return f;
     }
@@ -45,8 +45,8 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
             '//elevation.arcgisonline.com/ArcGIS/rest/services/WorldElevation/DTMEllipsoidal/ImageServer';
     String _arcGisApiKey;
 
-    ArcGisBaseTerrainLayer(String name, Map map)
-            : super("arcgis_base_terrain", name, map),
+    ArcGisBaseTerrainLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "arcgis_base_terrain", name, map),
               _arcGisApiKey = ConfigUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultKey);
 
     @override
@@ -58,7 +58,7 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
                 'token': _defaultKey
             };
 
-            _provider = _hub.cesium.setArcGisBaseTerrainProvider(options);
+            _provider = _backend.cesium.setArcGisBaseTerrainProvider(options);
         });
         return f;
     }
@@ -67,8 +67,8 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
 
 class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
 
-    CesiumSmallBaseTerrainLayer(String name, Map map)
-            : super("cesium_small_base_terrain", name, map);
+    CesiumSmallBaseTerrainLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "cesium_small_base_terrain", name, map);
 
     @override
     Future load() {
@@ -77,7 +77,7 @@ class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
                 'url': '//cesiumjs.org/smallterrain',
                 'credit': 'Terrain data courtesy Analytical Graphics, Inc.'
             };
-            _provider = _hub.cesium.setCesiumBaseTerrainProvider(options);
+            _provider = _backend.cesium.setCesiumBaseTerrainProvider(options);
         });
         return f;
     }
@@ -86,15 +86,15 @@ class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
 
 class CesiumStkBaseTerrainLayer extends BaseTerrainLayer {
 
-    CesiumStkBaseTerrainLayer(String name, Map map)
-            : super("cesium_stk_base_terrain", name, map);
+    CesiumStkBaseTerrainLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "cesium_stk_base_terrain", name, map);
     @override
     Future load() {
         var f = new Future(() {
             var options = {
                 'url': '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
             };
-            _provider = _hub.cesium.setCesiumBaseTerrainProvider(options);
+            _provider = _backend.cesium.setCesiumBaseTerrainProvider(options);
         });
         return f;
     }
@@ -103,8 +103,8 @@ class CesiumStkBaseTerrainLayer extends BaseTerrainLayer {
 
 class VrTheWorldBaseTerrainLayer extends BaseTerrainLayer {
 
-    VrTheWorldBaseTerrainLayer(String name, Map map)
-            : super("vrtheworld_base_terrain", name, map);
+    VrTheWorldBaseTerrainLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "vrtheworld_base_terrain", name, map);
 
     @override
     Future<bool> load() {
@@ -112,7 +112,7 @@ class VrTheWorldBaseTerrainLayer extends BaseTerrainLayer {
             var options = {
                 'url': '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/'
             };
-            _provider = _hub.cesium.setVrTheWorldBaseTerrainProvider(options);
+            _provider = _backend.cesium.setVrTheWorldBaseTerrainProvider(options);
         });
         return f;
     }

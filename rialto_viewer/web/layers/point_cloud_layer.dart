@@ -16,8 +16,8 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl, Bb
     bool _visible = true;
     bool _bboxVisible = true;
 
-    PointCloudLayer(String name, Map map)
-            : super("pointcloud", name, map) {
+    PointCloudLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "pointcloud", name, map) {
         _requireUrl();
     }
 
@@ -25,26 +25,26 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl, Bb
     Future load() {
         Completer c = new Completer();
 
-        _hub.cesium.createTileProviderAsync(
+        _backend.cesium.createTileProviderAsync(
                 urlString,
                 _colorizerData.ramp,
                 _colorizerData.dimension,
                 visible).then((provider) {
             _provider = provider;
 
-            numPoints = _hub.cesium.getNumPointsFromProvider(_provider);
+            numPoints = _backend.cesium.getNumPointsFromProvider(_provider);
 
-            var xStats = _hub.cesium.getStatsFromProvider(_provider, "X");
-            var yStats = _hub.cesium.getStatsFromProvider(_provider, "Y");
-            var zStats = _hub.cesium.getStatsFromProvider(_provider, "Z");
+            var xStats = _backend.cesium.getStatsFromProvider(_provider, "X");
+            var yStats = _backend.cesium.getStatsFromProvider(_provider, "Y");
+            var zStats = _backend.cesium.getStatsFromProvider(_provider, "Z");
 
             _bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
 
-            dimensions = _hub.cesium.getDimensionNamesFromProvider(_provider);
+            dimensions = _backend.cesium.getDimensionNamesFromProvider(_provider);
 
             if (_bboxShape != null) _bboxShape.remove();
             if (_bboxVisible && bbox != null && bbox.isValid) {
-                _bboxShape = new BboxShape(bbox.minimum, bbox.maximum);
+                _bboxShape = new BboxShape(_backend, bbox.minimum, bbox.maximum);
             }
 
             c.complete();
@@ -56,14 +56,14 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl, Bb
     @override
     Future unload() {
         return new Future(() {
-            _hub.cesium.unloadTileProvider(_provider);
+            _backend.cesium.unloadTileProvider(_provider);
         });
     }
 
     @override
     set visible(bool v) {
         _visible = v;
-        _hub.cesium.unloadTileProvider(_provider);
+        _backend.cesium.unloadTileProvider(_provider);
         load();
     }
 
@@ -85,7 +85,7 @@ class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl, Bb
 
     Future colorizeAsync() {
         return new Future(() {
-            _hub.cesium.unloadTileProvider(_provider);
+            _backend.cesium.unloadTileProvider(_provider);
             load();
         });
     }

@@ -14,9 +14,7 @@ class Viewshedder {
     /// Invokes the general WPS execution function to starts an asynchronous
     /// WPS job to run the viewshed analysis using the given observer
     /// position and radius.
-    static void callWps(double obsLon, double obsLat, double radius) {
-        var hub = Rialto.root;
-
+    static void callWps(RialtoBackend backend, double obsLon, double obsLat, double radius) {
         var params = new List(3);
         params[0] = "groovy:wpsviewshed";
         params[1] = {
@@ -32,9 +30,9 @@ class Viewshedder {
 
         var yes = (WpsJob job) {
             OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
-            Rialto.log(ogcDoc.dump(0));
+            RialtoBackend.log(ogcDoc.dump(0));
             var url = ogcDoc.getProcessOutput("outputUrl");
-            Rialto.log("SUCCESS: $url");
+            RialtoBackend.log("SUCCESS: $url");
 
             var layerData = new LayerData("viewshed-${job.id}", {
                 "type": "tms_imagery",
@@ -43,35 +41,35 @@ class Viewshedder {
                 "maximumLevel": 12,
             //"alpha": 0.5
             });
-            hub.commands.addLayer(layerData).then((_) {
+            backend.commands.addLayer(layerData).then((_) {
                 //Hub.log("layer added!");
             });
         };
 
         var no = (WpsJob job) {
-            Rialto.log("FAILURE");
+            RialtoBackend.log("FAILURE");
             assert(job.responseDocument != null || job.exceptionTexts != null);
             if (job.responseDocument != null) {
-                Rialto.log(job.responseDocument.dump(0));
+                RialtoBackend.log(job.responseDocument.dump(0));
             }
             if (job.exceptionTexts != null) {
-                Rialto.log(job.exceptionTexts);
+                RialtoBackend.log(job.exceptionTexts);
             }
         };
 
         var time = (WpsJob job) {
-            Rialto.error("wps request timed out!");
+            RialtoBackend.error("wps request timed out!");
         };
 
         var data = new WpsExecuteProcessData(params, successHandler: yes, errorHandler: no, timeoutHandler: time);
-        hub.commands.wpsExecuteProcess(data);
+        backend.commands.wpsExecuteProcess(data);
     }
 }
 
 
 /****
  Notes on the command line tool invocation:
- 
+
     double obsLat, obsLon;
 
     // --fov <start> <end>

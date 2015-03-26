@@ -13,19 +13,19 @@ part of rialto.viewer;
 ///
 /// The [LayerManager] is owned by the [Rialto] and treated as a singleton.
 class LayerManager {
-    Rialto _hub;
+    RialtoBackend _backend;
     List<Layer> layers = new List<Layer>();
     Map<String, Layer> _layerMap = new Map<String, Layer>();
     bool _hasBaseImagery = false;
 
     /// Create the (singleton) manager
-    LayerManager() : _hub = Rialto.root;
+    LayerManager(RialtoBackend this._backend);
 
     /// Colorize all (point cloud) layers
     Future colorizeLayers(ColorizerData data) {
         var futures = new List<Future>();
 
-        for (var layer in _hub.layerManager.layers) {
+        for (var layer in _backend.layerManager.layers) {
             if (layer is PointCloudLayer) {
                 (layer as ColorizerControl).colorizerData = data;
                 Future f = layer.colorizeAsync();
@@ -45,14 +45,14 @@ class LayerManager {
         var c = new Completer<Layer>();
 
         if (_layerMap.containsKey(name)) {
-            Rialto.error("Layer $name already loaded.");
+            RialtoBackend.error("Layer $name already loaded.");
             c.complete(null);
             return c.future;
         }
 
         Layer layer = _createLayer(name, data.options);
         if (layer == null) {
-            Rialto.error("Unable to load layer $name.");
+            RialtoBackend.error("Unable to load layer $name.");
             c.complete(null);
             return c.future;
         }
@@ -61,7 +61,7 @@ class LayerManager {
             layers.add(layer);
             _layerMap[layer.name] = layer;
 
-            _hub.events.AddLayerCompleted.fire(layer);
+            _backend.events.AddLayerCompleted.fire(layer);
 
             c.complete(layer);
         });
@@ -89,7 +89,7 @@ class LayerManager {
 
         layer.unload();
 
-        _hub.events.RemoveLayerCompleted.fire(layer);
+        _backend.events.RemoveLayerCompleted.fire(layer);
 
         return new Future.value();
     }
@@ -99,12 +99,12 @@ class LayerManager {
     /// Invokes [removeLayer] for each layer in the list.
     Future removeAllLayers() {
         var items = layers.toList();
-        items.forEach((layer) => _hub.commands.removeLayer(layer));
+        items.forEach((layer) => _backend.commands.removeLayer(layer));
 
         layers.clear();
         _layerMap.clear();
 
-        _hub.events.RemoveAllLayersCompleted.fire0();
+        _backend.events.RemoveAllLayersCompleted.fire0();
 
         return new Future.value();
     }
@@ -119,46 +119,46 @@ class LayerManager {
         switch (type) {
 
             case "bing_base_imagery":
-                layer = new BingBaseImageryLayer(name, map);
+                layer = new BingBaseImageryLayer(_backend, name, map);
                 _hasBaseImagery = true;
                 break;
 
             case "arcgis_base_imagery":
-                layer = new ArcGisBaseImageryLayer(name, map);
+                layer = new ArcGisBaseImageryLayer(_backend, name, map);
                 _hasBaseImagery = true;
                 break;
 
             case "osm_base_imagery":
-                layer = new OsmBaseImageryLayer(name, map);
+                layer = new OsmBaseImageryLayer(_backend, name, map);
                 _hasBaseImagery = true;
                 break;
 
             case "ellipsoid_base_terrain":
-                layer = new EllipsoidBaseTerrainLayer(name, map);
+                layer = new EllipsoidBaseTerrainLayer(_backend, name, map);
                 break;
 
             case "arcgis_base_terrain":
-                layer = new ArcGisBaseTerrainLayer(name, map);
+                layer = new ArcGisBaseTerrainLayer(_backend, name, map);
                 break;
 
             case "cesium_small_base_terrain":
-                layer = new CesiumSmallBaseTerrainLayer(name, map);
+                layer = new CesiumSmallBaseTerrainLayer(_backend, name, map);
                 break;
 
             case "cesium_stk_base_terrain":
-                layer = new CesiumStkBaseTerrainLayer(name, map);
+                layer = new CesiumStkBaseTerrainLayer(_backend, name, map);
                 break;
 
             case "vrtheworld_base_terrain":
-                layer = new VrTheWorldBaseTerrainLayer(name, map);
+                layer = new VrTheWorldBaseTerrainLayer(_backend, name, map);
                 break;
 
             case "wms_imagery":
-                layer = new WmsImageryLayer(name, map);
+                layer = new WmsImageryLayer(_backend, name, map);
                 break;
 
             case "tms_imagery":
-                layer = new TmsImageryLayer(name, map);
+                layer = new TmsImageryLayer(_backend, name, map);
                 break;
 
             case "single_imagery":
@@ -166,23 +166,23 @@ class LayerManager {
                     // TODO: under what conditions is this really a problem?
                     throw new ArgumentError("single_imagery requires a base imagery layer");
                 }
-                layer = new SingleImageryLayer(name, map);
+                layer = new SingleImageryLayer(_backend, name, map);
                 break;
 
             case "terrain":
-                layer = new TerrainLayer(name, map);
+                layer = new TerrainLayer(_backend, name, map);
                 break;
 
             case "geojson":
-                layer = new GeoJsonLayer(name, map);
+                layer = new GeoJsonLayer(_backend, name, map);
                 break;
 
             case "pointcloud":
-                layer = new PointCloudLayer(name, map);
+                layer = new PointCloudLayer(_backend, name, map);
                 break;
 
             default:
-                Rialto.error("Unrecognized layer type in configuration file", "Layer type: $type");
+                RialtoBackend.error("Unrecognized layer type in configuration file", "Layer type: $type");
                 return null;
         }
 

@@ -19,13 +19,13 @@ class LoadConfigurationDialog extends DialogVM {
     TextAreaInputVM _scriptText;
     ButtonVM _scriptButton;
 
-    LoadConfigurationDialog(String id) : super(id, hasCancelButton: false) {
+    LoadConfigurationDialog(RialtoFrontend frontend, String id) : super(frontend, id, hasCancelButton: false) {
 
-        _urlText = new TextInputVM("#loadConfigurationDialog_urlText", "");
-        _urlButton = new ButtonVM("#loadConfigurationDialog_urlButton", _loadUrl);
+        _urlText = new TextInputVM(_frontend, "#loadConfigurationDialog_urlText", "");
+        _urlButton = new ButtonVM(_frontend, "#loadConfigurationDialog_urlButton", _loadUrl);
 
-        _scriptText = new TextAreaInputVM("#loadConfigurationDialog_scriptText", "");
-        _scriptButton = new ButtonVM("#loadConfigurationDialog_scriptButton", _loadScript);
+        _scriptText = new TextAreaInputVM(_frontend, "#loadConfigurationDialog_scriptText", "");
+        _scriptButton = new ButtonVM(_frontend, "#loadConfigurationDialog_scriptButton", _loadScript);
 
         _register(_urlText);
     }
@@ -35,8 +35,8 @@ class LoadConfigurationDialog extends DialogVM {
         if (value != null) {
             var url = Uri.parse(value); // TODO: handle error
 
-            _hub.commands.removeAllLayers().then((_) {
-                _hub.commands.loadScriptFromUrl(url);
+            _backend.commands.removeAllLayers().then((_) {
+                _backend.commands.loadScriptFromUrl(url);
             });
         }
     }
@@ -44,8 +44,8 @@ class LoadConfigurationDialog extends DialogVM {
     void _loadScript(_) {
         String value = _scriptText.value;
         if (value != null) {
-            _hub.commands.removeAllLayers().then((_) {
-                _hub.commands.loadScriptFromStringAsync(value);
+            _backend.commands.removeAllLayers().then((_) {
+                _backend.commands.loadScriptFromStringAsync(value);
             });
         }
     }

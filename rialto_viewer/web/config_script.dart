@@ -21,10 +21,10 @@ typedef Future<dynamic> ChainCommndFunction(dynamic);
 ///
 /// Each command in the script has it's own function in this class ("_doCommand_NAME()");
 class ConfigScript {
-    Rialto _rialto;
+    RialtoBackend _backend;
 
     /// Creates a script parser/executer.
-    ConfigScript() : _rialto = Rialto.root;
+    ConfigScript(RialtoBackend this._backend);
 
     /// Loads a script from the [uri] and asynchronously executes the commands in it
     ///
@@ -58,13 +58,13 @@ class ConfigScript {
         try {
             commands = loadYaml(yamlText);
         } catch (e) {
-            Rialto.error("Unable to parse configuration", e);
+            RialtoBackend.error("Unable to parse configuration", e);
             return null;
         }
 
         var results = _executeCommandsInList(_executeCommand, commands);
 
-        results.then((_) => Rialto.root.events.LoadScriptCompleted.fire(urlString));
+        results.then((_) => _backend.events.LoadScriptCompleted.fire(urlString));
 
         return results;
     }
@@ -87,7 +87,7 @@ class ConfigScript {
                 return _doCommand_wps(data);
         }
 
-        Rialto.error("Unrecognized command in configuration file", "Command: $key");
+        RialtoBackend.error("Unrecognized command in configuration file", "Command: $key");
         return null;
     }
 
@@ -127,12 +127,12 @@ class ConfigScript {
         var proxyUri = ConfigUtils.getOptionalSettingAsUrl(data, "proxy");
         var url = ConfigUtils.getRequiredSettingAsUrl(data, "url");
         var description = ConfigUtils.getOptionalSettingAsString(data, "description");
-        var wps = new WpsService(url, proxyUri: proxyUri, description: description);
+        var wps = new WpsService(_backend, url, proxyUri: proxyUri, description: description);
         wps.open();
 
         //WpsServiceTest.test(wps);
 
-        _rialto.wps = wps;
+        _backend.wps = wps;
 
         return new Future(() {});
     }
@@ -156,7 +156,7 @@ class ConfigScript {
 
         double fov = data["fov"].toDouble();
 
-        _rialto.commands.zoomTo(eye, target, up, fov);
+        _backend.commands.zoomTo(eye, target, up, fov);
 
         return new Future(() {});
     }
@@ -168,7 +168,7 @@ class ConfigScript {
             String ramp = colorizeData["ramp"];
             assert(colorizeData.containsKey("dimension"));
             String dimName = colorizeData["dimension"];
-            _rialto.commands.colorizeLayers(new ColorizerData(ramp, dimName));
+            _backend.commands.colorizeLayers(new ColorizerData(ramp, dimName));
         }
 
         return new Future(() {});
@@ -182,7 +182,7 @@ class ConfigScript {
             assert(layermap.length == 1);
             var name = layermap.keys.first;
             var data = layermap[name];
-            var f = _rialto.commands.addLayer(new LayerData(name, data));
+            var f = _backend.commands.addLayer(new LayerData(name, data));
             futures.add(f);
         }
 

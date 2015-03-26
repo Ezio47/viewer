@@ -12,13 +12,13 @@ class LayerCustomizationDialog extends DialogVM {
     CheckBoxVM _visibilityButton;
     CheckBoxVM _bboxVisibilityButton;
 
-    LayerCustomizationDialog(String id) : super(id, hasCancelButton: false) {
+    LayerCustomizationDialog(RialtoFrontend frontend, String id) : super(frontend, id, hasCancelButton: false) {
 
-        _rampsListBox = new ListBoxVM("#layerCustomizationDialog_colorRamps");
-        _dimsListBox = new ListBoxVM("#layerCustomizationDialog_colorDims");
+        _rampsListBox = new ListBoxVM(_frontend, "#layerCustomizationDialog_colorRamps");
+        _dimsListBox = new ListBoxVM(_frontend, "#layerCustomizationDialog_colorDims");
 
-        _visibilityButton = new CheckBoxVM("#layerCustomizationDialog_visibility", true);
-        _bboxVisibilityButton = new CheckBoxVM("#layerCustomizationDialog_bboxVisibility", true);
+        _visibilityButton = new CheckBoxVM(_frontend, "#layerCustomizationDialog_visibility", true);
+        _bboxVisibilityButton = new CheckBoxVM(_frontend, "#layerCustomizationDialog_bboxVisibility", true);
 
         _register(_rampsListBox);
         _register(_dimsListBox);
@@ -34,7 +34,7 @@ class LayerCustomizationDialog extends DialogVM {
         final bool bboxVisibility = (_target is BboxVisibilityControl);
 
         if (colorizer) {
-            var ramps = _hub.cesium.getColorRampNames();
+            var ramps = _backend.cesium.getColorRampNames();
             ramps.forEach((s) => _rampsListBox.add(s));
             _rampsListBox.value = ramps[0];
 
@@ -84,6 +84,6 @@ class LayerCustomizationDialog extends DialogVM {
         String dim = _dimsListBox.value;
         if (dim == null) return;
 
-        _hub.commands.colorizeLayers(new ColorizerData(ramp, dim));
+        _backend.commands.colorizeLayers(new ColorizerData(ramp, dim));
     }
 }

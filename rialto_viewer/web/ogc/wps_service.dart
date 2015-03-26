@@ -10,8 +10,8 @@ part of rialto.viewer;
 /// Allows for getting process descriptions, executing processes, and so on.
 class WpsService extends OgcService {
 
-    WpsService(Uri server, {Uri proxyUri: null, String description: null})
-            : super("WPS", server, proxyUri: proxyUri, description: description);
+    WpsService(RialtoBackend backend, Uri server, {Uri proxyUri: null, String description: null})
+            : super(backend, "WPS", server, proxyUri: proxyUri, description: description);
 
 
     Future<OgcDocument> _getProcessDescriptionWork(String processName) {
@@ -20,7 +20,7 @@ class WpsService extends OgcService {
         _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"]).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
-                Rialto.error("Error parsing WPS process description response document");
+                RialtoBackend.error("Error parsing WPS process description response document");
                 c.complete(null);
                 return;
             }
@@ -32,7 +32,7 @@ class WpsService extends OgcService {
             }
 
             if (ogcDoc is! OgcProcessDescriptions_15) {
-                Rialto.error("Error parsing WPS process description response document");
+                RialtoBackend.error("Error parsing WPS process description response document");
                 c.complete(null);
                 return;
             }
@@ -41,7 +41,7 @@ class WpsService extends OgcService {
             var descList = descs.descriptions.where((d) => d.identifier == processName).toList();
 
             if (descList == null || descList.isEmpty || descList.length > 1) {
-                Rialto.error("Error parsing OWS Process Description response document");
+                RialtoBackend.error("Error parsing OWS Process Description response document");
             }
 
             var desc = descList[0];
@@ -85,7 +85,7 @@ class WpsService extends OgcService {
         _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
-                Rialto.error("Error parsing WPS process execution response document");
+                RialtoBackend.error("Error parsing WPS process execution response document");
                 c.complete(null);
                 return;
             }
@@ -96,7 +96,7 @@ class WpsService extends OgcService {
             }
 
             if (ogcDoc is! OgcExecuteResponseDocument_54) {
-                Rialto.error("Error parsing WPS process execution response document");
+                RialtoBackend.error("Error parsing WPS process execution response document");
                 c.complete(ogcDoc);
                 return;
             }
@@ -121,7 +121,7 @@ class WpsService extends OgcService {
         Map<String, dynamic> inputs = data.parameters[1];
         List<String> outputs = data.parameters[2];
 
-        var request = _hub.wpsJobManager.createJob(
+        var request = _backend.wpsJobManager.createJob(
                 this,
                 successHandler: successHandler,
                 errorHandler: errorHandler,

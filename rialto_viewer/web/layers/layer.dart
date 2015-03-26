@@ -12,7 +12,7 @@ part of rialto.viewer;
 /// At this base level, layers really only must have a name (which must be unique). Some layers also
 /// have an associated URL, bounding box, and description.
 abstract class Layer {
-    final Rialto _hub;
+    final RialtoBackend _backend;
 
     final String type;
     final String name;
@@ -23,9 +23,8 @@ abstract class Layer {
 
     CartographicBbox _bbox;
 
-    Layer(String this.type, String this.name, Map map)
-            : _hub = Rialto.root,
-              url = ConfigUtils.getOptionalSettingAsUrl(map, "url"),
+    Layer(RialtoBackend this._backend, String this.type, String this.name, Map map)
+            : url = ConfigUtils.getOptionalSettingAsUrl(map, "url"),
               proxy = ConfigUtils.getOptionalSettingAsUrl(map, "proxy"),
               description = ConfigUtils.getOptionalSettingAsString(map, "description");
     _requireUrl() {

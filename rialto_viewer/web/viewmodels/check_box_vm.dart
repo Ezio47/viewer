@@ -13,8 +13,8 @@ class CheckBoxVM extends ViewModel with MStateControl<bool> {
     bool _defaultValue;
     bool _disabled;
 
-    CheckBoxVM(String id, bool this._defaultValue)
-            : super(id),
+    CheckBoxVM(RialtoFrontend frontend, String id, bool this._defaultValue)
+            : super(frontend, id),
               _disabled = false {
         _inputElement = _element;
         assert(_inputElement.type == "checkbox");

@@ -7,15 +7,14 @@ part of rialto.viewer;
 
 /// Kludgy hack for attaching RGB-edged bounding boxes to a layer.
 class BboxShape {
-    Rialto _hub;
+    RialtoBackend _backend;
 
     var _primitive;
     bool _isVisible;
 
     Cartographic3 _point1, _point2;
 
-    BboxShape(this._point1, this._point2) : _isVisible = true {
-        _hub = Rialto.root;
+    BboxShape(RialtoBackend this._backend, this._point1, this._point2) : _isVisible = true {
         _create();
     }
 
@@ -31,12 +30,12 @@ class BboxShape {
     }
 
     void _create() {
-        _primitive = _hub.cesium.createBbox(_point1, _point2);
+        _primitive = _backend.cesium.createBbox(_point1, _point2);
     }
 
     void remove() {
         if (_primitive != null) {
-            _hub.cesium.remove(_primitive);
+            _backend.cesium.remove(_primitive);
             _primitive = null;
         }
     }

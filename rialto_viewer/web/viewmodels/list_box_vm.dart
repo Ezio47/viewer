@@ -24,8 +24,8 @@ class ListBoxVM extends ViewModel with MStateControl<String> {
     Map<OptionElement, String> _map = new Map<OptionElement, String>();
     Function _selectHandler;
 
-    ListBoxVM(String id, {Function onSelect: null})
-            : super(id),
+    ListBoxVM(RialtoFrontend frontend, String id, {Function onSelect: null})
+            : super(frontend, id),
               _selectHandler = onSelect {
 
         _selectElement = _element;

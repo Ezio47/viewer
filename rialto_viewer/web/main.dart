@@ -55,7 +55,7 @@ final String demo = """- layers:
     //Isolate.current.addErrorListener(errPort.sendPort);
     //errPort.listen((d) => log("bonk: $d"));
 
-    var rialto = new Rialto();
+    var ui = new RialtoFrontend();
 
     // The Rules:
     //
@@ -80,16 +80,16 @@ final String demo = """- layers:
 
     if (config == null) {
         try {
-            await rialto.commands.loadScriptFromStringAsync(demo);
+            await ui.backend.commands.loadScriptFromStringAsync(demo);
         } catch (e) {
-            Rialto.error("Top-level exception caught", e);
+            RialtoBackend.error("Top-level exception caught", e);
         }
     } else {
         try {
             final uri = Uri.parse(config);
-            await rialto.commands.loadScriptFromUrl(uri);
+            await ui.backend.commands.loadScriptFromUrl(uri);
         } catch (e) {
-            Rialto.error("Top-level exception caught", e);
+            RialtoBackend.error("Top-level exception caught", e);
         }
     }
 }

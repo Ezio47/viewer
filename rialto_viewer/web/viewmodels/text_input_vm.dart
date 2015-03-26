@@ -10,7 +10,7 @@ class TextInputVM extends ViewModel with MStateControl<String> {
     InputElement _inputElement;
     String defaultValue;
 
-    TextInputVM(String id, String this.defaultValue) : super(id) {
+    TextInputVM(RialtoFrontend frontend, String id, String this.defaultValue) : super(frontend, id) {
         _inputElement = _element;
         value = defaultValue;
     }
@@ -49,7 +49,7 @@ class TextAreaInputVM extends ViewModel with MStateControl<String> {
     TextAreaElement _inputElement;
     String defaultValue;
 
-    TextAreaInputVM(String id, String this.defaultValue) : super(id) {
+    TextAreaInputVM(RialtoFrontend frontend, String id, String this.defaultValue) : super(frontend, id) {
         _inputElement = _element;
         value = defaultValue;
     }

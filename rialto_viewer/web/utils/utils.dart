@@ -156,7 +156,7 @@ class Utils {
         client.get(url).then((Http.Response response) {
             c.complete(response);
         }).catchError((e) {
-            Rialto.error("Unable to load file", "Path: $url");
+            RialtoBackend.error("Unable to load file", "Path: $url");
         });
 
         return c.future;

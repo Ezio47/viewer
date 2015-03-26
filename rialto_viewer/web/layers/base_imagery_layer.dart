@@ -18,7 +18,7 @@ abstract class BaseImageryLayer extends Layer implements VisibilityControl, Alph
     double _saturation;
     double _gamma;
 
-    BaseImageryLayer(String type, String name, Map map)
+    BaseImageryLayer(RialtoBackend backend, String type, String name, Map map)
             : _visible = ConfigUtils.getOptionalSettingAsBool(map, "visible", true),
               _alpha = ConfigUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
               _brightness = ConfigUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
@@ -26,46 +26,46 @@ abstract class BaseImageryLayer extends Layer implements VisibilityControl, Alph
               _hue = ConfigUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
               _saturation = ConfigUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
               _gamma = ConfigUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
-              super(type, name, map);
+              super(backend, type, name, map);
 
     @override set visible(bool v) {
-        _hub.cesium.setLayerVisible(_layer, v);
+        _backend.cesium.setLayerVisible(_layer, v);
         _visible = v;
     }
     @override bool get visible => _visible;
 
     @override set alpha(double d) {
-        _hub.cesium.setLayerAlpha(_layer, d);
+        _backend.cesium.setLayerAlpha(_layer, d);
         _alpha = d;
     }
     @override double get alpha => _alpha;
 
     @override set brightness(double d) {
-        _hub.cesium.setLayerBrightness(_layer, d);
+        _backend.cesium.setLayerBrightness(_layer, d);
         _brightness = d;
     }
     @override double get brightness => _brightness;
 
     @override set contrast(double d) {
-        _hub.cesium.setLayerContrast(_layer, d);
+        _backend.cesium.setLayerContrast(_layer, d);
         _contrast = d;
     }
     @override double get contrast => _contrast;
 
     @override set hue(double d) {
-        _hub.cesium.setLayerHue(_layer, d);
+        _backend.cesium.setLayerHue(_layer, d);
         _hue = d;
     }
     @override double get hue => _hue;
 
     @override set saturation(double d) {
-        _hub.cesium.setLayerSaturation(_layer, d);
+        _backend.cesium.setLayerSaturation(_layer, d);
         _saturation = d;
     }
     @override double get saturation => _saturation;
 
     @override set gamma(double d) {
-        _hub.cesium.setLayerGamma(_layer, d);
+        _backend.cesium.setLayerGamma(_layer, d);
         _gamma = d;
     }
     @override double get gamma => _gamma;
@@ -74,7 +74,7 @@ abstract class BaseImageryLayer extends Layer implements VisibilityControl, Alph
     Future unload() {
 
         var f = new Future(() {
-            _hub.cesium.removeImageryLayer(_layer);
+            _backend.cesium.removeImageryLayer(_layer);
         });
 
         return f;
@@ -100,10 +100,10 @@ class BingBaseImageryLayer extends BaseImageryLayer {
     static const _defaultKey = "ApI13eFfY6SbmvsWx0DbJ1p5C1CaoR54uFc7Bk_Z9Jimwo1SKwCezqvWCskESZaf";
     String _apiKey;
 
-    BingBaseImageryLayer(String name, Map map)
+    BingBaseImageryLayer(RialtoBackend backend, String name, Map map)
             : _apiKey = ConfigUtils.getOptionalSettingAsString(map, "apiKey", _defaultKey),
               _style = ConfigUtils.getOptionalSettingAsString(map, "style", _defaultStyle),
-              super("bing_base_imagery", name, map) {
+              super(backend, "bing_base_imagery", name, map) {
 
         if (!_styles.contains(_style)) {
             throw new ArgumentError("invalid bing style");
@@ -119,7 +119,7 @@ class BingBaseImageryLayer extends BaseImageryLayer {
                 "mapStyle": _style,
                 "url": '//dev.virtualearth.net'
             };
-            _layer = _hub.cesium.addBingBaseImageryLayer(options);
+            _layer = _backend.cesium.addBingBaseImageryLayer(options);
             _forceUpdates();
         });
 
@@ -130,8 +130,8 @@ class BingBaseImageryLayer extends BaseImageryLayer {
 
 class ArcGisBaseImageryLayer extends BaseImageryLayer {
 
-    ArcGisBaseImageryLayer(String name, Map map)
-            : super("arcgis_base_imagery", name, map);
+    ArcGisBaseImageryLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "arcgis_base_imagery", name, map);
 
     @override
     Future load() {
@@ -139,7 +139,7 @@ class ArcGisBaseImageryLayer extends BaseImageryLayer {
             var options = {
                 "url": '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
             };
-            _layer = _hub.cesium.addArcGisBaseImageryLayer(options);
+            _layer = _backend.cesium.addArcGisBaseImageryLayer(options);
             _forceUpdates();
         });
 
@@ -150,15 +150,15 @@ class ArcGisBaseImageryLayer extends BaseImageryLayer {
 
 class OsmBaseImageryLayer extends BaseImageryLayer {
 
-    OsmBaseImageryLayer(String name, Map map)
-            : super("osm_base_imagery", name, map);
+    OsmBaseImageryLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "osm_base_imagery", name, map);
 
     @override
     Future load() {
 
         var f = new Future(() {
             var options = {};
-            _layer = _hub.cesium.addOsmBaseImageryLayer(options);
+            _layer = _backend.cesium.addOsmBaseImageryLayer(options);
 
             _forceUpdates();
         });

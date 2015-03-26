@@ -9,26 +9,26 @@ part of rialto.viewer;
 /// The [Rialto] singleton contains exactly one [Commands] object. External clients invoke
 /// viewer operations by calling one of the functions in this class.
 class Commands {
-    Rialto _rialto;
+    RialtoBackend _backend;
 
     /// Create the commands object
-    Commands() : _rialto = Rialto.root;
+    Commands(RialtoBackend this._backend);
 
     /// Allow user to draw a circle to be used for a viewshed analysis
     void createViewshedCircle() {
-        _rialto.cesium.drawCircle(
-                (longitude, latitude, height, radius) => _rialto.viewshedCircles.add([longitude, latitude, height, radius]));
+        _backend.cesium.drawCircle(
+                (longitude, latitude, height, radius) => _backend.viewshedCircles.add([longitude, latitude, height, radius]));
     }
 
     /// Run the viewshed analysis for each viewshed circle
     void computeViewshed() {
-        for (var v in _rialto.viewshedCircles) {
+        for (var v in _backend.viewshedCircles) {
             double obsLon = v[0];
             double obsLat = v[1];
             //double obsHeight = v[2];
             var radius = v[3];
 
-            Viewshedder.callWps(obsLon, obsLat, radius);
+            Viewshedder.callWps(_backend, obsLon, obsLat, radius);
         }
     }
 
@@ -36,9 +36,9 @@ class Commands {
     ///
     /// stub for future work
     void computeLinearMeasurement() {
-        _rialto.cesium.drawPolyline((positions) {
-            Rialto.log("Length of ...");// + positions);
-            var dist = _rialto.computeLength(positions);
+        _backend.cesium.drawPolyline((positions) {
+            RialtoBackend.log("Length of ...");// + positions);
+            var dist = _backend.computeLength(positions);
             var mi = dist / 1609.34;
             window.alert("Distance: ${dist.toStringAsFixed(1)} meters (${mi.toStringAsFixed(1)} miles)");
         });
@@ -48,9 +48,9 @@ class Commands {
     ///
     /// stub for future work
     void computeAreaMeasurement() {
-        _rialto.cesium.drawPolygon((positions) {
-            Rialto.log("Area of ...");// + positions);
-            var area = _rialto.computeArea(positions);
+        _backend.cesium.drawPolygon((positions) {
+            RialtoBackend.log("Area of ...");// + positions);
+            var area = _backend.computeArea(positions);
             window.alert("Area: ${area.toStringAsFixed(1)} m^2");
         });
     }
@@ -59,8 +59,8 @@ class Commands {
     ///
     /// stub for future work
     void dropPin() {
-        _rialto.cesium.drawMarker((position) {
-            Rialto.log("Pin...");// + position);
+        _backend.cesium.drawMarker((position) {
+            RialtoBackend.log("Pin...");// + position);
         });
     }
 
@@ -68,8 +68,8 @@ class Commands {
     ///
     /// stub for future work
     void drawExtent() {
-        _rialto.cesium.drawExtent((n, s, e, w) {
-            Rialto.log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
+        _backend.cesium.drawExtent((n, s, e, w) {
+            RialtoBackend.log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
         });
     }
 
@@ -77,28 +77,28 @@ class Commands {
     ///
     /// Returns a Future with the new [Layer] object.
     Future<Layer> addLayer(LayerData data) {
-        return _rialto.layerManager.addLayer(data);
+        return _backend.layerManager.addLayer(data);
     }
 
     /// Asynchronously colorizes all the (point cloud) layers
     ///
     /// Returns an empty future when done.
     Future colorizeLayers(ColorizerData data) {
-        return _rialto.layerManager.colorizeLayers(data);
+        return _backend.layerManager.colorizeLayers(data);
     }
 
     /// Asynchronously removes [layer] from the viewer
     ///
     /// Returns an empty future when done.
     Future removeLayer(Layer layer) {
-        return _rialto.layerManager.removeLayer(layer);
+        return _backend.layerManager.removeLayer(layer);
     }
 
     /// Asynchronously removes all layers from the viewer
     ///
     /// Returns an empty future when done.
     Future removeAllLayers() {
-        return _rialto.layerManager.removeAllLayers();
+        return _backend.layerManager.removeAllLayers();
     }
 
     /// Asynchronously reads in and execute a configuration script at the URL
@@ -107,7 +107,7 @@ class Commands {
     ///
     /// Returns a list with the results of each command.
     Future<List<dynamic>> loadScriptFromUrl(Uri url) {
-        var s = new ConfigScript();
+        var s = new ConfigScript(_backend);
         var f = s.loadFromUrl(url);
         return f;
     }
@@ -118,14 +118,14 @@ class Commands {
     ///
     /// Returns a list with the results of each command.
     Future<List<dynamic>> loadScriptFromStringAsync(String yaml) {
-        var s = new ConfigScript();
+        var s = new ConfigScript(_backend);
         var f = s.loadFromString(yaml);
         return f;
     }
 
     /// Asynchronously executes an arbitrary WPS process
     Future<WpsJob> wpsExecuteProcess(WpsExecuteProcessData data) {
-        return _rialto.wps.executeProcess(
+        return _backend.wps.executeProcess(
                 data,
                 successHandler: data.successHandler,
                 errorHandler: data.errorHandler,
@@ -136,21 +136,21 @@ class Commands {
     ///
     /// Returns the response document.
     Future<OgcDocument> wpsDescribeProcess(String processName) {
-        return _rialto.wps.describeProcess(processName);
+        return _backend.wps.describeProcess(processName);
     }
 
     /// Asynchronously requests an OGC capabilities document.
     ///
     /// Returns the response document.
     Future owsGetCapabilities() {
-        return _rialto.wps.doOwsGetCapabilities();
+        return _backend.wps.doOwsGetCapabilities();
     }
 
     /// Zooms to the given point
     ///
     /// Returns an empty future when done.
     Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
-        return _rialto.zoomTo(eyePosition, targetPosition, upDirection, fov);
+        return _backend.zoomTo(eyePosition, targetPosition, upDirection, fov);
     }
 
     /// Zooms to the given layer.
@@ -159,21 +159,21 @@ class Commands {
     ///
     /// Returns an empty future when done.
     Future zoomToLayer(Layer layer) {
-        return _rialto.zoomToLayer(layer);
+        return _backend.zoomToLayer(layer);
     }
 
     /// Zooms out to show the whole globe
     ///
     /// Returns an empty future when done.
     Future zoomToWorld() {
-        return _rialto.zoomToWorld();
+        return _backend.zoomToWorld();
     }
 
     /// Sets the view mode to 2D, 2.5D, or 3D
     ///
     /// Returns an empty future when done.
     Future setViewMode(ViewModeData mode) {
-        _rialto.cesium.setViewMode(mode.mode.index);
+        _backend.cesium.setViewMode(mode.mode.index);
         return new Future.value();
     }
 }

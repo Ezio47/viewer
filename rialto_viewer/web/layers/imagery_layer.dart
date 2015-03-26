@@ -18,7 +18,7 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
     double _gamma;
 
     // rect is: w, s, e, n
-    ImageryLayer(String type, String name, Map map)
+    ImageryLayer(RialtoBackend backend, String type, String name, Map map)
             : _visible = ConfigUtils.getOptionalSettingAsBool(map, "visible", true),
               _alpha = ConfigUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
               _brightness = ConfigUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
@@ -27,46 +27,46 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
               _saturation = ConfigUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
               _gamma = ConfigUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
               _rectangle = ConfigUtils.getOptionalSettingAsList4(map, "rectangle"),
-              super(type, name, map);
+              super(backend, type, name, map);
 
     @override set visible(bool v) {
-        _hub.cesium.setLayerVisible(_layer, v);
+        _backend.cesium.setLayerVisible(_layer, v);
         _visible = v;
     }
     @override bool get visible => _visible;
 
     @override set alpha(double d) {
-        _hub.cesium.setLayerAlpha(_layer, d);
+        _backend.cesium.setLayerAlpha(_layer, d);
         _alpha = d;
     }
     @override double get alpha => _alpha;
 
     @override set brightness(double d) {
-        _hub.cesium.setLayerBrightness(_layer, d);
+        _backend.cesium.setLayerBrightness(_layer, d);
         _brightness = d;
     }
     @override double get brightness => _brightness;
 
     @override set contrast(double d) {
-        _hub.cesium.setLayerContrast(_layer, d);
+        _backend.cesium.setLayerContrast(_layer, d);
         _contrast = d;
     }
     @override double get contrast => _contrast;
 
     @override set hue(double d) {
-        _hub.cesium.setLayerHue(_layer, d);
+        _backend.cesium.setLayerHue(_layer, d);
         _hue = d;
     }
     @override double get hue => _hue;
 
     @override set saturation(double d) {
-        _hub.cesium.setLayerSaturation(_layer, d);
+        _backend.cesium.setLayerSaturation(_layer, d);
         _saturation = d;
     }
     @override double get saturation => _saturation;
 
     @override set gamma(double d) {
-        _hub.cesium.setLayerGamma(_layer, d);
+        _backend.cesium.setLayerGamma(_layer, d);
         _gamma = d;
     }
     @override double get gamma => _gamma;
@@ -75,7 +75,7 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
     Future unload() {
 
         var f = new Future(() {
-            _hub.cesium.removeImageryLayer(_layer);
+            _backend.cesium.removeImageryLayer(_layer);
         });
 
         return f;
@@ -95,8 +95,8 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
 
 class SingleImageryLayer extends ImageryLayer {
 
-    SingleImageryLayer(String name, Map map)
-            : super("single_imagery", name, map) {
+    SingleImageryLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "single_imagery", name, map) {
         _requireUrl();
     }
 
@@ -104,7 +104,7 @@ class SingleImageryLayer extends ImageryLayer {
     Future load() {
         var f = new Future(() {
 
-            _layer = _hub.cesium.addSingleTileImageryLayer(urlString, _rectangle, proxyString);
+            _layer = _backend.cesium.addSingleTileImageryLayer(urlString, _rectangle, proxyString);
 
             _forceUpdates();
         });
@@ -116,8 +116,8 @@ class SingleImageryLayer extends ImageryLayer {
 class WmsImageryLayer extends ImageryLayer {
     String _layers;
 
-    WmsImageryLayer(String name, Map map)
-            : super("wms_imagery", name, map),
+    WmsImageryLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "wms_imagery", name, map),
               _layers = ConfigUtils.getRequiredSettingAsString(map, "layers") {
         _requireUrl();
     }
@@ -126,7 +126,7 @@ class WmsImageryLayer extends ImageryLayer {
     Future load() {
         var f = new Future(() {
 
-            _layer = _hub.cesium.addWebMapServiceImageryLayer(urlString, _layers, _rectangle, proxyString);
+            _layer = _backend.cesium.addWebMapServiceImageryLayer(urlString, _layers, _rectangle, proxyString);
 
             _forceUpdates();
         });
@@ -139,8 +139,8 @@ class TmsImageryLayer extends ImageryLayer {
     int _maximumLevel;
     bool _gdal2Tiles;
 
-    TmsImageryLayer(String name, Map map)
-            : super("tms_imagery", name, map),
+    TmsImageryLayer(RialtoBackend backend, String name, Map map)
+            : super(backend, "tms_imagery", name, map),
               _maximumLevel = ConfigUtils.getOptionalSettingAsInt(map, "maximumLevel", 18),
               _gdal2Tiles = ConfigUtils.getOptionalSettingAsBool(map, "gdal2Tiles", false) {
         _requireUrl();
@@ -151,7 +151,7 @@ class TmsImageryLayer extends ImageryLayer {
         var f = new Future(() {
 
             _layer =
-                    _hub.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
+                    _backend.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
 
             _forceUpdates();
         });

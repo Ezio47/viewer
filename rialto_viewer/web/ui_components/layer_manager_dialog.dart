@@ -14,27 +14,27 @@ class LayerManagerDialog extends DialogVM {
     LayerInfoDialog _layerInfoDialog;
     LayerCustomizationDialog _layerCustomizationDialog;
 
-    LayerManagerDialog(String id) : super(id, hasCancelButton: false) {
+    LayerManagerDialog(RialtoFrontend frontend, String id) : super(frontend, id, hasCancelButton: false) {
 
-        _layerInfoDialog = new LayerInfoDialog("#layerInfoDialog");
-        _layerCustomizationDialog = new LayerCustomizationDialog("#layerCustomizationDialog");
+        _layerInfoDialog = new LayerInfoDialog(_frontend, "#layerInfoDialog");
+        _layerCustomizationDialog = new LayerCustomizationDialog(_frontend, "#layerCustomizationDialog");
 
-        _removeButton = new ButtonVM("#layerManagerDialog_remove", (_) {
-            _hub.commands.removeLayer(_listbox.value);
+        _removeButton = new ButtonVM(_frontend, "#layerManagerDialog_remove", (_) {
+            _backend.commands.removeLayer(_listbox.value);
             _listbox.remove(_listbox.value);
         });
 
-        _customizeButton = new ButtonVM("#layerManagerDialog_customize", (_) {
+        _customizeButton = new ButtonVM(_frontend, "#layerManagerDialog_customize", (_) {
             _layerCustomizationDialog.target = _listbox.value;
             _layerCustomizationDialog.show();
         });
 
-        _detailsButton = new ButtonVM("#layerManagerDialog_details", (_) {
+        _detailsButton = new ButtonVM(_frontend, "#layerManagerDialog_details", (_) {
             _layerInfoDialog.target = _listbox.value;
             _layerInfoDialog.show();
         });
 
-        _listbox = new BetterListBoxVM("#layerList", _updateButtons);
+        _listbox = new BetterListBoxVM(_frontend, "#layerList", _updateButtons);
 
         _updateButtons();
     }
@@ -43,7 +43,7 @@ class LayerManagerDialog extends DialogVM {
     void _show() {
         _listbox.clear();
 
-        for (var layer in _hub.layerManager.layers) {
+        for (var layer in _backend.layerManager.layers) {
             _listbox.add(layer);
         }
 
@@ -95,8 +95,8 @@ class BetterListBoxVM extends ViewModel {
     BetterListBoxItem _selection;
     Function _onSelection;
 
-    BetterListBoxVM(String id, Function this._onSelection)
-            : super(id) {
+    BetterListBoxVM(RialtoFrontend frontend, String id, Function this._onSelection)
+            : super(frontend, id) {
         _ulElement = _element;
         _ulElement.children.clear();
     }

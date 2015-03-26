@@ -16,20 +16,21 @@ class WpsJobManager {
     static final Duration pollingDelay = new Duration(seconds: 2);
     static final Duration pollingTimeout = new Duration(minutes: 5);
 
-    Rialto _hub;
+    RialtoBackend _backend;
     Map<int, WpsJob> map = new Map<int, WpsJob>();
     int _jobId = 0;
 
-    WpsJobManager() : _hub = Rialto.root;
+    WpsJobManager(RialtoBackend this._backend);
 
     /// Start a WPS job
     ///
     /// The job will be tracked by this manager class.
     ///
     /// Use this function instead of calling the WpsJob ctor directly.
-    WpsJob createJob(WpsService service, {WpsJobResultHandler successHandler: null,
-            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null}) {
+    WpsJob createJob(WpsService service, {WpsJobResultHandler successHandler: null, WpsJobResultHandler errorHandler:
+            null, WpsJobResultHandler timeoutHandler: null}) {
         var obj = new WpsJob(
+                _backend,
                 service,
                 newJobId,
                 successHandler: successHandler,
@@ -55,7 +56,7 @@ class WpsJobManager {
 ///
 /// A [WpsJob] internally does it's own polling to keep its status up-to-date.
 class WpsJob {
-    Rialto _hub = Rialto.root;
+    RialtoBackend _backend;
     final WpsService service;
     final int id;
     Uri statusLocation;
@@ -75,7 +76,7 @@ class WpsJob {
     /// WpsJob constructor
     ///
     /// Users should nto call this directly -- call [WpsJobManager.createJob] instead.
-    WpsJob(WpsService this.service, int this.id, {WpsJobResultHandler successHandler: null,
+    WpsJob(RialtoBackend this._backend, WpsService this.service, int this.id, {WpsJobResultHandler successHandler: null,
             WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
             : code = OgcStatusCodes.notYetSubmitted,
               _startTime = new DateTime.now(),
@@ -119,7 +120,7 @@ class WpsJob {
     void _poll() {
 
         var secs = new DateTime.now().difference(_startTime).inSeconds;
-        Rialto.log("poll #$_pollCount, $secs seconds elapsed");
+        RialtoBackend.log("poll #$_pollCount, $secs seconds elapsed");
 
         var now = new DateTime.now();
         if (now.isAfter(_timeoutTime)) {
@@ -168,7 +169,7 @@ class WpsJob {
         });
     }
 
-    void _signalJobChange() => _hub.events.WpsJobUpdate.fire(new WpsJobUpdateData(id));
+    void _signalJobChange() => _backend.events.WpsJobUpdate.fire(new WpsJobUpdateData(id));
 
     String dump() {
         String s = "";

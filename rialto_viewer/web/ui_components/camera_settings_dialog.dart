@@ -18,18 +18,18 @@ class CameraSettingsDialog extends DialogVM {
     TextInputVM _upY;
     TextInputVM _upZ;
 
-    CameraSettingsDialog(String id) : super(id) {
+    CameraSettingsDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
 
-        _eyeLon = new TextInputVM("#cameraSettingsDialog_eyeLon", "0.0");
-        _eyeLat = new TextInputVM("#cameraSettingsDialog_eyeLat", "0.0");
-        _eyeHeight = new TextInputVM("#cameraSettingsDialog_eyeHeight", "15000.0");
-        _targetLon = new TextInputVM("#cameraSettingsDialog_targetLon", "0.0");
-        _targetLat = new TextInputVM("#cameraSettingsDialog_targetLat", "0.0");
-        _targetHeight = new TextInputVM("#cameraSettingsDialog_targetHeight", "0.0");
-        _fov = new TextInputVM("#cameraSettingsDialog_fov", "60.0");
-        _upX = new TextInputVM("#cameraSettingsDialog_upX", "0.0");
-        _upY = new TextInputVM("#cameraSettingsDialog_upY", "0.0");
-        _upZ = new TextInputVM("#cameraSettingsDialog_upZ", "1.0");
+        _eyeLon = new TextInputVM(_frontend, "#cameraSettingsDialog_eyeLon", "0.0");
+        _eyeLat = new TextInputVM(_frontend, "#cameraSettingsDialog_eyeLat", "0.0");
+        _eyeHeight = new TextInputVM(_frontend, "#cameraSettingsDialog_eyeHeight", "15000.0");
+        _targetLon = new TextInputVM(_frontend, "#cameraSettingsDialog_targetLon", "0.0");
+        _targetLat = new TextInputVM(_frontend, "#cameraSettingsDialog_targetLat", "0.0");
+        _targetHeight = new TextInputVM(_frontend, "#cameraSettingsDialog_targetHeight", "0.0");
+        _fov = new TextInputVM(_frontend, "#cameraSettingsDialog_fov", "60.0");
+        _upX = new TextInputVM(_frontend, "#cameraSettingsDialog_upX", "0.0");
+        _upY = new TextInputVM(_frontend, "#cameraSettingsDialog_upY", "0.0");
+        _upZ = new TextInputVM(_frontend, "#cameraSettingsDialog_upZ", "1.0");
 
         _register(_eyeLon);
         _register(_eyeLat);
@@ -64,24 +64,24 @@ class CameraSettingsDialog extends DialogVM {
 
         final eyeOkay = (eyeLon != null && eyeLat != null && eyeHeight != null);
         if (!eyeOkay) {
-            Rialto.error("Invalid camera settings (eye position)");
+            RialtoBackend.error("Invalid camera settings (eye position)");
             return;
         }
 
         final targetOkay = (targetLon != null && targetLat != null && targetHeight != null);
         if (!targetOkay) {
-            Rialto.error("Invalid camera settings (target position)");
+            RialtoBackend.error("Invalid camera settings (target position)");
             return;
         }
 
         bool upOkay = (upX != null && upY != null && upZ != null);
         if (!upOkay) {
-            Rialto.error("Invalid camera settings (up direction)");
+            RialtoBackend.error("Invalid camera settings (up direction)");
             return;
         }
         final fovOkay = (fov != null);
         if (!fovOkay) {
-            Rialto.error("Invalid camera settings (fov value)");
+            RialtoBackend.error("Invalid camera settings (fov value)");
             return;
         }
 
@@ -89,6 +89,6 @@ class CameraSettingsDialog extends DialogVM {
         Cartographic3 target = new Cartographic3(targetLon, targetLat, targetHeight);
         Cartesian3 up = new Cartesian3(upX, upY, upZ);
 
-        _hub.commands.zoomTo(eye, target, up, fov);
+        _backend.commands.zoomTo(eye, target, up, fov);
     }
 }
