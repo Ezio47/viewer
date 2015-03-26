@@ -29,7 +29,7 @@ class LayerCustomizationDialog extends DialogVM {
 
     @override
     void _show() {
-        final bool colorizer = (_target is PointCloudLayer);
+        final bool colorizer = (_target is ColorizerControl);
         final bool visibility = (_target is VisibilityControl);
         final bool bboxVisibility = (_target is BboxVisibilityControl);
 
@@ -39,7 +39,7 @@ class LayerCustomizationDialog extends DialogVM {
             _rampsListBox.value = ramps[0];
 
             var dims = new Set<String>();
-            if (_target is PointCloudLayer) {
+            if (_target is ColorizerControl) {
                 dims.addAll((_target as PointCloudLayer).dimensions);
             }
 

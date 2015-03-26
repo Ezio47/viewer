@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.backend;
+part of rialto.backend.private;
 
 abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, ColorCorrectionControl {
 
@@ -30,43 +30,43 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
               super(backend, type, name, map);
 
     @override set visible(bool v) {
-        _backend.cesium.setLayerVisible(_layer, v);
+        backend.cesium.setLayerVisible(_layer, v);
         _visible = v;
     }
     @override bool get visible => _visible;
 
     @override set alpha(double d) {
-        _backend.cesium.setLayerAlpha(_layer, d);
+        backend.cesium.setLayerAlpha(_layer, d);
         _alpha = d;
     }
     @override double get alpha => _alpha;
 
     @override set brightness(double d) {
-        _backend.cesium.setLayerBrightness(_layer, d);
+        backend.cesium.setLayerBrightness(_layer, d);
         _brightness = d;
     }
     @override double get brightness => _brightness;
 
     @override set contrast(double d) {
-        _backend.cesium.setLayerContrast(_layer, d);
+        backend.cesium.setLayerContrast(_layer, d);
         _contrast = d;
     }
     @override double get contrast => _contrast;
 
     @override set hue(double d) {
-        _backend.cesium.setLayerHue(_layer, d);
+        backend.cesium.setLayerHue(_layer, d);
         _hue = d;
     }
     @override double get hue => _hue;
 
     @override set saturation(double d) {
-        _backend.cesium.setLayerSaturation(_layer, d);
+        backend.cesium.setLayerSaturation(_layer, d);
         _saturation = d;
     }
     @override double get saturation => _saturation;
 
     @override set gamma(double d) {
-        _backend.cesium.setLayerGamma(_layer, d);
+        backend.cesium.setLayerGamma(_layer, d);
         _gamma = d;
     }
     @override double get gamma => _gamma;
@@ -75,7 +75,7 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
     Future unload() {
 
         var f = new Future(() {
-            _backend.cesium.removeImageryLayer(_layer);
+            backend.cesium.removeImageryLayer(_layer);
         });
 
         return f;
@@ -97,14 +97,14 @@ class SingleImageryLayer extends ImageryLayer {
 
     SingleImageryLayer(RialtoBackend backend, String name, Map map)
             : super(backend, "single_imagery", name, map) {
-        _requireUrl();
+        requireUrl();
     }
 
     @override
     Future load() {
         var f = new Future(() {
 
-            _layer = _backend.cesium.addSingleTileImageryLayer(urlString, _rectangle, proxyString);
+            _layer = backend.cesium.addSingleTileImageryLayer(urlString, _rectangle, proxyString);
 
             _forceUpdates();
         });
@@ -119,14 +119,14 @@ class WmsImageryLayer extends ImageryLayer {
     WmsImageryLayer(RialtoBackend backend, String name, Map map)
             : super(backend, "wms_imagery", name, map),
               _layers = ConfigUtils.getRequiredSettingAsString(map, "layers") {
-        _requireUrl();
+        requireUrl();
     }
 
     @override
     Future load() {
         var f = new Future(() {
 
-            _layer = _backend.cesium.addWebMapServiceImageryLayer(urlString, _layers, _rectangle, proxyString);
+            _layer = backend.cesium.addWebMapServiceImageryLayer(urlString, _layers, _rectangle, proxyString);
 
             _forceUpdates();
         });
@@ -143,7 +143,7 @@ class TmsImageryLayer extends ImageryLayer {
             : super(backend, "tms_imagery", name, map),
               _maximumLevel = ConfigUtils.getOptionalSettingAsInt(map, "maximumLevel", 18),
               _gdal2Tiles = ConfigUtils.getOptionalSettingAsBool(map, "gdal2Tiles", false) {
-        _requireUrl();
+        requireUrl();
     }
 
     @override
@@ -151,7 +151,7 @@ class TmsImageryLayer extends ImageryLayer {
         var f = new Future(() {
 
             _layer =
-                    _backend.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
+                    backend.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
 
             _forceUpdates();
         });

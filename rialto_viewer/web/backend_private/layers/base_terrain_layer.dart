@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.backend;
+part of rialto.backend.private;
 
 
 abstract class BaseTerrainLayer extends Layer {
@@ -14,7 +14,7 @@ abstract class BaseTerrainLayer extends Layer {
     @override
     Future unload() {
         var f = new Future(() {
-            _backend.cesium.unsetBaseTerrainProvider();
+            backend.cesium.unsetBaseTerrainProvider();
         });
         return f;
     }
@@ -30,7 +30,7 @@ class EllipsoidBaseTerrainLayer extends BaseTerrainLayer {
     Future load() {
         var f = new Future(() {
             var options = {};
-            _provider = _backend.cesium.setEllipsoidBaseTerrainProvider(options);
+            _provider = backend.cesium.setEllipsoidBaseTerrainProvider(options);
         });
         return f;
     }
@@ -58,7 +58,7 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
                 'token': _defaultKey
             };
 
-            _provider = _backend.cesium.setArcGisBaseTerrainProvider(options);
+            _provider = backend.cesium.setArcGisBaseTerrainProvider(options);
         });
         return f;
     }
@@ -77,7 +77,7 @@ class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
                 'url': '//cesiumjs.org/smallterrain',
                 'credit': 'Terrain data courtesy Analytical Graphics, Inc.'
             };
-            _provider = _backend.cesium.setCesiumBaseTerrainProvider(options);
+            _provider = backend.cesium.setCesiumBaseTerrainProvider(options);
         });
         return f;
     }
@@ -94,7 +94,7 @@ class CesiumStkBaseTerrainLayer extends BaseTerrainLayer {
             var options = {
                 'url': '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
             };
-            _provider = _backend.cesium.setCesiumBaseTerrainProvider(options);
+            _provider = backend.cesium.setCesiumBaseTerrainProvider(options);
         });
         return f;
     }
@@ -112,7 +112,7 @@ class VrTheWorldBaseTerrainLayer extends BaseTerrainLayer {
             var options = {
                 'url': '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/'
             };
-            _provider = _backend.cesium.setVrTheWorldBaseTerrainProvider(options);
+            _provider = backend.cesium.setVrTheWorldBaseTerrainProvider(options);
         });
         return f;
     }

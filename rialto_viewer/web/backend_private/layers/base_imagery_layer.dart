@@ -3,7 +3,7 @@
 // license found in the accompanying LICENSE.txt file.
 
 
-part of rialto.backend;
+part of rialto.backend.private;
 
 
 abstract class BaseImageryLayer extends Layer implements VisibilityControl, AlphaControl, ColorCorrectionControl {
@@ -29,43 +29,43 @@ abstract class BaseImageryLayer extends Layer implements VisibilityControl, Alph
               super(backend, type, name, map);
 
     @override set visible(bool v) {
-        _backend.cesium.setLayerVisible(_layer, v);
+        backend.cesium.setLayerVisible(_layer, v);
         _visible = v;
     }
     @override bool get visible => _visible;
 
     @override set alpha(double d) {
-        _backend.cesium.setLayerAlpha(_layer, d);
+        backend.cesium.setLayerAlpha(_layer, d);
         _alpha = d;
     }
     @override double get alpha => _alpha;
 
     @override set brightness(double d) {
-        _backend.cesium.setLayerBrightness(_layer, d);
+        backend.cesium.setLayerBrightness(_layer, d);
         _brightness = d;
     }
     @override double get brightness => _brightness;
 
     @override set contrast(double d) {
-        _backend.cesium.setLayerContrast(_layer, d);
+        backend.cesium.setLayerContrast(_layer, d);
         _contrast = d;
     }
     @override double get contrast => _contrast;
 
     @override set hue(double d) {
-        _backend.cesium.setLayerHue(_layer, d);
+        backend.cesium.setLayerHue(_layer, d);
         _hue = d;
     }
     @override double get hue => _hue;
 
     @override set saturation(double d) {
-        _backend.cesium.setLayerSaturation(_layer, d);
+        backend.cesium.setLayerSaturation(_layer, d);
         _saturation = d;
     }
     @override double get saturation => _saturation;
 
     @override set gamma(double d) {
-        _backend.cesium.setLayerGamma(_layer, d);
+        backend.cesium.setLayerGamma(_layer, d);
         _gamma = d;
     }
     @override double get gamma => _gamma;
@@ -74,7 +74,7 @@ abstract class BaseImageryLayer extends Layer implements VisibilityControl, Alph
     Future unload() {
 
         var f = new Future(() {
-            _backend.cesium.removeImageryLayer(_layer);
+            backend.cesium.removeImageryLayer(_layer);
         });
 
         return f;
@@ -119,7 +119,7 @@ class BingBaseImageryLayer extends BaseImageryLayer {
                 "mapStyle": _style,
                 "url": '//dev.virtualearth.net'
             };
-            _layer = _backend.cesium.addBingBaseImageryLayer(options);
+            _layer = backend.cesium.addBingBaseImageryLayer(options);
             _forceUpdates();
         });
 
@@ -139,7 +139,7 @@ class ArcGisBaseImageryLayer extends BaseImageryLayer {
             var options = {
                 "url": '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
             };
-            _layer = _backend.cesium.addArcGisBaseImageryLayer(options);
+            _layer = backend.cesium.addArcGisBaseImageryLayer(options);
             _forceUpdates();
         });
 
@@ -158,7 +158,7 @@ class OsmBaseImageryLayer extends BaseImageryLayer {
 
         var f = new Future(() {
             var options = {};
-            _layer = _backend.cesium.addOsmBaseImageryLayer(options);
+            _layer = backend.cesium.addOsmBaseImageryLayer(options);
 
             _forceUpdates();
         });

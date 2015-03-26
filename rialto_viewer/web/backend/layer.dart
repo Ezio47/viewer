@@ -12,7 +12,7 @@ part of rialto.backend;
 /// At this base level, layers really only must have a name (which must be unique). Some layers also
 /// have an associated URL, bounding box, and description.
 abstract class Layer {
-    final RialtoBackend _backend;
+    final RialtoBackend backend;
 
     final String type;
     final String name;
@@ -23,11 +23,11 @@ abstract class Layer {
 
     CartographicBbox _bbox;
 
-    Layer(RialtoBackend this._backend, String this.type, String this.name, Map map)
+    Layer(RialtoBackend this.backend, String this.type, String this.name, Map map)
             : url = ConfigUtils.getOptionalSettingAsUrl(map, "url"),
               proxy = ConfigUtils.getOptionalSettingAsUrl(map, "proxy"),
               description = ConfigUtils.getOptionalSettingAsString(map, "description");
-    _requireUrl() {
+    requireUrl() {
         if (url != null) return;
         throw new ArgumentError("url not set in config file");
     }
@@ -39,6 +39,7 @@ abstract class Layer {
     Future unload(); // "remove"
 
     CartographicBbox get bbox => _bbox;
+    set bbox(CartographicBbox v) => _bbox = v;
 
     bool get canZoomTo => (bbox != null);
 }

@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.backend;
+part of rialto.backend.private;
 
 
 class TerrainLayer extends Layer {
@@ -11,7 +11,7 @@ class TerrainLayer extends Layer {
 
     TerrainLayer(RialtoBackend backend, String name, Map map)
             : super(backend, "terrain", name, map) {
-        _requireUrl();
+        requireUrl();
     }
 
     @override
@@ -20,7 +20,7 @@ class TerrainLayer extends Layer {
             var options = {
                 'url': urlString
             };
-            _provider = _backend.cesium.setCesiumTerrainProvider(options);
+            _provider = backend.cesium.setCesiumTerrainProvider(options);
         });
         return f;
     }
@@ -28,7 +28,7 @@ class TerrainLayer extends Layer {
     @override
     Future unload() {
         var f = new Future(() {
-            _backend.cesium.unsetTerrainProvider();
+            backend.cesium.unsetTerrainProvider();
         });
         return f;
     }

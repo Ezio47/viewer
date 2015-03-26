@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.backend;
+part of rialto.backend.private;
 
 
 /// Interface to a large set of Javascript functions which deal with Cesium

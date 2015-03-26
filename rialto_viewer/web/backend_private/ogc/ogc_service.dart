@@ -2,7 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.backend;
+part of rialto.backend.private;
 
 
 /// Generalized notion of an OWS service.
