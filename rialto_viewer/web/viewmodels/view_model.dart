@@ -5,10 +5,14 @@
 part of rialto.viewer;
 
 
+/// base class for Rialto's notion of a UI component
 abstract class ViewModel {
     final String id;
     Element _element;
 
+    /// Create a view model for the given HTML element
+    ///
+    /// [id] must start with a '#'
     ViewModel(String this.id) {
         assert(id.startsWith("#"));
 
@@ -20,6 +24,7 @@ abstract class ViewModel {
 }
 
 
+/// mixin class for a UI component that contains other components (that need to track state)
 abstract class IForm {
     List<MStateControl> controls = new List();
     _register(MStateControl c) => controls.add(c);
@@ -29,6 +34,7 @@ abstract class IForm {
 }
 
 
+// /mixin class for a UI component that needs to track state
 abstract class MStateControl<T> {
     T _startingValue;
 

@@ -5,6 +5,8 @@
 part of rialto.viewer;
 
 
+/// Miscellaneous helper functions
+
 num min3(num a, num b, num c) => min(min(a, b), c);
 num max3(num a, num b, num c) => max(max(a, b), c);
 num degToRad(num deg) => deg * (PI / 180.0);
@@ -13,6 +15,7 @@ num clamp(num v, num low, num high) => (v < low) ? low : ((v > high) ? high : v)
 num clamp360(num degrees) => (degrees > 360 || degrees < -360) ? degrees % 360 : degrees;
 
 
+/// keyboard codes
 class Key {
     static const int UP = 38;
     static const int DOWN = 40;

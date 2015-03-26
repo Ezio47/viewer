@@ -5,6 +5,12 @@
 part of rialto.viewer;
 
 
+/// Base class for representing a "layer" in the viewer.
+///
+/// A layer may be an image, a point cloud, a GeoJSON shape, a base map, etc.
+///
+/// At this base level, layers really only must have a name (which must be unique). Some layers also
+/// have an associated URL, bounding box, and description.
 abstract class Layer {
     final Rialto _hub;
 
@@ -19,9 +25,9 @@ abstract class Layer {
 
     Layer(String this.type, String this.name, Map map)
             : _hub = Rialto.root,
-              url = YamlUtils.getOptionalSettingAsUrl(map, "url"),
-              proxy = YamlUtils.getOptionalSettingAsUrl(map, "proxy"),
-              description = YamlUtils.getOptionalSettingAsString(map, "description");
+              url = ConfigUtils.getOptionalSettingAsUrl(map, "url"),
+              proxy = ConfigUtils.getOptionalSettingAsUrl(map, "proxy"),
+              description = ConfigUtils.getOptionalSettingAsString(map, "description");
     _requireUrl() {
         if (url != null) return;
         throw new ArgumentError("url not set in config file");
@@ -39,24 +45,28 @@ abstract class Layer {
 }
 
 
+/// Interface class for a layer that can be turned on and off
 abstract class VisibilityControl {
     bool get visible;
     set visible(bool v);
 }
 
 
+/// Interface class for a layer that has a displayed bounding box that can be turned on and off
 abstract class BboxVisibilityControl {
     bool get bboxVisible;
     set bboxVisible(bool v);
 }
 
 
+/// Interface class for a layer that can have its alpha transparency set
 abstract class AlphaControl {
     double get alpha;
     set alpha(double d);
 }
 
 
+/// Interface class for a layer that can have saturation, gamma, etc set
 abstract class ColorCorrectionControl {
     double get brightness;
     set brightness(double d);
@@ -75,6 +85,9 @@ abstract class ColorCorrectionControl {
 }
 
 
+/// Interface class for a layer that can be colorized
+///
+/// This really only applies to point cloud layers.
 abstract class ColorizerControl {
     ColorizerData get colorizerData;
     set colorizerData(ColorizerData data);

@@ -5,6 +5,7 @@
 part of rialto.viewer;
 
 
+/// A point, represented by longitude, latitude, and height (in meters).
 class Cartographic3 {
     Vector3 _vector = new Vector3(0.0, 0.0, 0.0);
 
@@ -38,6 +39,7 @@ class Cartographic3 {
 }
 
 
+/// A bounding box in cartographic (lat/lon) space.
 class CartographicBbox {
     Cartographic3 minimum;
     Cartographic3 maximum;

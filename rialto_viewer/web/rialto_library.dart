@@ -49,7 +49,7 @@ part 'utils/color.dart';
 part 'utils/js_bridge.dart';
 part 'utils/signal.dart';
 part 'utils/utils.dart';
-part 'utils/yaml_utils.dart';
+part 'utils/config_utils.dart';
 
 part 'viewmodels/about_dialog.dart';
 part 'viewmodels/advanced_settings_dialog.dart';

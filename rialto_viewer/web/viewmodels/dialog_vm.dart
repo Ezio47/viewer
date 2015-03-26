@@ -4,6 +4,8 @@
 
 part of rialto.viewer;
 
+
+/// UI component for a "dialog"
 abstract class DialogVM extends ViewModel with IForm {
     bool _hasCancelButton;
     HtmlElement _dialogElement;

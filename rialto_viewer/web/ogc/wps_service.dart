@@ -5,13 +5,16 @@
 part of rialto.viewer;
 
 
-class WpsService extends OwsService {
+/// Implementation of a WPS server.
+///
+/// Allows for getting process descriptions, executing processes, and so on.
+class WpsService extends OgcService {
 
     WpsService(Uri server, {Uri proxyUri: null, String description: null})
             : super("WPS", server, proxyUri: proxyUri, description: description);
 
 
-    Future<OgcDocument> _getProcessDescription(String processName) {
+    Future<OgcDocument> _getProcessDescriptionWork(String processName) {
         var c = new Completer<OgcDocument>();
 
         _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"]).then((OgcDocument ogcDoc) {
@@ -49,7 +52,7 @@ class WpsService extends OwsService {
     }
 
 
-    Future<OgcDocument> _executeProcess(String processName, Map<String, dynamic> inputs, List<String> outputs) {
+    Future<OgcDocument> _executeProcessWork(String processName, Map<String, dynamic> inputs, List<String> outputs) {
         var c = new Completer<OgcDocument>();
 
         String identifierKV = "Identifier=$processName";
@@ -104,9 +107,11 @@ class WpsService extends OwsService {
         return c.future;
     }
 
-    // returns the job ID, and will have already created a status object for that ID (even in
-    // the case of any failures)
-    Future<WpsJob> doWpsExecuteProcess(WpsExecuteProcessData data, {WpsJobResultHandler successHandler: null,
+    /// Execute a WPS process
+    ///
+    /// Returns the job ID, and will have already created a status object for that ID (even in
+    /// the case of any failures)
+    Future<WpsJob> executeProcess(WpsExecuteProcessData data, {WpsJobResultHandler successHandler: null,
             WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null}) {
 
         var c = new Completer<WpsJob>();
@@ -116,13 +121,13 @@ class WpsService extends OwsService {
         Map<String, dynamic> inputs = data.parameters[1];
         List<String> outputs = data.parameters[2];
 
-        var request = _hub.wpsJobManager.createStatusObject(
+        var request = _hub.wpsJobManager.createJob(
                 this,
                 successHandler: successHandler,
                 errorHandler: errorHandler,
                 timeoutHandler: timeoutHandler);
 
-        _executeProcess(name, inputs, outputs).then((ogcDoc) {
+        _executeProcessWork(name, inputs, outputs).then((ogcDoc) {
 
             if (ogcDoc == null) {
                 request.code = OgcStatusCodes.systemFailure;
@@ -154,8 +159,10 @@ class WpsService extends OwsService {
         return c.future;
     }
 
-
-    Future<OgcDocument> doWpsDescribeProcess(String processName) {
-        return _getProcessDescription(processName);
+    /// Issues a "describe process" request to the WPS server
+    ///
+    /// Returns the response document
+    Future<OgcDocument> describeProcess(String processName) {
+        return _getProcessDescriptionWork(processName);
     }
 }

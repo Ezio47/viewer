@@ -125,7 +125,7 @@ class Commands {
 
     /// Asynchronously executes an arbitrary WPS process
     Future<WpsJob> wpsExecuteProcess(WpsExecuteProcessData data) {
-        return _rialto.wps.doWpsExecuteProcess(
+        return _rialto.wps.executeProcess(
                 data,
                 successHandler: data.successHandler,
                 errorHandler: data.errorHandler,
@@ -136,7 +136,7 @@ class Commands {
     ///
     /// Returns the response document.
     Future<OgcDocument> wpsDescribeProcess(String processName) {
-        return _rialto.wps.doWpsDescribeProcess(processName);
+        return _rialto.wps.describeProcess(processName);
     }
 
     /// Asynchronously requests an OGC capabilities document.

@@ -5,14 +5,19 @@
 part of rialto.viewer;
 
 
-class OwsService {
+/// Generalized notion of an OWS service.
+///
+/// Allows for doing a GetCapabilities call and for sending an arbitray GET request to the service.
+///
+/// The WPS service class is derived from this.
+class OgcService {
     final String service;
     final Uri server;
     final Uri proxyUri;
     final String description;
     Rialto _hub;
 
-    OwsService(String this.service, Uri this.server, {Uri this.proxyUri: null, String this.description: null})
+    OgcService(String this.service, Uri this.server, {Uri this.proxyUri: null, String this.description: null})
             : _hub = Rialto.root;
 
     void open() {

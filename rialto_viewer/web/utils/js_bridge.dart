@@ -5,6 +5,7 @@
 part of rialto.viewer;
 
 
+/// Javascript debugging helpers
 class JsBridge {
     JsObject _bridge;
 

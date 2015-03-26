@@ -4,11 +4,17 @@
 
 part of rialto.viewer;
 
+
+/// General system for sending "signals", i.e. "events", using Dart streams
+
+
 typedef void SignalHandler<T>(T data);
 typedef void SignalHandler0();
 
 
-
+/// Basic operations allowed on a Signal
+///
+/// The "0" functions are for signal objects that don't have a T parameter
 class SignalFunctions<T> {
     Signal<T> signal = new Signal<T>();
     SignalSubscription subscribe(SignalHandler<T> handler, {String name, bool once: false}) {
@@ -32,6 +38,7 @@ class _SignalData<T> {
     _SignalData(this.data);
 }
 
+
 class SignalSubscription {
     String _name;
     StreamSubscription _streamSubscription;
@@ -45,6 +52,9 @@ class SignalSubscription {
 }
 
 
+/// A named signal, which can be "fired" and "subscribed" to.
+///
+/// [T] is the data payload attached to the firing event and received by the subscribers.
 class Signal<T> {
     String _name;
     StreamController<_SignalData<T>> _controller;

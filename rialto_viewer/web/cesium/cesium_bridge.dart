@@ -5,7 +5,12 @@
 part of rialto.viewer;
 
 
-// this serves as an interface to the JavaScript functions in CesiumBridge
+/// Interface to a large set of Javascript functions which deal with Cesium
+///
+/// These functions wrap lower-level Cesium operations. We do not call from Dart into
+/// Javscript anywhere but here. Cesium is directly controlled only through this class.
+///
+/// The (singleton) Rialto class contains exactly one instance of this class.
 class CesiumBridge {
     JsObject _bridge;
 

@@ -8,6 +8,10 @@ part of rialto.viewer;
 typedef dynamic WpsJobResultHandler(WpsJob job);
 
 
+/// Manager of WPS operations
+///
+/// The (singleton) Rialto class has exactly one instance of this class. This manager
+/// is repsonsible for keeping track of all WPS jobs, both completed and in progress.
 class WpsJobManager {
     static final Duration pollingDelay = new Duration(seconds: 2);
     static final Duration pollingTimeout = new Duration(minutes: 5);
@@ -18,7 +22,12 @@ class WpsJobManager {
 
     WpsJobManager() : _hub = Rialto.root;
 
-    WpsJob createStatusObject(WpsService service, {WpsJobResultHandler successHandler: null,
+    /// Start a WPS job
+    ///
+    /// The job will be tracked by this manager class.
+    ///
+    /// Use this function instead of calling the WpsJob ctor directly.
+    WpsJob createJob(WpsService service, {WpsJobResultHandler successHandler: null,
             WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null}) {
         var obj = new WpsJob(
                 service,
@@ -40,6 +49,11 @@ class WpsJobManager {
 }
 
 
+/// Everything about a WPS job
+///
+/// Includes things like timestamp, current status, outputs/results, and so on.
+///
+/// A [WpsJob] internally does it's own polling to keep its status up-to-date.
 class WpsJob {
     Rialto _hub = Rialto.root;
     final WpsService service;
@@ -58,6 +72,9 @@ class WpsJob {
     final WpsJobResultHandler _errorHandler;
     final WpsJobResultHandler _timeoutHandler;
 
+    /// WpsJob constructor
+    ///
+    /// Users should nto call this directly -- call [WpsJobManager.createJob] instead.
     WpsJob(WpsService this.service, int this.id, {WpsJobResultHandler successHandler: null,
             WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
             : code = OgcStatusCodes.notYetSubmitted,

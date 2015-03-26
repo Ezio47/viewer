@@ -19,13 +19,13 @@ abstract class BaseImageryLayer extends Layer implements VisibilityControl, Alph
     double _gamma;
 
     BaseImageryLayer(String type, String name, Map map)
-            : _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
-              _alpha = YamlUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
-              _brightness = YamlUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
-              _contrast = YamlUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
-              _hue = YamlUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
-              _saturation = YamlUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
-              _gamma = YamlUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
+            : _visible = ConfigUtils.getOptionalSettingAsBool(map, "visible", true),
+              _alpha = ConfigUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
+              _brightness = ConfigUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
+              _contrast = ConfigUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
+              _hue = ConfigUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
+              _saturation = ConfigUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
+              _gamma = ConfigUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
               super(type, name, map);
 
     @override set visible(bool v) {
@@ -101,8 +101,8 @@ class BingBaseImageryLayer extends BaseImageryLayer {
     String _apiKey;
 
     BingBaseImageryLayer(String name, Map map)
-            : _apiKey = YamlUtils.getOptionalSettingAsString(map, "apiKey", _defaultKey),
-              _style = YamlUtils.getOptionalSettingAsString(map, "style", _defaultStyle),
+            : _apiKey = ConfigUtils.getOptionalSettingAsString(map, "apiKey", _defaultKey),
+              _style = ConfigUtils.getOptionalSettingAsString(map, "style", _defaultStyle),
               super("bing_base_imagery", name, map) {
 
         if (!_styles.contains(_style)) {

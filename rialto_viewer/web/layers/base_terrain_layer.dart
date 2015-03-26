@@ -47,7 +47,7 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
 
     ArcGisBaseTerrainLayer(String name, Map map)
             : super("arcgis_base_terrain", name, map),
-              _arcGisApiKey = YamlUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultKey);
+              _arcGisApiKey = ConfigUtils.getOptionalSettingAsString(map, "arcGisApiKey", _defaultKey);
 
     @override
     Future load() {

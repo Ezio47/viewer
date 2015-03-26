@@ -4,8 +4,14 @@
 
 part of rialto.viewer;
 
+/// code-behind for the index.html file
+///
+/// This class implements the functionality in Rialto's index.html file.
+///
+/// It is considered a "client" of the Rialto library, and so it should only access the viewer's
+/// public interfaces.
 class RialtoElement {
-    Rialto _hub;
+    Rialto _rialto;
     Element _mouseCoords;
 
     ViewModeCode viewMode = ViewModeCode.mode3D;
@@ -13,27 +19,27 @@ class RialtoElement {
     Element _textWpsJobStatus;
 
     RialtoElement() {
-        _hub = Rialto.root;
+        _rialto = Rialto.root;
 
-        querySelector("#homeWorldButton").onClick.listen((ev) => _hub.commands.zoomToWorld());
-        querySelector("#homeDataButton").onClick.listen((ev) => _hub.commands.zoomToLayer(null));
+        querySelector("#homeWorldButton").onClick.listen((ev) => _rialto.commands.zoomToWorld());
+        querySelector("#homeDataButton").onClick.listen((ev) => _rialto.commands.zoomToLayer(null));
 
-        querySelector("#viewshedCircleButton").onClick.listen((ev) => _hub.commands.createViewshedCircle());
-        querySelector("#viewshedComputeButton").onClick.listen((ev) => _hub.commands.computeViewshed());
+        querySelector("#viewshedCircleButton").onClick.listen((ev) => _rialto.commands.createViewshedCircle());
+        querySelector("#viewshedComputeButton").onClick.listen((ev) => _rialto.commands.computeViewshed());
 
-        querySelector("#linearMeasurementButton").onClick.listen((ev) => _hub.commands.computeLinearMeasurement());
-        querySelector("#areaMeasurementButton").onClick.listen((ev) => _hub.commands.computeAreaMeasurement());
+        querySelector("#linearMeasurementButton").onClick.listen((ev) => _rialto.commands.computeLinearMeasurement());
+        querySelector("#areaMeasurementButton").onClick.listen((ev) => _rialto.commands.computeAreaMeasurement());
 
-        querySelector("#dropPinButton").onClick.listen((ev) => _hub.commands.dropPin());
+        querySelector("#dropPinButton").onClick.listen((ev) => _rialto.commands.dropPin());
 
-        querySelector("#drawExtentButton").onClick.listen((ev) => _hub.commands.drawExtent());
+        querySelector("#drawExtentButton").onClick.listen((ev) => _rialto.commands.drawExtent());
 
         var modeButton2D = querySelector("#modeButton2D");
         var modeButton25D = querySelector("#modeButton25D");
         var modeButton3D = querySelector("#modeButton3D");
-        modeButton2D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
-        modeButton25D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
-        modeButton3D.onClick.listen((ev) => _hub.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
+        modeButton2D.onClick.listen((ev) => _rialto.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
+        modeButton25D.onClick.listen((ev) => _rialto.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
+        modeButton3D.onClick.listen((ev) => _rialto.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
 
         new LoadConfigurationDialog("#loadConfigurationDialog");
         new LayerManagerDialog("#layerManagerDialog");
@@ -47,20 +53,20 @@ class RialtoElement {
         new AboutDialog("#logDialog");
 
         _mouseCoords = querySelector("#textMouseCoords");
-        _hub.events.MouseMove.subscribe(_handleUpdateCoords);
+        _rialto.events.MouseMove.subscribe(_handleUpdateCoords);
 
         _textWpsJobStatus = querySelector("#wpsStatusDialog_open");
         _handleWpsJobUpdate();
-        _hub.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
+        _rialto.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";
 
     void _handleUpdateCoords(MouseData d) {
-        var v = _hub.cesium.getMouseCoordinates(d.x, d.y);
+        var v = _rialto.cesium.getMouseCoordinates(d.x, d.y);
         if (v == null) return;
 
-        final precision = _hub.displayPrecision;
+        final precision = _rialto.displayPrecision;
         final double lon = v.longitude;
         final double lat = v.latitude;
         String s = "(${lon.toStringAsFixed(precision)}, ${lat.toStringAsFixed(precision)})";
@@ -69,7 +75,7 @@ class RialtoElement {
     }
 
     void _handleWpsJobUpdate() {
-        final int numActive = _hub.wpsJobManager.numActive;
+        final int numActive = _rialto.wpsJobManager.numActive;
 
         if (numActive < 0) {
             throw new ArgumentError("invalid WPS request count");
@@ -85,12 +91,12 @@ class RialtoElement {
             }
         }
 
-        _textWpsJobStatus.text = "Active jobs: ${_hub.wpsJobManager.numActive}";
+        _textWpsJobStatus.text = "Active jobs: ${_rialto.wpsJobManager.numActive}";
 
         String s = "";
-        s += "Job count: ${_hub.wpsJobManager.map.length}\n";
+        s += "Job count: ${_rialto.wpsJobManager.map.length}\n";
 
-        _hub.wpsJobManager.map.keys.forEach((id) => s += "\n----\n" + _hub.wpsJobManager.map[id].dump());
+        _rialto.wpsJobManager.map.keys.forEach((id) => s += "\n----\n" + _rialto.wpsJobManager.map[id].dump());
         querySelector("#wpsStatusDialog_body").text = s;
     }
 }

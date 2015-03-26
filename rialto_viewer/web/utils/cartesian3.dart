@@ -5,6 +5,8 @@
 part of rialto.viewer;
 
 
+/// A point, represented by an (x,y,z) triple. No units or semantics are implied (as opposed
+/// to the [Cartographic3] class).
 class Cartesian3 {
     Vector3 _vector = new Vector3(0.0, 0.0, 0.0);
 

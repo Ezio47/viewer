@@ -5,7 +5,8 @@
 part of rialto.viewer;
 
 
-class YamlUtils {
+/// Static helper functions for dealing with YAML viewer config files
+class ConfigUtils {
     static final Type _stringType = ("").runtimeType;
     static final Type _intType = (0).runtimeType;
     static final Type _boolType = (false).runtimeType;

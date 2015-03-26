@@ -7,6 +7,7 @@ part of rialto.viewer;
 
 // TODO: make check to see if data has changed or not
 
+/// UI component for a check box
 class CheckBoxVM extends ViewModel with MStateControl<bool> {
     InputElement _inputElement;
     bool _defaultValue;

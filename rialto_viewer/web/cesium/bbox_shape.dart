@@ -4,6 +4,8 @@
 
 part of rialto.viewer;
 
+
+/// Kludgy hack for attaching RGB-edged bounding boxes to a layer.
 class BboxShape {
     Rialto _hub;
 

@@ -124,9 +124,9 @@ class ConfigScript {
 
     Future _doCommand_wps(Map data) {
 
-        var proxyUri = YamlUtils.getOptionalSettingAsUrl(data, "proxy");
-        var url = YamlUtils.getRequiredSettingAsUrl(data, "url");
-        var description = YamlUtils.getOptionalSettingAsString(data, "description");
+        var proxyUri = ConfigUtils.getOptionalSettingAsUrl(data, "proxy");
+        var url = ConfigUtils.getRequiredSettingAsUrl(data, "url");
+        var description = ConfigUtils.getOptionalSettingAsString(data, "description");
         var wps = new WpsService(url, proxyUri: proxyUri, description: description);
         wps.open();
 

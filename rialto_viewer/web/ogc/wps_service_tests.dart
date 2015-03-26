@@ -5,6 +5,7 @@
 part of rialto.viewer;
 
 
+/// Unit tests for WPS operations
 class WpsServiceTest {
 
     static void test(WpsService wps) {
@@ -26,7 +27,7 @@ class WpsServiceTest {
     }
 
     static void testDescribeSummation(WpsService wps) {
-        wps.doWpsDescribeProcess("groovy:wpssummationtest").then((OgcDocument doc) {
+        wps.describeProcess("groovy:wpssummationtest").then((OgcDocument doc) {
             assert(doc is OgcProcessDescription_16);
             var desc = doc as OgcProcessDescription_16;
             //log(desc.dump(0));
@@ -58,7 +59,7 @@ class WpsServiceTest {
             assert(literalData.value == "28.0");
         };
 
-        wps.doWpsExecuteProcess(data, successHandler: successHandler);
+        wps.executeProcess(data, successHandler: successHandler);
     }
 
     static void testExecuteSleep(WpsService wps, double duration) {
@@ -86,6 +87,6 @@ class WpsServiceTest {
             assert(double.parse(literalData.value) == (alpha + beta + duration));
         };
 
-        wps.doWpsExecuteProcess(data, successHandler: successHandler);
+        wps.executeProcess(data, successHandler: successHandler);
     }
 }

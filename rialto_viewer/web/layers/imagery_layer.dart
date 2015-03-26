@@ -19,14 +19,14 @@ abstract class ImageryLayer extends Layer with VisibilityControl, AlphaControl, 
 
     // rect is: w, s, e, n
     ImageryLayer(String type, String name, Map map)
-            : _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
-              _alpha = YamlUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
-              _brightness = YamlUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
-              _contrast = YamlUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
-              _hue = YamlUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
-              _saturation = YamlUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
-              _gamma = YamlUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
-              _rectangle = YamlUtils.getOptionalSettingAsList4(map, "rectangle"),
+            : _visible = ConfigUtils.getOptionalSettingAsBool(map, "visible", true),
+              _alpha = ConfigUtils.getOptionalSettingAsDouble(map, "alpha", 1.0),
+              _brightness = ConfigUtils.getOptionalSettingAsDouble(map, "brightness", 1.0),
+              _contrast = ConfigUtils.getOptionalSettingAsDouble(map, "contrast", 1.0),
+              _hue = ConfigUtils.getOptionalSettingAsDouble(map, "hue", 0.0),
+              _saturation = ConfigUtils.getOptionalSettingAsDouble(map, "saturation", 1.0),
+              _gamma = ConfigUtils.getOptionalSettingAsDouble(map, "gamma", 1.0),
+              _rectangle = ConfigUtils.getOptionalSettingAsList4(map, "rectangle"),
               super(type, name, map);
 
     @override set visible(bool v) {
@@ -118,7 +118,7 @@ class WmsImageryLayer extends ImageryLayer {
 
     WmsImageryLayer(String name, Map map)
             : super("wms_imagery", name, map),
-              _layers = YamlUtils.getRequiredSettingAsString(map, "layers") {
+              _layers = ConfigUtils.getRequiredSettingAsString(map, "layers") {
         _requireUrl();
     }
 
@@ -141,8 +141,8 @@ class TmsImageryLayer extends ImageryLayer {
 
     TmsImageryLayer(String name, Map map)
             : super("tms_imagery", name, map),
-              _maximumLevel = YamlUtils.getOptionalSettingAsInt(map, "maximumLevel", 18),
-              _gdal2Tiles = YamlUtils.getOptionalSettingAsBool(map, "gdal2Tiles", false) {
+              _maximumLevel = ConfigUtils.getOptionalSettingAsInt(map, "maximumLevel", 18),
+              _gdal2Tiles = ConfigUtils.getOptionalSettingAsBool(map, "gdal2Tiles", false) {
         _requireUrl();
     }
 

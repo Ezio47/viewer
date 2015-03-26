@@ -5,6 +5,7 @@
 part of rialto.viewer;
 
 
+/// Representation of an RGBA color
 class Color {
     double r, g, b, a;
 

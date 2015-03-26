@@ -4,8 +4,11 @@
 
 part of rialto.viewer;
 
-// OGC 06-121r3, sec 7.4
-// class names are from the spec document and have their table number from the spec appended
+
+/// Structures to represent OWS service documents
+///
+/// The class names are from the spec document (OGC 06-121r3). For convenience, the corresponding table number is
+/// appended to the class name.
 
 // TODO: we should respect namespace prefixes on element names
 

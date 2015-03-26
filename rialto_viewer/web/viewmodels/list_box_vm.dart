@@ -5,6 +5,7 @@
 part of rialto.viewer;
 
 
+/// UI component for the item in a list box
 class ListBoxItem {
     final String name;
     OptionElement optionElement;
@@ -15,6 +16,8 @@ class ListBoxItem {
     }
 }
 
+
+/// UI component for a list box
 class ListBoxVM extends ViewModel with MStateControl<String> {
     List<ListBoxItem> _list = new List<ListBoxItem>();
     SelectElement _selectElement;
@@ -57,7 +60,4 @@ class ListBoxVM extends ViewModel with MStateControl<String> {
 
     set disabled(bool v) => _selectElement.disabled = v;
     bool get disabled => _selectElement.disabled;
-
-    // only use for item iteration, no modification
-//    List<ListBoxItem<T>> get list => _list;
 }

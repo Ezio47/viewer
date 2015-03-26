@@ -5,6 +5,7 @@
 part of rialto.viewer;
 
 
+/// UI component that allows for one-line text entry
 class TextInputVM extends ViewModel with MStateControl<String> {
     InputElement _inputElement;
     String defaultValue;
@@ -21,7 +22,7 @@ class TextInputVM extends ViewModel with MStateControl<String> {
     set value(String value) => _inputElement.value = value;
 
 
-    // returns a double or null
+    /// returns value as a double (or 0.0)
     double get valueAsDouble {
         String s = value;
         double d = null;
@@ -30,7 +31,7 @@ class TextInputVM extends ViewModel with MStateControl<String> {
         return d;
     }
 
-    // returns a double or null
+    /// returns value as an int (or 0)
     int get valueAsInt {
         String s = value;
         int i = null;
@@ -39,10 +40,11 @@ class TextInputVM extends ViewModel with MStateControl<String> {
         return i;
     }
 
-    //TODO: add validation for data type of input string
+    // TODO: add validation for data type of input string
 }
 
 
+/// UI component that allows for multi-line text entry
 class TextAreaInputVM extends ViewModel with MStateControl<String> {
     TextAreaElement _inputElement;
     String defaultValue;

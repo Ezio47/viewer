@@ -5,8 +5,9 @@
 part of rialto.viewer;
 
 
-// this is for one-shot buttons, not toggle buttons
-
+/// UI component for a button
+///
+/// Note this is for "regular" buttons, not stateful, toggly buttons.
 class ButtonVM extends ViewModel {
     ButtonElement _buttonElement;
 
@@ -28,34 +29,3 @@ class ButtonVM extends ViewModel {
         }
     }
 }
-
-
-/*
-class ToggleButtonVM extends ButtonVM {
-    String _notPressedText;
-    String _pressedText;
-
-    ToggleButtonVM(String id, Function onClick, {String notPressedText, String pressedText}) :
-        super(id, onClick) {
-        _notPressedText = notPressedText;
-        _pressedText = pressedText;
-        pressed = false;
-    }
-
-    bool get pressed => _element.classes.contains("uk-active");
-
-    set pressed(bool pressed) {
-        if (pressed) {
-            _element.classes.add("uk-active");
-            if (_pressedText != null) {
-                _element.text = _pressedText;
-            }
-        } else {
-            _element.classes.remove("uk-active");
-            if (_notPressedText != null) {
-                _element.text = _notPressedText;
-            }
-        }
-    }
-}
-*/

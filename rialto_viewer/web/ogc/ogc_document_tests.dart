@@ -5,6 +5,9 @@
 part of rialto.viewer;
 
 
+/// Unit tests for OGC service work
+
+
 // http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=GetCapabilities&Service=WPS
 // http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=org.ciesin.gis.wps.algorithms.PopStats
 // http://beta.sedac.ciesin.columbia.edu/wps/WebProcessingService?Request=DescribeProcess&Service=WPS&identifier=badfunctionname
@@ -32,10 +35,10 @@ class OgcDocumentTests {
         wps.doOwsGetCapabilities().then((doc) {
             assert(doc is OgcCapabilitiesDocument_7);
         });
-        wps.doWpsDescribeProcess("org.ciesin.gis.wps.algorithms.PopStats").then((doc) {
+        wps.describeProcess("org.ciesin.gis.wps.algorithms.PopStats").then((doc) {
             assert(doc is OgcProcessDescription_16);
         });
-        wps.doWpsDescribeProcess("org.ciesin.gis.wps.algorithms.PopStat").then((doc) {
+        wps.describeProcess("org.ciesin.gis.wps.algorithms.PopStat").then((doc) {
             assert(doc is OgcExceptionReportDocument);
         });
         wps.close();

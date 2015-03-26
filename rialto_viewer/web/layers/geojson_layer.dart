@@ -10,7 +10,7 @@ class GeoJsonLayer extends Layer implements VisibilityControl {
     bool _visible;
 
     GeoJsonLayer(String name, Map map)
-            : _visible = YamlUtils.getOptionalSettingAsBool(map, "visible", true),
+            : _visible = ConfigUtils.getOptionalSettingAsBool(map, "visible", true),
               super("geojson", name, map) {
         _requireUrl();
     }
