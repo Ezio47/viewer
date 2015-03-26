@@ -6,14 +6,10 @@ library rialto.backend;
 
 import 'dart:async';
 import 'dart:html';
-import 'dart:js';
 import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:http/browser_client.dart' as BHttp;
 import 'package:http/http.dart' as Http;
 import 'package:vector_math/vector_math.dart';
-import 'package:xml/xml.dart' as Xml;
 import 'package:yaml/yaml.dart';
 
 import '../backend_private/rialto_backend_private_library.dart';
