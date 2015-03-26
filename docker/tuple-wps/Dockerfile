@@ -10,7 +10,7 @@ COPY ossim.repo /etc/yum.repos.d/
  
 RUN yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm \
 && yum -y update \
-&& yum -y install ossim tar unzip \
+&& yum -y install ossim tar unzip gdal-devel \
 java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && yum clean all \
 && curl -L http://apache.mesi.com.ar/tomcat/tomcat-7/v7.0.59/bin/apache-tomcat-7.0.59.tar.gz -o /tmp/apache-tomcat-7.0.59.tar.gz \
