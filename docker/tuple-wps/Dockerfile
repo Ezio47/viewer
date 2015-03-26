@@ -26,7 +26,9 @@ java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && curl -L http://ares.boundlessgeo.com/geoserver/2.6.x/community-latest/geoserver-2.6-SNAPSHOT-groovy-plugin.zip -o /tmp/geoserver-2.6-SNAPSHOT-groovy-plugin.zip \
 && unzip -o /tmp/geoserver-2.6-SNAPSHOT-groovy-plugin.zip -d /tomcat/webapps/geoserver/WEB-INF/lib \
 && rm -f /tmp/geoserver-2.6-SNAPSHOT-groovy-plugin.zip \
-&& rm -rf /tomcat/webapps/{docs,examples,host-manager,manager} 
+&& rm -rf /tomcat/webapps/{docs,examples,host-manager,manager} \
+&& mkdir -p /tomcat/webapps/geoserver/data/scripts/wps \
+&& curl -L https://raw.githubusercontent.com/radiantbluetechnologies/tuple/master/docker/tuple-wps/wpsviewshed.groovy -o /tomcat/webapps/geoserver/data/scripts/wps/wpsviewshed.groovy
 
 #COPY wpsviewshed.groovy /tomcat/webapps/geoserver/scripts/wps/wpsviewshed.groovy
 
