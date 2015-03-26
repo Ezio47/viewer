@@ -47,7 +47,7 @@ final String demo = """- layers:
 ///
 /// Called from inside index.html. Creates the viewer, reads in the configuration file, and
 /// runs the commands in it to create the layers
-/*void*/ main() async {
+/*void*/ main() {
     // TODO: fix all "/*void*/...async" after Dart 1.9 released
 
     // TODO: addErrorListener not yet implemented in Dart SDK...
@@ -80,14 +80,14 @@ final String demo = """- layers:
 
     if (config == null) {
         try {
-            await ui.backend.commands.loadScriptFromStringAsync(demo);
+            ui.backend.commands.loadScriptFromStringAsync(demo);
         } catch (e) {
             RialtoBackend.error("Top-level exception caught", e);
         }
     } else {
         try {
             final uri = Uri.parse(config);
-            await ui.backend.commands.loadScriptFromUrl(uri);
+            ui.backend.commands.loadScriptFromUrl(uri);
         } catch (e) {
             RialtoBackend.error("Top-level exception caught", e);
         }

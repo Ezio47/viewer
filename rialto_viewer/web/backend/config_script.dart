@@ -31,13 +31,16 @@ class ConfigScript {
     /// Returns a list with each command's result
     ///
     /// Throws or calls [Rialto.error] if there is a problem executing a command.
-    Future<List<dynamic>> loadFromUrl(Uri url) async {
+    Future<List<dynamic>> loadFromUrl(Uri url) {
         var c = new Completer<List<dynamic>>();
 
-        Http.Response response = await Utils.httpGet(url);
-        String yamlText = response.body;
+        Utils.httpGet(url).then((Http.Response response) {
+            String yamlText = response.body;
 
-        return _executeCommands(yamlText, url.toString());
+            c.complete(_executeCommands(yamlText, url.toString()));
+        });
+
+        return c.future;
     }
 
     /// Loads a script from the string [yamlText] and asynchronously executes the commands in it
@@ -45,14 +48,12 @@ class ConfigScript {
     /// Returns a list with each command's result
     ///
     /// Throws or calls [Rialto.error] if there is a problem executing a command.
-    Future<List<dynamic>> loadFromString(String yamlText) async {
+    Future<List<dynamic>> loadFromString(String yamlText) {
 
-        List<dynamic> results = await _executeCommands(yamlText, "");
-
-        return results;
+        return _executeCommands(yamlText, "");
     }
 
-    Future<List<dynamic>> _executeCommands(String yamlText, String urlString) async {
+    Future<List<dynamic>> _executeCommands(String yamlText, String urlString) {
 
         List<Map<String, Map>> commands;
         try {
