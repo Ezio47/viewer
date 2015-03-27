@@ -1,6 +1,8 @@
 tuplerialto:
   ports:
    - "80:80"
+  links:
+   - tuplewps
    
 tuplewps:
   ports:
