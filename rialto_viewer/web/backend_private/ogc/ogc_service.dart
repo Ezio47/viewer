@@ -65,7 +65,7 @@ class OgcService {
     }
 
 
-    Future<OgcDocument> doOwsGetCapabilities() {
+    Future<OgcDocument> getCapabilities() {
         var c = new Completer<OgcDocument>();
 
         _sendKvpServerRequest("GetCapabilities", []).then((OgcDocument ogcDoc) {

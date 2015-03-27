@@ -123,8 +123,26 @@ class Commands {
         return f;
     }
 
+    /// Allow user to test WPS
+    ///
+    /// Does a GetCapabilities request, a describe process for "helloworld", and executes "helloworld".
+    void testWps() {
+        if (_backend.wps == null) {
+            RialtoBackend.error("No WPS server configured");
+            return;
+        }
+
+        _backend.wps.testConnection().then((String status) {
+            window.alert(status);
+        });
+    }
+
     /// Asynchronously executes an arbitrary WPS process
     Future<WpsJob> wpsExecuteProcess(WpsExecuteProcessData data) {
+        if (_backend.wps == null) {
+            RialtoBackend.error("No WPS server configured");
+            return new Future.value(null);
+        }
         return _backend.wps.executeProcess(
                 data,
                 successHandler: data.successHandler,
@@ -136,6 +154,10 @@ class Commands {
     ///
     /// Returns the response document.
     Future<OgcDocument> wpsDescribeProcess(String processName) {
+        if (_backend.wps == null) {
+            RialtoBackend.error("No WPS server configured");
+            return new Future.value(null);
+        }
         return _backend.wps.describeProcess(processName);
     }
 
@@ -143,7 +165,11 @@ class Commands {
     ///
     /// Returns the response document.
     Future owsGetCapabilities() {
-        return _backend.wps.doOwsGetCapabilities();
+        if (_backend.wps == null) {
+            RialtoBackend.error("No WPS server configured");
+            return new Future.value(null);
+        }
+        return _backend.wps.getCapabilities();
     }
 
     /// Zooms to the given point

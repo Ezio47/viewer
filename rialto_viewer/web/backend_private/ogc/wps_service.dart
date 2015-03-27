@@ -52,7 +52,8 @@ class WpsService extends OgcService {
     }
 
 
-    Future<OgcDocument> _executeProcessWork(String processName, Map<String, dynamic> inputs, List<String> outputs) {
+    Future<OgcDocument> _executeProcessWork(String processName, Map<String, dynamic> inputs, List<String> outputs,
+            {Map<String, String> options: null}) {
         var c = new Completer<OgcDocument>();
 
         String identifierKV = "Identifier=$processName";
@@ -69,18 +70,17 @@ class WpsService extends OgcService {
         outputs.forEach((k) => responseDocumentKV += "$k;");
         responseDocumentKV = responseDocumentKV.substring(0, responseDocumentKV.length - 1); // remove trailing ';'
 
-        String storeExecRespKV = "StoreExecuteResponse=true";
-        String lineageKV = "Lineage=true";
-        String statusKV = "Status=true";
+        var opts = new Map<String, String>();
+        if (options != null) {
+            options.forEach((k, v) => opts[k.toLowerCase()] = v.toLowerCase());
+        }
 
-        var parms = [
-                identifierKV,
-                dataInputsKV,
-                dataOutputsKV,
-                responseDocumentKV,
-                storeExecRespKV,
-                lineageKV,
-                statusKV];
+        opts.putIfAbsent("storeexecuteresponse", () => "true");
+        opts.putIfAbsent("lineage", () => "true");
+        opts.putIfAbsent("status", () => "true");
+
+        var parms = [identifierKV, dataInputsKV, dataOutputsKV, responseDocumentKV];
+        opts.forEach((k, v) => parms.add("$k=$v"));
 
         _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
 
@@ -164,5 +164,83 @@ class WpsService extends OgcService {
     /// Returns the response document
     Future<OgcDocument> describeProcess(String processName) {
         return _getProcessDescriptionWork(processName);
+    }
+
+    Future<String> testConnection() async {
+        final alphaValue = "Yow!";
+        final omegaValue = "!woY";
+
+        String s = "";
+
+        OgcDocument capabilities = await getCapabilities();
+
+        if (capabilities is! OgcCapabilitiesDocument_7) {
+            s += "GetCapabilities check: FAILED";
+            return s;
+        }
+
+        final numProcesses = (capabilities as OgcCapabilitiesDocument_7).processOfferings.processes.length;
+        s += "GetCapabilities check: passed ($numProcesses processes)\n";
+
+        OgcDocument description = await this.describeProcess("groovy:wpshelloworld");
+
+        if (description is! OgcProcessDescription_16) {
+            s += "DescribeProcess check: FAILED\n";
+            if (description is OgcExceptionReportDocument) {
+                s += description.exceptionTexts.fold("", (prev, cur) => "$prev  Exception: $cur\n");
+            }
+            return s;
+        }
+
+        final title = (description as OgcProcessDescription_16).title;
+        if (title != "HelloWorld") {
+            s += "DescribeProcess check: FAILED (titled \"$title\")\n";
+            return s;
+        }
+
+        s += "DescribeProcess check: passed (titled \"$title\")\n";
+
+        final inputs = {
+            "alpha": alphaValue
+        };
+        final outputs = ["omega"];
+        final options = {
+            "storeexecuteresponse": "false",
+            "lineage": "false",
+            "status": "false"
+        };
+        OgcDocument exec = await _executeProcessWork("groovy:wpshelloworld", inputs, outputs, options: options);
+
+        if (exec is! OgcExecuteResponseDocument_54) {
+            s += "ExecuteProcess check: FAILED\n";
+            if (exec is OgcExceptionReportDocument) {
+                s += exec.exceptionTexts.fold("", (prev, cur) => "$prev  Exception: $cur\n");
+            }
+            return s;
+        }
+
+        String omega;
+        try {
+            var execRespDoc = (exec as OgcExecuteResponseDocument_54);
+            var procOuts = execRespDoc.processOutputs;
+            var outsDataList = procOuts.outputDataList;
+            var outData = outsDataList.first;
+            var data = outData.data;
+            var lit = data.literalData;
+            var val = lit.value;
+            omega = val;
+        } catch (_) {
+            s += "ExecuteProcess check: FAILED\n";
+            return s;
+        }
+
+        if (omega != omegaValue) {
+            s += "ExecuteProcess check: FAILED (returned \"$omega\")\n";
+            return s;
+        }
+
+        s += "ExecuteProcess check: passed (returned \"$omega\")\n";
+
+        return s;
     }
 }

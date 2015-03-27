@@ -35,7 +35,7 @@ class OgcDocumentTests {
         var proxyUri = Uri.parse("http://localhost:12345/proxy");
         var wps = new WpsService(_backend, uri, proxyUri: proxyUri);
         wps.open();
-        wps.doOwsGetCapabilities().then((doc) {
+        wps.getCapabilities().then((doc) {
             assert(doc is OgcCapabilitiesDocument_7);
         });
         wps.describeProcess("org.ciesin.gis.wps.algorithms.PopStats").then((doc) {
