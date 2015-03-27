@@ -19,7 +19,7 @@ class WpsServiceTest {
     }
 
     static void testCapabilities(WpsService wps) {
-        wps.doOwsGetCapabilities().then((OgcDocument doc) {
+        wps.getCapabilities().then((OgcDocument doc) {
             assert(doc is OgcCapabilitiesDocument_7);
             //log(doc.dump(0));
             assert(doc.dump(0).contains("Identifier: groovy:wpssummationtest"));
