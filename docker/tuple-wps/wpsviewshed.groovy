@@ -46,7 +46,7 @@ def run(input) {
     //
     // DEBUG
     //
-    def cmd0 = ['ls', tupleInputPath];
+    def cmd0 = ['ls', tupleInputPath]
     def proc0 = cmd0.execute()
     
     proc0.waitFor()
@@ -61,7 +61,7 @@ def run(input) {
             stderrText: myStderr
         ]
     }
-    
+
     //
     // VIEWSHED
     //
