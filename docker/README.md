@@ -9,10 +9,12 @@ This repo contains three docker directories, one for building, one for serving, 
 3. tuple-wps
         - Is the WPS Bridge with GeoServer and OSSIM
 
-You can start the entire stack with the included shell script:
-    $ ./start.sh
+You can use [docker-compose](https://docs.docker.com/compose/) to build, and start
+the stack:
+        - `$ docker-compose --file compose-build.yml  build`
+        - `$ docker-compose --file compose-run.yml up -d`
 
 This launches the tuple-wps and tuple-rialto containers and links them together.
 
-Access the application at http://somhost.com/rialto/ 
+Access the application at http://somehost.com/rialto/ 
 
