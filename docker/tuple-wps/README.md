@@ -7,5 +7,5 @@ the WPS bridge for tuple.
 `docker build --tag=radiantblue/tuple-wps .`
 
 ## Run it
-`docker run -d --link='TUPLEVIEWERCONTAINER' --name='tuple-wps' -v /ABS/LOCAL/PATH/TO/SCRIPTS:/tomcat/webapps/geoserver/data/scripts/wps radiantblue/tuple-wps:latest` **Subject to change**
+`docker run -d -p 8080:8080 --link='TUPLEVIEWERCONTAINER' --name='tuple-wps' -v /ABS/LOCAL/PATH/TO/SCRIPTS:/tomcat/webapps/geoserver/data/scripts/wps radiantblue/tuple-wps:latest` **Subject to change**
 
