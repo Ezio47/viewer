@@ -1,0 +1,12 @@
+tuplerialto:
+  ports:
+   - "80:80"
+  links:
+   - tuplewps
+   
+tuplewps:
+  ports:
+   - "8080:8080"
+  volumes:
+   - /vagrant/scripts/wps:/tomcat/webapps/geoserver/data/scripts/wps
+

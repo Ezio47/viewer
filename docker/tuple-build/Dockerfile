@@ -14,7 +14,7 @@ RUN yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.no
 && mv /tmp/mpgerlek-cesium-80d79e0 /tmp/Cesium \
 && rm -rf /tmp/cesium.tar.gz \
 && /tmp/apache-ant-1.9.4/bin/ant combine -buildfile /tmp/Cesium \
-&& curl -L https://storage.googleapis.com/dart-archive/channels/dev/release/44550/sdk/dartsdk-linux-x64-release.zip -o /tmp/dartsdk-linux-x64-release.zip \
+&& curl -L https://storage.googleapis.com/dart-archive/channels/stable/release/44672/sdk/dartsdk-linux-x64-release.zip -o /tmp/dartsdk-linux-x64-release.zip \
 && pushd /tmp \
 && unzip /tmp/dartsdk-linux-x64-release.zip \
 && rm -rf /tmp/dartsdk-linux-x64-release.zip \
