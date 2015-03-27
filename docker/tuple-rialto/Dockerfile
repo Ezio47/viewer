@@ -1,6 +1,6 @@
 FROM centos:centos6
 MAINTAINER mpg@flaxen.com
-ENV TUPLE_OUT=/vagrant/tuple-out
+ENV TUPLE_OUT=/vagrant/tuple/rialto_viewer/web
 
 ADD nginx.repo /etc/yum.repos.d/
 
