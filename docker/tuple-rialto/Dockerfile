@@ -11,7 +11,7 @@ RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noar
 && mkdir /usr/share/nginx/html/rialto 
 
 ADD nginx.conf /etc/nginx/nginx.conf
-ADD rialto-tuple.conf /etc/nginx/conf.d/rialto-tuple.conf
+ADD tuple-rialto.conf /etc/nginx/conf.d/tuple-rialto.conf
 #ADD @TODO put tuple-data in server docroot
 ADD $TUPLE_OUT /usr/share/nginx/html/rialto/
 
