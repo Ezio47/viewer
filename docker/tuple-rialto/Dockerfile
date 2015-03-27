@@ -1,6 +1,5 @@
 FROM centos:centos6
 MAINTAINER mpg@flaxen.com
-ENV TUPLE_OUT=/vagrant/tuple/rialto_viewer/web/
 
 ADD nginx.repo /etc/yum.repos.d/
 
@@ -12,8 +11,7 @@ RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noar
 
 ADD nginx.conf /etc/nginx/nginx.conf
 ADD tuple-rialto.conf /etc/nginx/conf.d/tuple-rialto.conf
-#ADD @TODO put tuple-data in server docroot
-ADD $TUPLE_OUT /usr/share/nginx/html/rialto/
+ADD ../rialto_viewer/web/ /usr/share/nginx/html/rialto/
 
 EXPOSE 80
 CMD /usr/sbin/nginx
