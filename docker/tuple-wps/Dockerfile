@@ -3,11 +3,14 @@ from centos:centos6
 MAINTAINER Ben Hosmer <ben.hosmer@gmail.com>
 
 ENV JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk.x86_64/
-ADD ossim.repo /etc/yum.repos.d/
+#ENV OSSIM_INSTALL_PREFIX /usr/bin
+#ENV OSSIM_PREFS_FILE 
+
+COPY ossim.repo /etc/yum.repos.d/
  
 RUN yum -y install http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm \
 && yum -y update \
-&& yum -y install ossim tar unzip \
+&& yum -y install ossim tar unzip gdal-devel \
 java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && yum clean all \
 && curl -L http://apache.mesi.com.ar/tomcat/tomcat-7/v7.0.59/bin/apache-tomcat-7.0.59.tar.gz -o /tmp/apache-tomcat-7.0.59.tar.gz \
@@ -30,7 +33,7 @@ java-1.7.0-openjdk-devel.x86_64 java-1.7.0-openjdk.x86_64 jai-imageio-core \
 && mkdir -p /tomcat/webapps/geoserver/data/scripts/wps \
 && curl -L https://raw.githubusercontent.com/radiantbluetechnologies/tuple/master/docker/tuple-wps/wpsviewshed.groovy -o /tomcat/webapps/geoserver/data/scripts/wps/wpsviewshed.groovy
 
-#COPY wpsviewshed.groovy /tomcat/webapps/geoserver/scripts/wps/wpsviewshed.groovy
+COPY web.xml /tomcat/webapps/geoserver/WEB-INF/
 
 CMD /bin/bash /tomcat/bin/catalina.sh run
 
