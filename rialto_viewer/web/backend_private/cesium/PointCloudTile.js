@@ -10,7 +10,7 @@ var PointCloudTile = function PointCloudTile(provider, level, x, y) {
     this._level = level;
 
     this._primitive = undefined;
-    this.url = this._provider._url + "/" + level + "/" + x + "/" + y + ".ria";
+    this.url = this._provider._url + "/" + level + "/" + x + "/" + y;
     this.dimensions = undefined; // list of arrays of dimension data
 
     this.sw = false;
@@ -59,7 +59,7 @@ Object.defineProperties(PointCloudTile.prototype, {
     name : {
         get : function () {
             "use strict";
-            return "[" + tile.level + "," + tile.x + "," + tile.y + "]";
+            return "[" + this.level + "," + this.x + "," + this.y + "]";
         }
     }
 });
@@ -69,12 +69,19 @@ Object.defineProperties(PointCloudTile.prototype, {
 PointCloudTile.prototype.load = function() {
    "use strict";
 
-    //mylog("loading " + this.name);
+    //mylog("loading tile: " + this.url);
 
     var that = this;
 
     Cesium.loadBlob(this.url).then(function (blob) {
-        //mylog("got blob:" + blob.size);
+        //mylog("got blob for " + that.name + ", size=" + blob.size);
+
+        if (blob.size == 0) {
+            myerror("Returned blob for tile has length zero");
+        }
+        if (blob.size < 8) {
+            myerror("Returned blob for tile is too short: " + blob.size + " bytes");
+        }
 
         var reader = new FileReader();
         reader.addEventListener("loadend", function () {
@@ -100,19 +107,27 @@ PointCloudTile.prototype._loadFromBuffer = function (buffer) {
     var x = this.x;
     var y = this.y;
 
-    var bytes = new Uint8Array(buffer);
-    var numBytes = bytes.length;
-    //mylog("numBytes=" + numBytes);
+    // first 4 bytes is number of points
+    // next 4 bytes is mask
+    // remaining bytes are the points
 
-    if (numBytes > 1) {
-        var dv = new DataView(buffer, 0, numBytes - 1);
-        this._createDimensionArrays(dv, numBytes - 1);
+    var uints = new Uint32Array(buffer, 0, 2);
+    var numUints = uints.length;
+
+    var numPoints = uints[0];
+    var mask = uints[1];
+    this._setChildren(mask);
+
+    var bytes = new Uint8Array(buffer, 8);
+    var numBytes = bytes.length;
+    //mylog("num bytes in point data=" + numBytes);
+
+    if (numBytes > 0) {
+        var dv = new DataView(buffer, 8, numBytes);
+        this._createDimensionArrays(dv, numBytes);
     } else {
         this._createDimensionArrays(null, 0);
     }
-
-    var mask = bytes[numBytes - 1];
-    this._setChildren(mask);
 };
 
 

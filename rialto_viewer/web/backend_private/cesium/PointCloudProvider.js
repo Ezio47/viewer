@@ -62,7 +62,7 @@ PointCloudProvider.prototype.readHeaderAsync = function () {
     var deferred = Cesium.when.defer();
 
     var that = this;
-    var url = this._url + "/header.json";
+    var url = this._url;
 
     Cesium.loadJson(url).then(function (json) {
         that.header = json;
@@ -70,7 +70,6 @@ PointCloudProvider.prototype.readHeaderAsync = function () {
 
         that._ready = true;
         deferred.resolve(that);
-
     }).otherwise(function () {
         myerror("Failed to load JSON: " + url);
     });
@@ -119,6 +118,8 @@ PointCloudProvider.prototype._computePointSize = function () {
         myassert(sizes[dims[i].datatype] != undefined);
         tot += sizes[dims[i].datatype];
     }
+
+    //mylog("Point size: " + tot);
 
     return tot;
 };
@@ -200,7 +201,7 @@ PointCloudProvider.prototype.initTileData = function(tile, frameState) {
 
 
 PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
-    //mylog("?: " + tile.name);
+    //mylog("?: " + tile.level + " " + tile.x + " " + tile.y);
 
     // first, see if we even have the file we need
     if (tile.state === Cesium.QuadtreeTileLoadState.START) {
@@ -253,7 +254,7 @@ PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
             if (tile.data.primitive.ready) {
                 tile.state = Cesium.QuadtreeTileLoadState.DONE;
                 tile.renderable = true;
-                //mylog("DONE/ok: " + tile.name);
+                //mylog("DONE/ok: " + tile.level + " " + tile.x + " " + tile.y);
             }
         }
     }
