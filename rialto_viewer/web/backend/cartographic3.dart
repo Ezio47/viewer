@@ -56,9 +56,9 @@ class CartographicBbox {
         maximum = new Cartographic3.copy(box.maximum);
     }
 
-    CartographicBbox.fromValues(double minx, double miny, double minz, double maxx, double maxy, double maxz) {
-        minimum = new Cartographic3(minx, miny, minz);
-        maximum = new Cartographic3(maxx, maxy, maxz);
+    CartographicBbox.fromValues(num minx, num miny, num minz, num maxx, num maxy, num maxz) {
+        minimum = new Cartographic3(minx.toDouble(), miny.toDouble(), minz.toDouble());
+        maximum = new Cartographic3(maxx.toDouble(), maxy.toDouble(), maxz.toDouble());
     }
 
     bool get isValid =>
