@@ -43,7 +43,7 @@ void main() {
 
     String config;
     if (window.location.href == "http://localhost:8080/index.html") {
-        config = "http://localhost:12345/file/test.yaml";
+        config = "http://localhost:12345/test.yaml";
     } else {
         final params = Uri.parse(window.location.href).queryParameters;
         config = params["config"];
