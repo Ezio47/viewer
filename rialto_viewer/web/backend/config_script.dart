@@ -139,7 +139,9 @@ class ConfigScript {
     }
 
 
-    Future _doCommand_camera(Map data) {
+    Future _doCommand_camera(Map yamlData) {
+        Map data = new Map.from(yamlData);
+
         assert(data.containsKey("eye"));
         assert(data.containsKey("target"));
         data.putIfAbsent("up", () => [0.0, 0.0, 1.0]);
