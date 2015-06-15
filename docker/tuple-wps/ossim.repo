@@ -1,6 +1,0 @@
-[ossim]
-gpgcheck=0
-enabled=1
-baseurl=http://omar.ossim.org/download/CentOS/6/dev/x86_64/
-name=Local OSSIM repository
-
