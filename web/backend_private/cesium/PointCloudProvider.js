@@ -140,15 +140,24 @@ PointCloudProvider.prototype.getLevelMaximumGeometricError = function(level) {
 };
 
 
+// The underlying tile system is such that we will never be asked
+// for a tile unless we have resolved it's parent first.
+//
 // returns:
-//   true - tile file does exist in the DB
-//   false - tile file does not exist in the DB, as far as we know right now
+//   true - the tile does exist in the DB
+//   false - we are certain that the tile does not exist in the DB
 PointCloudProvider.prototype.checkExistence = function(tile)
 {
     if (tile.parent == undefined || tile.parent == null) {
-        // this is the root tile, for which a file will always be present
+        // This is a root tile. The server will always tell us that the root
+        // tiles exist in the database. (It may not actually be in the database,
+        // but for now the server is designed to return an empty tile if the
+        // tile isn't present -- since Cesium will only ask for tiles it knows
+        // exist, the server will only ever "lie" about root tiles.)
         return true;
     }
+
+    myassert(tile.parent.state == Cesium.QuadtreeTileLoadState.DONE);
 
     //mylog("parent of: " + tile.name + " is " + tile.parent.name);
     if (tile.parent.data == undefined || tile.parent.data.ppcc == undefined || !tile.parent.data.ppcc.ready) {
@@ -175,6 +184,21 @@ PointCloudProvider.prototype.initTileData = function(tile, frameState) {
             if (Cesium.defined(this.primitive) && this.primitive != null) {
                 this.primitive.destroy();
                 this.primitive = undefined;
+                mylog("free: " + tile.level + " " + tile.x + " " + tile.y);
+
+                if (tile.data != undefined && tile.data != null &&
+                    tile.data.ppcc != undefined && tile.data.ppcc != null &&
+                    tile.data.ppcc.dimensions != undefined && tile.data.ppcc.dimensions != null) {
+                    var header = tile.data.ppcc.header;
+                    if (header != undefined && header != null) {
+                        var headerDims = header.dimensions;
+                        for (var i = 0; i < headerDims.length; i += 1) {
+                            var name = headerDims[i].name;
+                            tile.data.ppcc.dimensions[name] = null;
+                        }
+                        tile.data.ppcc.dimensions = null;
+                    }
+                }
             }
         }
     };
@@ -188,33 +212,19 @@ PointCloudProvider.prototype.initTileData = function(tile, frameState) {
 PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
     //mylog("?: " + tile.level + " " + tile.x + " " + tile.y);
 
-    // first, see if we even have the file we need
-    if (tile.state === Cesium.QuadtreeTileLoadState.START) {
-        var exists = this.checkExistence(tile);
+    myassert(tile.state === Cesium.QuadtreeTileLoadState.START ||
+             tile.state === Cesium.QuadtreeTileLoadState.LOADING);
 
-        if (exists == null) {
-            // state unknown right now
-            //mylog("UNK: " + tile.name);
-            return;
-        }
+    if (tile.state === Cesium.QuadtreeTileLoadState.START) {
+        // first, check and see if the tile even exists in the DB
+        var exists = this.checkExistence(tile);
 
         if (exists == false) {
             this.initTileData(tile, frameState);
             tile.renderable = true;
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
-
-            //mylog("DONE/dne: " + tile.name);
             return;
         }
-
-        myassert(exists == true);
-        // just drop through to below
-
-        //mylog("OK to start: " + tile.name);
-    }
-
-    if (tile.state === Cesium.QuadtreeTileLoadState.START) {
-        //mylog("START: " + tile.name);
 
         this.initTileData(tile, frameState);
 
@@ -222,8 +232,6 @@ PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
         tile.data.ppcc.load();
 
         tile.state = Cesium.QuadtreeTileLoadState.LOADING;
-        myassert(tile.data.ppcc != null);
-        //mylog("LOADING: " + tile.name);
     }
 
     if (tile.state === Cesium.QuadtreeTileLoadState.LOADING && tile.data.ppcc.ready) {
@@ -233,16 +241,18 @@ PointCloudProvider.prototype.loadTile = function(context, frameState, tile) {
         if (tile.data.primitive == null) {
             tile.state = Cesium.QuadtreeTileLoadState.DONE;
             tile.renderable = true;
-            //mylog("DONE/0: " + tile.name);
-        } else {
-            tile.data.primitive.update(context, frameState, []);
-            if (tile.data.primitive.ready) {
-                tile.state = Cesium.QuadtreeTileLoadState.DONE;
-                tile.renderable = true;
-                //mylog("DONE/ok: " + tile.level + " " + tile.x + " " + tile.y);
-            }
+            return;
+        }
+
+        tile.data.primitive.update(context, frameState, []);
+        if (tile.data.primitive.ready) {
+            tile.state = Cesium.QuadtreeTileLoadState.DONE;
+            tile.renderable = true;
+            return;
         }
     }
+
+    // fall-through case: will need to wait for next time around
 };
 
 

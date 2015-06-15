@@ -62,6 +62,12 @@ Object.defineProperties(PointCloudTile.prototype, {
             "use strict";
             return this._name;
         }
+    },
+    header : {
+        get : function () {
+            "use strict";
+            return this._provider.header;
+        }
     }
 });
 
@@ -92,6 +98,7 @@ PointCloudTile.prototype.load = function() {
             that._primitive = that.createPrimitive(that.numPoints, that.dimensions);
             that._ready = true;
             //mylog("ready: " + that.name);
+            reader.result = null;
         });
         reader.readAsArrayBuffer(blob);
 
@@ -107,6 +114,10 @@ PointCloudTile.prototype._loadFromBuffer = function (buffer) {
     var level = this.level;
     var x = this.x;
     var y = this.y;
+
+    if (buffer == null) {
+        mylog("buffer null: " + name);
+    }
 
     // first 4 bytes is number of points
     // next 4 bytes is mask
