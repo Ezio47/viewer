@@ -11,12 +11,13 @@ var PointCloudTile = function PointCloudTile(provider, level, x, y) {
 
     this._primitive = undefined;
     this.url = this._provider._url + "/" + level + "/" + x + "/" + y;
+    this._name = "[" + level + "/" + x + "/" + y + "]";
     this.dimensions = undefined; // list of arrays of dimension data
 
-    this.sw = false;
-    this.se = false;
-    this.nw = false;
-    this.ne = false;
+    this.swExists = false;
+    this.seExists = false;
+    this.nwExists = false;
+    this.neExists = false;
     this._childTileMask = undefined;
 
     this._ready = false;
@@ -59,7 +60,7 @@ Object.defineProperties(PointCloudTile.prototype, {
     name : {
         get : function () {
             "use strict";
-            return "[" + this.level + "," + this.x + "," + this.y + "]";
+            return this._name;
         }
     }
 });
@@ -259,33 +260,33 @@ PointCloudTile.prototype._setChildren = function (mask) {
 
     this._childTileMask = mask;
 
-    var level = this.level;
-    var x = this.x;
-    var y = this.y;
+    //var level = this.level;
+    //var x = this.x;
+    //var y = this.y;
 
     if ((mask & 1) == 1) {
         // (level + 1, 2 * x, 2 * y + 1);
-        this.sw = true;
+        this.swExists = true;
     }
     if ((mask & 2) == 2) {
         // (level + 1, 2 * x + 1, 2 * y + 1);
-        this.se = true;
+        this.seExists = true;
     }
     if ((mask & 4) == 4) {
         // (level + 1, 2 * x + 1, 2 * y);
-        this.ne = true;
+        this.neExists = true;
     }
     if ((mask & 8) == 8) {
         // (level + 1, 2 * x, 2 * y);
-        this.nw = true;
+        this.nwExists = true;
     }
 
-    myassert(this.isChildAvailable(x, y, x*2, y*2+1) == this.sw, "SW");
-    myassert(this.isChildAvailable(x, y, x*2+1, y*2+1) == this.se, "SE");
-    myassert(this.isChildAvailable(x, y, x*2+1, y*2) == this.ne, "NE");
-    myassert(this.isChildAvailable(x, y, x*2, y*2) == this.nw, "NW");
+    //myassert(this.isChildAvailable(x, y, x*2, y*2+1) == this.swExists, "SW");
+    //myassert(this.isChildAvailable(x, y, x*2+1, y*2+1) == this.seExists, "SE");
+    //myassert(this.isChildAvailable(x, y, x*2+1, y*2) == this.neExists, "NE");
+    //myassert(this.isChildAvailable(x, y, x*2, y*2) == this.nwExists, "NW");
 
-    //mylog("children of " + this.name + ": " + this.sw + this.se + this.ne + this.nw);
+    //mylog("children of " + this.name + ": " + this.swExists + this.seExists + this.neExists + this.nwExists);
 }
 
 
@@ -376,11 +377,11 @@ PointCloudTile.prototype.colorize = function () {
 PointCloudTile.prototype.isChildAvailable = function(parentX, parentY, childX, childY) {
 
     if (childX == parentX * 2) {
-        if (childY == parentY * 2) return this.nw;
-        if (childY == parentY * 2 + 1) return this.sw;
+        if (childY == parentY * 2) return this.nwExists;
+        if (childY == parentY * 2 + 1) return this.swExists;
     } else if (childX == parentX * 2 + 1) {
-        if (childY == parentY * 2) return this.ne;
-        if (childY == parentY * 2 + 1) return this.se;
+        if (childY == parentY * 2) return this.neExists;
+        if (childY == parentY * 2 + 1) return this.seExists;
     }
 
     return false;

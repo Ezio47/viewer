@@ -141,44 +141,29 @@ PointCloudProvider.prototype.getLevelMaximumGeometricError = function(level) {
 
 
 // returns:
-//   true - file does exist
-//   false - file does not exist
-//   null - file might or might not exist
-PointCloudProvider.prototype.checkExistence = function(tile) {
-
-    // only one of these will be true
-    var fileDoesNotExist = false;
-    var fileDoesExist = false;
-    var fileMightExist = false;
-
+//   true - tile file does exist in the DB
+//   false - tile file does not exist in the DB, as far as we know right now
+PointCloudProvider.prototype.checkExistence = function(tile)
+{
     if (tile.parent == undefined || tile.parent == null) {
-        // root tile, file will always be present
-        fileDoesExist = true;
-    } else {
-        //mylog("parent of: " + tile.name + " is " + tile.parent.name);
-        if (tile.parent.data == undefined || tile.parent.data.ppcc == undefined || !tile.parent.data.ppcc.ready) {
-            // parent not available for us to ask it
-            //fileMightExist = true;
-            fileDoesNotExist = true;
-        } else {
-            var pX = tile.parent.x;
-            var pY = tile.parent.y;
-            var hasChild = tile.parent.data.ppcc.isChildAvailable(pX, pY, tile.x, tile.y);
-            if (hasChild) {
-                fileDoesExist = true;
-            } else {
-                fileDoesNotExist = true;
-            }
-        }
+        // this is the root tile, for which a file will always be present
+        return true;
     }
 
-    myassert((fileDoesExist && !fileDoesNotExist && !fileMightExist) ||
-             (!fileDoesExist && fileDoesNotExist && !fileMightExist) ||
-             (!fileDoesExist && !fileDoesNotExist && fileMightExist));
+    //mylog("parent of: " + tile.name + " is " + tile.parent.name);
+    if (tile.parent.data == undefined || tile.parent.data.ppcc == undefined || !tile.parent.data.ppcc.ready) {
+        // parent not available for us to ask it about its child,
+        // and if the parent doesn't exist yet then the child must not either
+        return false;
+    }
 
-    if (fileDoesExist) return true;
-    if (fileDoesNotExist) return false;
-    return null;
+    var pX = tile.parent.x;
+    var pY = tile.parent.y;
+    var hasChild = tile.parent.data.ppcc.isChildAvailable(pX, pY, tile.x, tile.y);
+    if (hasChild) {
+        return true;
+    }
+    return false;
 }
 
 
