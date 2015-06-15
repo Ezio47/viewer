@@ -6,7 +6,6 @@ library rialto.backend;
 
 import 'dart:async';
 import 'dart:html';
-import 'dart:math';
 
 import 'package:http/http.dart' as Http;
 import 'package:vector_math/vector_math.dart';

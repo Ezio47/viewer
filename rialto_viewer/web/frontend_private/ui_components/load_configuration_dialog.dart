@@ -6,7 +6,6 @@ part of rialto.frontend.private;
 
 
 class LoadConfigurationDialog extends DialogVM {
-    static final _defaultUrl = "http://localhost:12345/file/test.yaml";
     final String _defaultScript = """- layers:
     - bing:
         type: bing_base_imagery
@@ -15,17 +14,15 @@ class LoadConfigurationDialog extends DialogVM {
 """;
 
     TextInputVM _urlText;
-    ButtonVM _urlButton;
     TextAreaInputVM _scriptText;
-    ButtonVM _scriptButton;
 
     LoadConfigurationDialog(RialtoFrontend frontend, String id) : super(frontend, id, hasCancelButton: false) {
 
         _urlText = new TextInputVM(_frontend, "#loadConfigurationDialog_urlText", "");
-        _urlButton = new ButtonVM(_frontend, "#loadConfigurationDialog_urlButton", _loadUrl);
+        new ButtonVM(_frontend, "#loadConfigurationDialog_urlButton", _loadUrl);
 
         _scriptText = new TextAreaInputVM(_frontend, "#loadConfigurationDialog_scriptText", "");
-        _scriptButton = new ButtonVM(_frontend, "#loadConfigurationDialog_scriptButton", _loadScript);
+        new ButtonVM(_frontend, "#loadConfigurationDialog_scriptButton", _loadScript);
 
         _register(_urlText);
     }

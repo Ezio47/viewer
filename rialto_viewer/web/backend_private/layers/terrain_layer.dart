@@ -7,8 +7,6 @@ part of rialto.backend.private;
 
 class TerrainLayer extends Layer {
 
-    dynamic _provider;
-
     TerrainLayer(RialtoBackend backend, String name, Map map)
             : super(backend, "terrain", name, map) {
         requireUrl();
@@ -20,7 +18,7 @@ class TerrainLayer extends Layer {
             var options = {
                 'url': urlString
             };
-            _provider = backend.cesium.setCesiumTerrainProvider(options);
+            backend.cesium.setCesiumTerrainProvider(options);
         });
         return f;
     }

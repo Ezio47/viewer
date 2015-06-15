@@ -7,8 +7,6 @@ part of rialto.backend.private;
 
 abstract class BaseTerrainLayer extends Layer {
 
-    dynamic _provider;
-
     BaseTerrainLayer(RialtoBackend backend, String type, String name, Map map) : super(backend, type, name, map);
 
     @override
@@ -30,7 +28,7 @@ class EllipsoidBaseTerrainLayer extends BaseTerrainLayer {
     Future load() {
         var f = new Future(() {
             var options = {};
-            _provider = backend.cesium.setEllipsoidBaseTerrainProvider(options);
+            backend.cesium.setEllipsoidBaseTerrainProvider(options);
         });
         return f;
     }
@@ -58,7 +56,7 @@ class ArcGisBaseTerrainLayer extends BaseTerrainLayer {
                 'token': _defaultKey
             };
 
-            _provider = backend.cesium.setArcGisBaseTerrainProvider(options);
+            backend.cesium.setArcGisBaseTerrainProvider(options);
         });
         return f;
     }
@@ -77,7 +75,7 @@ class CesiumSmallBaseTerrainLayer extends BaseTerrainLayer {
                 'url': '//cesiumjs.org/smallterrain',
                 'credit': 'Terrain data courtesy Analytical Graphics, Inc.'
             };
-            _provider = backend.cesium.setCesiumBaseTerrainProvider(options);
+            backend.cesium.setCesiumBaseTerrainProvider(options);
         });
         return f;
     }
@@ -94,7 +92,7 @@ class CesiumStkBaseTerrainLayer extends BaseTerrainLayer {
             var options = {
                 'url': '//cesiumjs.org/stk-terrain/tilesets/world/tiles'
             };
-            _provider = backend.cesium.setCesiumBaseTerrainProvider(options);
+            backend.cesium.setCesiumBaseTerrainProvider(options);
         });
         return f;
     }
@@ -112,7 +110,7 @@ class VrTheWorldBaseTerrainLayer extends BaseTerrainLayer {
             var options = {
                 'url': '//www.vr-theworld.com/vr-theworld/tiles1.0.0/73/'
             };
-            _provider = backend.cesium.setVrTheWorldBaseTerrainProvider(options);
+            backend.cesium.setVrTheWorldBaseTerrainProvider(options);
         });
         return f;
     }
