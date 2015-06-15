@@ -4,12 +4,5 @@ packages
 build
 
 # local copy of cesium build
-rialto_viewer/web/cesium-build
+web/cesium-build
 
-# dockery stuff
-docker/viewer-server/tiledserp18.tgz
-docker/viewer-server/pub-cache.tgz
-docker/viewer-server/rialto_viewer.tgz
-docker/tuple-rialto/pub-cache.tgz
-docker/tuple-rialto/rialto_viewer.tgz
-docker/tuple-rialto/tiledserp18.tgz
