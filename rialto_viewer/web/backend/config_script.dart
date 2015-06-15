@@ -142,24 +142,21 @@ class ConfigScript {
     Future _doCommand_camera(Map yamlData) {
         Map data = new Map.from(yamlData);
 
-        assert(data.containsKey("eye"));
-        assert(data.containsKey("target"));
-        data.putIfAbsent("up", () => [0.0, 0.0, 1.0]);
+        assert(data.containsKey("longitude"));
+        assert(data.containsKey("latitude"));
+        assert(data.containsKey("height"));
+        assert(data.containsKey("heading"));
+        assert(data.containsKey("pitch"));
+        assert(data.containsKey("roll"));
 
-        data.putIfAbsent("fov", () => 60.0);
+        double longitude = data["longitude"].toDouble();
+        double latitude = data["latitude"].toDouble();
+        double height = data["height"].toDouble();
+        double heading = data["heading"].toDouble();
+        double pitch = data["pitch"].toDouble();
+        double roll = data["roll"].toDouble();
 
-        List<num> eyelist = data["eye"];
-        var eye = new Cartographic3.fromList(eyelist);
-
-        List<num> targetlist = data["target"];
-        var target = new Cartographic3.fromList(targetlist);
-
-        List<num> uplist = data["up"];
-        var up = new Cartesian3.fromList(uplist);
-
-        double fov = data["fov"].toDouble();
-
-        _backend.commands.zoomTo(eye, target, up, fov);
+        _backend.commands.zoomToCustom(longitude, latitude, height, heading, pitch, roll);
 
         return new Future(() {});
     }

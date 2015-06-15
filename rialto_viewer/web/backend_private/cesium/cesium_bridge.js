@@ -801,39 +801,33 @@ var CesiumBridge = function (element) {
     }
 
 
-    // input: cartographic, height in meters
-    this.lookAtCartographic = function(eyeLon, eyeLat, eyeHeight,
-                                       targetLon, targetLat, targetHeight,
-                                       upX, upY, upZ, fovDegrees) {
-        var scene = this.viewer.scene;
-        var mode = scene.mode;
+    this.lookAtRect = function(west, south, east, north) {
 
-        if (Cesium.defined(scene) && mode === Cesium.SceneMode.MORPHING) {
-            scene.completeMorph();
-        }
+        // it looks better if we give a 10% pad around the rect
+        var rect = Cesium.Rectangle.fromDegrees(west, south, east, north);
+        var dx = (rect.east - rect.west) * 0.10;
+        var dy = (rect.north - rect.south) * 0.10;
+        rect.east -= dx;
+        rect.west += dx;
+        rect.south -= dy;
+        rect.north += dy;
 
-        if (mode === Cesium.SceneMode.SCENE2D ||
-            mode == Cesium.SceneMode.COLUMBUS_VIEW) {
-            // TODO: hack fix for now
-            this.goHome();
-            return;
-        }
+        var opts = {
+            destination : rect,
+            duration: 0.5
+        };
+        this.viewer.camera.flyTo(opts);
+    }
 
-        var ellipsoid = scene.globe.ellipsoid;
 
-        var eyeCartographic = Cesium.Cartographic.fromDegrees(eyeLon, eyeLat, eyeHeight);
-        var targetCartographic = Cesium.Cartographic.fromDegrees(targetLon, targetLat, targetHeight);
-        var eyeCartesian = ellipsoid.cartographicToCartesian(eyeCartographic);
-        var targetCartesian = ellipsoid.cartographicToCartesian(targetCartographic);
+    this.lookAtCustom = function(longitude, latitude, height, heading, pitch, roll) {
 
-        //mylog("eye cartesian: " + eyeCartesian.x + ", " + eyeCartesian.y + ", " + eyeCartesian.z);
-        //mylog("target cartesian: " + targetCartesian.x + ", " + targetCartesian.y + ", " + targetCartesian.z);
-
-        var up = new Cesium.Cartesian3(upX, upY, upZ);
-
-        // we only support PerspectiveFrustum camera, so seeting FOV is okay
-        this.viewer.camera.frustum.fov = Cesium.Math.toRadians(fovDegrees);
-
-        this.viewer.camera.lookAt(eyeCartesian, targetCartesian, up);
+        var opts = {
+            position : new Cesium.Cartesian3.fromDegrees(longitude, latitude, height),
+            heading: Cesium.Math.toRadians(heading),
+            pitch: Cesium.Math.toRadians(pitch),
+            roll: Cesium.Math.toRadians(roll)
+        };
+        this.viewer.camera.setView(opts);
     }
 }

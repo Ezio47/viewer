@@ -175,8 +175,15 @@ class Commands {
     /// Zooms to the given point
     ///
     /// Returns an empty future when done.
-    Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
-        return _backend.zoomTo(eyePosition, targetPosition, upDirection, fov);
+    Future zoomToBox(CartographicBbox bbox) {
+        return _backend.zoomToBox(bbox);
+    }
+
+    /// Zooms to the custom camera positioning
+    ///
+    /// Returns an empty future when done.
+    Future zoomToCustom(double longitude, double latitude, double height, double heading, double pitch, double roll) {
+        return _backend.zoomToCustom(longitude, latitude, height, heading, pitch, roll);
     }
 
     /// Zooms to the given layer.

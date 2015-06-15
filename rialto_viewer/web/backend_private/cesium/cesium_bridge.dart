@@ -262,22 +262,14 @@ class CesiumBridge {
         _bridge.callMethod('goHome');
     }
 
-    // eye & taregt inputs in cartographic lat/lon, height in kilometers
+    // eye & target inputs in cartographic lat/lon, height in meters
     // up vector is cartsian
-    void lookAt(Cartographic3 eye, Cartographic3 target, Cartesian3 up, double fovDegrees) {
-        _bridge.callMethod(
-                'lookAtCartographic',
-                [
-                        eye.longitude,
-                        eye.latitude,
-                        eye.height * 1000.0,
-                        target.longitude,
-                        target.latitude,
-                        target.height * 1000.0,
-                        up.x,
-                        up.y,
-                        up.z,
-                        fovDegrees]);
+    void lookAtBox(CartographicBbox bbox) {
+        _bridge.callMethod('lookAtRect', [bbox.west, bbox.south, bbox.east, bbox.north]);
+    }
+
+    void lookAtCustom(double longitude, double latitude, double height, double heading, double pitch, double roll) {
+        _bridge.callMethod('lookAtCustom', [longitude, latitude, height, heading, pitch, roll]);
     }
 
 

@@ -82,10 +82,18 @@ class RialtoBackend {
 
     }
 
-    /// Zooms the viewer to the given position
-    Future zoomTo(Cartographic3 eyePosition, Cartographic3 targetPosition, Cartesian3 upDirection, double fov) {
+    /// Zooms the viewer to the given rectangle
+    Future zoomToBox(CartographicBbox bbox) {
 
-        cesium.lookAt(eyePosition, targetPosition, upDirection, fov);
+        cesium.lookAtBox(bbox);
+
+        return new Future.value();
+    }
+
+    /// Zooms the viewer to the given position
+    Future zoomToCustom(double longitude, double latitude, double height, double heading, double pitch, double roll) {
+
+        cesium.lookAtCustom(longitude, latitude, height, heading, pitch, roll);
 
         return new Future.value();
     }
@@ -101,6 +109,11 @@ class RialtoBackend {
     /// the bbox of the [layer].
     Future zoomToLayer(Layer layer) {
         if (layer == null) {
+            if (layerManager == null ||
+                layerManager.layers == null ||
+                layerManager.layers.length == 0) {
+                return null;
+            }
             layer = layerManager.layers.last;
         }
 
@@ -108,25 +121,7 @@ class RialtoBackend {
             return new Future.value();
         }
 
-        var bbox = layer.bbox;
-        double west = bbox.west;
-        double south = bbox.south;
-        double east = bbox.east;
-        double north = bbox.north;
-
-        double centerLon = east + (west - east) / 2.0;
-        double centerLat = south + (north - south) / 2.0;
-
-        var targetPosition = new Cartographic3(centerLon, centerLat, 0.0);
-
-        var h = max(west - east, north - south) * 1000.0;
-        var eyePosition = new Cartographic3(centerLon, centerLat, h);
-
-
-        final Cartesian3 upDirection = new Cartesian3(0.0, 0.0, 1.0);
-        final double fov = 60.0;
-
-        cesium.lookAt(eyePosition, targetPosition, upDirection, fov);
+        cesium.lookAtBox(layer.bbox);
 
         return new Future.value();
     }
