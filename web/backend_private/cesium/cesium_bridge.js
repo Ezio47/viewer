@@ -395,7 +395,7 @@ var CesiumBridge = function (element) {
     this._createTileProvider2Async = function(urlarg, colorizeRamp, colorizeDimension, visible) {
         var deferred = Cesium.when.defer();
 
-        var provider = new PointCloudProvider(urlarg, colorizeRamp, colorizeDimension, visible);
+        var provider = new Cesium.RialtoPointCloudProvider(urlarg, colorizeRamp, colorizeDimension);
 
         provider.readHeaderAsync().then(function(header) {
             deferred.resolve(provider);
@@ -421,8 +421,6 @@ var CesiumBridge = function (element) {
             primitives.add(new Cesium.QuadtreePrimitive({
                 tileProvider : provider
             }));
-
-            //mylog("----------" + provider.header.numPoints);
 
             completer(provider);
             return;
@@ -462,7 +460,7 @@ var CesiumBridge = function (element) {
 
 
     this.getTileBboxFromProvider = function (provider) {
-        var b = provider.header.tilebbox;
+        var b = provider.header.tile_bbox;
         return b;
     }
 
@@ -471,7 +469,7 @@ var CesiumBridge = function (element) {
         var dims = provider.header.dimensions;
         for (var i=0; i<dims.length; i++) {
             if (dims[i].name == dimName) {
-                var list = [dims[i].min, dims[i].mean, dims[i].max];
+                var list = [dims[i].minimum, dims[i].mean, dims[i].maximum];
                 return list;
             }
         }
