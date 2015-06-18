@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<!-- Copyright (c) 2014-2015, RadiantBlue Technologies, Inc.  -->
+<!-- This file may only be used under the MIT-style      -->
+<!-- license found in the accompanying LICENSE.txt file. -->
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Rialto</title>
+        <style>
+            @import url(cesium-build/Cesium/Widgets/widgets.css);
+            @import url(frontend/cesium/DrawHelper.css);
+            html, body, #cesiumContainer {
+                width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+            }
+            .small-dialog {
+                width: 400px;
+            }
+        </style>
+
+        <script src="3rd-party/jquery-2.1.3.min.js"></script>
+        <script src="3rd-party/uikit/js/uikit.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="3rd-party/uikit/css/uikit.gradient.min.css">
+    </head>
+
+
+    <body>
+
+       <div id="cesiumContainer" class="uk-position-cover" style="z-index: 0"></div>
+
+
+       <div style="position: absolute; z-index: 1">
+            <nav class="uk-navbar uk-margin-small-top uk-margin-small-left">
+
+                <ul class="uk-navbar-nav">
+
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">View <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
+                                <li class="uk-active"><a id="homeWorldButton">Home (world)</a></li>
+                                <li class="uk-active"><a id="homeDataButton">Zoom to layer</a></li>
+                                <li class="uk-nav-header">Projection</li>
+                                <li class="uk-active"><a id="modeButton2D">2D</a></li>
+                                <li class="uk-active"><a id="modeButton25D">2.5D</a></li>
+                                <li class="uk-active"><a id="modeButton3D">3D</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">Layers <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
+                                <li class="uk-active"><a id="layerManagerDialog_open">Manage layers...</a></li>
+                                <li class="uk-active"><a id="layerAdderDialog_open">Add layer...</a></li>
+                                <li class="uk-active"><a id="loadConfigurationDialog_open">Load configuration...</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">Tools <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
+                                <li class=""><a id="wpsTestButton">Test WPS</a></li>
+                                <li class=""><a id="viewshedCircleButton">Make viewshed circle</a></li>
+                                <li class=""><a id="viewshedComputeButton">Compute viewshed</a></li>
+                                <li class="uk-nav-divider"></li>
+                                <li class=""><a id="linearMeasurementButton">Linear measurement</a></li>
+                                <li class=""><a id="areaMeasurementButton">Area measurement</a></li>
+                                <li class=""><a id="dropPinButton">Drop pin</a></li>
+                                <li class=""><a id="drawExtentButton">Draw extent</a></li>
+                                <li class="uk-nav-divider"></li>
+                                <li class="uk-active"><a id="cameraSettingsDialog_open">Camera settings...</a></li>
+                                <li class="uk-active"><a id="advancedSettingsDialog_open">Advanced settings...</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">Help <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar">
+                                <li class="uk-active"><a id="aboutRialtoDialog_open">About...</a></li>
+                                <li class="uk-active"><a id="aboutCesiumDialog_open">About Cesium...</a></li>
+                                <li class="uk-active"><a id="logDialog_open">Log...</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+
+            </nav>
+
+            <div style="width:50px;" id="drawHelperToolbar"></div>
+
+        </div>
+
+
+        <div class="uk-position-bottom uk-margin-small-bottom ">
+                <button id="textMouseCoords" disabled class="uk-button uk-button-mini uk-align-right" type="button"
+                         style="width:130px; margin: 0px 5px 0px 0px">
+                </button>
+
+                <button id="wpsStatusDialog_open" class="uk-button uk-button-mini uk-align-right" type="button"
+                         style="width:100px; margin: 0px 5px 0px 0px">
+                </button>
+        </div>
+
+
+
+        <div id="loadConfigurationDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Configuration Script Loader
+                </div>
+
+                <form class="uk-form">
+                    <label class="uk-form-label" for="loadConfigurationDialog_urlText">URL:</label>
+                    <div class="uk-form-controls">
+                        <input id="loadConfigurationDialog_urlText" type="text" class="uk-form-width-large">
+                        <button id="loadConfigurationDialog_urlButton" class="uk-button uk-modal-close">Load</button>
+                    </div>
+                 </form>
+
+                <hr>
+
+                <form class="uk-form">
+                    <label class="uk-form-label" for="loadConfigurationDialog_scriptText">Script:</label>
+                    <div class="uk-form-controls">
+                        <textarea id="loadConfigurationDialog_scriptText" class="uk-form-width-large" style="height:150px;"></textarea>
+                        <button id="loadConfigurationDialog_scriptButton" class="uk-button uk-modal-close">Load</button>
+                    </div>
+                 </form>
+
+                 <div class="uk-modal-footer uk-text-right">
+                    <button id="loadConfigurationDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+           </div>
+        </div>
+
+
+        <div id="layerAdderDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Add Layer
+                </div>
+
+                <p>
+                    <i>Add base imagery layer (Bing, ArcGis, OSM) - not yet implemented</i>
+                </p>
+                <hr>
+
+                <p>
+                    <i>Add base terrain layer (ArcGis, Cesium/small, Cesium/STK, VR/TheWorld) - not yet implemented</i>
+                </p>
+                <hr>
+
+                <p>
+                    <i>Add imagery layer (Single, WMS, TMS) - not yet implemented</i>
+                </p>
+                <hr>
+
+                <p>
+                    <i>Add Terrain layer - not yet implemented</i>
+                </p>
+                <hr>
+
+                <p>
+                    <i>Add GeoJSON layer - not yet implemented</i>
+                </p>
+                <hr>
+
+                <p>
+                    <i>Add point cloud layer - not yet implemented</i>
+                </p>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="layerAdderDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+           </div>
+        </div>
+
+
+        <div id="layerManagerDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Layer Manager
+               </div>
+
+                <div class="uk-grid">
+
+                    <div class="uk-width-2-3">
+                        <div class="uk-scrollable-box">
+
+                            <ul class="uk-list" id="layerList">
+                                <li>
+                                    <label><input type="checkbox">Item One</label>
+                                </li>
+                                <li>
+                                    <label><input type="checkbox">Item Two</label>
+                                </li>
+                            </ul>
+
+                        </div>
+                    </div>
+
+                    <div class="uk-width-1-3 uk-flex-column">
+                        <div>
+                            <button id="layerManagerDialog_remove" class="uk-button uk-margin-small-bottom">Remove</button>
+                        </div>
+                        <div>
+                            <button id="layerManagerDialog_customize" class="uk-button uk-margin-small-bottom">Customize...</button>
+                        </div>
+                        <div>
+                            <button id="layerManagerDialog_details" class="uk-button uk-margin-small-bottom">Details...</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="layerManagerDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div id="cameraSettingsDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Camera Settings
+                </div>
+
+                <form class="uk-form ">
+
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <label class="" for="cameraSettingsDialog_longitude">Lon:</label>
+                                    <input id="cameraSettingsDialog_longitude" type="text">
+                                </td>
+                                <td>
+                                    <label class="" for="cameraSettingsDialog_latitude">Lat:</label>
+                                    <input id="cameraSettingsDialog_latitude" type="text">
+                                </td>
+                                <td>
+                                    <label class="" for="cameraSettingsDialog_height">Height (m):</label>
+                                    <input id="cameraSettingsDialog_height" type="text">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="" for="cameraSettingsDialog_heading">Heading:</label>
+                                    <input id="cameraSettingsDialog_heading" type="text">
+                                </td>
+                                <td>
+                                    <label class="" for="cameraSettingsDialog_pitch">Pitch:</label>
+                                    <input id="cameraSettingsDialog_pitch" type="text">
+                                </td>
+                                <td>
+                                    <label class="" for="cameraSettingsDialog_roll">Roll:</label>
+                                    <input id="cameraSettingsDialog_roll" type="text">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </form>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="cameraSettingsDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="cameraSettingsDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="advancedSettingsDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Advanced Settings
+                </div>
+
+                <form class="uk-form uk-form-horizontal">
+                <div>
+                    <table>
+                    <tbody>
+                        <tr>
+                        <td>
+                            <label class="uk-form-label" for="advancedSettingsDialog_bboxEnabled">Bbox enabled:</label>
+                            <input id="advancedSettingsDialog_bboxEnabled" type="checkbox">
+                        </td>
+                        </tr>
+                        <tr>
+                        <td>
+                            <label class="uk-form-label" for="advancedSettingsDialog_displayPrecision">Display precision:</label>
+                            <input id="advancedSettingsDialog_displayPrecision" type="text">
+                        </td>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>
+
+                </form>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="advancedSettingsDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="advancedSettingsDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+         <div id="layerInfoDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Layer Information
+                </div>
+
+                <div>
+                    <table class="uk-table .uk-table-condensed">
+                        <tr>
+                            <td>Name:</td>
+                            <td id="infoDialog_name"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Layer Type:</td>
+                            <td id="infoDialog_type"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Description:</td>
+                            <td id="infoDialog_description" colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td>URL:</td>
+                            <td id="infoDialog_url" colspan="2"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Proxy:</td>
+                            <td id="infoDialog_proxy" colspan="2"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Points:</td>
+                            <td id="infoDialog_numPoints"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>X:</td>
+                            <td id="infoDialog_minX"></td>
+                            <td id="infoDialog_maxX"></td>
+                        </tr>
+                        <tr>
+                            <td>Y:</td>
+                            <td id="infoDialog_minY"></td>
+                            <td id="infoDialog_maxY"></td>
+                        </tr>
+                        <tr>
+                            <td>Z:</td>
+                            <td id="infoDialog_minZ"></td>
+                            <td id="infoDialog_maxZ"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="layerInfoDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+         <div id="layerCustomizationDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Layer Customization
+                </div>
+
+                <div>
+                    Visibility
+                    <form class="uk-form uk-form-horizontal">
+                            <label class="uk-form-label" for="layerCustomizationDialog_visible">Enabled:</label>
+                            <input id="layerCustomizationDialog_visibility" type="checkbox">
+                    </form>
+                </div>
+                <hr>
+
+                <div>
+                    Bounding Box Visibility
+                    <form class="uk-form uk-form-horizontal">
+                            <label class="uk-form-label" for="layerCustomizationDialog_bboxVisible">Enabled:</label>
+                            <input id="layerCustomizationDialog_bboxVisibility" type="checkbox">
+                    </form>
+                </div>
+                <hr>
+
+                <div>
+                    Colorization
+                    <form class="uk-form uk-form-horizontal">
+                        <div class="uk-form-select" data-uk-form-select>
+                            <span></span>
+                            <select id="layerCustomizationDialog_colorRamps" class="uk-form">
+                            </select>
+                        </div>
+                        <div class="uk-form-select" data-uk-form-select>
+                            <span></span>
+                            <select id="layerCustomizationDialog_colorDims" class="uk-form">
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <hr>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="layerCustomizationDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="wpsStatusDialog" class="uk-modal">
+            <div class="uk-modal-dialog small-dialog">
+                <div class="uk-modal-header">
+                    WPS Job Status
+                </div>
+
+                <div class="uk-scrollable-text">
+                    <pre id="wpsStatusDialog_body"></pre>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="wpsStatusDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="logDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header"">
+                    WPS Job Status
+                </div>
+
+                <div class="uk-scrollable-text">
+                    <pre id="logDialog_body"></pre>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="logDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="aboutCesiumDialog" class="uk-modal">
+            <div class="uk-modal-dialog small-dialog">
+                <div class="uk-modal-header">
+                    Cesium Credits
+                </div>
+
+                <div>
+                    Rialto is built on top of <a href="http://www.cesiumjs.org">Cesium</a> and
+                    its partner data providers.
+
+                    <div id="creditContainer" class="uk-text-small uk-text-muted"></div>
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="aboutCesiumDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="aboutRialtoDialog" class="uk-modal">
+            <div class="uk-modal-dialog small-dialog">
+                <div class="uk-modal-header">
+                    The Rialto Viewer
+                </div>
+
+                <div>
+                    Copyright © 2014-2015 RadiantBlue Technologies, Inc. This
+                    software is provided under an MIT-style open source license.
+                    <br><br>
+                    WebGL provided by <a href="http://www.cesiumjs.org">Cesium</a>.
+                    <br>
+                    CSS provided by <a href="http://www.getuikit.com">uikit</a>.
+                    <br>
+                    Javascript provided by <a href="http://www.dartlang.org">Dart</a>.
+                </div>
+
+                <div class="uk-modal-footer uk-text-right">
+                    <button id="aboutRialtoDialog_okay" class="uk-button uk-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        <script src="cesium-build/Cesium/Cesium.js"></script>
+        <script src="backend_private/utils/js_bridge.js"></script>
+        <script src="backend_private/cesium/cesium_bridge.js"></script>
+        <script src="backend_private/cesium/DrawHelper.js"></script>
+        <script type="application/dart" src="main.dart"></script>
+        <script data-pub-inline src="packages/browser/dart.js"></script>
+
+    </body>
+</html>

@@ -1,5 +1,3 @@
-tuple
-=====
+This is the repo for the Tuple project and the Rialto point cloud viewer.
 
-The Unnamed Project for Lidar Exploitation
-
+Build instructions: see the rialto-deployment repo
