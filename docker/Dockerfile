@@ -1,4 +1,4 @@
-FROM mpgerlek/cesium-server
+FROM mpgerlek/rialto-cesium
 MAINTAINER mpg@flaxen.com
 
 EXPOSE 8080
