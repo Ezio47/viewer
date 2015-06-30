@@ -1,4 +1,4 @@
-FROM quay.io/radiantbluetechnologies/rialto-cesium
+FROM radiantbluetechnologies/rialto-cesium
 MAINTAINER mpg@flaxen.com
 
 EXPOSE 8080
