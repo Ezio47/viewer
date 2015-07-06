@@ -8,11 +8,17 @@ import 'frontend/rialto_frontend_library.dart';
 import 'backend/rialto_backend_library.dart';
 
 
-final String demo = """- layers:
+final String demo = """
+- layers:
     - bing:
         type: bing_base_imagery
         #style: Road
         style: Aerial
+- wps:
+    proxy: http://localhost:12346/
+    url: http://localhost:8080/geoserver/ows
+    description: "la la la"
+
 """;
 
 
