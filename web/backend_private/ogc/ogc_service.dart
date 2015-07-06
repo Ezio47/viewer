@@ -36,7 +36,7 @@ class OgcService {
 
         String s = server.toString() + operation;
         if (proxyUri != null) {
-            s = Uri.encodeComponent(s);
+           // s = Uri.encodeComponent(s);
         }
 
         var uri = Uri.parse(s);
