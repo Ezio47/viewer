@@ -62,28 +62,28 @@ class RialtoFrontend {
         backend.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
     }
 
-    void addWpsProcess(String processName) {
-        var nam = processName.substring(3);
-        //nam = nam.replaceAll("-", "__");
+    void addWpsProcessDialog(String processName) {
+        var nam = processName.substring(3); // exclude the "py:" part
 
-        WpsDialog.makeShell(nam);
-
+        // add menu item for the process
         {
             var anchor = new AnchorElement();
             anchor.id = nam + "Dialog_open";
             anchor.text = processName;
 
             var list = new LIElement();
+            list.classes.add("uk-active");
             list.children.add(anchor);
 
             UListElement menu = querySelector("#toolsMenu");
             menu.children.add(list);
-
-            anchor.onClick.listen((ev) => wpsWizard.run(processName));
         }
 
-        new WpsDialog(this, "#" + nam + "Dialog");
-        //wpsWizard = new WpsWizard(backend);
+        // create the <dialog> html
+        WpsDialog.makeDialogShell(nam);
+
+        // populate the shell
+        new WpsDialog(this, "#" + nam + "Dialog", backend.wps.processes[processName]);
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";

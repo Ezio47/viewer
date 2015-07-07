@@ -10,10 +10,12 @@ abstract class DialogVM extends ViewModel with IForm {
     bool _hasCancelButton;
     HtmlElement _dialogElement;
     var _dialogProxy;
+    bool _ignoreStateChanging;
 
-    DialogVM(RialtoFrontend frontend, String id, {bool hasCancelButton: true})
+    DialogVM(RialtoFrontend frontend, String id, {bool hasCancelButton: true, bool ignoreStateChanging: false})
             : super(frontend, id),
               _hasCancelButton = hasCancelButton {
+        _ignoreStateChanging = ignoreStateChanging;
 
         _dialogProxy = _backend.js.registerDialog(id);
 
@@ -50,7 +52,7 @@ abstract class DialogVM extends ViewModel with IForm {
         if (!okay) {
             restoreState();
         } else {
-            if (anyStateChanged) {
+            if (_ignoreStateChanging || anyStateChanged) {
                 _hide();
             }
         }

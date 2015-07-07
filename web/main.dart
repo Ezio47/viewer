@@ -60,7 +60,7 @@ void main() {
         WpsService wps = ui.backend.wps;
         if (wps != null) {
               for (WpsProcess process in wps.processes.values) {
-                    ui.addWpsProcess(process.name);
+                    ui.addWpsProcessDialog(process.name);
             };
         }
     });
