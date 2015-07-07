@@ -4,27 +4,20 @@
 
 part of rialto.backend;
 
-
-enum WpsProcessParamDataType {
-    double,
-    string,
-    integer
-}
-
+enum WpsProcessParamDataType { double, string, integer }
 
 class WpsProcessParam {
-    String name;
-    WpsProcessParamDataType datatype;
+  String name;
+  WpsProcessParamDataType datatype;
 
-    WpsProcessParam(String this.name, WpsProcessParamDataType this.datatype);
+  WpsProcessParam(String this.name, WpsProcessParamDataType this.datatype);
 }
 
-
 class WpsProcess {
-    WpsService service;
-    String name;
-    List<WpsProcessParam> inputs = new List<WpsProcessParam>();
-    List<WpsProcessParam> outputs = new List<WpsProcessParam>();
+  WpsService service;
+  String name;
+  List<WpsProcessParam> inputs = new List<WpsProcessParam>();
+  List<WpsProcessParam> outputs = new List<WpsProcessParam>();
 
-    WpsProcess(WpsService this.service, String this.name);
+  WpsProcess(WpsService this.service, String this.name);
 }

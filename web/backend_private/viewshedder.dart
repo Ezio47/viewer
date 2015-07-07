@@ -69,23 +69,7 @@ class Viewshedder {
             });
         };
 
-        var no = (WpsJob job) {
-            RialtoBackend.log("FAILURE");
-            assert(job.responseDocument != null || job.exceptionTexts != null);
-            if (job.responseDocument != null) {
-                RialtoBackend.log(job.responseDocument.dump(0));
-            }
-            if (job.exceptionTexts != null) {
-                RialtoBackend.log(job.exceptionTexts);
-            }
-        };
-
-        var time = (WpsJob job) {
-            RialtoBackend.error("wps request timed out!");
-        };
-
-
-        backend.commands.wpsExecuteProcess(process, inputs, yes, no, time);
+        backend.commands.wpsExecuteProcess(process, inputs, successHandler: yes);
     }
 }
 

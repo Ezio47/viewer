@@ -64,6 +64,6 @@ class WpsServiceTest {
             assert(literalData.value == "28.0");
         };
 
-        wps.executeProcess(process, inputs, successHandler, null, null);
+        wps.executeProcess(process, inputs, successHandler: successHandler);
     }
 }

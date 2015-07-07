@@ -73,9 +73,9 @@ class WpsJob {
     DateTime _timeoutTime;
     int _pollCount = 0;
 
-    final WpsJobSuccessResultHandler _successHandler;
-    final WpsJobErrorResultHandler _errorHandler;
-    final WpsJobErrorResultHandler _timeoutHandler;
+    WpsJobSuccessResultHandler _successHandler;
+    WpsJobErrorResultHandler _errorHandler;
+    WpsJobErrorResultHandler _timeoutHandler;
 
     /// WpsJob constructor
     ///
@@ -93,6 +93,31 @@ class WpsJob {
 
         _timeoutTime = _startTime.add(WpsJobManager.pollingTimeout);
         _signalJobChange();
+
+        if (_successHandler == null) {
+            _successHandler = (WpsJob job, Map<String, dynamic> results) {
+               RialtoBackend.log("SUCCESS: $results");
+            };
+        }
+
+        if (_errorHandler == null) {
+            _errorHandler = (WpsJob job) {
+                RialtoBackend.log("FAILURE");
+                assert(job.responseDocument != null || job.exceptionTexts != null);
+                if (job.responseDocument != null) {
+                    RialtoBackend.log(job.responseDocument.dump(0));
+                }
+                if (job.exceptionTexts != null) {
+                    RialtoBackend.log(job.exceptionTexts);
+                }
+            };
+        }
+
+        if (_timeoutHandler == null) {
+           _timeoutHandler = (WpsJob job) {
+                RialtoBackend.error("wps request timed out!");
+            };
+        }
     }
 
     bool get _isActive => OgcStatus_55.isActive(jobStatus);

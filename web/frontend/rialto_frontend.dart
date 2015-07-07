@@ -13,7 +13,6 @@ part of rialto.frontend;
 class RialtoFrontend {
     RialtoBackend backend;
     Element _mouseCoords;
-    WpsWizard wpsWizard;
 
     ViewModeCode viewMode = ViewModeCode.mode3D;
 
