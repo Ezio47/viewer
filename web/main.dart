@@ -3,12 +3,13 @@
 // license found in the accompanying LICENSE.txt file.
 
 
+import 'dart:async';
 import 'dart:html';
 import 'frontend/rialto_frontend_library.dart';
 import 'backend/rialto_backend_library.dart';
 
 
-final String demo = """
+final String demoConfig = """
 - layers:
     - bing:
         type: bing_base_imagery
@@ -34,41 +35,36 @@ void main() {
 
     var ui = new RialtoFrontend();
 
-    // The Rules:
-    //
-    // if no ?config= parameter and we're localhost, then
-    //     set config to be special debug mode
-    // else
-    //     use the config param
-    // endif
-    // if config param is null, then
-    //     use a simple, canned demo script
-    // else
-    //     use the referenced config file
-    // endif
+    final params = Uri.parse(window.location.href).queryParameters;
+    String configParam = params["config"];
 
-    String config;
-    if (window.location.href == "http://localhost:8080/index.html") {
-        config = "http://localhost:12345/test.yaml";
-    } else {
-        final params = Uri.parse(window.location.href).queryParameters;
-        config = params["config"];
-    }
+    Future<List<dynamic>> p;
 
-    if (config == null) {
+    if (configParam == null) {
         try {
-            ui.backend.commands.loadScriptFromStringAsync(demo);
+            p = ui.backend.commands.loadScriptFromStringAsync(demoConfig);
         } catch (e) {
             RialtoBackend.error("Top-level exception caught", e);
         }
     } else {
         try {
-            final uri = Uri.parse(config);
-            ui.backend.commands.loadScriptFromUrl(uri);
+            final configUri = Uri.parse(configParam);
+            p = ui.backend.commands.loadScriptFromUrl(configUri);
         } catch (e) {
             RialtoBackend.error("Top-level exception caught", e);
         }
     }
+
+    p.then((list) {
+        if (ui.backend.wps != null) {
+            ui.backend.commands.wpsGetProcesses().then((processes) {
+                for (WpsProcess process in processes) {
+                    ui.backend.wpsProcesses[process.name] = process;
+                    ui.addWpsProcess(process.name);
+                }
+            });
+        }
+    });
 }
 
 

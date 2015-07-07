@@ -32,6 +32,8 @@ class OgcService {
             params.forEach((s) => operation += "&$s");
         }
 
+        RialtoBackend.log(operation);
+
         Completer c = new Completer<OgcDocument>();
 
         String s = server.toString() + operation;

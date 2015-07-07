@@ -61,6 +61,20 @@ class RialtoFrontend {
         backend.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
     }
 
+    void addWpsProcess(String processName) {
+        var anchor = new AnchorElement();
+        anchor.id = "wpsProcess" + processName + "Button";
+        anchor.text = processName;
+
+        var list = new LIElement();
+        list.children.add(anchor);
+
+        UListElement menu = querySelector("#toolsMenu");
+        menu.children.add(list);
+
+        anchor.onClick.listen((ev) => backend.commands.runWizard(processName));
+    }
+
     String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";
 
     void _handleUpdateCoords(MouseData d) {

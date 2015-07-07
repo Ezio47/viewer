@@ -52,29 +52,24 @@ class WpsService extends OgcService {
     }
 
 
-    Future<OgcDocument> _executeProcessWork(String processName, Map<String, dynamic> inputs, List<String> outputs,
-            {Map<String, String> options: null}) {
+    Future<OgcDocument> _executeProcessWork(WpsProcess process, Map<String, dynamic> inputs) {
         var c = new Completer<OgcDocument>();
 
-        String identifierKV = "Identifier=$processName";
+        String identifierKV = "Identifier=${process.name}";
 
         String dataInputsKV = "DataInputs="; //alpha=$alpha;beta=$beta
-        inputs.forEach((k, v) => dataInputsKV += "$k=${v.toString()};");
+        process.inputs.forEach((param) => dataInputsKV += "${param.name}=${inputs[param.name].toString()};");
         dataInputsKV = dataInputsKV.substring(0, dataInputsKV.length - 1); // remove trailing ';'
 
         String dataOutputsKV = "DataOutputs="; //gamma;delta
-        outputs.forEach((k) => dataOutputsKV += "$k;");
+        process.outputs.forEach((param) => dataOutputsKV += "${param.name};");
         dataOutputsKV = dataOutputsKV.substring(0, dataOutputsKV.length - 1); // remove trailing ';'
 
         String responseDocumentKV = "ResponseDocument="; //gamma;delta
-        outputs.forEach((k) => responseDocumentKV += "$k;");
+        process.outputs.forEach((param) => responseDocumentKV += "${param.name};");
         responseDocumentKV = responseDocumentKV.substring(0, responseDocumentKV.length - 1); // remove trailing ';'
 
         var opts = new Map<String, String>();
-        if (options != null) {
-            options.forEach((k, v) => opts[k.toLowerCase()] = v.toLowerCase());
-        }
-
         opts.putIfAbsent("storeexecuteresponse", () => "true");
         opts.putIfAbsent("lineage", () => "true");
         opts.putIfAbsent("status", () => "true");
@@ -82,6 +77,7 @@ class WpsService extends OgcService {
         var parms = [identifierKV, dataInputsKV, dataOutputsKV, responseDocumentKV];
         opts.forEach((k, v) => parms.add("$k=$v"));
 
+        RialtoBackend.log(parms);
         _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
 
             if (ogcDoc == null) {
@@ -111,23 +107,22 @@ class WpsService extends OgcService {
     ///
     /// Returns the job ID, and will have already created a status object for that ID (even in
     /// the case of any failures)
-    Future<WpsJob> executeProcess(WpsExecuteProcessData data, {WpsJobResultHandler successHandler: null,
-            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null}) {
+    Future<WpsJob> executeProcess(WpsProcess process,
+            Map<String, dynamic> inputs,
+            WpsJobResultHandler successHandler,
+            WpsJobResultHandler failureHandler,
+            WpsJobResultHandler timeoutHandler) {
+
 
         var c = new Completer<WpsJob>();
-
-        assert(data.parameters.length == 3);
-        String name = data.parameters[0];
-        Map<String, dynamic> inputs = data.parameters[1];
-        List<String> outputs = data.parameters[2];
 
         var request = _backend.wpsJobManager.createJob(
                 this,
                 successHandler: successHandler,
-                errorHandler: errorHandler,
+                errorHandler: failureHandler,
                 timeoutHandler: timeoutHandler);
 
-        _executeProcessWork(name, inputs, outputs).then((ogcDoc) {
+        _executeProcessWork(process, inputs).then((ogcDoc) {
 
             if (ogcDoc == null) {
                 request.code = OgcStatusCodes.systemFailure;
@@ -166,203 +161,87 @@ class WpsService extends OgcService {
         return _getProcessDescriptionWork(processName);
     }
 
-    static String inferDatatype(String abstract, String datatype) {
+    static WpsProcessParamDataType inferDatatype(String abstract, String datatype) {
         if (abstract != null) {
-            if (abstract.endsWith("[int]")) return "int";
-            if (abstract.endsWith("[double]")) return "double";
-            if (abstract.endsWith("[string]")) return "string";
+            if (abstract.endsWith("[int]")) return WpsProcessParamDataType.integer;
+            if (abstract.endsWith("[double]")) return WpsProcessParamDataType.double;
+            if (abstract.endsWith("[string]")) return WpsProcessParamDataType.string;
             assert(!abstract.endsWith("]"));
         }
 
         if (datatype == null) {
-            return "string";
+            return WpsProcessParamDataType.string;
         }
 
         switch (datatype)
         {
             case "":
-                return "string";
+                return WpsProcessParamDataType.string;
             case "xs:double":
-                return "double";
+                return WpsProcessParamDataType.double;
             case "int":         // (geoserver says "int", not "xs:int"?)
             case "xs:int":
-                return "int";
+                return WpsProcessParamDataType.integer;
             default:
                 assert(false);
                 return null;
         }
     }
 
-    Future<String> testConnection() async {
-        String s = "";
+    Future<List<WpsProcess>> getProcesses() async {
 
         OgcDocument doc = await getCapabilities();
 
         if (doc is! OgcCapabilitiesDocument_7) {
-            s += "GetCapabilities check: FAILED";
-            return s;
+            RialtoBackend.error("GetCapabilities check: FAILED");
+            return new Future.value(null);
         }
         var capabilities = doc as  OgcCapabilitiesDocument_7;
-        var processes = capabilities.processOfferings.processes;
+        var xmlProcesses = capabilities.processOfferings.processes;
 
-        var procs = processes.where((p) => p.identifier.startsWith("py:"));
+        xmlProcesses = xmlProcesses.where((p) => p.identifier.startsWith("py:"));
 
-        for (var proc in procs) {
-            OgcDocument doc = await this.describeProcess(proc.identifier);
-            OgcProcessDescription_16 descr = doc as OgcProcessDescription_16;
-            var inputs = descr.dataInput.dataInputs;
-            for (OgcInputDescription_19 input in inputs) {
-                var dt = inferDatatype(input.abstract, input.literalData.datatype);
-                var nam = input.identifier;
-                print("IN {$nam} ${dt}");
+        List<WpsProcess> processes = new List<WpsProcess>();
+
+        for (var xmlProcess in xmlProcesses) {
+            OgcDocument doc = await this.describeProcess(xmlProcess.identifier);
+            OgcProcessDescription_16 xmlDescription = doc as OgcProcessDescription_16;
+            print(xmlDescription.identifier);
+
+            WpsProcess process = new WpsProcess(xmlDescription.identifier);
+
+            var xmlInputs = xmlDescription.dataInput.dataInputs;
+            for (OgcInputDescription_19 xmlInput in xmlInputs) {
+                var datatype = inferDatatype(xmlInput.abstract, xmlInput.literalData.datatype);
+                var name = xmlInput.identifier;
+                //print("IN {$name} ${datatype}");
+
+                WpsProcessParam param = new WpsProcessParam(name, datatype);
+                process.inputs.add(param);
             }
-            var outputs = descr.processOutputs.outputData;
-            for (var output in outputs) {
-                var nam = output.identifier;
-                var dt = inferDatatype(output.abstract, output.literalOutput.datatype);
-                print("OUT {$nam} ${dt}");
+
+            var xmlOutputs = xmlDescription.processOutputs.outputData;
+            for (var xmlOutput in xmlOutputs) {
+                var name = xmlOutput.identifier;
+                var datatype = inferDatatype(xmlOutput.abstract, xmlOutput.literalOutput.datatype);
+                //print("OUT {$nam} ${dt}");
+                WpsProcessParam param = new WpsProcessParam(name, datatype);
+                process.outputs.add(param);
             }
+
+            processes.add(process);
         }
 
-        return s;
-
-        OgcDocument description = await this.describeProcess("groovy:wpshelloworld");
-
-        if (description is! OgcProcessDescription_16) {
-            s += "DescribeProcess check: FAILED\n";
-            if (description is OgcExceptionReportDocument) {
-                s += description.exceptionTexts.fold("", (prev, cur) => "$prev  Exception: $cur\n");
-            }
-            return s;
-        }
-
-        final title = (description as OgcProcessDescription_16).title;
-        if (title != "HelloWorld") {
-            s += "DescribeProcess check: FAILED (titled \"$title\")\n";
-            return s;
-        }
-
-        s += "DescribeProcess check: passed (titled \"$title\")\n";
-
-        final inputs = {
-            "alpha": alphaValue
-        };
-        final outputs = ["omega"];
-        final options = {
-            "storeexecuteresponse": "false",
-            "lineage": "false",
-            "status": "false"
-        };
-        OgcDocument exec = await _executeProcessWork("groovy:wpshelloworld", inputs, outputs, options: options);
-
-        if (exec is! OgcExecuteResponseDocument_54) {
-            s += "ExecuteProcess check: FAILED\n";
-            if (exec is OgcExceptionReportDocument) {
-                s += exec.exceptionTexts.fold("", (prev, cur) => "$prev  Exception: $cur\n");
-            }
-            return s;
-        }
-
-        String omega;
-        try {
-            var execRespDoc = (exec as OgcExecuteResponseDocument_54);
-            var procOuts = execRespDoc.processOutputs;
-            var outsDataList = procOuts.outputDataList;
-            var outData = outsDataList.first;
-            var data = outData.data;
-            var lit = data.literalData;
-            var val = lit.value;
-            omega = val;
-        } catch (_) {
-            s += "ExecuteProcess check: FAILED\n";
-            return s;
-        }
-
-        if (omega != omegaValue) {
-            s += "ExecuteProcess check: FAILED (returned \"$omega\")\n";
-            return s;
-        }
-
-        s += "ExecuteProcess check: passed (returned \"$omega\")\n";
-
-        return s;
+        return processes;
     }
 
-    Future<String> testConnection2() async {
-        final alphaValue = "Yow!";
-        final omegaValue = "!woY";
-
-        String s = "";
-
+    Future<String> testConnection() async {
         OgcDocument capabilities = await getCapabilities();
 
         if (capabilities is! OgcCapabilitiesDocument_7) {
-            s += "GetCapabilities check: FAILED";
-            return s;
+            RialtoBackend.error("GetCapabilities check: FAILED");
         }
 
-        final numProcesses = (capabilities as OgcCapabilitiesDocument_7).processOfferings.processes.length;
-        s += "GetCapabilities check: passed ($numProcesses processes)\n";
-
-        OgcDocument description = await this.describeProcess("groovy:wpshelloworld");
-
-        if (description is! OgcProcessDescription_16) {
-            s += "DescribeProcess check: FAILED\n";
-            if (description is OgcExceptionReportDocument) {
-                s += description.exceptionTexts.fold("", (prev, cur) => "$prev  Exception: $cur\n");
-            }
-            return s;
-        }
-
-        final title = (description as OgcProcessDescription_16).title;
-        if (title != "HelloWorld") {
-            s += "DescribeProcess check: FAILED (titled \"$title\")\n";
-            return s;
-        }
-
-        s += "DescribeProcess check: passed (titled \"$title\")\n";
-
-        final inputs = {
-            "alpha": alphaValue
-        };
-        final outputs = ["omega"];
-        final options = {
-            "storeexecuteresponse": "false",
-            "lineage": "false",
-            "status": "false"
-        };
-        OgcDocument exec = await _executeProcessWork("groovy:wpshelloworld", inputs, outputs, options: options);
-
-        if (exec is! OgcExecuteResponseDocument_54) {
-            s += "ExecuteProcess check: FAILED\n";
-            if (exec is OgcExceptionReportDocument) {
-                s += exec.exceptionTexts.fold("", (prev, cur) => "$prev  Exception: $cur\n");
-            }
-            return s;
-        }
-
-        String omega;
-        try {
-            var execRespDoc = (exec as OgcExecuteResponseDocument_54);
-            var procOuts = execRespDoc.processOutputs;
-            var outsDataList = procOuts.outputDataList;
-            var outData = outsDataList.first;
-            var data = outData.data;
-            var lit = data.literalData;
-            var val = lit.value;
-            omega = val;
-        } catch (_) {
-            s += "ExecuteProcess check: FAILED\n";
-            return s;
-        }
-
-        if (omega != omegaValue) {
-            s += "ExecuteProcess check: FAILED (returned \"$omega\")\n";
-            return s;
-        }
-
-        s += "ExecuteProcess check: passed (returned \"$omega\")\n";
-
-        return s;
+        return new Future.value(null);
     }
 }

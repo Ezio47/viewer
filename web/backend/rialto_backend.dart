@@ -5,6 +5,30 @@
 part of rialto.backend;
 
 
+enum WpsProcessParamDataType {
+    double,
+    string,
+    integer
+}
+
+class WpsProcessParam {
+    String name;
+    WpsProcessParamDataType datatype;
+
+    WpsProcessParam(String this.name, WpsProcessParamDataType this.datatype);
+}
+
+
+class WpsProcess {
+    String name;
+    List<WpsProcessParam> inputs = new List<WpsProcessParam>();
+    List<WpsProcessParam> outputs = new List<WpsProcessParam>();
+
+    WpsProcess(String this.name);
+}
+
+
+
 /// Main, public class for the viewer
 ///
 /// All external calls to the Rialto viewer, e.g. from main or from the UI pieces,
@@ -20,6 +44,7 @@ class RialtoBackend {
     CesiumBridge cesium;
     JsBridge js;
     WpsService wps;
+    Map<String, WpsProcess> wpsProcesses = new Map<String, WpsProcess>();
     LayerManager layerManager;
     WpsJobManager wpsJobManager;
 

@@ -13,9 +13,6 @@ class WpsServiceTest {
         testCapabilities(wps);
         testDescribeSummation(wps);
         testExecuteSummation(wps);
-        testExecuteSleep(wps, 60.0);
-        testExecuteSleep(wps, 10.0);
-        testExecuteSleep(wps, 20.0);
     }
 
     static void testCapabilities(WpsService wps) {
@@ -39,13 +36,21 @@ class WpsServiceTest {
     }
 
     static void testExecuteSummation(WpsService wps) {
-        var inputs = {
-            "alpha": "17",
-            "beta": "11"
-        };
-        var outputs = ["gamma"];
 
-        var data = new WpsExecuteProcessData(["groovy:wpssummationtest", inputs, outputs]);
+        var process = new WpsProcess("groovy:wpssummationtest");
+
+        var inputs = new Map<String, dynamic>();
+
+        var alpha = new WpsProcessParam("alpha", WpsProcessParamDataType.integer);
+        process.inputs.add(alpha);
+        inputs["alpha"] = 17;
+
+        var beta = new WpsProcessParam("beta", WpsProcessParamDataType.integer);
+        process.inputs.add(beta);
+        inputs["beta"] = 11;
+
+        var gamma = new WpsProcessParam("gamma", WpsProcessParamDataType.integer);
+        process.outputs.add(gamma);
 
         var successHandler = (WpsJob job) {
             var doc = job.responseDocument;
@@ -59,34 +64,6 @@ class WpsServiceTest {
             assert(literalData.value == "28.0");
         };
 
-        wps.executeProcess(data, successHandler: successHandler);
-    }
-
-    static void testExecuteSleep(WpsService wps, double duration) {
-        var alpha = 17.0;
-        var beta = 11.0;
-
-        var inputs = {
-            "alpha": alpha.toString(),
-            "beta": beta.toString(),
-            "duration": duration.toString()
-        };
-        var outputs = ["gamma"];
-
-        var data = new WpsExecuteProcessData(["groovy:wpssleeptest", inputs, outputs]);
-
-        var successHandler = (WpsJob job) {
-            var doc = job.responseDocument;
-            assert(doc is OgcExecuteResponseDocument_54);
-            OgcExecuteResponseDocument_54 resp = doc;
-            var status = resp.status.processSucceeded;
-            assert(status != null);
-            OgcDataType_46 datatype = resp.processOutputs.outputDataList[0].data;
-            OgcLiteralData_48 literalData = datatype.literalData;
-            //log(literalData.dump(0));
-            assert(double.parse(literalData.value) == (alpha + beta + duration));
-        };
-
-        wps.executeProcess(data, successHandler: successHandler);
+        wps.executeProcess(process, inputs, successHandler, null, null);
     }
 }

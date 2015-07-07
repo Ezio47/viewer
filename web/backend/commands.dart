@@ -14,6 +14,65 @@ class Commands {
     /// Create the commands object
     Commands(RialtoBackend this._backend);
 
+    void runWizard(String processName) {
+        WpsProcess process = _backend.wpsProcesses[processName];
+        print("running wizard ${process.name}");
+
+        var inputs = new Map<String, dynamic>();
+        for (WpsProcessParam param in process.inputs) {
+            switch (param.datatype) {
+                case WpsProcessParamDataType.double:
+                    inputs[param.name] = wizardGetDouble(param.name);
+                    break;
+                case WpsProcessParamDataType.integer:
+                    inputs[param.name] = wizardGetInteger(param.name);
+                    break;
+                case WpsProcessParamDataType.string:
+                    inputs[param.name] = wizardGetString(param.name);
+                    break;
+                default:
+                    RialtoBackend.error("invalid wps datatype");
+            }
+        }
+
+        var yes = (WpsJob job) {
+            OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
+            RialtoBackend.log(ogcDoc.dump(0));
+            var url = ogcDoc.getProcessOutput("outputUrl");
+            RialtoBackend.log("SUCCESS: $url");
+        };
+
+        var no = (WpsJob job) {
+            RialtoBackend.log("FAILURE");
+            assert(job.responseDocument != null || job.exceptionTexts != null);
+            if (job.responseDocument != null) {
+                RialtoBackend.log(job.responseDocument.dump(0));
+            }
+            if (job.exceptionTexts != null) {
+                RialtoBackend.log(job.exceptionTexts);
+            }
+        };
+
+        var time = (WpsJob job) {
+            RialtoBackend.error("wps request timed out!");
+        };
+
+        this.wpsExecuteProcess(process, inputs, yes, no, time);
+    }
+
+    String wizardGetDouble(String name) {
+        return "1.1";
+    }
+
+    String wizardGetInteger(String name) {
+        return "22";
+    }
+
+    String wizardGetString(String name) {
+        return "33";
+    }
+
+
     /// Allow user to draw a circle to be used for a viewshed analysis
     void createViewshedCircle() {
         _backend.cesium.drawCircle(
@@ -138,16 +197,16 @@ class Commands {
     }
 
     /// Asynchronously executes an arbitrary WPS process
-    Future<WpsJob> wpsExecuteProcess(WpsExecuteProcessData data) {
+    Future<WpsJob> wpsExecuteProcess(WpsProcess process,
+            Map<String, dynamic> inputs,
+             WpsJobResultHandler successHandler,
+            WpsJobResultHandler failureHandler,
+            WpsJobResultHandler timeoutHandler) {
         if (_backend.wps == null) {
             RialtoBackend.error("No WPS server configured");
             return new Future.value(null);
         }
-        return _backend.wps.executeProcess(
-                data,
-                successHandler: data.successHandler,
-                errorHandler: data.errorHandler,
-                timeoutHandler: data.timeoutHandler);
+        return _backend.wps.executeProcess(process, inputs, successHandler, failureHandler, timeoutHandler);
     }
 
     /// Asynchronously requests description of a WPS function
@@ -159,6 +218,17 @@ class Commands {
             return new Future.value(null);
         }
         return _backend.wps.describeProcess(processName);
+    }
+
+    /// Asynchronously requests description of a WPS function
+    ///
+    /// Returns the response document.
+    Future<List<WpsProcess>> wpsGetProcesses() {
+        if (_backend.wps == null) {
+            RialtoBackend.error("No WPS server configured");
+            return new Future.value(null);
+        }
+        return _backend.wps.getProcesses();
     }
 
     /// Asynchronously requests an OGC capabilities document.
@@ -217,18 +287,6 @@ class LayerData {
     LayerData(String this.name, Map this.options);
 }
 
-class WpsExecuteProcessData {
-    final List<Object> parameters;
-    final WpsJobResultHandler successHandler;
-    final WpsJobResultHandler errorHandler;
-    final WpsJobResultHandler timeoutHandler;
-
-    WpsExecuteProcessData(List<Object> this.parameters, {WpsJobResultHandler successHandler: null,
-            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
-            : this.successHandler = successHandler,
-              this.errorHandler = errorHandler,
-              this.timeoutHandler = timeoutHandler;
-}
 
 class ColorizerData {
     String ramp;
