@@ -13,6 +13,7 @@ part of rialto.frontend;
 class RialtoFrontend {
     RialtoBackend backend;
     Element _mouseCoords;
+    WpsWizard wpsWizard;
 
     ViewModeCode viewMode = ViewModeCode.mode3D;
 
@@ -62,17 +63,27 @@ class RialtoFrontend {
     }
 
     void addWpsProcess(String processName) {
-        var anchor = new AnchorElement();
-        anchor.id = "wpsProcess" + processName + "Button";
-        anchor.text = processName;
+        var nam = processName.substring(3);
+        //nam = nam.replaceAll("-", "__");
 
-        var list = new LIElement();
-        list.children.add(anchor);
+        WpsDialog.makeShell(nam);
 
-        UListElement menu = querySelector("#toolsMenu");
-        menu.children.add(list);
+        {
+            var anchor = new AnchorElement();
+            anchor.id = nam + "Dialog_open";
+            anchor.text = processName;
 
-        anchor.onClick.listen((ev) => backend.commands.runWizard(processName));
+            var list = new LIElement();
+            list.children.add(anchor);
+
+            UListElement menu = querySelector("#toolsMenu");
+            menu.children.add(list);
+
+            anchor.onClick.listen((ev) => wpsWizard.run(processName));
+        }
+
+        new WpsDialog(this, "#" + nam + "Dialog");
+        //wpsWizard = new WpsWizard(backend);
     }
 
     String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";

@@ -37,7 +37,7 @@ class WpsServiceTest {
 
     static void testExecuteSummation(WpsService wps) {
 
-        var process = new WpsProcess("groovy:wpssummationtest");
+        var process = new WpsProcess(wps, "groovy:wpssummationtest");
 
         var inputs = new Map<String, dynamic>();
 
@@ -52,7 +52,7 @@ class WpsServiceTest {
         var gamma = new WpsProcessParam("gamma", WpsProcessParamDataType.integer);
         process.outputs.add(gamma);
 
-        var successHandler = (WpsJob job) {
+        var successHandler = (WpsJob job, Map<String, dynamic> results) {
             var doc = job.responseDocument;
             assert(doc is OgcExecuteResponseDocument_54);
             OgcExecuteResponseDocument_54 resp = doc;

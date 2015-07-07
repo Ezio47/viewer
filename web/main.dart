@@ -55,14 +55,13 @@ void main() {
         }
     }
 
+    // TODO: get ths out of main()
     p.then((list) {
-        if (ui.backend.wps != null) {
-            ui.backend.commands.wpsGetProcesses().then((processes) {
-                for (WpsProcess process in processes) {
-                    ui.backend.wpsProcesses[process.name] = process;
+        WpsService wps = ui.backend.wps;
+        if (wps != null) {
+              for (WpsProcess process in wps.processes.values) {
                     ui.addWpsProcess(process.name);
-                }
-            });
+            };
         }
     });
 }

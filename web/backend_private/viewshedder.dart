@@ -16,7 +16,7 @@ class Viewshedder {
     /// position and radius.
     static void callWps(RialtoBackend backend, double obsLon, double obsLat, double radius) {
 
-        var process = new WpsProcess("groovy:wpsviewshed");
+        var process = new WpsProcess(backend.wps, "groovy:wpsviewshed");
 
         var inputs = new Map<String, dynamic>();
         WpsProcessParam param;
@@ -51,10 +51,10 @@ class Viewshedder {
         param = new WpsProcessParam("outputUrl", WpsProcessParamDataType.string);
         process.outputs.add(param);
 
-        var yes = (WpsJob job) {
+        var yes = (WpsJob job, Map<String, dynamic> results) {
             OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
             RialtoBackend.log(ogcDoc.dump(0));
-            var url = ogcDoc.getProcessOutput("outputUrl");
+            var url = results["outputUrl"];
             RialtoBackend.log("SUCCESS: $url");
 
             var layerData = new LayerData("viewshed-${job.id}", {

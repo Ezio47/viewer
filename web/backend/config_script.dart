@@ -131,11 +131,9 @@ class ConfigScript {
         var wps = new WpsService(_backend, url, proxyUri: proxyUri, description: description);
         wps.open();
 
-        //WpsServiceTest.test(wps);
-
         _backend.wps = wps;
 
-        return new Future(() {});
+        return wps.readProcessList();
     }
 
 

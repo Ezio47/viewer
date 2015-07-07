@@ -2,13 +2,15 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.backend.private;
+part of rialto.backend;
 
 
-/// Implementation of a WPS server.
+/// Implementation of a client for a WPS server.
 ///
 /// Allows for getting process descriptions, executing processes, and so on.
 class WpsService extends OgcService {
+
+    Map<String, WpsProcess> processes = new Map<String, WpsProcess>();
 
     WpsService(RialtoBackend backend, Uri server, {Uri proxyUri: null, String description: null})
             : super(backend, "WPS", server, proxyUri: proxyUri, description: description);
@@ -109,15 +111,16 @@ class WpsService extends OgcService {
     /// the case of any failures)
     Future<WpsJob> executeProcess(WpsProcess process,
             Map<String, dynamic> inputs,
-            WpsJobResultHandler successHandler,
-            WpsJobResultHandler failureHandler,
-            WpsJobResultHandler timeoutHandler) {
+            WpsJobSuccessResultHandler successHandler,
+            WpsJobErrorResultHandler failureHandler,
+            WpsJobErrorResultHandler timeoutHandler) {
 
 
         var c = new Completer<WpsJob>();
 
         var request = _backend.wpsJobManager.createJob(
                 this,
+                process,
                 successHandler: successHandler,
                 errorHandler: failureHandler,
                 timeoutHandler: timeoutHandler);
@@ -125,14 +128,14 @@ class WpsService extends OgcService {
         _executeProcessWork(process, inputs).then((ogcDoc) {
 
             if (ogcDoc == null) {
-                request.code = OgcStatusCodes.systemFailure;
+                request.jobStatus = OgcStatusCodes.systemFailure;
                 request.stopPolling();
                 c.complete(request);
                 return;
             }
 
             if (ogcDoc is OgcExceptionReportDocument) {
-                request.code = OgcStatusCodes.failed;
+                request.jobStatus = OgcStatusCodes.failed;
                 request.exceptionTexts = ogcDoc.exceptionTexts;
                 request.stopPolling();
                 c.complete(request);
@@ -143,8 +146,8 @@ class WpsService extends OgcService {
 
             request.statusLocation = Uri.parse(resp.statusLocation);
             request.proxyUri = proxyUri;
-            request.processCreationTime = DateTime.parse(resp.status.creationTime);
-            request.code = resp.status.code;
+            request.jobCreationTime = DateTime.parse(resp.status.creationTime);
+            request.jobStatus = resp.status.code;
 
             request.startPolling();
 
@@ -188,7 +191,7 @@ class WpsService extends OgcService {
         }
     }
 
-    Future<List<WpsProcess>> getProcesses() async {
+    Future readProcessList() async {
 
         OgcDocument doc = await getCapabilities();
 
@@ -201,14 +204,12 @@ class WpsService extends OgcService {
 
         xmlProcesses = xmlProcesses.where((p) => p.identifier.startsWith("py:"));
 
-        List<WpsProcess> processes = new List<WpsProcess>();
-
         for (var xmlProcess in xmlProcesses) {
             OgcDocument doc = await this.describeProcess(xmlProcess.identifier);
             OgcProcessDescription_16 xmlDescription = doc as OgcProcessDescription_16;
             print(xmlDescription.identifier);
 
-            WpsProcess process = new WpsProcess(xmlDescription.identifier);
+            WpsProcess process = new WpsProcess(this, xmlDescription.identifier);
 
             var xmlInputs = xmlDescription.dataInput.dataInputs;
             for (OgcInputDescription_19 xmlInput in xmlInputs) {
@@ -229,10 +230,8 @@ class WpsService extends OgcService {
                 process.outputs.add(param);
             }
 
-            processes.add(process);
+            processes[xmlDescription.identifier] = process;
         }
-
-        return processes;
     }
 
     Future<String> testConnection() async {

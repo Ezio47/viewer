@@ -5,7 +5,8 @@
 part of rialto.backend.private;
 
 
-typedef dynamic WpsJobResultHandler(WpsJob job);
+typedef dynamic WpsJobSuccessResultHandler(WpsJob job, Map<String, dynamic> results);
+typedef dynamic WpsJobErrorResultHandler(WpsJob job);
 
 
 /// Manager of WPS operations
@@ -27,11 +28,14 @@ class WpsJobManager {
     /// The job will be tracked by this manager class.
     ///
     /// Use this function instead of calling the WpsJob ctor directly.
-    WpsJob createJob(WpsService service, {WpsJobResultHandler successHandler: null, WpsJobResultHandler errorHandler:
-            null, WpsJobResultHandler timeoutHandler: null}) {
+    WpsJob createJob(WpsService service,
+                     WpsProcess process,
+                     {WpsJobSuccessResultHandler successHandler: null,
+                     WpsJobErrorResultHandler errorHandler: null,
+                     WpsJobErrorResultHandler timeoutHandler: null}) {
         var obj = new WpsJob(
                 _backend,
-                service,
+                process,
                 newJobId,
                 successHandler: successHandler,
                 errorHandler: errorHandler,
@@ -46,7 +50,7 @@ class WpsJobManager {
 
     int get newJobId => _jobId++;
 
-    int get numActive => map.values.where((j) => j.isActive).length;
+    int get numActive => map.values.where((j) => j._isActive).length;
 }
 
 
@@ -57,28 +61,31 @@ class WpsJobManager {
 /// A [WpsJob] internally does it's own polling to keep its status up-to-date.
 class WpsJob {
     RialtoBackend _backend;
-    final WpsService service;
+    final WpsProcess process;
     final int id;
     Uri statusLocation;
-    DateTime processCreationTime;
     Uri proxyUri;
-    OgcStatusCodes code;
+    OgcStatusCodes jobStatus; // from the server
     List<String> exceptionTexts;
     OgcExecuteResponseDocument_54 responseDocument;
     final DateTime _startTime;
+    DateTime jobCreationTime; // from the server
     DateTime _timeoutTime;
     int _pollCount = 0;
 
-    final WpsJobResultHandler _successHandler;
-    final WpsJobResultHandler _errorHandler;
-    final WpsJobResultHandler _timeoutHandler;
+    final WpsJobSuccessResultHandler _successHandler;
+    final WpsJobErrorResultHandler _errorHandler;
+    final WpsJobErrorResultHandler _timeoutHandler;
 
     /// WpsJob constructor
     ///
-    /// Users should nto call this directly -- call [WpsJobManager.createJob] instead.
-    WpsJob(RialtoBackend this._backend, WpsService this.service, int this.id, {WpsJobResultHandler successHandler: null,
-            WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
-            : code = OgcStatusCodes.notYetSubmitted,
+    /// Users should not call this directly -- call [WpsJobManager.createJob] instead.
+    WpsJob(RialtoBackend this._backend, WpsProcess this.process,
+            int this.id,
+            {WpsJobSuccessResultHandler successHandler: null,
+            WpsJobErrorResultHandler errorHandler: null,
+            WpsJobErrorResultHandler timeoutHandler: null})
+            : jobStatus = OgcStatusCodes.notYetSubmitted,
               _startTime = new DateTime.now(),
               _successHandler = successHandler,
               _errorHandler = errorHandler,
@@ -88,28 +95,32 @@ class WpsJob {
         _signalJobChange();
     }
 
-    bool get isActive => OgcStatus_55.isActive(code);
-    bool get isComplete => OgcStatus_55.isComplete(code);
-    bool get isFailure => OgcStatus_55.isFailure(code);
-    bool get isSuccess => OgcStatus_55.isSuccess(code);
+    bool get _isActive => OgcStatus_55.isActive(jobStatus);
+    bool get _hasFailed => OgcStatus_55.isFailure(jobStatus);
+    bool get _hasSucceeded => OgcStatus_55.isSuccess(jobStatus);
 
     startPolling() => new Timer(WpsJobManager.pollingDelay, _poll);
 
     stopPolling() {
-        if (code == OgcStatusCodes.timeout) {
+        if (jobStatus == OgcStatusCodes.timeout) {
             if (_timeoutHandler != null) {
                 _timeoutHandler(this);
             }
         }
 
-        if (isFailure) {
+        if (_hasFailed) {
             if (_errorHandler != null) {
                 _errorHandler(this);
             }
         } else {
-            assert(isSuccess);
+            assert(_hasSucceeded);
             if (_successHandler != null) {
-                _successHandler(this);
+                var outs = new Map<String, dynamic>();
+                for (var param in process.outputs) {
+                    var value = responseDocument.getProcessOutput(param.name);
+                    outs[param.name] = value;
+                }
+                _successHandler(this, outs);
             }
         }
 
@@ -124,7 +135,7 @@ class WpsJob {
 
         var now = new DateTime.now();
         if (now.isAfter(_timeoutTime)) {
-            code = OgcStatusCodes.timeout;
+            jobStatus = OgcStatusCodes.timeout;
             exceptionTexts = ["process timed out"];
 
             stopPolling();
@@ -138,7 +149,7 @@ class WpsJob {
             //log(ogcDoc.dump(0));
 
             if (ogcDoc.isException) {
-                code = OgcStatusCodes.systemFailure;
+                jobStatus = OgcStatusCodes.systemFailure;
                 exceptionTexts = ogcDoc.exceptionTexts;
 
                 stopPolling();
@@ -146,7 +157,7 @@ class WpsJob {
             }
 
             if (ogcDoc is! OgcExecuteResponseDocument_54) {
-                code = OgcStatusCodes.systemFailure;
+                jobStatus = OgcStatusCodes.systemFailure;
                 exceptionTexts = ["polled response neither exception report not response document"];
 
                 stopPolling();
@@ -154,10 +165,10 @@ class WpsJob {
             }
 
             OgcExecuteResponseDocument_54 resp = ogcDoc;
-            code = resp.status.code;
+            jobStatus = resp.status.code;
             responseDocument = resp;
 
-            if (OgcStatus_55.isComplete(code)) {
+            if (OgcStatus_55.isComplete(jobStatus)) {
                 //Hub.log("done!");
 
                 stopPolling();
@@ -173,11 +184,10 @@ class WpsJob {
 
     String dump() {
         String s = "";
-        s += service.dump();
         s += "Id: $id\n";
         s += "Status location: $statusLocation\n";
-        s += "Creation time: $processCreationTime\n";
-        s += "Status: $code\n";
+        s += "Start time: $_startTime\n";
+        s += "Status: $jobStatus\n";
 
         s += "Exception texts: ";
         if (exceptionTexts != null && exceptionTexts.length > 0) {
