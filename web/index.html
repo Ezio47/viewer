@@ -53,9 +53,10 @@
                         <a href="">Layers <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class="uk-active"><a id="layerManagerDialog_open">Manage layers...</a></li>
-                                <li class="uk-active"><a id="layerAdderDialog_open">Add layer...</a></li>
-                                <li class="uk-active"><a id="loadConfigurationDialog_open">Load configuration...</a></li>
+                                <li class="uk-active"><a id="layerCustomizationDialog_open">Customize layers...</a></li>
+                                <li class="uk-active"><a id="layerInfoDialog_open">Layer info...</a></li>
+                                <li class="uk-active"><a id="loadUrlDialog_open">Load layers via URL...</a></li>
+                                <li class="uk-active"><a id="loadScriptDialog_open">Load layers via script...</a></li>
                             </ul>
                         </div>
                     </li>
@@ -110,123 +111,49 @@
 
 
 
-        <div id="loadConfigurationDialog" class="uk-modal">
+        <div id="loadUrlDialog" class="uk-modal">
+            <div class="uk-modal-dialog">
+                <div class="uk-modal-header">
+                    Configuration URL Loader
+                </div>
+
+                <form class="uk-form">
+                    <label class="uk-form-label" for="loadUrlDialog_urlText">URL:</label>
+                    <div class="uk-form-controls">
+                        <input id="loadUrlDialog_urlText" type="text" class="uk-form-width-large">
+                        <button id="loadUrlDialog_urlButton" class="uk-button uk-modal-close">Load</button>
+                    </div>
+                 </form>
+
+                 <div class="uk-modal-footer uk-text-right">
+                    <button id="loadUrlDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="loadUrlDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+           </div>
+        </div>
+
+        <div id="loadScriptDialog" class="uk-modal">
             <div class="uk-modal-dialog">
                 <div class="uk-modal-header">
                     Configuration Script Loader
                 </div>
 
-                <form class="uk-form">
-                    <label class="uk-form-label" for="loadConfigurationDialog_urlText">URL:</label>
-                    <div class="uk-form-controls">
-                        <input id="loadConfigurationDialog_urlText" type="text" class="uk-form-width-large">
-                        <button id="loadConfigurationDialog_urlButton" class="uk-button uk-modal-close">Load</button>
-                    </div>
-                 </form>
-
-                <hr>
 
                 <form class="uk-form">
-                    <label class="uk-form-label" for="loadConfigurationDialog_scriptText">Script:</label>
+                    <label class="uk-form-label" for="loadScriptDialog_scriptText">Script:</label>
                     <div class="uk-form-controls">
-                        <textarea id="loadConfigurationDialog_scriptText" class="uk-form-width-large" style="height:150px;"></textarea>
-                        <button id="loadConfigurationDialog_scriptButton" class="uk-button uk-modal-close">Load</button>
+                        <textarea id="loadScriptDialog_scriptText" class="uk-form-width-large" style="height:150px;"></textarea>
+                        <button id="loadScriptDialog_scriptButton" class="uk-button uk-modal-close">Load</button>
                     </div>
                  </form>
 
                  <div class="uk-modal-footer uk-text-right">
-                    <button id="loadConfigurationDialog_okay" class="uk-button uk-modal-close">Close</button>
+                    <button id="loadScriptDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="loadScriptDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
                 </div>
            </div>
         </div>
 
-
-        <div id="layerAdderDialog" class="uk-modal">
-            <div class="uk-modal-dialog">
-                <div class="uk-modal-header">
-                    Add Layer
-                </div>
-
-                <p>
-                    <i>Add base imagery layer (Bing, ArcGis, OSM) - not yet implemented</i>
-                </p>
-                <hr>
-
-                <p>
-                    <i>Add base terrain layer (ArcGis, Cesium/small, Cesium/STK, VR/TheWorld) - not yet implemented</i>
-                </p>
-                <hr>
-
-                <p>
-                    <i>Add imagery layer (Single, WMS, TMS) - not yet implemented</i>
-                </p>
-                <hr>
-
-                <p>
-                    <i>Add Terrain layer - not yet implemented</i>
-                </p>
-                <hr>
-
-                <p>
-                    <i>Add GeoJSON layer - not yet implemented</i>
-                </p>
-                <hr>
-
-                <p>
-                    <i>Add point cloud layer - not yet implemented</i>
-                </p>
-
-                <div class="uk-modal-footer uk-text-right">
-                    <button id="layerAdderDialog_okay" class="uk-button uk-modal-close">Close</button>
-                </div>
-           </div>
-        </div>
-
-
-        <div id="layerManagerDialog" class="uk-modal">
-            <div class="uk-modal-dialog">
-                <div class="uk-modal-header">
-                    Layer Manager
-               </div>
-
-                <div class="uk-grid">
-
-                    <div class="uk-width-2-3">
-                        <div class="uk-scrollable-box">
-
-                            <ul class="uk-list" id="layerList">
-                                <li>
-                                    <label><input type="checkbox">Item One</label>
-                                </li>
-                                <li>
-                                    <label><input type="checkbox">Item Two</label>
-                                </li>
-                            </ul>
-
-                        </div>
-                    </div>
-
-                    <div class="uk-width-1-3 uk-flex-column">
-                        <div>
-                            <button id="layerManagerDialog_remove" class="uk-button uk-margin-small-bottom">Remove</button>
-                        </div>
-                        <div>
-                            <button id="layerManagerDialog_customize" class="uk-button uk-margin-small-bottom">Customize...</button>
-                        </div>
-                        <div>
-                            <button id="layerManagerDialog_details" class="uk-button uk-margin-small-bottom">Details...</button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="uk-modal-footer uk-text-right">
-                    <button id="layerManagerDialog_okay" class="uk-button uk-modal-close">Close</button>
-                </div>
-
-            </div>
-
-        </div>
 
 
         <div id="cameraSettingsDialog" class="uk-modal">
@@ -316,60 +243,14 @@
             </div>
         </div>
 
-
          <div id="layerInfoDialog" class="uk-modal">
             <div class="uk-modal-dialog">
                 <div class="uk-modal-header">
                     Layer Information
                 </div>
 
-                <div>
-                    <table class="uk-table .uk-table-condensed">
-                        <tr>
-                            <td>Name:</td>
-                            <td id="infoDialog_name"></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Layer Type:</td>
-                            <td id="infoDialog_type"></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Description:</td>
-                            <td id="infoDialog_description" colspan="2"></td>
-                        </tr>
-                        <tr>
-                            <td>URL:</td>
-                            <td id="infoDialog_url" colspan="2"></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Proxy:</td>
-                            <td id="infoDialog_proxy" colspan="2"></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Points:</td>
-                            <td id="infoDialog_numPoints"></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>X:</td>
-                            <td id="infoDialog_minX"></td>
-                            <td id="infoDialog_maxX"></td>
-                        </tr>
-                        <tr>
-                            <td>Y:</td>
-                            <td id="infoDialog_minY"></td>
-                            <td id="infoDialog_maxY"></td>
-                        </tr>
-                        <tr>
-                            <td>Z:</td>
-                            <td id="infoDialog_minZ"></td>
-                            <td id="infoDialog_maxZ"></td>
-                        </tr>
-                    </table>
+                <div class="uk-scrollable-text">
+                    <pre id="infoDialog_body"></pre>
                 </div>
 
                 <div class="uk-modal-footer uk-text-right">
@@ -378,26 +259,41 @@
             </div>
         </div>
 
-
          <div id="layerCustomizationDialog" class="uk-modal">
             <div class="uk-modal-dialog">
                 <div class="uk-modal-header">
                     Layer Customization
                 </div>
+                <div class="uk-grid">
+
+                    <div class="uk-width-2-3">
+                        <div class="uk-scrollable-box">
+
+                            <ul class="uk-list" id="layerList2">
+                                <li>
+                                    <label><input type="checkbox">Item One</label>
+                                </li>
+                                <li>
+                                    <label><input type="checkbox">Item Two</label>
+                                </li>
+                            </ul>
+
+                        </div>
+                    </div>
+
+                </div>
 
                 <div>
-                    Visibility
                     <form class="uk-form uk-form-horizontal">
-                            <label class="uk-form-label" for="layerCustomizationDialog_visible">Enabled:</label>
+                            <label class="uk-form-label" for="layerCustomizationDialog_visible">Visibility enabled:</label>
                             <input id="layerCustomizationDialog_visibility" type="checkbox">
                     </form>
                 </div>
                 <hr>
 
                 <div>
-                    Bounding Box Visibility
                     <form class="uk-form uk-form-horizontal">
-                            <label class="uk-form-label" for="layerCustomizationDialog_bboxVisible">Enabled:</label>
+                            <label class="uk-form-label" for="layerCustomizationDialog_bboxVisible">Bbox visibility Enabled:</label>
                             <input id="layerCustomizationDialog_bboxVisibility" type="checkbox">
                     </form>
                 </div>
@@ -421,7 +317,8 @@
                 <hr>
 
                 <div class="uk-modal-footer uk-text-right">
-                    <button id="layerCustomizationDialog_okay" class="uk-button uk-modal-close">Close</button>
+                    <button id="layerCustomizationDialog_okay" class="uk-button uk-modal-close">Okay</button>
+                    <button id="layerCustomizationDialog_cancel" class="uk-button uk-modal-close">Cancel</button>
                 </div>
             </div>
         </div>

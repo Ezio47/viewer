@@ -14,11 +14,10 @@ import '../frontend/rialto_frontend_library.dart';
 part 'ui_components/about_dialog.dart';
 part 'ui_components/advanced_settings_dialog.dart';
 part 'ui_components/camera_settings_dialog.dart';
-part 'ui_components/layer_adder_dialog.dart';
-part 'ui_components/layer_customization_dialog.dart';
+part 'ui_components/load_script_dialog.dart';
+part 'ui_components/load_url_dialog.dart';
 part 'ui_components/layer_info_dialog.dart';
-part 'ui_components/load_configuration_dialog.dart';
-part 'ui_components/layer_manager_dialog.dart';
+part 'ui_components/layer_customization_dialog.dart';
 part 'ui_components/wps_dialog.dart';
 
 part 'viewmodels/check_box_vm.dart';

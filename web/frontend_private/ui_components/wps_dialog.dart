@@ -9,8 +9,7 @@ class WpsDialog extends DialogVM {
 
   Map<String, TextInputVM> _fields = new Map<String, TextInputVM>();
 
-  WpsDialog(RialtoFrontend frontend, String id, WpsProcess this.process)
-      : super(frontend, id, ignoreStateChanging: true) {
+  WpsDialog(RialtoFrontend frontend, String id, WpsProcess this.process) : super(frontend, id) {
     for (var param in process.inputs) {
       addParameter(param);
     }
@@ -36,7 +35,7 @@ class WpsDialog extends DialogVM {
     tcell.children.add(input);
 
     _fields[param.name] = new TextInputVM(_frontend, id + "_" + param.name, "");
-    _register(_fields[param.name]);
+    register(_fields[param.name]);
   }
 
   static void makeDialogShell(String name) {
@@ -105,7 +104,7 @@ class WpsDialog extends DialogVM {
           inputs[param.name] = _fields[param.name].valueAsInt;
           break;
         case WpsProcessParamDataType.string:
-          inputs[param.name] = _fields[param.name].value;
+          inputs[param.name] = _fields[param.name].getValue();
           break;
         default:
           RialtoBackend.error("invalid wps datatype");

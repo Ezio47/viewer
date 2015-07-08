@@ -4,56 +4,96 @@
 
 part of rialto.frontend.private;
 
-
 /// base class for Rialto's notion of a UI component
 abstract class ViewModel {
-    RialtoFrontend _frontend;
-    RialtoBackend _backend;
-    final String id;
-    Element _element;
+  RialtoFrontend _frontend;
+  RialtoBackend _backend;
+  final String id;
+  Element _element;
 
-    /// Create a view model for the given HTML element
-    ///
-    /// [id] must start with a '#'
-    ViewModel(RialtoFrontend this._frontend, String this.id) {
-        assert(id.startsWith("#"));
+  /// Create a view model for the given HTML element
+  ///
+  /// [id] must start with a '#'
+  ViewModel(RialtoFrontend this._frontend, String this.id) {
+    assert(id.startsWith("#"));
 
-        _backend = _frontend.backend;
+    _backend = _frontend.backend;
 
-        _element = querySelector(id);
-        if (_element == null) {
-            throw new ArgumentError("HTML element with id=$id not found");
-        }
+    _element = querySelector(id);
+    if (_element == null) {
+      throw new ArgumentError("HTML element with id=$id not found");
     }
+  }
 }
 
+//----------------------------------------------------
 
-/// mixin class for a UI component that contains other components (that need to track state)
-abstract class IForm {
-    List<MStateControl> controls = new List();
-    _register(MStateControl c) => controls.add(c);
-    void saveState() => controls.forEach((c) => c.saveState());
-    void restoreState() => controls.forEach((c) => c.restoreState());
-    bool get anyStateChanged => controls.any((c) => c.stateChanged);
+class StateTracker {
+  List<StateControl> _controls = new List<StateControl>();
+
+  void _add(InputVM input) {
+    _controls.add(input.stateControl);
+  }
+
+  void saveState() => _controls.forEach((c) => c.saveState());
+
+  void restoreState() => _controls.forEach((c) => c.restoreState());
+
+  bool get stateChanged => _controls.any((c) => c.stateChanged);
 }
 
+abstract class FormVM extends ViewModel {
+  StateTracker stateTracker;
 
-// /mixin class for a UI component that needs to track state
-abstract class MStateControl<T> {
-    T _startingValue;
+  FormVM(RialtoFrontend frontend, String id) : super(frontend, id) {
+    stateTracker = new StateTracker();
+  }
+  void register(InputVM input) {
+    stateTracker._add(input);
+  }
+}
 
-    void saveState() {
-        _startingValue = value;
-    }
+//----------------------------------------------------
 
-    void restoreState() {
-        value = _startingValue;
-    }
+class StateControl<T> {
+  final T _defaultValue;
+  T _savedValue;
+  T _currentValue;
 
-    bool get stateChanged {
-        return (_startingValue != value);
-    }
+  StateControl(T this._defaultValue) {
+    _currentValue = _defaultValue;
+  }
 
-    T get value;
-    set value(T);
+  void setCurrentValue(T v) {
+    _currentValue = v;
+  }
+
+  T getCurrentValue() => _currentValue;
+
+  T getDefaultValue() => _defaultValue;
+
+  void saveState() {
+    _savedValue = _currentValue;
+  }
+
+  void restoreState() {
+    _currentValue = _savedValue;
+  }
+
+  bool get stateChanged => _savedValue != _currentValue;
+}
+
+abstract class InputVM<T> extends ViewModel {
+  StateControl<T> stateControl;
+
+  InputVM(RialtoFrontend frontend, String id, T defaultValue) : super(frontend, id) {
+    stateControl = new StateControl<T>(defaultValue);
+  }
+
+  void refresh(T v) {
+    stateControl.setCurrentValue(v);
+    print("control $id is now $v");
+  }
+
+  T getValue() => stateControl.getCurrentValue();
 }

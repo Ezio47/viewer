@@ -11,117 +11,126 @@ part of rialto.frontend;
 /// It is considered a "client" of the Rialto library, and so it should only access the viewer's
 /// public interfaces.
 class RialtoFrontend {
-    RialtoBackend backend;
-    Element _mouseCoords;
+  RialtoBackend backend;
+  Element _mouseCoords;
 
-    ViewModeCode viewMode = ViewModeCode.mode3D;
+  ViewModeCode viewMode = ViewModeCode.mode3D;
 
-    Element _textWpsJobStatus;
+  Element _textWpsJobStatus;
 
-    RialtoFrontend() {
-        backend = new RialtoBackend();
+  RialtoFrontend() {
+    backend = new RialtoBackend();
 
-        querySelector("#homeWorldButton").onClick.listen((ev) => backend.commands.zoomToWorld());
-        querySelector("#homeDataButton").onClick.listen((ev) => backend.commands.zoomToLayer(null));
+    querySelector("#homeWorldButton").onClick.listen((ev) => backend.commands.zoomToWorld());
+    querySelector("#homeDataButton").onClick.listen((ev) => backend.commands.zoomToLayer(null));
 
-        querySelector("#wpsTestButton").onClick.listen((ev) => backend.commands.testWps());
-        querySelector("#viewshedCircleButton").onClick.listen((ev) => backend.commands.createViewshedCircle());
-        querySelector("#viewshedComputeButton").onClick.listen((ev) => backend.commands.computeViewshed());
+    querySelector("#wpsTestButton").onClick.listen((ev) => backend.commands.testWps());
+    querySelector("#viewshedCircleButton").onClick
+        .listen((ev) => backend.commands.createViewshedCircle());
+    querySelector("#viewshedComputeButton").onClick
+        .listen((ev) => backend.commands.computeViewshed());
 
-        querySelector("#linearMeasurementButton").onClick.listen((ev) => backend.commands.computeLinearMeasurement());
-        querySelector("#areaMeasurementButton").onClick.listen((ev) => backend.commands.computeAreaMeasurement());
+    querySelector("#linearMeasurementButton").onClick
+        .listen((ev) => backend.commands.computeLinearMeasurement());
+    querySelector("#areaMeasurementButton").onClick
+        .listen((ev) => backend.commands.computeAreaMeasurement());
 
-        querySelector("#dropPinButton").onClick.listen((ev) => backend.commands.dropPin());
+    querySelector("#dropPinButton").onClick.listen((ev) => backend.commands.dropPin());
 
-        querySelector("#drawExtentButton").onClick.listen((ev) => backend.commands.drawExtent());
+    querySelector("#drawExtentButton").onClick.listen((ev) => backend.commands.drawExtent());
 
-        var modeButton2D = querySelector("#modeButton2D");
-        var modeButton25D = querySelector("#modeButton25D");
-        var modeButton3D = querySelector("#modeButton3D");
-        modeButton2D.onClick.listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
-        modeButton25D.onClick.listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
-        modeButton3D.onClick.listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
+    var modeButton2D = querySelector("#modeButton2D");
+    var modeButton25D = querySelector("#modeButton25D");
+    var modeButton3D = querySelector("#modeButton3D");
+    modeButton2D.onClick
+        .listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
+    modeButton25D.onClick
+        .listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
+    modeButton3D.onClick
+        .listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
 
-        new LoadConfigurationDialog(this, "#loadConfigurationDialog");
-        new LayerManagerDialog(this, "#layerManagerDialog");
-        new LayerAdderDialog(this, "#layerAdderDialog");
-        new CameraSettingsDialog(this, "#cameraSettingsDialog");
-        new AdvancedSettingsDialog(this, "#advancedSettingsDialog");
+    new LoadUrlDialog(this, "#loadUrlDialog");
+    new LoadScriptDialog(this, "#loadScriptDialog");
+    new LayerCustomizationDialog(this, "#layerCustomizationDialog");
+    new LayerInfoDialog(this, "#layerInfoDialog");
+    new CameraSettingsDialog(this, "#cameraSettingsDialog");
+    new AdvancedSettingsDialog(this, "#advancedSettingsDialog");
 
-        new AboutDialog(this, "#aboutRialtoDialog");
-        new AboutDialog(this, "#aboutCesiumDialog");
-        new AboutDialog(this, "#wpsStatusDialog");
-        new AboutDialog(this, "#logDialog");
+    new AboutDialog(this, "#aboutRialtoDialog");
+    new AboutDialog(this, "#aboutCesiumDialog");
+    new AboutDialog(this, "#wpsStatusDialog");
+    new AboutDialog(this, "#logDialog");
 
-        _mouseCoords = querySelector("#textMouseCoords");
-        backend.events.MouseMove.subscribe(_handleUpdateCoords);
+    _mouseCoords = querySelector("#textMouseCoords");
+    backend.events.MouseMove.subscribe(_handleUpdateCoords);
 
-        _textWpsJobStatus = querySelector("#wpsStatusDialog_open");
-        _handleWpsJobUpdate();
-        backend.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
+    _textWpsJobStatus = querySelector("#wpsStatusDialog_open");
+    _handleWpsJobUpdate();
+    backend.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
+  }
+
+  void addWpsProcessDialog(String processName) {
+    var nam = processName.substring(3); // exclude the "py:" part
+
+    // add menu item for the process
+    {
+      var anchor = new AnchorElement();
+      anchor.id = nam + "Dialog_open";
+      anchor.text = processName;
+
+      var list = new LIElement();
+      list.classes.add("uk-active");
+      list.children.add(anchor);
+
+      UListElement menu = querySelector("#toolsMenu");
+      menu.children.add(list);
     }
 
-    void addWpsProcessDialog(String processName) {
-        var nam = processName.substring(3); // exclude the "py:" part
+    // create the <dialog> html
+    WpsDialog.makeDialogShell(nam);
 
-        // add menu item for the process
-        {
-            var anchor = new AnchorElement();
-            anchor.id = nam + "Dialog_open";
-            anchor.text = processName;
+    // populate the shell
+    new WpsDialog(this, "#" + nam + "Dialog", backend.wps.processes[processName]);
+  }
 
-            var list = new LIElement();
-            list.classes.add("uk-active");
-            list.children.add(anchor);
+  String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";
 
-            UListElement menu = querySelector("#toolsMenu");
-            menu.children.add(list);
-        }
+  void _handleUpdateCoords(MouseData d) {
+    var v = backend.cesium.getMouseCoordinates(d.x, d.y);
+    if (v == null) return;
 
-        // create the <dialog> html
-        WpsDialog.makeDialogShell(nam);
+    final precision = backend.displayPrecision;
+    final double lon = v.longitude;
+    final double lat = v.latitude;
+    String s = "(${lon.toStringAsFixed(precision)}, ${lat.toStringAsFixed(precision)})";
 
-        // populate the shell
-        new WpsDialog(this, "#" + nam + "Dialog", backend.wps.processes[processName]);
+    _mouseCoords.text = s;
+  }
+
+  void _handleWpsJobUpdate() {
+    final int numActive = backend.wpsJobManager.numActive;
+
+    if (numActive < 0) {
+      throw new ArgumentError("invalid WPS request count");
     }
 
-    String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";
-
-    void _handleUpdateCoords(MouseData d) {
-        var v = backend.cesium.getMouseCoordinates(d.x, d.y);
-        if (v == null) return;
-
-        final precision = backend.displayPrecision;
-        final double lon = v.longitude;
-        final double lat = v.latitude;
-        String s = "(${lon.toStringAsFixed(precision)}, ${lat.toStringAsFixed(precision)})";
-
-        _mouseCoords.text = s;
+    if (numActive == 0) {
+      if (!_textWpsJobStatus.classes.contains("uk-text-muted")) {
+        _textWpsJobStatus.classes.add("uk-text-muted");
+      }
+    } else {
+      if (_textWpsJobStatus.classes.contains("uk-text-muted")) {
+        _textWpsJobStatus.classes.remove("uk-text-muted");
+      }
     }
 
-    void _handleWpsJobUpdate() {
-        final int numActive = backend.wpsJobManager.numActive;
+    _textWpsJobStatus.text = "Active jobs: ${backend.wpsJobManager.numActive}";
 
-        if (numActive < 0) {
-            throw new ArgumentError("invalid WPS request count");
-        }
+    String s = "";
+    s += "Job count: ${backend.wpsJobManager.map.length}\n";
 
-        if (numActive == 0) {
-            if (!_textWpsJobStatus.classes.contains("uk-text-muted")) {
-                _textWpsJobStatus.classes.add("uk-text-muted");
-            }
-        } else {
-            if (_textWpsJobStatus.classes.contains("uk-text-muted")) {
-                _textWpsJobStatus.classes.remove("uk-text-muted");
-            }
-        }
-
-        _textWpsJobStatus.text = "Active jobs: ${backend.wpsJobManager.numActive}";
-
-        String s = "";
-        s += "Job count: ${backend.wpsJobManager.map.length}\n";
-
-        backend.wpsJobManager.map.keys.forEach((id) => s += "\n----\n" + backend.wpsJobManager.map[id].dump());
-        querySelector("#wpsStatusDialog_body").text = s;
-    }
+    backend.wpsJobManager.map.keys
+        .forEach((id) => s += "\n----\n" + backend.wpsJobManager.map[id].dump());
+    querySelector("#wpsStatusDialog_body").text = s;
+  }
 }

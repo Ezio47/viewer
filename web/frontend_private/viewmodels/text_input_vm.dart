@@ -4,59 +4,46 @@
 
 part of rialto.frontend.private;
 
-
 /// UI component that allows for one-line text entry
-class TextInputVM extends ViewModel with MStateControl<String> {
-    InputElement _inputElement;
-    String defaultValue;
+class TextInputVM extends InputVM<String> {
+  InputElement _inputElement;
 
-    TextInputVM(RialtoFrontend frontend, String id, String this.defaultValue) : super(frontend, id) {
-        _inputElement = _element;
-        value = defaultValue;
-    }
+  TextInputVM(RialtoFrontend frontend, String id, String defaultValue)
+      : super(frontend, id, defaultValue) {
+    _inputElement = _element;
+    _inputElement.value = defaultValue;
+    _inputElement.onChange.listen((e) => refresh(_inputElement.value));
+  }
 
-    @override
-    String get value => _inputElement.value;
+  /// returns value as a double (or 0.0)
+  double get valueAsDouble {
+    String s = getValue();
+    double d = null;
 
-    @override
-    set value(String value) => _inputElement.value = value;
+    d = double.parse(s, (s) => 0.0);
+    return d;
+  }
 
+  /// returns value as an int (or 0)
+  int get valueAsInt {
+    String s = getValue();
+    int i = null;
 
-    /// returns value as a double (or 0.0)
-    double get valueAsDouble {
-        String s = value;
-        double d = null;
+    i = int.parse(s, onError: (s) => 0);
+    return i;
+  }
 
-        d = double.parse(s, (s) => 0.0);
-        return d;
-    }
-
-    /// returns value as an int (or 0)
-    int get valueAsInt {
-        String s = value;
-        int i = null;
-
-        i = int.parse(s, onError: (s) => 0);
-        return i;
-    }
-
-    // TODO: add validation for data type of input string
+  // TODO: add validation for data type of input string
 }
 
-
 /// UI component that allows for multi-line text entry
-class TextAreaInputVM extends ViewModel with MStateControl<String> {
-    TextAreaElement _inputElement;
-    String defaultValue;
+class TextAreaInputVM extends InputVM<String> {
+  TextAreaElement _inputElement;
 
-    TextAreaInputVM(RialtoFrontend frontend, String id, String this.defaultValue) : super(frontend, id) {
-        _inputElement = _element;
-        value = defaultValue;
-    }
-
-    @override
-    String get value => _inputElement.value;
-
-    @override
-    set value(String value) => _inputElement.value = value;
+  TextAreaInputVM(RialtoFrontend frontend, String id, String defaultValue)
+      : super(frontend, id, defaultValue) {
+    _inputElement = _element;
+    _inputElement.value = defaultValue;
+    _inputElement.onChange.listen((e) => refresh(_inputElement.value));
+  }
 }
