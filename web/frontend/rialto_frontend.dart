@@ -25,15 +25,11 @@ class RialtoFrontend {
     querySelector("#homeDataButton").onClick.listen((ev) => backend.commands.zoomToLayer(null));
 
     querySelector("#wpsTestButton").onClick.listen((ev) => backend.commands.testWps());
-    querySelector("#viewshedCircleButton").onClick
-        .listen((ev) => backend.commands.createViewshedCircle());
-    querySelector("#viewshedComputeButton").onClick
-        .listen((ev) => backend.commands.computeViewshed());
+    querySelector("#viewshedCircleButton").onClick.listen((ev) => backend.commands.createViewshedCircle());
+    querySelector("#viewshedComputeButton").onClick.listen((ev) => backend.commands.computeViewshed());
 
-    querySelector("#linearMeasurementButton").onClick
-        .listen((ev) => backend.commands.computeLinearMeasurement());
-    querySelector("#areaMeasurementButton").onClick
-        .listen((ev) => backend.commands.computeAreaMeasurement());
+    querySelector("#linearMeasurementButton").onClick.listen((ev) => backend.commands.computeLinearMeasurement());
+    querySelector("#areaMeasurementButton").onClick.listen((ev) => backend.commands.computeAreaMeasurement());
 
     querySelector("#dropPinButton").onClick.listen((ev) => backend.commands.dropPin());
 
@@ -42,24 +38,21 @@ class RialtoFrontend {
     var modeButton2D = querySelector("#modeButton2D");
     var modeButton25D = querySelector("#modeButton25D");
     var modeButton3D = querySelector("#modeButton3D");
-    modeButton2D.onClick
-        .listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
-    modeButton25D.onClick
-        .listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
-    modeButton3D.onClick
-        .listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
+    modeButton2D.onClick.listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode2D)));
+    modeButton25D.onClick.listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode25D)));
+    modeButton3D.onClick.listen((ev) => backend.commands.setViewMode(new ViewModeData(ViewModeCode.mode3D)));
 
-    new LoadUrlDialog(this, "#loadUrlDialog");
-    new LoadScriptDialog(this, "#loadScriptDialog");
-    new LayerCustomizationDialog(this, "#layerCustomizationDialog");
-    new LayerInfoDialog(this, "#layerInfoDialog");
-    new CameraSettingsDialog(this, "#cameraSettingsDialog");
-    new AdvancedSettingsDialog(this, "#advancedSettingsDialog");
+    new LoadUrlDialog(this, "loadUrlDialog");
+    new LoadScriptDialog(this, "loadScriptDialog");
+    new LayerCustomizationDialog(this, "layerCustomizationDialog");
+    new LayerInfoDialog(this, "layerInfoDialog");
+    new CameraSettingsDialog(this, "cameraSettingsDialog");
+    new AdvancedSettingsDialog(this, "advancedSettingsDialog");
 
-    new AboutDialog(this, "#aboutRialtoDialog");
-    new AboutDialog(this, "#aboutCesiumDialog");
-    new AboutDialog(this, "#wpsStatusDialog");
-    new AboutDialog(this, "#logDialog");
+    new AboutDialog(this, "aboutRialtoDialog");
+    new AboutDialog(this, "aboutCesiumDialog");
+    new AboutDialog(this, "wpsStatusDialog");
+    new AboutDialog(this, "logDialog");
 
     _mouseCoords = querySelector("#textMouseCoords");
     backend.events.MouseMove.subscribe(_handleUpdateCoords);
@@ -90,7 +83,7 @@ class RialtoFrontend {
     WpsDialog.makeDialogShell(nam);
 
     // populate the shell
-    new WpsDialog(this, "#" + nam + "Dialog", backend.wps.processes[processName]);
+    new WpsDialog(this, nam + "Dialog", backend.wps.processes[processName]);
   }
 
   String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";
@@ -129,8 +122,7 @@ class RialtoFrontend {
     String s = "";
     s += "Job count: ${backend.wpsJobManager.map.length}\n";
 
-    backend.wpsJobManager.map.keys
-        .forEach((id) => s += "\n----\n" + backend.wpsJobManager.map[id].dump());
+    backend.wpsJobManager.map.keys.forEach((id) => s += "\n----\n" + backend.wpsJobManager.map[id].dump());
     querySelector("#wpsStatusDialog_body").text = s;
   }
 }

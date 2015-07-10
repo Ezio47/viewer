@@ -18,18 +18,18 @@ abstract class DialogVM extends FormVM {
     _dialogElement = _element;
     assert(_dialogElement != null);
 
-    var openButton = querySelector(openButtonId);
+    var openButton = querySelector("#" + openButtonId);
     if (openButton != null) {
       openButton.onClick.listen((ev) => show());
     }
 
-    var okayButton = querySelector(okayButtonId);
+    var okayButton = querySelector("#" + okayButtonId);
     print("listening? $okayButtonId");
     assert(okayButton != null);
     okayButton.onClick.listen((e) => hide(true));
 
     if (_hasCancelButton) {
-      var cancelButton = querySelector(cancelButtonId);
+      var cancelButton = querySelector("#" + cancelButtonId);
       assert(cancelButton != null);
       cancelButton.onClick.listen((e) => hide(false));
     }
@@ -41,13 +41,13 @@ abstract class DialogVM extends FormVM {
 
   void show() {
     _backend.js.showDialog(_dialogProxy);
-    stateTracker.saveState();
+    _stateTracker.saveState();
     _show();
   }
 
   void hide(bool okay) {
     if (!okay) {
-      stateTracker.restoreState();
+      _stateTracker.restoreState();
     } else {
       _hide();
       _postHide();
@@ -57,12 +57,12 @@ abstract class DialogVM extends FormVM {
 
   void tempshow() {
     _backend.js.showDialog(_dialogProxy);
-    stateTracker.restoreState();
+    _stateTracker.restoreState();
     _show();
   }
 
   void temphide() {
-    stateTracker.saveState();
+    _stateTracker.saveState();
     _backend.js.hideDialog(_dialogProxy);
   }
 

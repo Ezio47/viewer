@@ -8,13 +8,20 @@ part of rialto.frontend.private;
 class TextInputVM extends InputVM<String> {
   InputElement _inputElement;
 
+  static InputElement makeHtmlTextInputElement(String id, String defaultValue) {
+    var t = new InputElement();
+    t.id = id;
+    t.type = "text";
+    return t;
+  }
+
   TextInputVM(RialtoFrontend frontend, String id, String defaultValue) : super(frontend, id, defaultValue) {
     _inputElement = _element;
     _inputElement.value = defaultValue;
-    _inputElement.onChange.listen((e) => refresh(_inputElement.value));
+    _inputElement.onChange.listen((e) => setValue(_inputElement.value));
   }
 
-  void _elementRefresh(String v) {
+  void _setElementValue(String v) {
     _inputElement.value = v;
   }
 
@@ -46,10 +53,10 @@ class TextAreaInputVM extends InputVM<String> {
   TextAreaInputVM(RialtoFrontend frontend, String id, String defaultValue) : super(frontend, id, defaultValue) {
     _inputElement = _element;
     _inputElement.value = defaultValue;
-    _inputElement.onChange.listen((e) => refresh(_inputElement.value));
+    _inputElement.onChange.listen((e) => setValue(_inputElement.value));
   }
 
-  void _elementRefresh(String v) {
+  void _setElementValue(String v) {
     _inputElement.value = v;
   }
 }
@@ -66,7 +73,7 @@ class PositionInputVM extends TextInputVM {
         RialtoBackend.log("Pin + $position");
 
         _parentDialog.tempshow();
-        refresh("$position");
+        setValue("$position");
       });
       //print(state);
     };

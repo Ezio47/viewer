@@ -10,15 +10,15 @@ class LoadUrlDialog extends DialogVM {
   TextInputVM _urlText;
 
   LoadUrlDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _urlText = new TextInputVM(_frontend, "#loadUrlDialog_urlText", _defaultUrl);
+    _urlText = new TextInputVM(_frontend, "loadUrlDialog_urlText", _defaultUrl);
 
-    register(_urlText);
+    _trackState(_urlText);
   }
 
   @override
   void _show() {
     if (_urlText.getValue() == null || _urlText.getValue().isEmpty) {
-      _urlText.refresh(_defaultUrl);
+      _urlText.setValue(_defaultUrl);
     }
   }
 

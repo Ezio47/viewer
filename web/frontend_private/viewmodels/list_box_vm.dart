@@ -34,11 +34,11 @@ class ListBoxVM extends InputVM<String> {
       if (_selectElement.value != null && !_selectElement.value.isEmpty) {
         v = _selectElement.value;
       }
-      refresh(v);
+      setValue(v);
     });
   }
 
-  void _elementRefresh(String v) {}
+  void _setElementValue(String v) {}
 
   void add(String item) {
     var wrapper = new ListBoxItem(item);
@@ -51,7 +51,7 @@ class ListBoxVM extends InputVM<String> {
     _list.clear();
     _map.clear();
     _selectElement.children.clear();
-    stateControl.setCurrentValue(null);
+    _stateController.setCurrentValue(null);
   }
 
   set disabled(bool v) => _selectElement.disabled = v;

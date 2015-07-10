@@ -13,19 +13,18 @@ class LayerCustomizationDialog extends DialogVM {
   CheckBoxVM _bboxVisibilityButton;
 
   LayerCustomizationDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _rampsListBox = new ListBoxVM(_frontend, "#layerCustomizationDialog_colorRamps");
-    _dimsListBox = new ListBoxVM(_frontend, "#layerCustomizationDialog_colorDims");
+    _rampsListBox = new ListBoxVM(_frontend, "layerCustomizationDialog_colorRamps");
+    _dimsListBox = new ListBoxVM(_frontend, "layerCustomizationDialog_colorDims");
 
-    _visibilityButton = new CheckBoxVM(_frontend, "#layerCustomizationDialog_visibility", true);
-    _bboxVisibilityButton =
-        new CheckBoxVM(_frontend, "#layerCustomizationDialog_bboxVisibility", true);
+    _visibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_visibility", true);
+    _bboxVisibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_bboxVisibility", true);
 
-    register(_rampsListBox);
-    register(_dimsListBox);
-    register(_visibilityButton);
-    register(_bboxVisibilityButton);
+    _trackState(_rampsListBox);
+    _trackState(_dimsListBox);
+    _trackState(_visibilityButton);
+    _trackState(_bboxVisibilityButton);
 
-    _listbox = new BetterListBoxVM(_frontend, "#layerList2", _updateButtons);
+    _listbox = new BetterListBoxVM(_frontend, "layerList2", _updateButtons);
 
     _updateButtons();
   }
@@ -73,7 +72,7 @@ class LayerCustomizationDialog extends DialogVM {
     if (colorizer) {
       var ramps = _backend.cesium.getColorRampNames();
       ramps.forEach((s) => _rampsListBox.add(s));
-      _rampsListBox.refresh(ramps[0]);
+      _rampsListBox.setValue(ramps[0]);
 
       var dims = new Set<String>();
       if (_target is ColorizerControl) {
@@ -84,7 +83,7 @@ class LayerCustomizationDialog extends DialogVM {
       dims.sort();
 
       dims.forEach((d) => _dimsListBox.add(d));
-      _dimsListBox.refresh(dims[0]);
+      _dimsListBox.setValue(dims[0]);
 
       _rampsListBox.disabled = false;
       _dimsListBox.disabled = false;
@@ -95,14 +94,14 @@ class LayerCustomizationDialog extends DialogVM {
 
     if (visibility) {
       _visibilityButton.disabled = false;
-      _visibilityButton.refresh((_target as VisibilityControl).visible);
+      _visibilityButton.setValue((_target as VisibilityControl).visible);
     } else {
       _visibilityButton.disabled = true;
     }
 
     if (bboxVisibility) {
       _bboxVisibilityButton.disabled = false;
-      _bboxVisibilityButton.refresh((_target as BboxVisibilityControl).bboxVisible);
+      _bboxVisibilityButton.setValue((_target as BboxVisibilityControl).bboxVisible);
     } else {
       _bboxVisibilityButton.disabled = true;
     }
@@ -138,8 +137,7 @@ class BetterListBoxVM extends ViewModel {
   BetterListBoxItem _selection;
   Function _onSelection;
 
-  BetterListBoxVM(RialtoFrontend frontend, String id, Function this._onSelection)
-      : super(frontend, id) {
+  BetterListBoxVM(RialtoFrontend frontend, String id, Function this._onSelection) : super(frontend, id) {
     _ulElement = _element;
     _ulElement.children.clear();
   }

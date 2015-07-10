@@ -13,19 +13,19 @@ class CameraSettingsDialog extends DialogVM {
   TextInputVM _roll;
 
   CameraSettingsDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _longitude = new TextInputVM(_frontend, "#cameraSettingsDialog_longitude", "0.0");
-    _latitude = new TextInputVM(_frontend, "#cameraSettingsDialog_latitude", "0.0");
-    _height = new TextInputVM(_frontend, "#cameraSettingsDialog_height", "15000000.0");
-    _heading = new TextInputVM(_frontend, "#cameraSettingsDialog_heading", "0.0");
-    _pitch = new TextInputVM(_frontend, "#cameraSettingsDialog_pitch", "-90.0");
-    _roll = new TextInputVM(_frontend, "#cameraSettingsDialog_roll", "0.0");
+    _longitude = new TextInputVM(_frontend, "cameraSettingsDialog_longitude", "0.0");
+    _latitude = new TextInputVM(_frontend, "cameraSettingsDialog_latitude", "0.0");
+    _height = new TextInputVM(_frontend, "cameraSettingsDialog_height", "15000000.0");
+    _heading = new TextInputVM(_frontend, "cameraSettingsDialog_heading", "0.0");
+    _pitch = new TextInputVM(_frontend, "cameraSettingsDialog_pitch", "-90.0");
+    _roll = new TextInputVM(_frontend, "cameraSettingsDialog_roll", "0.0");
 
-    register(_longitude);
-    register(_latitude);
-    register(_height);
-    register(_heading);
-    register(_pitch);
-    register(_roll);
+    _trackState(_longitude);
+    _trackState(_latitude);
+    _trackState(_height);
+    _trackState(_heading);
+    _trackState(_pitch);
+    _trackState(_roll);
   }
 
   @override

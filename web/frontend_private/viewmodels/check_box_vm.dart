@@ -17,10 +17,10 @@ class CheckBoxVM extends InputVM<bool> {
     _inputElement = _element;
     assert(_inputElement.type == "checkbox");
     _inputElement.checked = getValue();
-    _inputElement.onClick.listen((e) => refresh(_inputElement.checked));
+    _inputElement.onClick.listen((e) => setValue(_inputElement.checked));
   }
 
-  void _elementRefresh(bool v) {
+  void _setElementValue(bool v) {
     _inputElement.checked = v;
   }
 

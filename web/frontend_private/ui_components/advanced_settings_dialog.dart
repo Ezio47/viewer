@@ -10,17 +10,17 @@ class AdvancedSettingsDialog extends DialogVM {
   TextInputVM _displayPrecision;
 
   AdvancedSettingsDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _displayPrecision = new TextInputVM(_frontend, "#advancedSettingsDialog_displayPrecision", "5");
+    _displayPrecision = new TextInputVM(_frontend, "advancedSettingsDialog_displayPrecision", "5");
 
     _backend.events.AdvancedSettingsChanged.subscribe(_handleChange);
-    _bboxEnabled = new CheckBoxVM(_frontend, "#advancedSettingsDialog_bboxEnabled", true);
+    _bboxEnabled = new CheckBoxVM(_frontend, "advancedSettingsDialog_bboxEnabled", true);
 
-    register(_bboxEnabled);
-    register(_displayPrecision);
+    _trackState(_bboxEnabled);
+    _trackState(_displayPrecision);
   }
 
   void _handleChange(AdvancedSettingsChangedData data) {
-    _displayPrecision.refresh(data.displayPrecision.toString());
+    _displayPrecision.setValue(data.displayPrecision.toString());
   }
 
   @override
@@ -28,8 +28,7 @@ class AdvancedSettingsDialog extends DialogVM {
 
   @override
   void _hide() {
-    var data =
-        new AdvancedSettingsChangedData(_bboxEnabled.getValue(), _displayPrecision.valueAsInt);
+    var data = new AdvancedSettingsChangedData(_bboxEnabled.getValue(), _displayPrecision.valueAsInt);
     _backend.events.AdvancedSettingsChanged.fire(data);
   }
 }

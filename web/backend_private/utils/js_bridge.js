@@ -10,9 +10,9 @@ var JsBridge = function (logger) {
 
     mylogger = logger;
 
-    // dialogId must include leading '#'
+    // dialogId must not include leading '#'
     this.registerDialog = function (dialogId) {
-        var dialog = UIkit.modal(dialogId);
+        var dialog = UIkit.modal("#" + dialogId);
         return dialog;
     }
 

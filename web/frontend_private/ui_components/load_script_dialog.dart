@@ -15,15 +15,15 @@ class LoadScriptDialog extends DialogVM {
   TextAreaInputVM _scriptText;
 
   LoadScriptDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _scriptText = new TextAreaInputVM(_frontend, "#loadScriptDialog_scriptText", _defaultScript);
+    _scriptText = new TextAreaInputVM(_frontend, "loadScriptDialog_scriptText", _defaultScript);
 
-    register(_scriptText);
+    _trackState(_scriptText);
   }
 
   @override
   void _show() {
     if (_scriptText.getValue() == null || _scriptText.getValue().isEmpty) {
-      _scriptText.refresh(_defaultScript);
+      _scriptText.setValue(_defaultScript);
     }
   }
 
