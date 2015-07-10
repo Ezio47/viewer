@@ -20,9 +20,11 @@ part 'ui_components/layer_info_dialog.dart';
 part 'ui_components/layer_customization_dialog.dart';
 part 'ui_components/wps_dialog.dart';
 
+part 'viewmodels/button_vm.dart';
 part 'viewmodels/check_box_vm.dart';
 part 'viewmodels/dialog_vm.dart';
-part 'viewmodels/button_vm.dart';
+part 'viewmodels/form_vm.dart';
+part 'viewmodels/input_vm.dart';
 part 'viewmodels/list_box_vm.dart';
 part 'viewmodels/text_input_vm.dart';
 part 'viewmodels/view_model.dart';
