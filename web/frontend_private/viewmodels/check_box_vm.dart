@@ -20,6 +20,10 @@ class CheckBoxVM extends InputVM<bool> {
     _inputElement.onClick.listen((e) => refresh(_inputElement.checked));
   }
 
+  void _elementRefresh(bool v) {
+    _inputElement.checked = v;
+  }
+
   // TODO: this should also disable the associated label
   bool get disabled => _disabled;
   set disabled(bool v) {

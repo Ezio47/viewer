@@ -16,8 +16,7 @@ class WpsService extends OgcService {
   Future<OgcDocument> _getProcessDescriptionWork(String processName) {
     var c = new Completer<OgcDocument>();
 
-    _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"])
-        .then((OgcDocument ogcDoc) {
+    _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"]).then((OgcDocument ogcDoc) {
       if (ogcDoc == null) {
         RialtoBackend.error("Error parsing WPS process description response document");
         c.complete(null);
@@ -56,8 +55,7 @@ class WpsService extends OgcService {
     String identifierKV = "Identifier=${process.name}";
 
     String dataInputsKV = "DataInputs="; //alpha=$alpha;beta=$beta
-    process.inputs
-        .forEach((param) => dataInputsKV += "${param.name}=${inputs[param.name].toString()};");
+    process.inputs.forEach((param) => dataInputsKV += "${param.name}=${inputs[param.name].toString()};");
     dataInputsKV = dataInputsKV.substring(0, dataInputsKV.length - 1); // remove trailing ';'
 
     String dataOutputsKV = "DataOutputs="; //gamma;delta
@@ -66,8 +64,7 @@ class WpsService extends OgcService {
 
     String responseDocumentKV = "ResponseDocument="; //gamma;delta
     process.outputs.forEach((param) => responseDocumentKV += "${param.name};");
-    responseDocumentKV =
-        responseDocumentKV.substring(0, responseDocumentKV.length - 1); // remove trailing ';'
+    responseDocumentKV = responseDocumentKV.substring(0, responseDocumentKV.length - 1); // remove trailing ';'
 
     var opts = new Map<String, String>();
     opts.putIfAbsent("storeexecuteresponse", () => "true");
@@ -107,15 +104,12 @@ class WpsService extends OgcService {
   /// Returns the job ID, and will have already created a status object for that ID (even in
   /// the case of any failures)
   Future<WpsJob> executeProcess(WpsProcess process, Map<String, dynamic> inputs,
-      {WpsJobSuccessResultHandler successHandler: null,
-      WpsJobErrorResultHandler failureHandler: null,
+      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler failureHandler: null,
       WpsJobErrorResultHandler timeoutHandler: null}) {
     var c = new Completer<WpsJob>();
 
     var request = _backend.wpsJobManager.createJob(this, process,
-        successHandler: successHandler,
-        errorHandler: failureHandler,
-        timeoutHandler: timeoutHandler);
+        successHandler: successHandler, errorHandler: failureHandler, timeoutHandler: timeoutHandler);
 
     _executeProcessWork(process, inputs).then((ogcDoc) {
       if (ogcDoc == null) {
@@ -209,6 +203,8 @@ class WpsService extends OgcService {
         WpsProcessParam param = new WpsProcessParam(name, datatype);
         process.inputs.add(param);
       }
+
+      process.inputs.add(new WpsProcessParam("posn", WpsProcessParamDataType.position));
 
       var xmlOutputs = xmlDescription.processOutputs.outputData;
       for (var xmlOutput in xmlOutputs) {

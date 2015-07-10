@@ -91,6 +91,13 @@ abstract class InputVM<T> extends ViewModel {
   }
 
   void refresh(T v) {
+    _elementRefresh(v);
+    _controlRefresh(v);
+  }
+
+  void _elementRefresh(T);
+
+  void _controlRefresh(T v) {
     stateControl.setCurrentValue(v);
     print("control $id is now $v");
   }

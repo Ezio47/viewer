@@ -8,11 +8,14 @@ part of rialto.frontend.private;
 class TextInputVM extends InputVM<String> {
   InputElement _inputElement;
 
-  TextInputVM(RialtoFrontend frontend, String id, String defaultValue)
-      : super(frontend, id, defaultValue) {
+  TextInputVM(RialtoFrontend frontend, String id, String defaultValue) : super(frontend, id, defaultValue) {
     _inputElement = _element;
     _inputElement.value = defaultValue;
     _inputElement.onChange.listen((e) => refresh(_inputElement.value));
+  }
+
+  void _elementRefresh(String v) {
+    _inputElement.value = v;
   }
 
   /// returns value as a double (or 0.0)
@@ -40,10 +43,34 @@ class TextInputVM extends InputVM<String> {
 class TextAreaInputVM extends InputVM<String> {
   TextAreaElement _inputElement;
 
-  TextAreaInputVM(RialtoFrontend frontend, String id, String defaultValue)
-      : super(frontend, id, defaultValue) {
+  TextAreaInputVM(RialtoFrontend frontend, String id, String defaultValue) : super(frontend, id, defaultValue) {
     _inputElement = _element;
     _inputElement.value = defaultValue;
     _inputElement.onChange.listen((e) => refresh(_inputElement.value));
+  }
+
+  void _elementRefresh(String v) {
+    _inputElement.value = v;
+  }
+}
+
+/// UI component that allows for multi-line text entry
+class PositionInputVM extends TextInputVM {
+  DialogVM _parentDialog;
+
+  PositionInputVM(RialtoFrontend frontend, DialogVM this._parentDialog, String id, String defaultValue)
+      : super(frontend, id, defaultValue) {
+    var whenClicked = (event) {
+      _parentDialog.temphide();
+      _backend.cesium.drawMarker((position) {
+        RialtoBackend.log("Pin + $position");
+
+        _parentDialog.tempshow();
+        refresh("$position");
+      });
+      //print(state);
+    };
+
+    new ButtonVM(frontend, id + "_button", whenClicked);
   }
 }

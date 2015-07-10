@@ -38,6 +38,8 @@ class ListBoxVM extends InputVM<String> {
     });
   }
 
+  void _elementRefresh(String v) {}
+
   void add(String item) {
     var wrapper = new ListBoxItem(item);
     _list.add(wrapper);
