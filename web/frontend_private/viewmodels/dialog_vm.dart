@@ -50,18 +50,19 @@ abstract class DialogVM extends FormVM {
       _stateTracker.restoreState();
     } else {
       _hide();
-      _postHide();
     }
     _backend.js.hideDialog(_dialogProxy);
   }
 
-  void tempshow() {
+  // must be called only after temporaryHide()
+  void temporaryShow() {
     _backend.js.showDialog(_dialogProxy);
     _stateTracker.restoreState();
     _show();
   }
 
-  void temphide() {
+  // must be called only before a temporaryShow()
+  void temporaryHide() {
     _stateTracker.saveState();
     _backend.js.hideDialog(_dialogProxy);
   }
@@ -69,5 +70,4 @@ abstract class DialogVM extends FormVM {
   // derived dialogs may reimplement these
   void _show() {}
   void _hide() {} // only called on OK, not Cancel
-  void _postHide() {} // only called on OK, not Cancel
 }

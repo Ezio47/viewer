@@ -61,21 +61,38 @@ class TextAreaInputVM extends InputVM<String> {
   }
 }
 
-/// UI component that allows for multi-line text entry
 class PositionInputVM extends TextInputVM {
   DialogVM _parentDialog;
 
   PositionInputVM(RialtoFrontend frontend, DialogVM this._parentDialog, String id, String defaultValue)
       : super(frontend, id, defaultValue) {
     var whenClicked = (event) {
-      _parentDialog.temphide();
+      _parentDialog.temporaryHide();
+
       _backend.cesium.drawMarker((position) {
         RialtoBackend.log("Pin + $position");
-
-        _parentDialog.tempshow();
+        _parentDialog.temporaryShow();
         setValue("$position");
       });
-      //print(state);
+    };
+
+    new ButtonVM(frontend, id + "_button", whenClicked);
+  }
+}
+
+class BboxInputVM extends TextInputVM {
+  DialogVM _parentDialog;
+
+  BboxInputVM(RialtoFrontend frontend, DialogVM this._parentDialog, String id, String defaultValue)
+      : super(frontend, id, defaultValue) {
+    var whenClicked = (event) {
+      _parentDialog.temporaryHide();
+
+      _backend.cesium.drawExtent((n, s, e, w) {
+        RialtoBackend.log("Box + $n + $s + $e + $w");
+        _parentDialog.temporaryShow();
+        setValue("$n $s $e $w");
+      });
     };
 
     new ButtonVM(frontend, id + "_button", whenClicked);

@@ -205,6 +205,7 @@ class WpsService extends OgcService {
       }
 
       process.inputs.add(new WpsProcessParam("posn", WpsProcessParamDataType.position));
+      process.inputs.add(new WpsProcessParam("box", WpsProcessParamDataType.bbox));
 
       var xmlOutputs = xmlDescription.processOutputs.outputData;
       for (var xmlOutput in xmlOutputs) {

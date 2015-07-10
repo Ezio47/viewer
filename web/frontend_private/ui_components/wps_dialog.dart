@@ -40,6 +40,9 @@ class WpsDialog extends DialogVM {
       case WpsProcessParamDataType.position:
         _addParameter_position(param, tcell);
         break;
+      case WpsProcessParamDataType.bbox:
+        _addParameter_bbox(param, tcell);
+        break;
     }
   }
 
@@ -81,6 +84,17 @@ class WpsDialog extends DialogVM {
     tcell.children.add(buttonElement);
 
     _fields[param.name] = new PositionInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
+    _trackState(_fields[param.name]);
+  }
+
+  void _addParameter_bbox(WpsProcessParam param, TableCellElement tcell) {
+    InputElement textElement = TextInputVM.makeHtmlTextInputElement(id + "_" + param.name, "empty");
+    tcell.children.add(textElement);
+
+    ButtonElement buttonElement = ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
+    tcell.children.add(buttonElement);
+
+    _fields[param.name] = new BboxInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
     _trackState(_fields[param.name]);
   }
 
@@ -155,33 +169,10 @@ class WpsDialog extends DialogVM {
         case WpsProcessParamDataType.position:
           inputs[param.name] = _fields[param.name].getValue();
           break;
-        default:
-          RialtoBackend.error("invalid wps datatype");
-      }
-    }
-  }
-  @override
-  void _postHide() {
-/*    var inputs = new Map<String, dynamic>();
-    for (WpsProcessParam param in process.inputs) {
-      switch (param.datatype) {
-        case WpsProcessParamDataType.double:
-          inputs[param.name] = _fields[param.name].valueAsDouble;
-          break;
-        case WpsProcessParamDataType.integer:
-          inputs[param.name] = _fields[param.name].valueAsInt;
-          break;
-        case WpsProcessParamDataType.string:
+        case WpsProcessParamDataType.bbox:
           inputs[param.name] = _fields[param.name].getValue();
           break;
-        default:
-          RialtoBackend.error("invalid wps datatype");
       }
     }
-
-    _backend.cesium.drawMarker((position) {
-      RialtoBackend.log("Pin + $position");
-      _backend.commands.wpsExecuteProcess(process, inputs);
-    });*/
   }
 }
