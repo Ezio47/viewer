@@ -4,7 +4,7 @@
 
 part of rialto.backend;
 
-enum WpsProcessParamDataType { double, string, integer, position, bbox }
+enum WpsProcessParamDataType { double, string, integer, position, box }
 
 class WpsProcessParam {
   String name;
@@ -17,7 +17,7 @@ class WpsProcessParam {
     WpsProcessParamDataType.string: "string",
     WpsProcessParamDataType.integer: "integer",
     WpsProcessParamDataType.position: "position",
-    WpsProcessParamDataType.bbox: "bbox",
+    WpsProcessParamDataType.box: "box",
   };
 
   static String datatypeString(WpsProcessParamDataType datatype) {

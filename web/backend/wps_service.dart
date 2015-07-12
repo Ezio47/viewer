@@ -16,7 +16,8 @@ class WpsService extends OgcService {
   Future<OgcDocument> _getProcessDescriptionWork(String processName) {
     var c = new Completer<OgcDocument>();
 
-    _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"]).then((OgcDocument ogcDoc) {
+    _sendKvpServerRequest("DescribeProcess", ["identifier=$processName"])
+        .then((OgcDocument ogcDoc) {
       if (ogcDoc == null) {
         RialtoBackend.error("Error parsing WPS process description response document");
         c.complete(null);
@@ -55,7 +56,8 @@ class WpsService extends OgcService {
     String identifierKV = "Identifier=${process.name}";
 
     String dataInputsKV = "DataInputs="; //alpha=$alpha;beta=$beta
-    process.inputs.forEach((param) => dataInputsKV += "${param.name}=${inputs[param.name].toString()};");
+    process.inputs
+        .forEach((param) => dataInputsKV += "${param.name}=${inputs[param.name].toString()};");
     dataInputsKV = dataInputsKV.substring(0, dataInputsKV.length - 1); // remove trailing ';'
 
     String dataOutputsKV = "DataOutputs="; //gamma;delta
@@ -64,7 +66,8 @@ class WpsService extends OgcService {
 
     String responseDocumentKV = "ResponseDocument="; //gamma;delta
     process.outputs.forEach((param) => responseDocumentKV += "${param.name};");
-    responseDocumentKV = responseDocumentKV.substring(0, responseDocumentKV.length - 1); // remove trailing ';'
+    responseDocumentKV =
+        responseDocumentKV.substring(0, responseDocumentKV.length - 1); // remove trailing ';'
 
     var opts = new Map<String, String>();
     opts.putIfAbsent("storeexecuteresponse", () => "true");
@@ -104,12 +107,15 @@ class WpsService extends OgcService {
   /// Returns the job ID, and will have already created a status object for that ID (even in
   /// the case of any failures)
   Future<WpsJob> executeProcess(WpsProcess process, Map<String, dynamic> inputs,
-      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler failureHandler: null,
+      {WpsJobSuccessResultHandler successHandler: null,
+      WpsJobErrorResultHandler failureHandler: null,
       WpsJobErrorResultHandler timeoutHandler: null}) {
     var c = new Completer<WpsJob>();
 
     var request = _backend.wpsJobManager.createJob(this, process,
-        successHandler: successHandler, errorHandler: failureHandler, timeoutHandler: timeoutHandler);
+        successHandler: successHandler,
+        errorHandler: failureHandler,
+        timeoutHandler: timeoutHandler);
 
     _executeProcessWork(process, inputs).then((ogcDoc) {
       if (ogcDoc == null) {
@@ -149,27 +155,39 @@ class WpsService extends OgcService {
     return _getProcessDescriptionWork(processName);
   }
 
-  static WpsProcessParamDataType inferDatatype(String abstract, String datatype) {
-    if (abstract != null) {
-      if (abstract.endsWith("[int]")) return WpsProcessParamDataType.integer;
-      if (abstract.endsWith("[double]")) return WpsProcessParamDataType.double;
-      if (abstract.endsWith("[string]")) return WpsProcessParamDataType.string;
-      assert(!abstract.endsWith("]"));
+  static String _descriptionField(String rawDescription, String field) {
+    if (rawDescription == null) return null;
+    var lines = rawDescription.split('\n');
+    var tok = "# " + field + ": ";
+    for (var line in lines) {
+      if (line.startsWith(tok)) {
+        return line.substring(tok.length);
+      }
     }
+    return null;
+  }
 
-    if (datatype == null) {
+  static WpsProcessParamDataType inferDatatype(String abstract, String datatype_notused) {
+    var dt = _descriptionField(abstract, "datatype");
+    assert(dt != null);
+
+    if (dt.startsWith("enum:")) {
       return WpsProcessParamDataType.string;
     }
 
-    switch (datatype) {
-      case "":
+    switch (dt) {
+      case "string":
         return WpsProcessParamDataType.string;
-      case "xs:double":
-        return WpsProcessParamDataType.double;
-      case "int": // (geoserver says "int", not "xs:int"?)
-      case "xs:int":
+      case "int":
         return WpsProcessParamDataType.integer;
+      case "double":
+        return WpsProcessParamDataType.double;
+      case "geo_pos_2d":
+        return WpsProcessParamDataType.position;
+      case "geo_box_2d":
+        return WpsProcessParamDataType.box;
       default:
+        RialtoBackend.error("unknown passed datatype: $dt");
         assert(false);
         return null;
     }
@@ -204,14 +222,13 @@ class WpsService extends OgcService {
         process.inputs.add(param);
       }
 
-      process.inputs.add(new WpsProcessParam("posn", WpsProcessParamDataType.position));
-      process.inputs.add(new WpsProcessParam("box", WpsProcessParamDataType.bbox));
-
       var xmlOutputs = xmlDescription.processOutputs.outputData;
       for (var xmlOutput in xmlOutputs) {
         var name = xmlOutput.identifier;
-        var datatype = inferDatatype(xmlOutput.abstract, xmlOutput.literalOutput.datatype);
-        //print("OUT {$nam} ${dt}");
+
+        ////////var datatype = inferDatatype(xmlOutput.abstract, xmlOutput.literalOutput.datatype);
+        var datatype = WpsProcessParamDataType.string;
+
         WpsProcessParam param = new WpsProcessParam(name, datatype);
         process.outputs.add(param);
       }

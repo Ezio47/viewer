@@ -40,7 +40,7 @@ class WpsDialog extends DialogVM {
       case WpsProcessParamDataType.position:
         _addParameter_position(param, tcell);
         break;
-      case WpsProcessParamDataType.bbox:
+      case WpsProcessParamDataType.box:
         _addParameter_bbox(param, tcell);
         break;
     }
@@ -80,7 +80,8 @@ class WpsDialog extends DialogVM {
     InputElement textElement = TextInputVM.makeHtmlTextInputElement(id + "_" + param.name, "empty");
     tcell.children.add(textElement);
 
-    ButtonElement buttonElement = ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
+    ButtonElement buttonElement =
+        ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
     tcell.children.add(buttonElement);
 
     _fields[param.name] = new PositionInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
@@ -91,7 +92,8 @@ class WpsDialog extends DialogVM {
     InputElement textElement = TextInputVM.makeHtmlTextInputElement(id + "_" + param.name, "empty");
     tcell.children.add(textElement);
 
-    ButtonElement buttonElement = ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
+    ButtonElement buttonElement =
+        ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
     tcell.children.add(buttonElement);
 
     _fields[param.name] = new BboxInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
@@ -169,7 +171,7 @@ class WpsDialog extends DialogVM {
         case WpsProcessParamDataType.position:
           inputs[param.name] = _fields[param.name].getValue();
           break;
-        case WpsProcessParamDataType.bbox:
+        case WpsProcessParamDataType.box:
           inputs[param.name] = _fields[param.name].getValue();
           break;
       }
