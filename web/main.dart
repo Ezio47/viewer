@@ -2,12 +2,10 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-
 import 'dart:async';
 import 'dart:html';
 import 'frontend/rialto_frontend_library.dart';
 import 'backend/rialto_backend_library.dart';
-
 
 final String demoConfig = """
 - layers:
@@ -22,50 +20,52 @@ final String demoConfig = """
 
 """;
 
-
 /// Main entry point for running the viewer
 ///
 /// Called from inside index.html. Creates the viewer, reads in the configuration file, and
 /// runs the commands in it to create the layers
 void main() {
-    // TODO: addErrorListener not yet implemented in Dart SDK...
-    //ReceivePort errPort = new ReceivePort();
-    //Isolate.current.addErrorListener(errPort.sendPort);
-    //errPort.listen((d) => log("bonk: $d"));
+  // We didn't start this process, so we need a special way to catch any errors from it.
+  // See https://groups.google.com/a/dartlang.org/d/msg/misc/4x05P1rBggE/YId9pX1E0MQJ
+  // However, as of v1.10., it still doesn't seem to work.
+  /*import 'dart:isolate';*/
+  /*ReceivePort errPort = new ReceivePort();
+  Isolate.current.addErrorListener(errPort.sendPort);
+  errPort.listen((d) => RialtoBackend.error("Caught error: ${d[0].toString()}"));*/
 
-    var ui = new RialtoFrontend();
+  var ui = new RialtoFrontend();
 
-    final params = Uri.parse(window.location.href).queryParameters;
-    String configParam = params["config"];
+  final params = Uri.parse(window.location.href).queryParameters;
+  String configParam = params["config"];
 
-    Future<List<dynamic>> p;
+  Future<List<dynamic>> p;
 
-    if (configParam == null) {
-        try {
-            p = ui.backend.commands.loadScriptFromStringAsync(demoConfig);
-        } catch (e) {
-            RialtoBackend.error("Top-level exception caught", e);
-        }
-    } else {
-        try {
-            final configUri = Uri.parse(configParam);
-            p = ui.backend.commands.loadScriptFromUrl(configUri);
-        } catch (e) {
-            RialtoBackend.error("Top-level exception caught", e);
-        }
+  if (configParam == null) {
+    try {
+      p = ui.backend.commands.loadScriptFromStringAsync(demoConfig);
+    } catch (e) {
+      RialtoBackend.error("Top-level exception caught", e);
     }
+  } else {
+    try {
+      final configUri = Uri.parse(configParam);
+      p = ui.backend.commands.loadScriptFromUrl(configUri);
+    } catch (e) {
+      RialtoBackend.error("Top-level exception caught", e);
+    }
+  }
 
-    // TODO: get ths out of main()
-    p.then((list) {
-        WpsService wps = ui.backend.wps;
-        if (wps != null) {
-              for (WpsProcess process in wps.processes.values) {
-                    ui.addWpsProcessDialog(process.name);
-            };
-        }
-    });
+  // TODO: get ths out of main()
+  p.then((list) {
+    WpsService wps = ui.backend.wps;
+    if (wps != null) {
+      for (WpsProcess process in wps.processes.values) {
+        ui.addWpsProcessDialog(process.name);
+      }
+      ;
+    }
+  });
 }
-
 
 /*
 final Map tests = {
