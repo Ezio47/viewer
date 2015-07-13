@@ -34,7 +34,6 @@ class ConfigScript {
 - wps:
     proxy: http://localhost:12346/
     url: http://localhost:8080/geoserver/ows
-    description: "la la la"
 """;
 
   RialtoBackend _backend;
