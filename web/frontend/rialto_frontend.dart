@@ -60,6 +60,14 @@ class RialtoFrontend {
     _textWpsJobStatus = querySelector("#wpsStatusDialog_open");
     _handleWpsJobUpdate();
     backend.events.WpsJobUpdate.subscribe((_) => _handleWpsJobUpdate());
+
+    ButtonElement clearLogButton = querySelector("#logDialog_clear");
+    clearLogButton.onClick.listen((_) {
+      var e = querySelector("#logDialog_body");
+      if (e != null) {
+        e.text = "";
+      }
+    });
   }
 
   void addWpsProcessDialog(String processName) {
