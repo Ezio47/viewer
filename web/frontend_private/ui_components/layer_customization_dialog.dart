@@ -70,14 +70,13 @@ class LayerCustomizationDialog extends DialogVM {
     final bool bboxVisibility = (_target is BboxVisibilityControl);
 
     if (colorizer) {
-      var ramps = _backend.cesium.getColorRampNames();
+      var provider = (_target as PointCloudLayer).provider;
+      var ramps = _backend.cesium.getColorRampNamesFromProvider(provider);
       ramps.forEach((s) => _rampsListBox.add(s));
       _rampsListBox.setValue(ramps[0]);
 
       var dims = new Set<String>();
-      if (_target is ColorizerControl) {
-        dims.addAll((_target as PointCloudLayer).dimensions);
-      }
+      dims.addAll((_target as PointCloudLayer).dimensions);
 
       dims = dims.toList();
       dims.sort();

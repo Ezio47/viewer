@@ -6,8 +6,7 @@ part of rialto.backend;
 
 // TODO: this class should live in rialto.backend.private
 
-class PointCloudLayer extends Layer
-    with VisibilityControl, ColorizerControl, BboxVisibilityControl {
+class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl, BboxVisibilityControl {
   var _provider;
   int numPoints;
   List<String> dimensions;
@@ -18,10 +17,11 @@ class PointCloudLayer extends Layer
   bool _visible = true;
   bool _bboxVisible = true;
 
-  PointCloudLayer(RialtoBackend backend, String name, Map map)
-      : super(backend, "pointcloud", name, map) {
+  PointCloudLayer(RialtoBackend backend, String name, Map map) : super(backend, "pointcloud", name, map) {
     requireUrl();
   }
+
+  dynamic get provider => _provider;
 
   @override
   Future load() {
@@ -38,8 +38,7 @@ class PointCloudLayer extends Layer
       var yStats = backend.cesium.getStatsFromProvider(_provider, "Y");
       var zStats = backend.cesium.getStatsFromProvider(_provider, "Z");
 
-      bbox = new CartographicBbox.fromValues(
-          xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
+      bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
 
       dimensions = backend.cesium.getDimensionNamesFromProvider(_provider);
 

@@ -478,9 +478,9 @@ var CesiumBridge = function (element) {
     }
 
 
-    this.getColorRampNames = function () {
-        var keys = Object.keys(colorRamps);
-        return keys;
+    this.getColorRampNamesFromProvider = function (provider) {
+        var names = provider.colorizer.rampNames;
+        return names;
     }
 
 
