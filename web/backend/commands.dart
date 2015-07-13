@@ -16,8 +16,8 @@ class Commands {
 
   /// Allow user to draw a circle to be used for a viewshed analysis
   void createViewshedCircle() {
-    _backend.cesium.drawCircle((longitude, latitude, height, radius) =>
-        _backend.viewshedCircles.add([longitude, latitude, height, radius]));
+    _backend.cesium.drawCircle(
+        (longitude, latitude, height, radius) => _backend.viewshedCircles.add([longitude, latitude, height, radius]));
   }
 
   /// Run the viewshed analysis for each viewshed circle
@@ -69,8 +69,7 @@ class Commands {
   /// stub for future work
   void drawExtent() {
     _backend.cesium.drawExtent((n, s, e, w) {
-      RialtoBackend.log(
-          "Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
+      RialtoBackend.log("Extent: " + n.toString() + " " + s.toString() + " " + e.toString() + " " + w.toString());
     });
   }
 
@@ -108,8 +107,8 @@ class Commands {
   ///
   /// Returns a list with the results of each command.
   Future<List<dynamic>> loadScriptFromUrl(Uri url) {
-    var s = new ConfigScript(_backend);
-    var f = s.loadFromUrl(url);
+    _backend.configScript = ConfigScript.fromUrl(_backend, url);
+    var f = _backend.configScript.load();
     return f;
   }
 
@@ -119,8 +118,8 @@ class Commands {
   ///
   /// Returns a list with the results of each command.
   Future<List<dynamic>> loadScriptFromStringAsync(String yaml) {
-    var s = new ConfigScript(_backend);
-    var f = s.loadFromString(yaml);
+    _backend.configScript = ConfigScript.fromYaml(_backend, yaml);
+    var f = _backend.configScript.load();
     return f;
   }
 
@@ -140,17 +139,14 @@ class Commands {
 
   /// Asynchronously executes an arbitrary WPS process
   Future<WpsJob> wpsExecuteProcess(WpsProcess process, Map<String, dynamic> inputs,
-      {WpsJobSuccessResultHandler successHandler: null,
-      WpsJobErrorResultHandler failureHandler: null,
+      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler failureHandler: null,
       WpsJobErrorResultHandler timeoutHandler: null}) {
     if (_backend.wps == null) {
       RialtoBackend.error("No WPS server configured");
       return new Future.value(null);
     }
     return _backend.wps.executeProcess(process, inputs,
-        successHandler: successHandler,
-        failureHandler: failureHandler,
-        timeoutHandler: timeoutHandler);
+        successHandler: successHandler, failureHandler: failureHandler, timeoutHandler: timeoutHandler);
   }
 
   /// Asynchronously requests description of a WPS function
@@ -185,8 +181,7 @@ class Commands {
   /// Zooms to the custom camera positioning
   ///
   /// Returns an empty future when done.
-  Future zoomToCustom(
-      double longitude, double latitude, double height, double heading, double pitch, double roll) {
+  Future zoomToCustom(double longitude, double latitude, double height, double heading, double pitch, double roll) {
     return _backend.zoomToCustom(longitude, latitude, height, heading, pitch, roll);
   }
 
@@ -234,9 +229,5 @@ class ViewModeData {
 
   ViewModeData(ViewModeCode this.mode);
 
-  static Map name = {
-    ViewModeCode.mode2D: "2D",
-    ViewModeCode.mode25D: "2.5D",
-    ViewModeCode.mode3D: "3D"
-  };
+  static Map name = {ViewModeCode.mode2D: "2D", ViewModeCode.mode25D: "2.5D", ViewModeCode.mode3D: "3D"};
 }

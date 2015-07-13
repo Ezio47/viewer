@@ -7,24 +7,12 @@ import 'dart:html';
 import 'frontend/rialto_frontend_library.dart';
 import 'backend/rialto_backend_library.dart';
 
-final String demoConfig = """
-- layers:
-    - bing:
-        type: bing_base_imagery
-        #style: Road
-        style: Aerial
-- wps:
-    proxy: http://localhost:12346/
-    url: http://localhost:8080/geoserver/ows
-    description: "la la la"
-
-""";
-
 /// Main entry point for running the viewer
 ///
 /// Called from inside index.html. Creates the viewer, reads in the configuration file, and
 /// runs the commands in it to create the layers
 void main() {
+
   // We didn't start this process, so we need a special way to catch any errors from it.
   // See https://groups.google.com/a/dartlang.org/d/msg/misc/4x05P1rBggE/YId9pX1E0MQJ
   // However, as of v1.10., it still doesn't seem to work.
@@ -36,13 +24,13 @@ void main() {
   var ui = new RialtoFrontend();
 
   final params = Uri.parse(window.location.href).queryParameters;
-  String configParam = params["config"];
+  final String configParam = params["config"];
 
   Future<List<dynamic>> p;
 
   if (configParam == null) {
     try {
-      p = ui.backend.commands.loadScriptFromStringAsync(demoConfig);
+      p = ui.backend.commands.loadScriptFromStringAsync(ConfigScript.defaultYaml);
     } catch (e) {
       RialtoBackend.error("Top-level exception caught", e);
     }

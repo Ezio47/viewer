@@ -21,41 +21,68 @@ typedef Future<dynamic> ChainCommndFunction(dynamic);
 ///
 /// Each command in the script has it's own function in this class ("_doCommand_NAME()");
 class ConfigScript {
-  RialtoBackend _backend;
+  static Uri _defaultUri = Uri.parse("http://rialto.example.com:12345/demo.yaml");
+  static String _defaultYaml = """
+- layers:
+    - basemap:
+        type: bing_base_imagery
+        #style: Road
+        style: Aerial
+    - pointcloud:
+        type: pointcloud
+        url: http://localhost:12345/serp-small/mytablename
+- wps:
+    proxy: http://localhost:12346/
+    url: http://localhost:8080/geoserver/ows
+    description: "la la la"
+""";
 
-  /// Creates a script parser/executer.
+  RialtoBackend _backend;
+  String _configYaml;
+  Uri _configUri;
+
+  /// Creates a script parser/executer. Do not call this directly.
   ConfigScript(RialtoBackend this._backend);
+
+  static Uri get defaultUri => _defaultUri;
+  static String get defaultYaml => _defaultYaml;
+
+  static ConfigScript fromUrl(RialtoBackend backend, Uri uri) {
+    var c = new ConfigScript(backend);
+    c._configUri = uri;
+    c._configYaml = null;
+    return c;
+  }
+
+  static ConfigScript fromYaml(RialtoBackend backend, String yaml) {
+    var c = new ConfigScript(backend);
+    c._configUri = null;
+    c._configYaml = yaml;
+    return c;
+  }
+
+  String get configYaml => _configYaml;
+  Uri get configUri => _configUri;
 
   /// Loads a script from the [uri] and asynchronously executes the commands in it
   ///
   /// Returns a list with each command's result
   ///
   /// Throws or calls [Rialto.error] if there is a problem executing a command.
-  Future<List<dynamic>> loadFromUrl(Uri url) {
-    var c = new Completer<List<dynamic>>();
+  Future<List<dynamic>> load() async {
+    if (_configUri != null) {
+      Http.Response response = await Utils.httpGet(_configUri);
+      _configYaml = response.body;
+    }
 
-    Utils.httpGet(url).then((Http.Response response) {
-      String yamlText = response.body;
-
-      c.complete(_executeCommands(yamlText, url.toString()));
-    });
-
-    return c.future;
+    var c = new Future(() => _executeCommands());
+    return c;
   }
 
-  /// Loads a script from the string [yamlText] and asynchronously executes the commands in it
-  ///
-  /// Returns a list with each command's result
-  ///
-  /// Throws or calls [Rialto.error] if there is a problem executing a command.
-  Future<List<dynamic>> loadFromString(String yamlText) {
-    return _executeCommands(yamlText, "");
-  }
-
-  Future<List<dynamic>> _executeCommands(String yamlText, String urlString) {
+  Future<List<dynamic>> _executeCommands() {
     List<Map<String, Map>> commands;
     try {
-      commands = loadYaml(yamlText);
+      commands = loadYaml(_configYaml);
     } catch (e) {
       RialtoBackend.error("Unable to parse configuration", e);
       return null;
@@ -63,7 +90,7 @@ class ConfigScript {
 
     var results = _executeCommandsInList(_executeCommand, commands);
 
-    results.then((_) => _backend.events.LoadScriptCompleted.fire(urlString));
+    results.then((_) => _backend.events.LoadScriptCompleted.fire(_configUri.toString()));
 
     return results;
   }

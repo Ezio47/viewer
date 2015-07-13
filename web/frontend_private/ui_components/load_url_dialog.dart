@@ -5,20 +5,23 @@
 part of rialto.frontend.private;
 
 class LoadUrlDialog extends DialogVM {
-  final String _defaultUrl = "http://localhost:12345/file/test.yaml";
-
   TextInputVM _urlText;
 
   LoadUrlDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _urlText = new TextInputVM(_frontend, "loadUrlDialog_urlText", _defaultUrl);
-
+    _urlText = new TextInputVM(_frontend, "loadUrlDialog_urlText", null);
     _trackState(_urlText);
   }
 
   @override
   void _show() {
     if (_urlText.getValue() == null || _urlText.getValue().isEmpty) {
-      _urlText.setValue(_defaultUrl);
+      Uri uri;
+      if (_backend.configScript != null && _backend.configScript.configUri != null) {
+        uri = _backend.configScript.configUri;
+      } else {
+        uri = ConfigScript.defaultUri;
+      }
+      _urlText.setValue(uri.toString());
     }
   }
 

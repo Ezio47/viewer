@@ -5,17 +5,10 @@
 part of rialto.frontend.private;
 
 class LoadScriptDialog extends DialogVM {
-  final String _defaultScript = """- layers:
-    - bing:
-        type: bing_base_imagery
-        #style: Road
-        style: Aerial
-""";
-
   TextAreaInputVM _scriptText;
 
   LoadScriptDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _scriptText = new TextAreaInputVM(_frontend, "loadScriptDialog_scriptText", _defaultScript);
+    _scriptText = new TextAreaInputVM(_frontend, "loadScriptDialog_scriptText", null);
 
     _trackState(_scriptText);
   }
@@ -23,7 +16,15 @@ class LoadScriptDialog extends DialogVM {
   @override
   void _show() {
     if (_scriptText.getValue() == null || _scriptText.getValue().isEmpty) {
-      _scriptText.setValue(_defaultScript);
+      String text;
+      if (_backend.configScript != null &&
+          _backend.configScript.configYaml != null &&
+          _backend.configScript.configYaml.isNotEmpty) {
+        text = _backend.configScript.configYaml;
+      } else {
+        text = ConfigScript.defaultYaml;
+      }
+      _scriptText.setValue(text);
     }
   }
 

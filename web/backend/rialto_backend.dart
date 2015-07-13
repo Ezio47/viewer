@@ -21,6 +21,7 @@ class RialtoBackend {
   WpsService wps;
   LayerManager layerManager;
   WpsJobManager wpsJobManager;
+  ConfigScript configScript;
 
   int displayPrecision = 5;
 
@@ -88,8 +89,7 @@ class RialtoBackend {
   }
 
   /// Zooms the viewer to the given position
-  Future zoomToCustom(
-      double longitude, double latitude, double height, double heading, double pitch, double roll) {
+  Future zoomToCustom(double longitude, double latitude, double height, double heading, double pitch, double roll) {
     cesium.lookAtCustom(longitude, latitude, height, heading, pitch, roll);
 
     return new Future.value();
