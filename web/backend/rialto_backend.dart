@@ -97,7 +97,7 @@ class RialtoBackend {
 
   /// Zooms the viewer to the given [layer]
   ///
-  /// Zooms to the last layer in the system, if [layer] is null.
+  /// Zooms to the first point cloud layer in the system, if [layer] is null.
   ///
   /// If [layer] can't be zoomed to, e.g. because it doesn't have an explicit bbox,
   /// the function does nothing and returns.
@@ -109,7 +109,7 @@ class RialtoBackend {
       if (layerManager == null || layerManager.layers == null || layerManager.layers.length == 0) {
         return null;
       }
-      layer = layerManager.layers.last;
+      layer = layerManager.layers.firstWhere((layer) => layer is PointCloudLayer);
     }
 
     if (layer == null || layer.bbox == null) {
