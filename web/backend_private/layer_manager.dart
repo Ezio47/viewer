@@ -39,7 +39,7 @@ class LayerManager {
   }
 
   /// Add a new layer and asynchronously load it's data into viewer
-  Future<Layer> addLayer(String newName, Map newOptions) {
+  Future<Layer> addLayer(String newName, Map options) {
     final name = newName;
 
     var c = new Completer<Layer>();
@@ -50,7 +50,7 @@ class LayerManager {
       return c.future;
     }
 
-    Layer layer = _createLayer(name, newOptions);
+    Layer layer = _createLayer(name, options);
     if (layer == null) {
       RialtoBackend.error("Unable to load layer $name.");
       c.complete(null);
@@ -112,54 +112,54 @@ class LayerManager {
     return new Future.value();
   }
 
-  Layer _createLayer(String name, Map map) {
-    assert(map.containsKey("type"));
+  Layer _createLayer(String name, Map options) {
+    assert(options.containsKey("type"));
 
-    String type = map["type"];
+    String type = options["type"];
 
     Layer layer = null;
     switch (type) {
       case "bing_base_imagery":
-        layer = new BingBaseImageryLayer(_backend, name, map);
+        layer = new BingBaseImageryLayer(_backend, name, options);
         _hasBaseImagery = true;
         break;
 
       case "arcgis_base_imagery":
-        layer = new ArcGisBaseImageryLayer(_backend, name, map);
+        layer = new ArcGisBaseImageryLayer(_backend, name, options);
         _hasBaseImagery = true;
         break;
 
       case "osm_base_imagery":
-        layer = new OsmBaseImageryLayer(_backend, name, map);
+        layer = new OsmBaseImageryLayer(_backend, name, options);
         _hasBaseImagery = true;
         break;
 
       case "ellipsoid_base_terrain":
-        layer = new EllipsoidBaseTerrainLayer(_backend, name, map);
+        layer = new EllipsoidBaseTerrainLayer(_backend, name, options);
         break;
 
       case "arcgis_base_terrain":
-        layer = new ArcGisBaseTerrainLayer(_backend, name, map);
+        layer = new ArcGisBaseTerrainLayer(_backend, name, options);
         break;
 
       case "cesium_small_base_terrain":
-        layer = new CesiumSmallBaseTerrainLayer(_backend, name, map);
+        layer = new CesiumSmallBaseTerrainLayer(_backend, name, options);
         break;
 
       case "cesium_stk_base_terrain":
-        layer = new CesiumStkBaseTerrainLayer(_backend, name, map);
+        layer = new CesiumStkBaseTerrainLayer(_backend, name, options);
         break;
 
       case "vrtheworld_base_terrain":
-        layer = new VrTheWorldBaseTerrainLayer(_backend, name, map);
+        layer = new VrTheWorldBaseTerrainLayer(_backend, name, options);
         break;
 
       case "wms_imagery":
-        layer = new WmsImageryLayer(_backend, name, map);
+        layer = new WmsImageryLayer(_backend, name, options);
         break;
 
       case "tms_imagery":
-        layer = new TmsImageryLayer(_backend, name, map);
+        layer = new TmsImageryLayer(_backend, name, options);
         break;
 
       case "single_imagery":
@@ -167,19 +167,19 @@ class LayerManager {
           // TODO: under what conditions is this really a problem?
           throw new ArgumentError("single_imagery requires a base imagery layer");
         }
-        layer = new SingleImageryLayer(_backend, name, map);
+        layer = new SingleImageryLayer(_backend, name, options);
         break;
 
       case "terrain":
-        layer = new TerrainLayer(_backend, name, map);
+        layer = new TerrainLayer(_backend, name, options);
         break;
 
       case "geojson":
-        layer = new GeoJsonLayer(_backend, name, map);
+        layer = new GeoJsonLayer(_backend, name, options);
         break;
 
       case "pointcloud":
-        layer = new PointCloudLayer(_backend, name, map);
+        layer = new PointCloudLayer(_backend, name, options);
         break;
 
       default:
