@@ -19,20 +19,23 @@ class LayerCustomizationDialog extends DialogVM {
     _visibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_visibility", true);
     _bboxVisibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_bboxVisibility", true);
 
-    _layerListBox = new BetterListBoxVM(_frontend, "layerList2", _updateButtons);
-
-    //  _updateButtons();
+    _layerListBox = new BetterListBoxVM(_frontend, "layerList", _updateButtons);
   }
 
   @override
   void _show() {
     _layerListBox.clear();
 
-    for (var layer in _backend.layerManager.layers) {
+    var layerList = new List<Layer>();
+    layerList.addAll(_backend.layerManager.layers);
+    layerList.sort((a, b) => a.name.compareTo(b.name));
+
+    for (var layer in layerList) {
       _layerListBox.add(layer);
     }
 
-    _layerListBox.value = _backend.layerManager.layers[0];
+    // set current selection to the first point cloud, if there is one
+    _layerListBox.value = layerList.firstWhere((layer) => layer is PointCloudLayer, orElse: () => layerList[0]);
 
     _updateButtons();
   }
@@ -56,20 +59,21 @@ class LayerCustomizationDialog extends DialogVM {
   }
 
   void _updateButtons([_ = null]) {
-    Layer _target = _layerListBox.value;
+    final Layer layer = _layerListBox.value;
+    final Map options = layer.options;
 
-    _dimsListBox.clear();
-    _rampsListBox.clear();
+    _visibilityButton.disabled = false;
+    _visibilityButton.setValue(options["isVisible"]);
 
-    if (_target is PointCloudLayer) {
+    if (layer is PointCloudLayer) {
       var dims = new List<String>();
-      dims.addAll(_target.dimensions);
+      dims.addAll(layer.dimensions);
       dims.sort();
 
       dims.forEach((d) => _dimsListBox.add(d));
-      _dimsListBox.setValue("Z");
+      _dimsListBox.setValue(options["colorDimension"]);
 
-      var provider = _target.provider;
+      var provider = layer.provider;
       var ramps = _backend.cesium.getColorRampNamesFromProvider(provider);
 
       _rampsListBox.add("none");
@@ -77,14 +81,21 @@ class LayerCustomizationDialog extends DialogVM {
         _rampsListBox.add("native");
       }
       ramps.forEach((s) => _rampsListBox.add(s));
-      _rampsListBox.setValue("none");
+      _rampsListBox.setValue(options["colorRamp"]);
 
       _rampsListBox.disabled = false;
       _dimsListBox.disabled = false;
-    }
 
-    _bboxVisibilityButton.setValue(_target.options["isBboxVisible"]);
-    _visibilityButton.setValue(_target.options["isVisible"]);
+      _bboxVisibilityButton.disabled = false;
+      _bboxVisibilityButton.setValue(options["isBboxVisible"]);
+    } else {
+      _dimsListBox.disabled = true;
+      _rampsListBox.disabled = true;
+      _dimsListBox.clear();
+      _rampsListBox.clear();
+
+      _bboxVisibilityButton.disabled = true;
+    }
   }
 }
 
