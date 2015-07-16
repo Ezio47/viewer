@@ -88,8 +88,11 @@ class BingBaseImageryLayer extends BaseImageryLayer {
   @override
   Future load() {
     var f = new Future(() {
-      var options = {"key": _apiKey, "mapStyle": _style, "url": '//dev.virtualearth.net'};
-      _layer = backend.cesium.addBingBaseImageryLayer(options);
+      var localOptions = {"key": _apiKey, "mapStyle": _style, "url": '//dev.virtualearth.net'};
+      _layer = backend.cesium.addBingBaseImageryLayer(localOptions);
+      if (!options["isVisible"]) {
+        backend.cesium.setLayerVisible(_layer, false);
+      }
     });
 
     return f;
@@ -103,8 +106,11 @@ class ArcGisBaseImageryLayer extends BaseImageryLayer {
   @override
   Future load() {
     var f = new Future(() {
-      var options = {"url": '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'};
-      _layer = backend.cesium.addArcGisBaseImageryLayer(options);
+      var localOptions = {"url": '//services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'};
+      _layer = backend.cesium.addArcGisBaseImageryLayer(localOptions);
+      if (!options["isVisible"]) {
+        backend.cesium.setLayerVisible(_layer, false);
+      }
     });
 
     return f;
@@ -117,8 +123,11 @@ class OsmBaseImageryLayer extends BaseImageryLayer {
   @override
   Future load() {
     var f = new Future(() {
-      var options = {};
-      _layer = backend.cesium.addOsmBaseImageryLayer(options);
+      var localOptions = {};
+      _layer = backend.cesium.addOsmBaseImageryLayer(localOptions);
+      if (!options["isVisible"]) {
+        backend.cesium.setLayerVisible(_layer, false);
+      }
     });
     return f;
   }

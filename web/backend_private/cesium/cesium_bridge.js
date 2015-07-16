@@ -395,7 +395,7 @@ var CesiumBridge = function (element) {
     this._createTileProvider2Async = function(urlarg, colorizeRamp, colorizeDimension, visible) {
         var deferred = Cesium.when.defer();
 
-        var provider = new Cesium.RialtoPointCloudProvider(urlarg, colorizeRamp, colorizeDimension);
+        var provider = new Cesium.RialtoPointCloudProvider(urlarg, colorizeRamp, colorizeDimension, visible);
 
         provider.readHeaderAsync().then(function(header) {
             deferred.resolve(provider);

@@ -61,10 +61,6 @@ class LayerCustomizationDialog extends DialogVM {
     _dimsListBox.clear();
     _rampsListBox.clear();
 
-    if (_target != null) {
-      print("list selected ${_target.name}");
-    }
-
     if (_target is PointCloudLayer) {
       var dims = new List<String>();
       dims.addAll(_target.dimensions);

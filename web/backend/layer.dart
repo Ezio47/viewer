@@ -24,8 +24,6 @@ abstract class Layer {
 
   CartographicBbox _bbox;
 
-  bool isVisible;
-
   Layer(RialtoBackend this.backend, String this.type, String this.name, Map theMap) {
     options = new Map();
     options.addAll(theMap);
@@ -35,9 +33,8 @@ abstract class Layer {
     description = ConfigUtils.getOptionalSettingAsString(options, "description");
 
     if (!options.containsKey("isVisible")) {
-      isVisible = true;
+      options["isVisible"] = true;
     }
-    isVisible = true;
   }
 
   void requireUrl() {
@@ -55,6 +52,19 @@ abstract class Layer {
   set bbox(CartographicBbox v) => _bbox = v;
 
   bool get canZoomTo => (bbox != null);
+}
+
+class NullLayer extends Layer {
+  NullLayer(RialtoBackend backend, String name, Map options) : super(backend, "NullLayer", name, options);
+
+  Future unload() {
+    return new Future.value();
+  }
+
+  @override
+  Future load() {
+    return new Future.value();
+  }
 }
 
 /// Interface class for a layer that can have its alpha transparency set

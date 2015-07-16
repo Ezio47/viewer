@@ -81,6 +81,9 @@ class SingleImageryLayer extends ImageryLayer {
   Future load() {
     var f = new Future(() {
       _layer = backend.cesium.addSingleTileImageryLayer(urlString, _rectangle, proxyString);
+      if (!options["isVisible"]) {
+        backend.cesium.setLayerVisible(_layer, false);
+      }
     });
     return f;
   }
@@ -99,6 +102,9 @@ class WmsImageryLayer extends ImageryLayer {
   Future load() {
     var f = new Future(() {
       _layer = backend.cesium.addWebMapServiceImageryLayer(urlString, _layers, _rectangle, proxyString);
+      if (!options["isVisible"]) {
+        backend.cesium.setLayerVisible(_layer, false);
+      }
     });
     return f;
   }
@@ -120,6 +126,9 @@ class TmsImageryLayer extends ImageryLayer {
     var f = new Future(() {
       _layer =
           backend.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
+      if (!options["isVisible"]) {
+        backend.cesium.setLayerVisible(_layer, false);
+      }
     });
     return f;
   }
