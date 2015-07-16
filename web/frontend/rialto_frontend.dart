@@ -70,28 +70,39 @@ class RialtoFrontend {
     });
   }
 
-  void addWpsProcessDialog(String processName) {
-    var nam = processName.substring(3); // exclude the "py:" part
+  void addWpsControls() {
+    WpsService wps = backend.wps;
+    if (wps == null) return;
 
-    // add menu item for the process
-    {
-      var anchor = new AnchorElement();
-      anchor.id = nam + "Dialog_open";
-      anchor.text = processName;
-
-      var list = new LIElement();
-      list.classes.add("uk-active");
-      list.children.add(anchor);
-
-      UListElement menu = querySelector("#wpsMenu");
-      menu.children.add(list);
+    for (WpsProcess process in wps.processes.values) {
+      _addWpsMenuItem(process.name);
+      _addWpsProcessDialog(process.name);
     }
+  }
+
+  void _addWpsMenuItem(String processName) {
+    var name = processName.substring(3); // exclude the "py:" part
+
+    var anchor = new AnchorElement();
+    anchor.id = name + "Dialog_open";
+    anchor.text = name;
+
+    var list = new LIElement();
+    list.classes.add("uk-active");
+    list.children.add(anchor);
+
+    UListElement menu = querySelector("#wpsMenu");
+    menu.children.add(list);
+  }
+
+  void _addWpsProcessDialog(String processName) {
+    var name = processName.substring(3); // exclude the "py:" part
 
     // create the <dialog> html
-    WpsDialog.makeDialogShell(nam);
+    WpsDialog.makeDialogShell(name);
 
     // populate the shell
-    new WpsDialog(this, nam + "Dialog", backend.wps.processes[processName]);
+    new WpsDialog(this, name + "Dialog", backend.wps.processes[processName]);
   }
 
   String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";

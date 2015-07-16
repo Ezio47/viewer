@@ -80,8 +80,7 @@ class WpsDialog extends DialogVM {
     InputElement textElement = TextInputVM.makeHtmlTextInputElement(id + "_" + param.name, "empty");
     tcell.children.add(textElement);
 
-    ButtonElement buttonElement =
-        ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
+    ButtonElement buttonElement = ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
     tcell.children.add(buttonElement);
 
     _fields[param.name] = new PositionInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
@@ -92,8 +91,7 @@ class WpsDialog extends DialogVM {
     InputElement textElement = TextInputVM.makeHtmlTextInputElement(id + "_" + param.name, "empty");
     tcell.children.add(textElement);
 
-    ButtonElement buttonElement =
-        ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
+    ButtonElement buttonElement = ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
     tcell.children.add(buttonElement);
 
     _fields[param.name] = new BboxInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
@@ -105,7 +103,7 @@ class WpsDialog extends DialogVM {
     dialogDiv.id = name + "Dialog";
     dialogDiv.classes.add("uk-modal");
 
-    querySelector("#bodybodybody").children.add(dialogDiv);
+    querySelector("#documentBody").children.add(dialogDiv);
 
     var modalDiv = new DivElement();
     modalDiv.classes.add("uk-modal-dialog");
@@ -113,7 +111,7 @@ class WpsDialog extends DialogVM {
 
     var headerDiv = new DivElement();
     headerDiv.classes.add("uk-modal-header");
-    headerDiv.text = "WPS Wizard for " + name;
+    headerDiv.text = "WPS Process: " + name;
     modalDiv.children.add(headerDiv);
 
     var form = new FormElement();

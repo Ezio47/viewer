@@ -43,16 +43,7 @@ void main() {
     }
   }
 
-  // TODO: get ths out of main()
-  p.then((list) {
-    WpsService wps = ui.backend.wps;
-    if (wps != null) {
-      for (WpsProcess process in wps.processes.values) {
-        ui.addWpsProcessDialog(process.name);
-      }
-      ;
-    }
-  });
+  p.then((list) => ui.addWpsControls());
 }
 
 /*

@@ -25,7 +25,7 @@
     </head>
 
 
-    <body id="bodybodybody">
+    <body id="documentBody">
 
        <div id="cesiumContainer" class="uk-position-cover" style="z-index: 0"></div>
 
@@ -86,6 +86,7 @@
                                 <li class=""><a id="wpsTestButton">Test WPS</a></li>
                                 <li class=""><a id="viewshedCircleButton">Make viewshed circle</a></li>
                                 <li class=""><a id="viewshedComputeButton">Compute viewshed</a></li>
+                                <li class="uk-nav-header">New</li>
                             </ul>
                         </div>
                     </li>
@@ -273,48 +274,60 @@
                 <div class="uk-modal-header">
                     Layer Customization
                 </div>
-                <div class="uk-grid">
 
-                    <div class="uk-width-2-3">
-                        <div class="uk-scrollable-box">
-                            <ul class="uk-list" id="layerList">
-                            </ul>
+                <!-- http://getuikit.com/docs/form.html "Form horizontal" -->
+                <form class="uk-form uk-form-horizontal">
+
+                    <div class="uk-form-row">
+                        <label class="uk-form-label" for="form-h-s">Layer name:</label>
+                        <div class="uk-form-select">
+                            <select class="uk-form" id="layerList">
+                            </select>
                         </div>
                     </div>
 
-                </div>
+                    <div class="uk-form-row">
+                        <label class="uk-form-label" for="layerCustomizationDialog_visibility">Layer visible:</label>
+                        <input type="checkbox" id="layerCustomizationDialog_visibility">
+                    </div>
 
-                <div>
-                    <form class="uk-form uk-form-horizontal">
-                            <label class="uk-form-label" for="layerCustomizationDialog_visibility">Layer visible:</label>
-                            <input id="layerCustomizationDialog_visibility" type="checkbox">
-                    </form>
-                </div>
-                <hr>
+                    <div class="uk-form-row">
+                        <label class="uk-form-label" for="layerCustomizationDialog_bboxVisibility">Bounds visible:</label>
+                        <input type="checkbox" id="layerCustomizationDialog_bboxVisibility">
+                    </div>
 
-                <div>
-                    <form class="uk-form uk-form-horizontal">
-                            <label class="uk-form-label" for="layerCustomizationDialog_bboxVisibility">Bounds visible:</label>
-                            <input id="layerCustomizationDialog_bboxVisibility" type="checkbox">
-                    </form>
-                </div>
-                <hr>
+                    <!--
+                    <div class="uk-form-row">
+                        <label class="uk-form-label" for="form-h-it">Text input</label>
+                        <div class="uk-form-controls">
+                            <input type="text" id="form-h-it" placeholder="Text input">
+                        </div>
+                    </div>
 
-                <div>
-                    Colorization
-                    <form class="uk-form uk-form-horizontal">
+                    <div class="uk-form-row">
+                        <label class="uk-form-label" for="form-h-t">Textarea</label>
+                        <div class="uk-form-controls">
+                            <textarea id="form-h-t" cols="30" rows="5" placeholder="Textarea text"></textarea>
+                        </div>
+                    </div>
+                    -->
+
+                    <div class="uk-form-row">
                         <div class="uk-form-select" data-uk-form-select>
-                            <span></span>
+                            <label class="uk-form-label" for="layerCustomizationDialog_colorRamps">Color ramp:</label>
                             <select id="layerCustomizationDialog_colorRamps" class="uk-form">
                             </select>
                         </div>
+                    </div>
+                    <div class="uk-form-row">
                         <div class="uk-form-select" data-uk-form-select>
-                            <span></span>
+                            <label class="uk-form-label" for="layerCustomizationDialog_colorDims">Color dimension:</label>
                             <select id="layerCustomizationDialog_colorDims" class="uk-form">
                             </select>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                </form>
                 <hr>
 
                 <div class="uk-modal-footer uk-text-right">

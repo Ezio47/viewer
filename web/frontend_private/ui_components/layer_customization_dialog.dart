@@ -5,7 +5,7 @@
 part of rialto.frontend.private;
 
 class LayerCustomizationDialog extends DialogVM {
-  BetterListBoxVM _layerListBox;
+  ListBoxVM _layerListBox;
 
   ListBoxVM _rampsListBox;
   ListBoxVM _dimsListBox;
@@ -19,30 +19,34 @@ class LayerCustomizationDialog extends DialogVM {
     _visibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_visibility", true);
     _bboxVisibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_bboxVisibility", true);
 
-    _layerListBox = new BetterListBoxVM(_frontend, "layerList", _updateButtons);
+    _layerListBox = new ListBoxVM(_frontend, "layerList", handler: _updateButtons);
   }
 
   @override
   void _show() {
     _layerListBox.clear();
 
-    var layerList = new List<Layer>();
-    layerList.addAll(_backend.layerManager.layers);
-    layerList.sort((a, b) => a.name.compareTo(b.name));
+    List<String> layerNames = new List<String>();
+    List<Layer> layers = _backend.layerManager.layers;
 
-    for (var layer in layerList) {
+    layers.forEach((layer) => layerNames.add(layer.name));
+    layerNames.sort();
+
+    for (var layer in layerNames) {
       _layerListBox.add(layer);
     }
 
     // set current selection to the first point cloud, if there is one
-    _layerListBox.value = layerList.firstWhere((layer) => layer is PointCloudLayer, orElse: () => layerList[0]);
+    var layer = layers.firstWhere((layer) => layer is PointCloudLayer, orElse: () => layers.first);
+    _layerListBox.setValue(layer.name);
 
     _updateButtons();
   }
 
   @override
   void _hide() {
-    Layer _target = _layerListBox.value;
+    String targetName = _layerListBox.getValue();
+    Layer target = _backend.layerManager.lookupLayer(targetName);
 
     String colorRamp = _rampsListBox.getValue();
     String colorDimension = _dimsListBox.getValue();
@@ -55,11 +59,12 @@ class LayerCustomizationDialog extends DialogVM {
       "isVisible": isVisible,
       "isBboxVisible": isBboxVisible
     };
-    _backend.commands.reloadLayer(_target, newOptions);
+    _backend.commands.reloadLayer(target, newOptions);
   }
 
   void _updateButtons([_ = null]) {
-    final Layer layer = _layerListBox.value;
+    final String layerName = _layerListBox.getValue();
+    final Layer layer = _backend.layerManager.lookupLayer(layerName);
     final Map options = layer.options;
 
     _visibilityButton.disabled = false;
@@ -96,116 +101,5 @@ class LayerCustomizationDialog extends DialogVM {
 
       _bboxVisibilityButton.disabled = true;
     }
-  }
-}
-
-class BetterListBoxItem {
-  final Layer layer;
-  DivElement element;
-
-  BetterListBoxItem(Layer this.layer) {
-    var span = new SpanElement();
-    span.text = layer.name;
-
-    var label = new LabelElement();
-    label.children.add(span);
-
-    var li = new LIElement();
-    li.children.add(label);
-
-    var div = new DivElement();
-    div.children.add(li);
-
-    element = div;
-  }
-}
-
-class BetterListBoxVM extends ViewModel {
-  List<BetterListBoxItem> _itemsList = new List<BetterListBoxItem>();
-  UListElement _ulElement;
-  Map<DivElement, BetterListBoxItem> _divToItemMap = new Map<DivElement, BetterListBoxItem>();
-  Map<Layer, BetterListBoxItem> _layerToItemMap = new Map<Layer, BetterListBoxItem>();
-  BetterListBoxItem _selection;
-  Function _onSelection;
-
-  BetterListBoxVM(RialtoFrontend frontend, String id, Function this._onSelection) : super(frontend, id) {
-    _ulElement = _element;
-    _ulElement.children.clear();
-  }
-
-  void _selectHandler(Event e) {
-    Element element = e.currentTarget;
-    if (element == null) return;
-
-    BetterListBoxItem item = _divToItemMap[element];
-    _selectItemAction(item);
-  }
-
-  void _selectItemAction(BetterListBoxItem item) {
-    if (item == _selection) {
-      // do nothing
-      return;
-    }
-
-    if (_selection != null) {
-      //log("${_selection.layer.name} unselected");
-      _selection.element.attributes["class"] = "";
-    }
-
-    _selection = item;
-    //log("${_selection.layer.name} selected");
-
-    _selection.element.attributes["class"] = "uk-text-success";
-
-    _onSelection(_selection.layer);
-  }
-
-  Layer get value {
-    if (_selection == null) {
-      return null;
-    }
-    return _selection.layer;
-  }
-
-  set value(Layer layer) {
-    if (layer == null) {
-      _selection = null;
-      return;
-    }
-
-    if (_layerToItemMap.containsKey(layer)) {
-      var item = _layerToItemMap[layer];
-      _selectItemAction(item);
-      return;
-    }
-
-    throw new ArgumentError("bad layer name");
-  }
-
-  void add(Layer layer) {
-    var item = new BetterListBoxItem(layer);
-    _itemsList.add(item);
-    _ulElement.children.add(item.element);
-    _divToItemMap[item.element] = item;
-    _layerToItemMap[layer] = item;
-
-    item.element.onClick.listen(_selectHandler);
-  }
-
-  void remove(Layer layer) {
-    var item = _layerToItemMap[layer];
-
-    _itemsList.remove(item);
-    _layerToItemMap.remove(item.layer);
-    _divToItemMap.remove(item.element);
-
-    _ulElement.children.remove(item.element);
-  }
-
-  void clear() {
-    _itemsList.clear();
-    _divToItemMap.clear();
-    _ulElement.children.clear();
-    _selection = null;
   }
 }

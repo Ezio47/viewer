@@ -27,7 +27,6 @@ class ListBoxVM extends InputVM<String> {
         _selectHandler = handler {
     _selectElement = _element;
     _selectElement.children.clear();
-    _selectElement.onChange.listen(_selectHandler);
 
     _selectElement.onChange.listen((e) {
       String v = null;
@@ -35,6 +34,9 @@ class ListBoxVM extends InputVM<String> {
         v = _selectElement.value;
       }
       setValue(v);
+      if (_selectHandler != null) {
+        _selectHandler();
+      }
     });
   }
 
