@@ -106,8 +106,6 @@ class ConfigScript {
         return _doCommand_layers(data);
       case "camera":
         return _doCommand_camera(data);
-      case "display":
-        return _doCommand_display(data);
       case "wps":
         return _doCommand_wps(data);
     }
@@ -181,19 +179,6 @@ class ConfigScript {
     return new Future(() {});
   }
 
-  Future _doCommand_display(Map data) {
-    if (data.containsKey("colorize")) {
-      Map colorizeData = data["colorize"];
-      assert(colorizeData.containsKey("ramp"));
-      String ramp = colorizeData["ramp"];
-      assert(colorizeData.containsKey("dimension"));
-      String dimName = colorizeData["dimension"];
-      _backend.commands.colorizeLayers(new ColorizerData(ramp, dimName));
-    }
-
-    return new Future(() {});
-  }
-
   Future<List<Layer>> _doCommand_layers(List layers) {
     var futures = [];
 
@@ -202,7 +187,7 @@ class ConfigScript {
       assert(layermap.length == 1);
       var name = layermap.keys.first;
       var data = layermap[name];
-      var f = _backend.commands.addLayer(new LayerData(name, data));
+      var f = _backend.commands.addLayer(name, data);
       futures.add(f);
     }
 

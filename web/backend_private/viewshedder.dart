@@ -9,70 +9,69 @@ part of rialto.backend.private;
 ///
 class Viewshedder {
 
-    /// Starts an asynchronous job to run the viewshed analysis via WPS
-    ///
-    /// Invokes the general WPS execution function to starts an asynchronous
-    /// WPS job to run the viewshed analysis using the given observer
-    /// position and radius.
-    static void callWps(RialtoBackend backend, double obsLon, double obsLat, double radius) {
+  /// Starts an asynchronous job to run the viewshed analysis via WPS
+  ///
+  /// Invokes the general WPS execution function to starts an asynchronous
+  /// WPS job to run the viewshed analysis using the given observer
+  /// position and radius.
+  static void callWps(RialtoBackend backend, double obsLon, double obsLat, double radius) {
+    var process = new WpsProcess(backend.wps, "groovy:wpsviewshed");
 
-        var process = new WpsProcess(backend.wps, "groovy:wpsviewshed");
+    var inputs = new Map<String, dynamic>();
+    WpsProcessParam param;
 
-        var inputs = new Map<String, dynamic>();
-        WpsProcessParam param;
+    param = new WpsProcessParam("obsLat", WpsProcessParamDataType.double);
+    process.inputs.add(param);
 
-        param = new WpsProcessParam("obsLat", WpsProcessParamDataType.double);
-        process.inputs.add(param);
+    param = new WpsProcessParam("obsLon", WpsProcessParamDataType.double);
+    process.inputs.add(param);
+    inputs["obsLon"] = obsLon;
 
-        param = new WpsProcessParam("obsLon", WpsProcessParamDataType.double);
-        process.inputs.add(param);
-        inputs["obsLon"] = obsLon;
+    param = new WpsProcessParam("fovStart", WpsProcessParamDataType.double);
+    process.inputs.add(param);
+    inputs["fovStart"] = 0.0;
 
-        param = new WpsProcessParam("fovStart", WpsProcessParamDataType.double);
-        process.inputs.add(param);
-        inputs["fovStart"] = 0.0;
+    param = new WpsProcessParam("fovEnd", WpsProcessParamDataType.double);
+    process.inputs.add(param);
+    inputs["fovEnd"] = 360.0;
 
-        param = new WpsProcessParam("fovEnd", WpsProcessParamDataType.double);
-        process.inputs.add(param);
-        inputs["fovEnd"] = 360.0;
+    param = new WpsProcessParam("eyeHeight", WpsProcessParamDataType.double);
+    process.inputs.add(param);
+    inputs["eyeHeight"] = 1.5;
 
-        param = new WpsProcessParam("eyeHeight", WpsProcessParamDataType.double);
-        process.inputs.add(param);
-        inputs["eyeHeight"] = 1.5;
+    param = new WpsProcessParam("radius", WpsProcessParamDataType.double);
+    process.inputs.add(param);
+    inputs["radius"] = radius;
 
-        param = new WpsProcessParam("radius", WpsProcessParamDataType.double);
-        process.inputs.add(param);
-        inputs["radius"] = radius;
+    param = new WpsProcessParam("inputDem", WpsProcessParamDataType.string);
+    process.inputs.add(param);
+    inputs["inputDem"] = "N48W114.hgt";
 
-        param = new WpsProcessParam("inputDem", WpsProcessParamDataType.string);
-        process.inputs.add(param);
-        inputs["inputDem"] = "N48W114.hgt";
+    param = new WpsProcessParam("outputUrl", WpsProcessParamDataType.string);
+    process.outputs.add(param);
 
-        param = new WpsProcessParam("outputUrl", WpsProcessParamDataType.string);
-        process.outputs.add(param);
+    var yes = (WpsJob job, Map<String, dynamic> results) {
+      OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
+      RialtoBackend.log(ogcDoc.dump(0));
+      var url = results["outputUrl"];
+      RialtoBackend.log("SUCCESS: $url");
 
-        var yes = (WpsJob job, Map<String, dynamic> results) {
-            OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
-            RialtoBackend.log(ogcDoc.dump(0));
-            var url = results["outputUrl"];
-            RialtoBackend.log("SUCCESS: $url");
+      var layerName = "viewshed-${job.id}";
+      Map layerOptions = {
+        "type": "tms_imagery",
+        "url": url,
+        "gdal2Tiles": true,
+        "maximumLevel": 12,
+        //"alpha": 0.5
+      };
+      backend.commands.addLayer(layerName, layerOptions).then((_) {
+        //Hub.log("layer added!");
+      });
+    };
 
-            var layerData = new LayerData("viewshed-${job.id}", {
-                "type": "tms_imagery",
-                "url": url,
-                "gdal2Tiles": true,
-                "maximumLevel": 12,
-            //"alpha": 0.5
-            });
-            backend.commands.addLayer(layerData).then((_) {
-                //Hub.log("layer added!");
-            });
-        };
-
-        backend.commands.wpsExecuteProcess(process, inputs, successHandler: yes);
-    }
+    backend.commands.wpsExecuteProcess(process, inputs, successHandler: yes);
+  }
 }
-
 
 /****
  Notes on the command line tool invocation:

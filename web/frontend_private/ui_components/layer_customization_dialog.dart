@@ -5,7 +5,7 @@
 part of rialto.frontend.private;
 
 class LayerCustomizationDialog extends DialogVM {
-  BetterListBoxVM _listbox;
+  BetterListBoxVM _layerListBox;
 
   ListBoxVM _rampsListBox;
   ListBoxVM _dimsListBox;
@@ -19,91 +19,76 @@ class LayerCustomizationDialog extends DialogVM {
     _visibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_visibility", true);
     _bboxVisibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_bboxVisibility", true);
 
-    _trackState(_rampsListBox);
-    _trackState(_dimsListBox);
-    _trackState(_visibilityButton);
-    _trackState(_bboxVisibilityButton);
+    _layerListBox = new BetterListBoxVM(_frontend, "layerList2", _updateButtons);
 
-    _listbox = new BetterListBoxVM(_frontend, "layerList2", _updateButtons);
-
-    _updateButtons();
+    //  _updateButtons();
   }
 
   @override
   void _show() {
-    _listbox.clear();
+    _layerListBox.clear();
 
     for (var layer in _backend.layerManager.layers) {
-      _listbox.add(layer);
+      _layerListBox.add(layer);
     }
+
+    _layerListBox.value = _backend.layerManager.layers[0];
 
     _updateButtons();
   }
 
   @override
   void _hide() {
-    Layer _target = _listbox.value;
+    Layer _target = _layerListBox.value;
 
-    String ramp = _rampsListBox.getValue();
+    String colorRamp = _rampsListBox.getValue();
+    String colorDimension = _dimsListBox.getValue();
+    bool isVisible = _visibilityButton.getValue();
+    bool isBboxVisible = _bboxVisibilityButton.getValue();
 
-    String dim = _dimsListBox.getValue();
-
-    if (ramp != null && dim != null) {
-      _backend.commands.colorizeLayers(new ColorizerData(ramp, dim));
-    }
-
-    if (_target is VisibilityControl) {
-      var t = (_target as VisibilityControl);
-      t.visible = _visibilityButton.getValue();
-    }
+    var newOptions = {
+      "colorRamp": colorRamp,
+      "colorDimension": colorDimension,
+      "isVisible": isVisible,
+      "isBboxVisible": isBboxVisible
+    };
+    _backend.commands.reloadLayer(_target, newOptions);
   }
 
   void _updateButtons([_ = null]) {
-    Layer _target = _listbox.value;
+    Layer _target = _layerListBox.value;
+
+    _dimsListBox.clear();
+    _rampsListBox.clear();
 
     if (_target != null) {
       print("list selected ${_target.name}");
     }
 
-    final bool colorizer = (_target is ColorizerControl);
-    final bool visibility = (_target is VisibilityControl);
-    final bool bboxVisibility = (_target is BboxVisibilityControl);
-
-    if (colorizer) {
-      var provider = (_target as PointCloudLayer).provider;
-      var ramps = _backend.cesium.getColorRampNamesFromProvider(provider);
-      ramps.forEach((s) => _rampsListBox.add(s));
-      _rampsListBox.setValue(ramps[0]);
-
-      var dims = new Set<String>();
-      dims.addAll((_target as PointCloudLayer).dimensions);
-
-      dims = dims.toList();
+    if (_target is PointCloudLayer) {
+      var dims = new List<String>();
+      dims.addAll(_target.dimensions);
       dims.sort();
 
       dims.forEach((d) => _dimsListBox.add(d));
-      _dimsListBox.setValue(dims[0]);
+      _dimsListBox.setValue("Z");
+
+      var provider = _target.provider;
+      var ramps = _backend.cesium.getColorRampNamesFromProvider(provider);
+
+      _rampsListBox.add("none");
+      if (dims.contains("Red") && dims.contains("Green") && dims.contains("Blue")) {
+        _rampsListBox.add("native");
+      }
+      ramps.forEach((s) => _rampsListBox.add(s));
+      _rampsListBox.setValue("none");
 
       _rampsListBox.disabled = false;
       _dimsListBox.disabled = false;
-    } else {
-      _rampsListBox.disabled = true;
-      _dimsListBox.disabled = true;
     }
 
-    if (visibility) {
-      _visibilityButton.disabled = false;
-      _visibilityButton.setValue((_target as VisibilityControl).visible);
-    } else {
-      _visibilityButton.disabled = true;
-    }
-
-    if (bboxVisibility) {
-      _bboxVisibilityButton.disabled = false;
-      _bboxVisibilityButton.setValue((_target as BboxVisibilityControl).bboxVisible);
-    } else {
-      _bboxVisibilityButton.disabled = true;
-    }
+    _bboxVisibilityButton.setValue(_target.options["isBboxVisible"]);
+    _visibilityButton.setValue(_target.options["isVisible"]);
   }
 }
 
@@ -146,7 +131,10 @@ class BetterListBoxVM extends ViewModel {
     if (element == null) return;
 
     BetterListBoxItem item = _divToItemMap[element];
+    _selectItemAction(item);
+  }
 
+  void _selectItemAction(BetterListBoxItem item) {
     if (item == _selection) {
       // do nothing
       return;
@@ -179,7 +167,8 @@ class BetterListBoxVM extends ViewModel {
     }
 
     if (_layerToItemMap.containsKey(layer)) {
-      _selection = _layerToItemMap[layer];
+      var item = _layerToItemMap[layer];
+      _selectItemAction(item);
       return;
     }
 

@@ -15,18 +15,32 @@ abstract class Layer {
 
   final String type;
   final String name;
-  final String description;
+  String description;
 
-  final Uri url;
-  final Uri proxy;
+  Uri url;
+  Uri proxy;
+
+  Map options;
 
   CartographicBbox _bbox;
 
-  Layer(RialtoBackend this.backend, String this.type, String this.name, Map map)
-      : url = ConfigUtils.getOptionalSettingAsUrl(map, "url"),
-        proxy = ConfigUtils.getOptionalSettingAsUrl(map, "proxy"),
-        description = ConfigUtils.getOptionalSettingAsString(map, "description");
-  requireUrl() {
+  bool isVisible;
+
+  Layer(RialtoBackend this.backend, String this.type, String this.name, Map theMap) {
+    options = new Map();
+    options.addAll(theMap);
+
+    url = ConfigUtils.getOptionalSettingAsUrl(options, "url");
+    proxy = ConfigUtils.getOptionalSettingAsUrl(options, "proxy");
+    description = ConfigUtils.getOptionalSettingAsString(options, "description");
+
+    if (!options.containsKey("isVisible")) {
+      isVisible = true;
+    }
+    isVisible = true;
+  }
+
+  void requireUrl() {
     if (url != null) return;
     throw new ArgumentError("url not set in config file");
   }
@@ -41,18 +55,6 @@ abstract class Layer {
   set bbox(CartographicBbox v) => _bbox = v;
 
   bool get canZoomTo => (bbox != null);
-}
-
-/// Interface class for a layer that can be turned on and off
-abstract class VisibilityControl {
-  bool get visible;
-  set visible(bool v);
-}
-
-/// Interface class for a layer that has a displayed bounding box that can be turned on and off
-abstract class BboxVisibilityControl {
-  bool get bboxVisible;
-  set bboxVisible(bool v);
 }
 
 /// Interface class for a layer that can have its alpha transparency set
@@ -77,12 +79,4 @@ abstract class ColorCorrectionControl {
 
   double get gamma;
   set gamma(double d);
-}
-
-/// Interface class for a layer that can be colorized
-///
-/// This really only applies to point cloud layers.
-abstract class ColorizerControl {
-  ColorizerData get colorizerData;
-  set colorizerData(ColorizerData data);
 }

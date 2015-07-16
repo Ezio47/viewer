@@ -76,15 +76,12 @@ class Commands {
   /// Asynchronously adds a new layer to the viewer
   ///
   /// Returns a Future with the new [Layer] object.
-  Future<Layer> addLayer(LayerData data) {
-    return _backend.layerManager.addLayer(data);
+  Future<Layer> addLayer(String name, Map options) {
+    return _backend.layerManager.addLayer(name, options);
   }
 
-  /// Asynchronously colorizes all the (point cloud) layers
-  ///
-  /// Returns an empty future when done.
-  Future colorizeLayers(ColorizerData data) {
-    return _backend.layerManager.colorizeLayers(data);
+  Future<Layer> reloadLayer(Layer layer, Map newOptions) {
+    return _backend.layerManager.reloadLayer(layer, newOptions);
   }
 
   /// Asynchronously removes [layer] from the viewer
@@ -214,12 +211,6 @@ class LayerData {
   String name;
   Map options;
   LayerData(String this.name, Map this.options);
-}
-
-class ColorizerData {
-  String ramp;
-  String dimension;
-  ColorizerData(String this.ramp, String this.dimension);
 }
 
 enum ViewModeCode { mode2D, mode25D, mode3D }

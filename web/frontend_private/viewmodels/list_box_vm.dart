@@ -38,7 +38,17 @@ class ListBoxVM extends InputVM<String> {
     });
   }
 
-  void _setElementValue(String v) {}
+  void _setElementValue(String v) {
+    int index = 0;
+    for (var s in _list) {
+      if (s.name == v) {
+        _selectElement.selectedIndex = index;
+        return;
+      }
+      ++index;
+    }
+    throw new ArgumentError("ListBox element not found: $v");
+  }
 
   void add(String item) {
     var wrapper = new ListBoxItem(item);
