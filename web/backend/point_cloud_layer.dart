@@ -55,7 +55,9 @@ class PointCloudLayer extends Layer {
 
       dimensions = backend.cesium.getDimensionNamesFromProvider(_provider);
 
-      if (_bboxShape != null) _bboxShape.remove();
+      if (_bboxShape != null) {
+        _bboxShape.remove();
+      }
       if (options["isBboxVisible"] && bbox != null && bbox.isValid) {
         _bboxShape = new BboxShape(backend, bbox.minimum, bbox.maximum);
       }
@@ -70,6 +72,9 @@ class PointCloudLayer extends Layer {
   Future unload() {
     return new Future(() {
       backend.cesium.unloadTileProvider(_provider);
+      if (_bboxShape != null) {
+        _bboxShape.remove();
+      }
     });
   }
 }
