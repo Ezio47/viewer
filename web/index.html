@@ -36,11 +36,12 @@
                 <ul class="uk-navbar-nav">
 
                     <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
-                        <a href="">View <i class="uk-icon-caret-down"></i></a>
+                        <a href="">Navigation <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class="uk-active"><a id="homeWorldButton">Home (world)</a></li>
-                                <li class="uk-active"><a id="homeDataButton">Zoom to layer</a></li>
+                                <li class="uk-nav-header">Zoom To</li>
+                                <li class="uk-active"><a id="homeWorldButton">World</a></li>
+                                <li class="uk-active"><a id="homeDataButton">Point Cloud</a></li>
                                 <li class="uk-nav-header">Projection</li>
                                 <li class="uk-active"><a id="modeButton2D">2D</a></li>
                                 <li class="uk-active"><a id="modeButton25D">2.5D</a></li>
@@ -53,10 +54,11 @@
                         <a href="">Layers <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar">
-                                <li class="uk-active"><a id="layerCustomizationDialog_open">Customize layers...</a></li>
+                                <li class="uk-active"><a id="layerCustomizationDialog_open">Layer display...</a></li>
                                 <li class="uk-active"><a id="layerInfoDialog_open">Layer info...</a></li>
-                                <li class="uk-active"><a id="loadUrlDialog_open">Load layers via URL...</a></li>
-                                <li class="uk-active"><a id="loadScriptDialog_open">Load layers via script...</a></li>
+                                <li class="uk-nav-header">Layer Loading</li>
+                                <li class="uk-active"><a id="loadUrlDialog_open">From URL...</a></li>
+                                <li class="uk-active"><a id="loadScriptDialog_open">From text...</a></li>
                             </ul>
                         </div>
                     </li>
@@ -65,10 +67,6 @@
                         <a href="">Tools <i class="uk-icon-caret-down"></i></a>
                         <div class="uk-dropdown uk-dropdown-navbar">
                             <ul class="uk-nav uk-nav-navbar" id="toolsMenu">
-                                <li class=""><a id="wpsTestButton">Test WPS</a></li>
-                                <li class=""><a id="viewshedCircleButton">Make viewshed circle</a></li>
-                                <li class=""><a id="viewshedComputeButton">Compute viewshed</a></li>
-                                <li class="uk-nav-divider"></li>
                                 <li class=""><a id="linearMeasurementButton">Linear measurement</a></li>
                                 <li class=""><a id="areaMeasurementButton">Area measurement</a></li>
                                 <li class=""><a id="dropPinButton">Drop pin</a></li>
@@ -76,6 +74,18 @@
                                 <li class="uk-nav-divider"></li>
                                 <li class="uk-active"><a id="cameraSettingsDialog_open">Camera settings...</a></li>
                                 <li class="uk-active"><a id="advancedSettingsDialog_open">Advanced settings...</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="uk-parent" data-uk-dropdown="{mode:'click'}">
+                        <a href="">WPS <i class="uk-icon-caret-down"></i></a>
+                        <div class="uk-dropdown uk-dropdown-navbar">
+                            <ul class="uk-nav uk-nav-navbar" id="wpsMenu">
+                                <li class="uk-nav-header">Old</li>
+                                <li class=""><a id="wpsTestButton">Test WPS</a></li>
+                                <li class=""><a id="viewshedCircleButton">Make viewshed circle</a></li>
+                                <li class=""><a id="viewshedComputeButton">Compute viewshed</a></li>
                             </ul>
                         </div>
                     </li>

@@ -83,7 +83,7 @@ class RialtoFrontend {
       list.classes.add("uk-active");
       list.children.add(anchor);
 
-      UListElement menu = querySelector("#toolsMenu");
+      UListElement menu = querySelector("#wpsMenu");
       menu.children.add(list);
     }
 

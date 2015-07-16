@@ -34,7 +34,7 @@ class LayerInfoDialog extends DialogVM {
 
     if (layer.url != null) {
       final url = layer.url.toString();
-      str += "  URL: $url";
+      str += "  URL: $url\n";
       if (layer.proxy != null) {
         final proxy = layer.proxy.toString();
         str += "  Proxy: $proxy\n";
@@ -43,8 +43,8 @@ class LayerInfoDialog extends DialogVM {
 
     if (layer.bbox != null) {
       str += "\n";
-      str += "Bounding Box\n";
-      str += "============\n";
+      str += "  Bounding Box\n";
+      str += "  ------------\n";
 
       final precision = _backend.displayPrecision;
 
@@ -55,20 +55,20 @@ class LayerInfoDialog extends DialogVM {
       final maxy = layer.bbox.maximum.latitude.toStringAsFixed(precision);
       final maxz = layer.bbox.maximum.height.toStringAsFixed(precision);
 
-      str += "  Min X: $minx\n";
-      str += "  Min Y: $miny\n";
-      str += "  Min Z: $minz\n";
-      str += "  Max X: $maxx\n";
-      str += "  Max Y: $maxy\n";
-      str += "  Max Z: $maxz\n";
+      str += "    Min X: $minx\n";
+      str += "    Min Y: $miny\n";
+      str += "    Min Z: $minz\n";
+      str += "    Max X: $maxx\n";
+      str += "    Max Y: $maxy\n";
+      str += "    Max Z: $maxz\n";
     }
 
     if (layer is PointCloudLayer) {
       str += "\n";
-      str += "Point Cloud\n";
-      str += "===========\n";
+      str += "  Point Cloud\n";
+      str += "  -----------\n";
 
-      str += "  Nuymber of points: ${layer.numPoints.toString()}\n";
+      str += "    Number of points: ${layer.numPoints.toString()}\n";
     }
 
     str += "\n\n";
