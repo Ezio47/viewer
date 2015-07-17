@@ -14,6 +14,8 @@ class ButtonVM extends ViewModel {
     var b = new ButtonElement();
     b.id = id;
     b.text = label;
+    b.type = "button";
+    b.classes.add("uk-button");
     return b;
   }
 

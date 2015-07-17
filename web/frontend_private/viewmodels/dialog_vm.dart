@@ -9,10 +9,12 @@ abstract class DialogVM extends FormVM {
   bool _hasCancelButton;
   HtmlElement _dialogElement;
   var _dialogProxy;
+  bool _skipStateTest;
 
-  DialogVM(RialtoFrontend frontend, String id, {bool hasCancelButton: true})
+  DialogVM(RialtoFrontend frontend, String id, {bool hasCancelButton: true, bool skipStateTest: false})
       : super(frontend, id),
-        _hasCancelButton = hasCancelButton {
+        _hasCancelButton = hasCancelButton,
+        _skipStateTest = skipStateTest {
     _dialogProxy = _backend.js.registerDialog(id);
 
     _dialogElement = _element;
@@ -45,10 +47,14 @@ abstract class DialogVM extends FormVM {
   }
 
   void hide(bool okay) {
-    if (!okay) {
-      _stateTracker.restoreState();
-    } else {
+    if (_skipStateTest) {
       _hide();
+    } else {
+      if (!okay) {
+        _stateTracker.restoreState();
+      } else {
+        _hide();
+      }
     }
     _backend.js.hideDialog(_dialogProxy);
   }

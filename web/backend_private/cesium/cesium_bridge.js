@@ -153,7 +153,7 @@ var CesiumBridge = function (element) {
             billboard.setEditable();
 
             if (cb) {
-                cb(position);
+                cb(position.x, position.y, position.z);
             }
         };
 

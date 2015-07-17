@@ -9,7 +9,7 @@ class WpsDialog extends DialogVM {
 
   Map<String, _BaseTextInputVM> _fields = new Map<String, _BaseTextInputVM>();
 
-  WpsDialog(RialtoFrontend frontend, String id, WpsProcess this.process) : super(frontend, id) {
+  WpsDialog(RialtoFrontend frontend, String id, WpsProcess this.process) : super(frontend, id, skipStateTest: true) {
     for (var param in process.inputs) {
       _addParameter(param);
     }
@@ -68,7 +68,7 @@ class WpsDialog extends DialogVM {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     div.children.add(input);
 
-    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name);
+    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: "name");
     _trackState(_fields[param.name]);
   }
 
@@ -79,7 +79,7 @@ class WpsDialog extends DialogVM {
     ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Set via UI");
     div.children.add(buttonElement);
 
-    _fields[param.name] = new PositionInputVM(_frontend, id + "_" + param.name, this);
+    _fields[param.name] = new PositionInputVM(_frontend, id + "_" + param.name, this, new PositionString());
     _trackState(_fields[param.name]);
   }
 
@@ -90,7 +90,7 @@ class WpsDialog extends DialogVM {
     ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Set via UI");
     div.children.add(buttonElement);
 
-    _fields[param.name] = new BoxInputVM(_frontend, id + "_" + param.name, null, this);
+    _fields[param.name] = new BoxInputVM(_frontend, id + "_" + param.name, this, new BoxString());
     _trackState(_fields[param.name]);
   }
 
@@ -163,5 +163,7 @@ class WpsDialog extends DialogVM {
           break;
       }
     }
+
+    process.service.executeProcess(process, inputs);
   }
 }

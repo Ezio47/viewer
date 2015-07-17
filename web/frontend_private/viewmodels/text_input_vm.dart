@@ -100,56 +100,100 @@ class StringListInputVM extends _MultiTextInputVM<String> {
   List<String> _parse(String s) => s.split("\n");
 }
 
-class Position {
+class PositionString {
   double x, y;
+  PositionString([double this.x = 0.0, double this.y = 0.0]);
+  String toString() => "$x,$y";
+
+  static PositionString fromString(String str) {
+    final begin = r"^";
+    final end = r"$";
+    final sp = r"\s*";
+    final number = r"([0-9]*[.]?[0-9]*)";
+    final comma = r",";
+
+    RegExp pattern = new RegExp(begin + sp + number + sp + comma + sp + number + sp + end);
+    var match = pattern.firstMatch(str);
+
+    if (match == null) return null;
+    if (match.groupCount != 2) return null;
+
+    var x = double.parse(match.group(1));
+    var y = double.parse(match.group(2));
+    return new PositionString(x, y);
+  }
 }
 
-class Box {
-  double x, y;
+class BoxString {
+  double north, south, east, west;
+
+  BoxString([double this.north = 0.0, double this.south = 0.0, double this.east = 0.0, double this.west = 0.0]);
+
+  String toString() => "$north,$south,$east,$west";
+
+  static BoxString fromString(String str) {
+    final begin = r"^";
+    final end = r"$";
+    final sp = r"\s*";
+    final number = r"([0-9]*[.]?[0-9]*)";
+    final comma = r",";
+
+    final A = begin + sp;
+    final B = number + sp + comma + number + sp + comma + number + sp + comma + number;
+    final C = sp + end;
+
+    RegExp pattern = new RegExp(A + B + C);
+    var match = pattern.firstMatch(str);
+
+    if (match == null) return null;
+    if (match.groupCount != 4) return null;
+
+    var n = double.parse(match.group(1));
+    var s = double.parse(match.group(2));
+    var e = double.parse(match.group(3));
+    var w = double.parse(match.group(4));
+    return new BoxString(n, s, e, w);
+  }
 }
 
-class PositionInputVM extends _SingleTextInputVM<Position> {
+class PositionInputVM extends _SingleTextInputVM<PositionString> {
   DialogVM _parentDialog;
 
-  PositionInputVM(RialtoFrontend frontend, String id, DialogVM this._parentDialog, {Position defaultValue: null})
+  PositionInputVM(RialtoFrontend frontend, String id, DialogVM this._parentDialog, PositionString defaultValue)
       : super(frontend, id, defaultValue) {
-    var whenClicked = (event) {
+    var clickHandler = () {
       _parentDialog.temporaryHide();
-
-      _backend.cesium.drawMarker((position) {
-        RialtoBackend.log("Position $position");
+      _backend.cesium.drawMarker((x, y, z) {
+        RialtoBackend.log("Position $x $y $z");
         _parentDialog.temporaryShow();
-        setValueFromString("$position");
+        setValueFromString("$x,$y");
       });
     };
 
-    new ButtonVM(frontend, id + "_button", whenClicked);
+    new ButtonVM(frontend, id + "_button", (e) => clickHandler());
   }
 
-  Position _parse(String s) {
-    return new Position();
-  }
+  PositionString _parse(String s) => PositionString.fromString(s);
 }
 
-class BoxInputVM extends _SingleTextInputVM<Box> {
-  DialogVM _parentDialog;
+typedef void BoxClickHandler();
 
-  BoxInputVM(RialtoFrontend frontend, String id, Box defaultValue, DialogVM this._parentDialog)
+class BoxInputVM extends _SingleTextInputVM<BoxString> {
+  final DialogVM _parentDialog;
+
+  BoxInputVM(RialtoFrontend frontend, String id, DialogVM this._parentDialog, BoxString defaultValue)
       : super(frontend, id, defaultValue) {
-    var whenClicked = (event) {
+    BoxClickHandler clickHandler = () {
       _parentDialog.temporaryHide();
-
-      _backend.cesium.drawExtent((a, b, c, d) {
-        RialtoBackend.log("Box $a $b $c $d");
+      _backend.cesium.drawExtent((north, south, east, west) {
+        RialtoBackend.log("Box $north $south $east $west");
         _parentDialog.temporaryShow();
-        setValueFromString("");
+        setValueFromString("$north,$south,$east,$west");
       });
     };
 
-    new ButtonVM(frontend, id + "_button", whenClicked);
+    new ButtonVM(frontend, id + "_button", (e) => clickHandler());
   }
 
-  Box _parse(String s) {
-    return new Box();
-  }
+  BoxString _parse(String s) => BoxString.fromString(s);
 }
