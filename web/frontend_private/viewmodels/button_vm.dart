@@ -10,7 +10,7 @@ part of rialto.frontend.private;
 class ButtonVM extends ViewModel {
   ButtonElement _buttonElement;
 
-  static ButtonElement makeHtmlButton(String id, String label) {
+  static ButtonElement makeButtonElement(String id, String label) {
     var b = new ButtonElement();
     b.id = id;
     b.text = label;

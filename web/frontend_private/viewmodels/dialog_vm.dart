@@ -24,7 +24,6 @@ abstract class DialogVM extends FormVM {
     }
 
     var okayButton = querySelector("#" + okayButtonId);
-    print("listening? $okayButtonId");
     assert(okayButton != null);
     okayButton.onClick.listen((e) => hide(true));
 

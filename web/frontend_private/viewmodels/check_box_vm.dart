@@ -4,27 +4,34 @@
 
 part of rialto.frontend.private;
 
-// TODO: make check to see if data has changed or not
-
 /// UI component for a check box
-class CheckBoxVM extends InputVM<bool> {
+class CheckBoxVM extends InputVM {
   InputElement _inputElement;
   bool _disabled;
 
   CheckBoxVM(RialtoFrontend frontend, String id, bool defaultValue)
-      : super(frontend, id, defaultValue),
+      : super(frontend, id, defaultValue.toString()),
         _disabled = false {
     _inputElement = _element;
     assert(_inputElement.type == "checkbox");
-    _inputElement.checked = getValue();
-    _inputElement.onClick.listen((e) => setValue(_inputElement.checked));
+    _inputElement.checked = getValueAsBool();
+    _inputElement.onClick.listen((e) => setValueFromString(_inputElement.checked.toString()));
   }
 
-  void _setElementValue(bool v) {
-    _inputElement.checked = v;
+  // String -> bool
+  static bool _bool_parse(String s) {
+    if (s == "true") return true;
+    if (s == "false") return false;
+    return null;
   }
 
-  // TODO: this should also disable the associated label
+  bool getValueAsBool() => _bool_parse(getValueAsString());
+
+  @override
+  void _setElementValueFromString(String v) {
+    _inputElement.checked = _bool_parse(v);
+  }
+
   bool get disabled => _disabled;
   set disabled(bool v) {
     _disabled = v;

@@ -7,7 +7,7 @@ part of rialto.frontend.private;
 class WpsDialog extends DialogVM {
   WpsProcess process;
 
-  Map<String, TextInputVM> _fields = new Map<String, TextInputVM>();
+  Map<String, _BaseTextInputVM> _fields = new Map<String, _BaseTextInputVM>();
 
   WpsDialog(RialtoFrontend frontend, String id, WpsProcess this.process) : super(frontend, id) {
     for (var param in process.inputs) {
@@ -16,85 +16,81 @@ class WpsDialog extends DialogVM {
   }
 
   void _addParameter(WpsProcessParam param) {
-    TableSectionElement tbody = querySelector("#" + id + "_tbody") as TableSectionElement;
+    FormElement form = querySelector("#" + id + "_formbody") as FormElement;
+    assert(form != null);
 
-    TableRowElement trow = tbody.addRow();
-
-    TableCellElement tcell = trow.addCell();
+    var div = new DivElement();
+    div.classes.add("uk-form-row");
+    form.children.add(div);
 
     LabelElement label = new LabelElement();
     label.htmlFor = id + "_" + param.name;
     label.text = "${param.name} (${WpsProcessParam.datatypeString(param.datatype)})";
-    tcell.children.add(label);
+    label.classes.add("uk-form-label");
+    div.children.add(label);
 
     switch (param.datatype) {
       case WpsProcessParamDataType.double:
-        _addParameter_double(param, tcell);
+        _addParameter_double(param, div);
         break;
       case WpsProcessParamDataType.integer:
-        _addParameter_integer(param, tcell);
+        _addParameter_integer(param, div);
         break;
       case WpsProcessParamDataType.string:
-        _addParameter_string(param, tcell);
+        _addParameter_string(param, div);
         break;
       case WpsProcessParamDataType.position:
-        _addParameter_position(param, tcell);
+        _addParameter_position(param, div);
         break;
       case WpsProcessParamDataType.box:
-        _addParameter_bbox(param, tcell);
+        _addParameter_bbox(param, div);
         break;
     }
   }
 
-  void _addParameter_double(WpsProcessParam param, TableCellElement tcell) {
-    InputElement input = new InputElement();
-    input.id = id + "_" + param.name;
-    input.type = "text";
-    tcell.children.add(input);
+  void _addParameter_double(WpsProcessParam param, DivElement div) {
+    InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    div.children.add(input);
 
-    _fields[param.name] = new TextInputVM(_frontend, id + "_" + param.name, "1.1");
+    _fields[param.name] = new DoubleInputVM(_frontend, id + "_" + param.name);
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_integer(WpsProcessParam param, TableCellElement tcell) {
-    InputElement input = new InputElement();
-    input.id = id + "_" + param.name;
-    input.type = "text";
-    tcell.children.add(input);
+  void _addParameter_integer(WpsProcessParam param, DivElement div) {
+    InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    div.children.add(input);
 
-    _fields[param.name] = new TextInputVM(_frontend, id + "_" + param.name, "2");
+    _fields[param.name] = new IntInputVM(_frontend, id + "_" + param.name);
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_string(WpsProcessParam param, TableCellElement tcell) {
-    InputElement input = new InputElement();
-    input.id = id + "_" + param.name;
-    input.type = "text";
-    tcell.children.add(input);
+  void _addParameter_string(WpsProcessParam param, DivElement div) {
+    InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    div.children.add(input);
 
-    _fields[param.name] = new TextInputVM(_frontend, id + "_" + param.name, "empty");
+    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name);
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_position(WpsProcessParam param, TableCellElement tcell) {
-    InputElement textElement = TextInputVM.makeHtmlTextInputElement(id + "_" + param.name, "empty");
-    tcell.children.add(textElement);
+  void _addParameter_position(WpsProcessParam param, DivElement div) {
+    InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    div.children.add(input);
 
-    ButtonElement buttonElement = ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
-    tcell.children.add(buttonElement);
+    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Set via UI");
+    div.children.add(buttonElement);
 
-    _fields[param.name] = new PositionInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
+    _fields[param.name] = new PositionInputVM(_frontend, id + "_" + param.name, this);
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_bbox(WpsProcessParam param, TableCellElement tcell) {
-    InputElement textElement = TextInputVM.makeHtmlTextInputElement(id + "_" + param.name, "empty");
-    tcell.children.add(textElement);
+  void _addParameter_bbox(WpsProcessParam param, DivElement div) {
+    InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    div.children.add(input);
 
-    ButtonElement buttonElement = ButtonVM.makeHtmlButton(id + "_" + param.name + "_button", "Set via UI");
-    tcell.children.add(buttonElement);
+    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Set via UI");
+    div.children.add(buttonElement);
 
-    _fields[param.name] = new BboxInputVM(_frontend, this, id + "_" + param.name, "(1.2,3.4)");
+    _fields[param.name] = new BoxInputVM(_frontend, id + "_" + param.name, null, this);
     _trackState(_fields[param.name]);
   }
 
@@ -116,16 +112,9 @@ class WpsDialog extends DialogVM {
 
     var form = new FormElement();
     form.classes.add("uk-form");
-    modalDiv.children.add(headerDiv);
-
-    var bodyDiv = new DivElement();
-    modalDiv.children.add(bodyDiv);
-
-    var table = new TableElement();
-    bodyDiv.children.add(table);
-
-    var tbody = table.createTBody();
-    tbody.id = name + "Dialog_tbody";
+    form.classes.add("uk-form-horizontal");
+    form.id = name + "Dialog_formbody";
+    modalDiv.children.add(form);
 
     var footerDiv = new DivElement();
     footerDiv.classes.add("uk-modal-footer");
@@ -152,25 +141,25 @@ class WpsDialog extends DialogVM {
 
   @override
   void _hide() {
-    print("running wizard ${process.name}");
+    RialtoBackend.log("running WPS process: ${process.name}");
 
     var inputs = new Map<String, dynamic>();
     for (WpsProcessParam param in process.inputs) {
       switch (param.datatype) {
         case WpsProcessParamDataType.double:
-          inputs[param.name] = _fields[param.name].valueAsDouble;
+          inputs[param.name] = _fields[param.name].valueAs;
           break;
         case WpsProcessParamDataType.integer:
-          inputs[param.name] = _fields[param.name].valueAsInt;
+          inputs[param.name] = _fields[param.name].valueAs;
           break;
         case WpsProcessParamDataType.string:
-          inputs[param.name] = _fields[param.name].getValue();
+          inputs[param.name] = _fields[param.name].valueAs;
           break;
         case WpsProcessParamDataType.position:
-          inputs[param.name] = _fields[param.name].getValue();
+          inputs[param.name] = _fields[param.name].valueAs;
           break;
         case WpsProcessParamDataType.box:
-          inputs[param.name] = _fields[param.name].getValue();
+          inputs[param.name] = _fields[param.name].valueAs;
           break;
       }
     }

@@ -16,7 +16,7 @@ class ListBoxItem {
 }
 
 /// UI component for a list box
-class ListBoxVM extends InputVM<String> {
+class ListBoxVM extends InputVM {
   List<ListBoxItem> _list = new List<ListBoxItem>();
   SelectElement _selectElement;
   Map<OptionElement, String> _map = new Map<OptionElement, String>();
@@ -33,14 +33,14 @@ class ListBoxVM extends InputVM<String> {
       if (_selectElement.value != null && !_selectElement.value.isEmpty) {
         v = _selectElement.value;
       }
-      setValue(v);
+      setValueFromString(v);
       if (_selectHandler != null) {
         _selectHandler();
       }
     });
   }
 
-  void _setElementValue(String v) {
+  void _setElementValueFromString(String v) {
     int index = 0;
     for (var s in _list) {
       if (s.name == v) {

@@ -5,29 +5,29 @@
 part of rialto.frontend.private;
 
 class LoadUrlDialog extends DialogVM {
-  TextInputVM _urlText;
+  StringInputVM _urlText;
 
   LoadUrlDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _urlText = new TextInputVM(_frontend, "loadUrlDialog_urlText", null);
+    _urlText = new StringInputVM(_frontend, "loadUrlDialog_urlText");
     _trackState(_urlText);
   }
 
   @override
   void _show() {
-    if (_urlText.getValue() == null || _urlText.getValue().isEmpty) {
+    if (_urlText.getValueAsString() == null || _urlText.getValueAsString().isEmpty) {
       Uri uri;
       if (_backend.configScript != null && _backend.configScript.configUri != null) {
         uri = _backend.configScript.configUri;
       } else {
         uri = ConfigScript.defaultUri;
       }
-      _urlText.setValue(uri.toString());
+      _urlText.setValueFromString(uri.toString());
     }
   }
 
   @override
   void _hide() {
-    String value = _urlText.getValue();
+    String value = _urlText.getValueAsString();
     if (value != null) {
       var url = Uri.parse(value); // TODO: handle error
 

@@ -5,20 +5,20 @@
 part of rialto.frontend.private;
 
 class CameraSettingsDialog extends DialogVM {
-  TextInputVM _longitude;
-  TextInputVM _latitude;
-  TextInputVM _height;
-  TextInputVM _heading;
-  TextInputVM _pitch;
-  TextInputVM _roll;
+  DoubleInputVM _longitude;
+  DoubleInputVM _latitude;
+  DoubleInputVM _height;
+  DoubleInputVM _heading;
+  DoubleInputVM _pitch;
+  DoubleInputVM _roll;
 
   CameraSettingsDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
-    _longitude = new TextInputVM(_frontend, "cameraSettingsDialog_longitude", "0.0");
-    _latitude = new TextInputVM(_frontend, "cameraSettingsDialog_latitude", "0.0");
-    _height = new TextInputVM(_frontend, "cameraSettingsDialog_height", "15000000.0");
-    _heading = new TextInputVM(_frontend, "cameraSettingsDialog_heading", "0.0");
-    _pitch = new TextInputVM(_frontend, "cameraSettingsDialog_pitch", "-90.0");
-    _roll = new TextInputVM(_frontend, "cameraSettingsDialog_roll", "0.0");
+    _longitude = new DoubleInputVM(_frontend, "cameraSettingsDialog_longitude", defaultValue: 0.0);
+    _latitude = new DoubleInputVM(_frontend, "cameraSettingsDialog_latitude", defaultValue: 0.0);
+    _height = new DoubleInputVM(_frontend, "cameraSettingsDialog_height", defaultValue: 15000000.0);
+    _heading = new DoubleInputVM(_frontend, "cameraSettingsDialog_heading", defaultValue: 0.0);
+    _pitch = new DoubleInputVM(_frontend, "cameraSettingsDialog_pitch", defaultValue: -90.0);
+    _roll = new DoubleInputVM(_frontend, "cameraSettingsDialog_roll", defaultValue: 0.0);
 
     _trackState(_longitude);
     _trackState(_latitude);
@@ -33,13 +33,13 @@ class CameraSettingsDialog extends DialogVM {
 
   @override
   void _hide() {
-    var longitude = _longitude.valueAsDouble;
-    var latitude = _latitude.valueAsDouble;
-    var height = _height.valueAsDouble;
+    var longitude = _longitude.valueAs;
+    var latitude = _latitude.valueAs;
+    var height = _height.valueAs;
 
-    var heading = _heading.valueAsDouble;
-    var pitch = _pitch.valueAsDouble;
-    var roll = _roll.valueAsDouble;
+    var heading = _heading.valueAs;
+    var pitch = _pitch.valueAs;
+    var roll = _roll.valueAs;
 
     final eyeOkay = (longitude != null && latitude != null && height != null);
     if (!eyeOkay) {

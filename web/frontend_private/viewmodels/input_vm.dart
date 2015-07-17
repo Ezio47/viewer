@@ -4,22 +4,22 @@
 
 part of rialto.frontend.private;
 
-class StateController<T> {
-  final T _defaultValue;
-  T _savedValue;
-  T _currentValue;
+class StateController {
+  final String _defaultValue;
+  String _savedValue;
+  String _currentValue;
 
-  StateController(T this._defaultValue) {
+  StateController(String this._defaultValue) {
     _currentValue = _defaultValue;
   }
 
-  void setCurrentValue(T v) {
+  void setCurrentValue(String v) {
     _currentValue = v;
   }
 
-  T getCurrentValue() => _currentValue;
+  String getCurrentValue() => _currentValue;
 
-  T getDefaultValue() => _defaultValue;
+  String getDefaultValue() => _defaultValue;
 
   void saveState() {
     _savedValue = _currentValue;
@@ -32,21 +32,21 @@ class StateController<T> {
   bool get stateChanged => _savedValue != _currentValue;
 }
 
-abstract class InputVM<T> extends ViewModel {
-  StateController<T> _stateController;
+abstract class InputVM extends ViewModel {
+  StateController _stateController;
 
-  InputVM(RialtoFrontend frontend, String id, T defaultValue) : super(frontend, id) {
-    _stateController = new StateController<T>(defaultValue);
+  InputVM(RialtoFrontend frontend, String id, String defaultValue) : super(frontend, id) {
+    _stateController = new StateController(defaultValue);
   }
 
-  void setValue(T v) {
-    _setElementValue(v);
+  void setValueFromString(String v) {
+    _setElementValueFromString(v);
     _stateController.setCurrentValue(v);
-    print("control $id is now $v");
+    //print("control $id is now $v");
   }
 
   // implement this to set the value on the actual HTML element
-  void _setElementValue(T);
+  void _setElementValueFromString(String);
 
-  T getValue() => _stateController.getCurrentValue();
+  String getValueAsString() => _stateController.getCurrentValue();
 }
