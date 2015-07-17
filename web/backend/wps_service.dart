@@ -74,7 +74,7 @@ class WpsService extends OgcService {
     var parms = [identifierKV, dataInputsKV, dataOutputsKV, responseDocumentKV];
     opts.forEach((k, v) => parms.add("$k=$v"));
 
-    RialtoBackend.log(parms);
+    //RialtoBackend.log(parms);
     _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
       if (ogcDoc == null) {
         RialtoBackend.error("Error parsing WPS process execution response document");
