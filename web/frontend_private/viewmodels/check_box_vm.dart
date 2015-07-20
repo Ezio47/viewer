@@ -4,44 +4,43 @@
 
 part of rialto.frontend.private;
 
-
-// TODO: make check to see if data has changed or not
-
 /// UI component for a check box
-class CheckBoxVM extends ViewModel with MStateControl<bool> {
-    InputElement _inputElement;
-    bool _defaultValue;
-    bool _disabled;
+class CheckBoxVM extends InputVM {
+  InputElement _inputElement;
+  bool _disabled;
 
-    CheckBoxVM(RialtoFrontend frontend, String id, bool this._defaultValue)
-            : super(frontend, id),
-              _disabled = false {
-        _inputElement = _element;
-        assert(_inputElement.type == "checkbox");
+  CheckBoxVM(RialtoFrontend frontend, String id, bool defaultValue)
+      : super(frontend, id, defaultValue.toString()),
+        _disabled = false {
+    _inputElement = _element;
+    assert(_inputElement.type == "checkbox");
+    _inputElement.checked = getValueAsBool();
+    _inputElement.onClick.listen((e) => setValueFromString(_inputElement.checked.toString()));
+  }
 
-        value = _defaultValue;
+  // String -> bool
+  static bool _bool_parse(String s) {
+    if (s == "true") return true;
+    if (s == "false") return false;
+    return null;
+  }
+
+  bool getValueAsBool() => _bool_parse(getValueAsString());
+
+  @override
+  void _setElementValueFromString(String v) {
+    _inputElement.checked = _bool_parse(v);
+  }
+
+  bool get disabled => _disabled;
+  set disabled(bool v) {
+    _disabled = v;
+
+    var attrs = _inputElement.attributes;
+    if (v) {
+      attrs.putIfAbsent("disabled", () => "true");
+    } else {
+      attrs.remove("disabled");
     }
-
-    void setClickHandler(var f) {
-        _inputElement.onClick.listen((e) => f(e));
-    }
-
-    @override
-    bool get value => _inputElement.checked;
-
-    @override
-    set value(bool value) => _inputElement.checked = value;
-
-    // TODO: this should also disable the associated label
-    bool get disabled => _disabled;
-    set disabled(bool v) {
-        _disabled = v;
-
-        var attrs = _inputElement.attributes;
-        if (v) {
-            attrs.putIfAbsent("disabled", () => "true");
-        } else {
-            attrs.remove("disabled");
-        }
-    }
+  }
 }

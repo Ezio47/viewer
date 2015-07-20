@@ -2,69 +2,49 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-
+import 'dart:async';
 import 'dart:html';
 import 'frontend/rialto_frontend_library.dart';
 import 'backend/rialto_backend_library.dart';
-
-
-final String demo = """- layers:
-    - bing:
-        type: bing_base_imagery
-        #style: Road
-        style: Aerial
-""";
-
 
 /// Main entry point for running the viewer
 ///
 /// Called from inside index.html. Creates the viewer, reads in the configuration file, and
 /// runs the commands in it to create the layers
 void main() {
-    // TODO: addErrorListener not yet implemented in Dart SDK...
-    //ReceivePort errPort = new ReceivePort();
-    //Isolate.current.addErrorListener(errPort.sendPort);
-    //errPort.listen((d) => log("bonk: $d"));
 
-    var ui = new RialtoFrontend();
+  // We didn't start this process, so we need a special way to catch any errors from it.
+  // See https://groups.google.com/a/dartlang.org/d/msg/misc/4x05P1rBggE/YId9pX1E0MQJ
+  // However, as of v1.10., it still doesn't seem to work.
+  /*import 'dart:isolate';*/
+  /*ReceivePort errPort = new ReceivePort();
+  Isolate.current.addErrorListener(errPort.sendPort);
+  errPort.listen((d) => RialtoBackend.error("Caught error: ${d[0].toString()}"));*/
 
-    // The Rules:
-    //
-    // if no ?config= parameter and we're localhost, then
-    //     set config to be special debug mode
-    // else
-    //     use the config param
-    // endif
-    // if config param is null, then
-    //     use a simple, canned demo script
-    // else
-    //     use the referenced config file
-    // endif
+  var ui = new RialtoFrontend();
 
-    String config;
-    if (window.location.href == "http://localhost:8080/index.html") {
-        config = "http://localhost:12345/test.yaml";
-    } else {
-        final params = Uri.parse(window.location.href).queryParameters;
-        config = params["config"];
+  final params = Uri.parse(window.location.href).queryParameters;
+  final String configParam = params["config"];
+
+  Future<List<dynamic>> p;
+
+  if (configParam == null) {
+    try {
+      p = ui.backend.commands.loadScriptFromStringAsync(ConfigScript.defaultYaml);
+    } catch (e) {
+      RialtoBackend.error("Top-level exception caught", e);
     }
-
-    if (config == null) {
-        try {
-            ui.backend.commands.loadScriptFromStringAsync(demo);
-        } catch (e) {
-            RialtoBackend.error("Top-level exception caught", e);
-        }
-    } else {
-        try {
-            final uri = Uri.parse(config);
-            ui.backend.commands.loadScriptFromUrl(uri);
-        } catch (e) {
-            RialtoBackend.error("Top-level exception caught", e);
-        }
+  } else {
+    try {
+      final configUri = Uri.parse(configParam);
+      p = ui.backend.commands.loadScriptFromUrl(configUri);
+    } catch (e) {
+      RialtoBackend.error("Top-level exception caught", e);
     }
+  }
+
+  p.then((list) => ui.addWpsControls());
 }
-
 
 /*
 final Map tests = {

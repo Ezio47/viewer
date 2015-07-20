@@ -19,5 +19,8 @@ part 'commands.dart';
 part 'config_script.dart';
 part 'event_registry.dart';
 part 'layer.dart';
+part 'ogc_service.dart';
 part 'point_cloud_layer.dart';
 part 'rialto_backend.dart';
+part 'wps_process.dart';
+part 'wps_service.dart';

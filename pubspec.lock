@@ -8,7 +8,7 @@ packages:
   collection:
     description: collection
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   crypto:
     description: crypto
     source: hosted
@@ -16,31 +16,31 @@ packages:
   http:
     description: http
     source: hosted
-    version: "0.11.1+1"
+    version: "0.11.2"
   http_parser:
     description: http_parser
     source: hosted
-    version: "0.0.2+5"
+    version: "0.0.2+7"
   path:
     description: path
     source: hosted
-    version: "1.3.1"
+    version: "1.3.6"
   petitparser:
     description: petitparser
     source: hosted
-    version: "1.3.4"
+    version: "1.4.3"
   source_span:
     description: source_span
     source: hosted
-    version: "1.0.2"
+    version: "1.1.2"
   stack_trace:
     description: stack_trace
     source: hosted
-    version: "1.1.1"
+    version: "1.3.4"
   string_scanner:
     description: string_scanner
     source: hosted
-    version: "0.1.3"
+    version: "0.1.3+1"
   vector_math:
     description: vector_math
     source: hosted
@@ -48,8 +48,8 @@ packages:
   xml:
     description: xml
     source: hosted
-    version: "2.2.2"
+    version: "2.3.2"
   yaml:
     description: yaml
     source: hosted
-    version: "2.1.2"
+    version: "2.1.3"

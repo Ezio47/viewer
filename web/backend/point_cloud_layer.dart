@@ -6,88 +6,75 @@ part of rialto.backend;
 
 // TODO: this class should live in rialto.backend.private
 
-class PointCloudLayer extends Layer with VisibilityControl, ColorizerControl, BboxVisibilityControl {
-    var _provider;
-    int numPoints;
-    List<String> dimensions;
-    BboxShape _bboxShape;
+class PointCloudLayer extends Layer {
+  var _provider;
+  int numPoints;
+  List<String> dimensions;
+  BboxShape _bboxShape;
 
-    ColorizerData _colorizerData = new ColorizerData("Spectral", "Z");
+  // supported in Options Map:
+  //   isVisible [inherited]
+  //   colorDimension  (string)
+  //   colorRamp  (string)
+  //   isBboxVisible  (bool)
 
-    bool _visible = true;
-    bool _bboxVisible = true;
+  PointCloudLayer(RialtoBackend backend, String name, Map map) : super(backend, "pointcloud", name, map) {
+    requireUrl();
 
-    PointCloudLayer(RialtoBackend backend, String name, Map map)
-            : super(backend, "pointcloud", name, map) {
-        requireUrl();
+    if (!map.containsKey("colorDimension")) {
+      options["colorDimension"] = "Z";
     }
 
-    @override
-    Future load() {
-        Completer c = new Completer();
-
-        backend.cesium.createTileProviderAsync(
-                urlString,
-                _colorizerData.ramp,
-                _colorizerData.dimension,
-                visible).then((provider) {
-            _provider = provider;
-
-            numPoints = backend.cesium.getNumPointsFromProvider(_provider);
-
-            var xStats = backend.cesium.getStatsFromProvider(_provider, "X");
-            var yStats = backend.cesium.getStatsFromProvider(_provider, "Y");
-            var zStats = backend.cesium.getStatsFromProvider(_provider, "Z");
-
-            bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
-
-            dimensions = backend.cesium.getDimensionNamesFromProvider(_provider);
-
-            if (_bboxShape != null) _bboxShape.remove();
-            if (_bboxVisible && bbox != null && bbox.isValid) {
-                _bboxShape = new BboxShape(backend, bbox.minimum, bbox.maximum);
-            }
-
-            c.complete();
-        });
-
-        return c.future;
+    if (!map.containsKey("colorRamp")) {
+      options["colorRamp"] = "Spectral";
     }
 
-    @override
-    Future unload() {
-        return new Future(() {
-            backend.cesium.unloadTileProvider(_provider);
-        });
+    if (!map.containsKey("isBboxVisible")) {
+      options["isBboxVisible"] = true;
     }
+  }
 
-    @override
-    set visible(bool v) {
-        _visible = v;
-        backend.cesium.unloadTileProvider(_provider);
-        load();
-    }
+  dynamic get provider => _provider;
 
-    @override
-    bool get visible => _visible;
+  @override
+  Future load() {
+    Completer c = new Completer();
 
-    @override
-    set bboxVisible(bool v) => _bboxShape.isVisible = v;
+    backend.cesium
+        .createTileProviderAsync(urlString, options["colorRamp"], options["colorDimension"], options["isVisible"])
+        .then((provider) {
+      _provider = provider;
 
-    @override
-    bool get bboxVisible => _bboxShape.isVisible;
+      numPoints = backend.cesium.getNumPointsFromProvider(_provider);
 
-    ColorizerData get colorizerData => _colorizerData;
+      var xStats = backend.cesium.getStatsFromProvider(_provider, "X");
+      var yStats = backend.cesium.getStatsFromProvider(_provider, "Y");
+      var zStats = backend.cesium.getStatsFromProvider(_provider, "Z");
 
-    // note this doesn't run the colorizer, you need to do that manually
-    set colorizerData(ColorizerData d) {
-        _colorizerData = d;
-    }
+      bbox = new CartographicBbox.fromValues(xStats[0], yStats[0], zStats[0], xStats[2], yStats[2], zStats[2]);
 
-    Future colorizeAsync() {
-        return new Future(() {
-            backend.cesium.unloadTileProvider(_provider);
-            load();
-        });
-    }
+      dimensions = backend.cesium.getDimensionNamesFromProvider(_provider);
+
+      if (_bboxShape != null) {
+        _bboxShape.remove();
+      }
+      if (options["isBboxVisible"] && bbox != null && bbox.isValid) {
+        _bboxShape = new BboxShape(backend, bbox.minimum, bbox.maximum);
+      }
+
+      c.complete();
+    });
+
+    return c.future;
+  }
+
+  @override
+  Future unload() {
+    return new Future(() {
+      backend.cesium.unloadTileProvider(_provider);
+      if (_bboxShape != null) {
+        _bboxShape.remove();
+      }
+    });
+  }
 }

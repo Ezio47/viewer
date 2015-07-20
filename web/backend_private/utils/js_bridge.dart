@@ -4,25 +4,24 @@
 
 part of rialto.backend.private;
 
-
 /// Javascript debugging helpers
 class JsBridge {
-    JsObject _bridge;
+  JsObject _bridge;
 
-    JsBridge(logger) {
-        _bridge = new JsObject(context['JsBridge'], [logger]);
-    }
+  JsBridge(logger) {
+    _bridge = new JsObject(context['JsBridge'], [logger]);
+  }
 
-    dynamic registerDialog(String dialogId) {
-        assert(dialogId.startsWith("#"));
-        return _bridge.callMethod('registerDialog', [dialogId]);
-    }
+  dynamic registerDialog(String dialogId) {
+    assert(!dialogId.startsWith("#"));
+    return _bridge.callMethod('registerDialog', [dialogId]);
+  }
 
-    void showDialog(dynamic dialog) {
-        _bridge.callMethod('showDialog', [dialog]);
-    }
+  void showDialog(dynamic dialog) {
+    _bridge.callMethod('showDialog', [dialog]);
+  }
 
-    void hideDialog(dynamic dialog) {
-        _bridge.callMethod('hideDialog', [dialog]);
-    }
+  void hideDialog(dynamic dialog) {
+    _bridge.callMethod('hideDialog', [dialog]);
+  }
 }

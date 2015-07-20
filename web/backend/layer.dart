@@ -4,7 +4,6 @@
 
 part of rialto.backend;
 
-
 /// Base class for representing a "layer" in the viewer.
 ///
 /// A layer may be an image, a point cloud, a GeoJSON shape, a base map, etc.
@@ -12,83 +11,82 @@ part of rialto.backend;
 /// At this base level, layers really only must have a name (which must be unique). Some layers also
 /// have an associated URL, bounding box, and description.
 abstract class Layer {
-    final RialtoBackend backend;
+  final RialtoBackend backend;
 
-    final String type;
-    final String name;
-    final String description;
+  final String type;
+  final String name;
+  String description;
 
-    final Uri url;
-    final Uri proxy;
+  Uri url;
+  Uri proxy;
 
-    CartographicBbox _bbox;
+  Map options;
 
-    Layer(RialtoBackend this.backend, String this.type, String this.name, Map map)
-            : url = ConfigUtils.getOptionalSettingAsUrl(map, "url"),
-              proxy = ConfigUtils.getOptionalSettingAsUrl(map, "proxy"),
-              description = ConfigUtils.getOptionalSettingAsString(map, "description");
-    requireUrl() {
-        if (url != null) return;
-        throw new ArgumentError("url not set in config file");
+  CartographicBbox _bbox;
+
+  Layer(RialtoBackend this.backend, String this.type, String this.name, Map theMap) {
+    options = new Map();
+    options.addAll(theMap);
+
+    url = ConfigUtils.getOptionalSettingAsUrl(options, "url");
+    proxy = ConfigUtils.getOptionalSettingAsUrl(options, "proxy");
+    description = ConfigUtils.getOptionalSettingAsString(options, "description");
+
+    if (!options.containsKey("isVisible")) {
+      options["isVisible"] = true;
     }
+  }
 
-    String get urlString => url.toString();
-    String get proxyString => (proxy == null) ? null : proxy.toString();
+  void requireUrl() {
+    if (url != null) return;
+    throw new ArgumentError("url not set in config file");
+  }
 
-    Future load(); // "add"
-    Future unload(); // "remove"
+  String get urlString => url.toString();
+  String get proxyString => (proxy == null) ? null : proxy.toString();
 
-    CartographicBbox get bbox => _bbox;
-    set bbox(CartographicBbox v) => _bbox = v;
+  Future load(); // "add"
+  Future unload(); // "remove"
 
-    bool get canZoomTo => (bbox != null);
+  CartographicBbox get bbox => _bbox;
+  set bbox(CartographicBbox v) => _bbox = v;
+
+  bool get canZoomTo => (bbox != null);
 }
 
+class NullLayer extends Layer {
+  NullLayer(RialtoBackend backend, String name, Map options) : super(backend, "NullLayer", name, options);
 
-/// Interface class for a layer that can be turned on and off
-abstract class VisibilityControl {
-    bool get visible;
-    set visible(bool v);
+  Future unload() {
+    return new Future.value();
+  }
+
+  @override
+  Future load() {
+    return new Future.value();
+  }
 }
-
-
-/// Interface class for a layer that has a displayed bounding box that can be turned on and off
-abstract class BboxVisibilityControl {
-    bool get bboxVisible;
-    set bboxVisible(bool v);
-}
-
 
 /// Interface class for a layer that can have its alpha transparency set
 abstract class AlphaControl {
-    double get alpha;
-    set alpha(double d);
+  double get alpha;
+  set alpha(double d);
 }
-
 
 /// Interface class for a layer that can have saturation, gamma, etc set
 abstract class ColorCorrectionControl {
-    double get brightness;
-    set brightness(double d);
+  double get brightness;
+  set brightness(double d);
 
-    double get contrast;
-    set contrast(double d);
+  double get contrast;
+  set contrast(double d);
 
-    double get hue;
-    set hue(double d);
+  double get hue;
+  set hue(double d);
 
-    double get saturation;
-    set saturation(double d);
+  double get saturation;
+  set saturation(double d);
 
-    double get gamma;
-    set gamma(double d);
-}
-
-
-/// Interface class for a layer that can be colorized
-///
-/// This really only applies to point cloud layers.
-abstract class ColorizerControl {
-    ColorizerData get colorizerData;
-    set colorizerData(ColorizerData data);
+  double get gamma;
+  set gamma(double d);
 }

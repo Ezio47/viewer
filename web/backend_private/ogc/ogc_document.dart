@@ -319,7 +319,7 @@ class OgcInputDescription_19 extends OgcDocument {
 
             // InputFormChoice, table 20
             "ComplexData": _ignoreElement,
-            "LiteralData": (e) => new OgcLiteralInput_25(e),
+            "LiteralData": (e) => literalData = new OgcLiteralInput_25(e),
             "BoundingBoxData": _errorElement
         });
 
@@ -333,6 +333,7 @@ class OgcInputDescription_19 extends OgcDocument {
         String s = "";
         s += pad(indent) + "[InputDescription19]\n";
         s += pad(indent + 1) + "Identifier: $identifier\n";
+        s += literalData.dump(indent + 1);
         return s;
     }
 }
@@ -398,7 +399,7 @@ class OgcOutputDescription_35 extends OgcDocument {
 
             // OutputFormChoice, table 36
             "ComplexOutput": _ignoreElement,
-            "LiteralOutput": (e) => new OgcLiteralOutput_37(e),
+            "LiteralOutput": (e) =>literalOutput = new OgcLiteralOutput_37(e),
             "BoundingBoxOutput": _errorElement
         });
     }

@@ -153,7 +153,7 @@ var CesiumBridge = function (element) {
             billboard.setEditable();
 
             if (cb) {
-                cb(position);
+                cb(position.x, position.y, position.z);
             }
         };
 
@@ -395,7 +395,7 @@ var CesiumBridge = function (element) {
     this._createTileProvider2Async = function(urlarg, colorizeRamp, colorizeDimension, visible) {
         var deferred = Cesium.when.defer();
 
-        var provider = new Cesium.RialtoPointCloudProvider(urlarg, colorizeRamp, colorizeDimension);
+        var provider = new Cesium.RialtoPointCloudProvider(urlarg, colorizeRamp, colorizeDimension, visible);
 
         provider.readHeaderAsync().then(function(header) {
             deferred.resolve(provider);
@@ -478,9 +478,9 @@ var CesiumBridge = function (element) {
     }
 
 
-    this.getColorRampNames = function () {
-        var keys = Object.keys(colorRamps);
-        return keys;
+    this.getColorRampNamesFromProvider = function (provider) {
+        var names = provider.colorizer.rampNames;
+        return names;
     }
 
 

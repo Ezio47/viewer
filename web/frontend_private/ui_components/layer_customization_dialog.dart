@@ -1,89 +1,105 @@
-// Copyright (c) 2015, RadiantBlue Technologies, Inc.
+// Copyright (c) 2014, RadiantBlue Technologies, Inc.
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
 part of rialto.frontend.private;
 
-
 class LayerCustomizationDialog extends DialogVM {
-    Layer _target;
-    ListBoxVM _rampsListBox;
-    ListBoxVM _dimsListBox;
-    CheckBoxVM _visibilityButton;
-    CheckBoxVM _bboxVisibilityButton;
+  ListBoxVM _layerListBox;
 
-    LayerCustomizationDialog(RialtoFrontend frontend, String id) : super(frontend, id, hasCancelButton: false) {
+  ListBoxVM _rampsListBox;
+  ListBoxVM _dimsListBox;
+  CheckBoxVM _visibilityButton;
+  CheckBoxVM _bboxVisibilityButton;
 
-        _rampsListBox = new ListBoxVM(_frontend, "#layerCustomizationDialog_colorRamps");
-        _dimsListBox = new ListBoxVM(_frontend, "#layerCustomizationDialog_colorDims");
+  LayerCustomizationDialog(RialtoFrontend frontend, String id) : super(frontend, id) {
+    _rampsListBox = new ListBoxVM(_frontend, "layerCustomizationDialog_colorRamps");
+    _dimsListBox = new ListBoxVM(_frontend, "layerCustomizationDialog_colorDims");
 
-        _visibilityButton = new CheckBoxVM(_frontend, "#layerCustomizationDialog_visibility", true);
-        _bboxVisibilityButton = new CheckBoxVM(_frontend, "#layerCustomizationDialog_bboxVisibility", true);
+    _visibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_visibility", true);
+    _bboxVisibilityButton = new CheckBoxVM(_frontend, "layerCustomizationDialog_bboxVisibility", true);
 
-        _register(_rampsListBox);
-        _register(_dimsListBox);
+    _layerListBox = new ListBoxVM(_frontend, "layerList", handler: _updateButtons);
+  }
 
+  @override
+  void _show() {
+    _layerListBox.clear();
+
+    List<String> layerNames = new List<String>();
+    List<Layer> layers = _backend.layerManager.layers;
+
+    layers.forEach((layer) => layerNames.add(layer.name));
+    layerNames.sort();
+
+    for (var layer in layerNames) {
+      _layerListBox.add(layer);
     }
 
-    set target(Layer layer) => _target = layer;
+    // set current selection to the first point cloud, if there is one
+    var layer = layers.firstWhere((layer) => layer is PointCloudLayer, orElse: () => layers.first);
+    _layerListBox.setValueFromString(layer.name);
 
-    @override
-    void _show() {
-        final bool colorizer = (_target is ColorizerControl);
-        final bool visibility = (_target is VisibilityControl);
-        final bool bboxVisibility = (_target is BboxVisibilityControl);
+    _updateButtons();
+  }
 
-        if (colorizer) {
-            var ramps = _backend.cesium.getColorRampNames();
-            ramps.forEach((s) => _rampsListBox.add(s));
-            _rampsListBox.value = ramps[0];
+  @override
+  void _hide() {
+    String targetName = _layerListBox.getValueAsString();
+    Layer target = _backend.layerManager.lookupLayer(targetName);
 
-            var dims = new Set<String>();
-            if (_target is ColorizerControl) {
-                dims.addAll((_target as PointCloudLayer).dimensions);
-            }
+    String colorRamp = _rampsListBox.getValueAsString();
+    String colorDimension = _dimsListBox.getValueAsString();
+    bool isVisible = _visibilityButton.getValueAsBool();
+    bool isBboxVisible = _bboxVisibilityButton.getValueAsBool();
 
-            dims = dims.toList();
-            dims.sort();
+    var newOptions = {
+      "colorRamp": colorRamp,
+      "colorDimension": colorDimension,
+      "isVisible": isVisible,
+      "isBboxVisible": isBboxVisible
+    };
+    _backend.commands.reloadLayer(target, newOptions);
+  }
 
-            dims.forEach((d) => _dimsListBox.add(d));
-            _dimsListBox.value = dims[0];
+  void _updateButtons([_ = null]) {
+    final String layerName = _layerListBox.getValueAsString();
+    final Layer layer = _backend.layerManager.lookupLayer(layerName);
+    final Map options = layer.options;
 
-            _rampsListBox.disabled = false;
-            _dimsListBox.disabled = false;
-        } else {
-            _rampsListBox.disabled = true;
-            _dimsListBox.disabled = true;
-        }
+    _visibilityButton.disabled = false;
+    _visibilityButton.setValueFromString(options["isVisible"].toString());
 
-        if (visibility) {
-            _visibilityButton.disabled = false;
-            _visibilityButton.setClickHandler((_) {
-                (_target as VisibilityControl).visible = _visibilityButton.value;
-            });
-        } else {
-            _visibilityButton.disabled = true;
-        }
+    if (layer is PointCloudLayer) {
+      var dims = new List<String>();
+      dims.addAll(layer.dimensions);
+      dims.sort();
 
-        if (bboxVisibility) {
-            _bboxVisibilityButton.disabled = false;
-            _bboxVisibilityButton.setClickHandler((_) {
-                (_target as BboxVisibilityControl).bboxVisible = _bboxVisibilityButton.value;
-            });
-        } else {
-            _bboxVisibilityButton.disabled = true;
-        }
+      dims.forEach((d) => _dimsListBox.add(d));
+      _dimsListBox.setValueFromString(options["colorDimension"].toString());
+
+      var provider = layer.provider;
+      var ramps = _backend.cesium.getColorRampNamesFromProvider(provider);
+
+      _rampsListBox.add("none");
+      if (dims.contains("Red") && dims.contains("Green") && dims.contains("Blue")) {
+        _rampsListBox.add("native");
+      }
+      ramps.forEach((s) => _rampsListBox.add(s));
+      _rampsListBox.setValueFromString(options["colorRamp"].toString());
+
+      _rampsListBox.disabled = false;
+      _dimsListBox.disabled = false;
+
+      _bboxVisibilityButton.disabled = false;
+      _bboxVisibilityButton.setValueFromString(options["isBboxVisible"].toString());
+    } else {
+      _dimsListBox.disabled = true;
+      _rampsListBox.disabled = true;
+      _dimsListBox.clear();
+      _rampsListBox.clear();
+
+      _bboxVisibilityButton.disabled = true;
     }
-
-    @override
-    void _hide() {
-
-        String ramp = _rampsListBox.value;
-        if (ramp == null) return;
-
-        String dim = _dimsListBox.value;
-        if (dim == null) return;
-
-        _backend.commands.colorizeLayers(new ColorizerData(ramp, dim));
-    }
+  }
 }

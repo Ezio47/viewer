@@ -29,9 +29,7 @@ part 'layers/geojson_layer.dart';
 
 part 'ogc/ogc_document_tests.dart';
 part 'ogc/ogc_document.dart';
-part 'ogc/ogc_service.dart';
 part 'ogc/wps_job_manager.dart';
-part 'ogc/wps_service.dart';
 part 'ogc/wps_service_tests.dart';
 
 part 'utils/color.dart';

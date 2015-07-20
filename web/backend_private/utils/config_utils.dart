@@ -44,7 +44,13 @@ class ConfigUtils {
 
     static Uri getRequiredSettingAsUrl(Map map, String key) {
         var s = _getRequiredSettingAsType(map, key, _stringType);
-        var u = Uri.parse(s);
+        var u;
+        try {
+            u = Uri.parse(s);
+        } catch (e) {
+            RialtoBackend.error("Unable to parse WPS URL", e);
+        }
+
         return u;
     }
 
