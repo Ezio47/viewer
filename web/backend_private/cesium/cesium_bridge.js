@@ -522,7 +522,7 @@ var CesiumBridge = function (element) {
         viewer.dataSources.add(ds);
 
         // these are default styling settings, if no simplestyle present
-        ds.loadUrl(url, {
+        ds.load(url, {
           stroke: Cesium.Color.WHITE,
           fill: Cesium.Color.WHITE,
           strokeWidth: 1,
