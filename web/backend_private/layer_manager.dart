@@ -57,15 +57,18 @@ class LayerManager {
       return c.future;
     }
 
-    layer.load().then((_) {
-      layers.add(layer);
-      _layerMap[layer.name] = layer;
+    try {
+      layer.load().then((_) {
+        layers.add(layer);
+        _layerMap[layer.name] = layer;
 
-      _backend.events.AddLayerCompleted.fire(layer);
+        _backend.events.AddLayerCompleted.fire(layer);
 
-      c.complete(layer);
-    });
-
+        c.complete(layer);
+      });
+    } catch (e) {
+      RialtoBackend.error("unable to load layer ${layer.name}", e);
+    }
     return c.future;
   }
 
