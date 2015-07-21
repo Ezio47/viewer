@@ -21,30 +21,12 @@ typedef Future<dynamic> ChainCommndFunction(dynamic);
 ///
 /// Each command in the script has it's own function in this class ("_doCommand_NAME()");
 class ConfigScript {
-  static Uri _defaultUri = Uri.parse("http://rialto.example.com:12345/demo.yaml");
-  static String _defaultYaml = """
-- layers:
-    - basemap:
-        type: bing_base_imagery
-        #style: Road
-        style: Aerial
-    - pointcloud:
-        type: pointcloud
-        url: http://localhost:12345/serp-small/mytablename
-- wps:
-    proxy: http://localhost:12346/
-    url: http://localhost:8080/geoserver/ows
-""";
-
   RialtoBackend _backend;
   String _configYaml;
   Uri _configUri;
 
   /// Creates a script parser/executer. Do not call this directly.
   ConfigScript(RialtoBackend this._backend);
-
-  static Uri get defaultUri => _defaultUri;
-  static String get defaultYaml => _defaultYaml;
 
   static ConfigScript fromUrl(RialtoBackend backend, Uri uri) {
     var c = new ConfigScript(backend);
@@ -193,4 +175,106 @@ class ConfigScript {
 
     return Future.wait(futures);
   }
+
+  static Map<String, Uri> get defaultServers {
+    Uri viewerServer;
+    Uri geopackageServer;
+    Uri dataServer;
+    Uri wpsServer;
+    Uri wpsProxyServer;
+
+    Uri uri = Uri.parse(window.location.href);
+
+    final mode = DeploymentMode.DockerServices;
+
+    switch (mode) {
+      case DeploymentMode.LocalAll:
+        viewerServer = uri;
+        geopackageServer = uri.replace(port: GeoPackageServerPort, path: RootPath);
+        dataServer = uri.replace(port: DataServerPort, path: RootPath);
+        wpsServer = uri.replace(port: WpsServerPort, path: WpsServerPath);
+        wpsProxyServer = uri.replace(port: WpsProxyServerPort, path: RootPath);
+        break;
+      case DeploymentMode.DockerServices:
+        viewerServer = uri;
+        uri = uri.replace(host: "192.168.59.103");
+        geopackageServer = uri.replace(port: GeoPackageServerPort, path: RootPath);
+        dataServer = uri.replace(port: DataServerPort, path: RootPath);
+        wpsServer = uri.replace(port: WpsServerPort, path: WpsServerPath);
+        wpsProxyServer = uri.replace(port: WpsProxyServerPort, path: RootPath);
+        break;
+      case DeploymentMode.DockerAll:
+        viewerServer = uri;
+        geopackageServer = uri.replace(port: GeoPackageServerPort, path: RootPath);
+        dataServer = uri.replace(port: DataServerPort, path: RootPath);
+        wpsServer = uri.replace(port: WpsServerPort, path: WpsServerPath);
+        wpsProxyServer = uri.replace(port: WpsProxyServerPort, path: RootPath);
+        break;
+      case DeploymentMode.Tutum:
+        viewerServer = uri;
+        var host = uri.host;
+        var geopackageServerHost = host.replaceAll("viewerserver.", "geopackageserver.");
+        var dataServerHost = host.replaceAll("viewerserver.", "dataserver.");
+        var wpsServerHost = host.replaceAll("viewerserver.", "wpsserver.");
+        var wpsProxyServerHost = host.replaceAll("viewerserver.", "wpsproxyserver.");
+
+        geopackageServer = uri.replace(host: geopackageServerHost, port: GeoPackageServerPort, path: RootPath);
+        dataServer = uri.replace(host: dataServerHost, port: DataServerPort, path: RootPath);
+        wpsServer = uri.replace(host: wpsServerHost, port: WpsServerPort, path: WpsServerPath);
+        wpsProxyServer = uri.replace(host: wpsProxyServerHost, port: WpsProxyServerPort, path: RootPath);
+        break;
+    }
+
+    return {
+      "viewer": viewerServer,
+      "geopackage": geopackageServer,
+      "data": dataServer,
+      "wps": wpsServer,
+      "wpsproxy": wpsProxyServer
+    };
+  }
+
+  static Uri get defaultUri {
+    var uri = defaultServers["data"].replace(path: "/demo.yaml");
+    return uri;
+  }
+
+  static String get defaultYaml {
+    var servers = defaultServers;
+
+    String yaml = """
+- layers:
+    - basemap:
+        type: bing_base_imagery
+        #style: Road
+        style: Aerial
+    - pointcloud:
+        type: pointcloud
+        url: ${servers["geopackage"].toString()}/serp-small/mytablename
+    - alberta_poly:
+        type: geojson
+        url: ${servers["data"].toString()}/alberta.json
+
+- wps:
+    proxy: ${servers["wpsproxy"].toString()}
+    url: ${servers["wps"].toString()}
+""";
+
+    return yaml;
+  }
+}
+
+final GeoPackageServerPort = 42422;
+final WpsServerPort = 42423;
+final DataServerPort = 42424;
+final WpsProxyServerPort = 42425;
+
+final WpsServerPath = "/geoserver/ows";
+final RootPath = "";
+
+enum DeploymentMode {
+  LocalAll, // viewer and services running manually on localhost
+  DockerServices, // viewer on localhost, services via docker
+  DockerAll, // viewer and services on docker
+  Tutum // viewer and services on tutum stack
 }
