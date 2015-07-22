@@ -2,6 +2,8 @@
 
 set -e
 
+BRANCH=dev
+
 #
 # Dart
 #
@@ -13,9 +15,9 @@ rm -rf /tmp/dartsdk-linux-x64-release.zip
 #
 # download Rialto viewer
 #
-curl -L https://github.com/radiantbluetechnologies/rialto-viewer/archive/master.zip -o /tmp/viewer.zip
+curl -L https://github.com/radiantbluetechnologies/rialto-viewer/archive/$BRANCH.zip -o /tmp/viewer.zip
 unzip -o -d /tmp /tmp/viewer.zip
-mv /tmp/rialto-viewer-master /tmp/viewer
+mv /tmp/rialto-viewer-$BRANCH /tmp/viewer
 
 #
 # build & install Rialto viewer
