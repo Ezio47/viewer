@@ -2,6 +2,8 @@
 
 set -e
 
+BRANCH=dev
+
 #
 # Dart
 #
@@ -13,27 +15,20 @@ rm -rf /tmp/dartsdk-linux-x64-release.zip
 #
 # download Rialto viewer
 #
-curl -L https://github.com/radiantbluetechnologies/rialto-viewer/archive/master.zip -o /tmp/viewer.zip
+curl -L https://github.com/radiantbluetechnologies/rialto-viewer/archive/$BRANCH.zip -o /tmp/viewer.zip
 unzip -o -d /tmp /tmp/viewer.zip
-mv /tmp/rialto-viewer-master /tmp/viewer
+mv /tmp/rialto-viewer-$BRANCH /tmp/viewer
 
 #
 # build & install Rialto viewer
 #
 mkdir -p /tmp/viewer/web/cesium-build
-cp -r /opt/cesium-build/* /tmp/viewer/web/cesium-build/
+cp -r /opt/cesium-build/Build/* /tmp/viewer/web/cesium-build/
 cd /tmp/viewer
 /tmp/dart-sdk/bin/pub build
-mkdir -p /opt/viewer
-cp -r /tmp/viewer/* /opt/viewer/
+mkdir -p /opt/viewer-build
+cp -r /tmp/viewer/* /opt/viewer-build/
 
-#
-# deploy
-#
-rm -rf /opt/www/*
-cp -r /opt/viewer/build/web/* /opt/www/
-
-#
 # cleanup
 #
 rm -rf \
