@@ -26,7 +26,7 @@ mkdir -p /tmp/viewer/web/cesium-build
 cp -r /opt/cesium-build/* /tmp/viewer/web/cesium-build/
 cd /tmp/viewer
 /tmp/dart-sdk/bin/pub build
-mkdir -p /opt/viewer
+mkdir -p /opt/viewer-build
 cp -r /tmp/viewer/* /opt/viewer-build/
 
 # cleanup
