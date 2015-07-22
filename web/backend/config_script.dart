@@ -226,10 +226,10 @@ class ConfigScript {
         RialtoBackend.log("Using deployment mode 'Tutum'");
         viewerServer = uri;
         var host = uri.host;
-        var geopackageServerHost = host.replaceAll("viewerserver.", "geopackageserver.");
+        var geopackageServerHost = host.replaceAll("viewerserver.", "gpkgserver.");
         var dataServerHost = host.replaceAll("viewerserver.", "dataserver.");
-        var wpsServerHost = host.replaceAll("viewerserver.", "wpsserver.");
-        var wpsProxyServerHost = host.replaceAll("viewerserver.", "wpsproxyserver.");
+        var wpsServerHost = host.replaceAll("viewerserver.", "geoserver.");
+        var wpsProxyServerHost = host.replaceAll("viewerserver.", "proxyserver.");
 
         geopackageServer = uri.replace(host: geopackageServerHost, port: GeoPackageServerPort, path: RootPath);
         dataServer = uri.replace(host: dataServerHost, port: DataServerPort, path: RootPath);
