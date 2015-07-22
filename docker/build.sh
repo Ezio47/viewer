@@ -27,15 +27,8 @@ cp -r /opt/cesium-build/* /tmp/viewer/web/cesium-build/
 cd /tmp/viewer
 /tmp/dart-sdk/bin/pub build
 mkdir -p /opt/viewer
-cp -r /tmp/viewer/* /opt/viewer/
+cp -r /tmp/viewer/* /opt/viewer-build/
 
-#
-# deploy
-#
-rm -rf /opt/www/*
-cp -r /opt/viewer/build/web/* /opt/www/
-
-#
 # cleanup
 #
 rm -rf \
