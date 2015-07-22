@@ -185,10 +185,20 @@ class ConfigScript {
 
     Uri uri = Uri.parse(window.location.href);
 
-    final mode = DeploymentMode.DockerServices;
+    var mode;
+    if (uri.host == "localhost") {
+      mode = DeploymentMode.LocalAll;
+    } else if (uri.host.startsWith("viewerserver")) {
+      mode = DeploymentMode.Tutum;
+    } else if (uri.host == "192.168.59.103") {
+      mode = DeploymentMode.DockerAll;
+    } else {
+      mode = DeploymentMode.LocalAll;
+    }
 
     switch (mode) {
       case DeploymentMode.LocalAll:
+        RialtoBackend.log("Using deployment mode 'LocalAll'");
         viewerServer = uri;
         geopackageServer = uri.replace(port: GeoPackageServerPort, path: RootPath);
         dataServer = uri.replace(port: DataServerPort, path: RootPath);
@@ -196,6 +206,7 @@ class ConfigScript {
         wpsProxyServer = uri.replace(port: WpsProxyServerPort, path: RootPath);
         break;
       case DeploymentMode.DockerServices:
+        RialtoBackend.log("Using deployment mode 'DockerServices'");
         viewerServer = uri;
         uri = uri.replace(host: "192.168.59.103");
         geopackageServer = uri.replace(port: GeoPackageServerPort, path: RootPath);
@@ -204,6 +215,7 @@ class ConfigScript {
         wpsProxyServer = uri.replace(port: WpsProxyServerPort, path: RootPath);
         break;
       case DeploymentMode.DockerAll:
+        RialtoBackend.log("Using deployment mode 'DockerAll'");
         viewerServer = uri;
         geopackageServer = uri.replace(port: GeoPackageServerPort, path: RootPath);
         dataServer = uri.replace(port: DataServerPort, path: RootPath);
@@ -211,6 +223,7 @@ class ConfigScript {
         wpsProxyServer = uri.replace(port: WpsProxyServerPort, path: RootPath);
         break;
       case DeploymentMode.Tutum:
+        RialtoBackend.log("Using deployment mode 'Tutum'");
         viewerServer = uri;
         var host = uri.host;
         var geopackageServerHost = host.replaceAll("viewerserver.", "geopackageserver.");

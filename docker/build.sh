@@ -23,7 +23,7 @@ mv /tmp/rialto-viewer-$BRANCH /tmp/viewer
 # build & install Rialto viewer
 #
 mkdir -p /tmp/viewer/web/cesium-build
-cp -r /opt/cesium-build/* /tmp/viewer/web/cesium-build/
+cp -r /opt/cesium-build/Build/* /tmp/viewer/web/cesium-build/
 cd /tmp/viewer
 /tmp/dart-sdk/bin/pub build
 mkdir -p /opt/viewer-build
