@@ -164,6 +164,6 @@ class WpsDialog extends DialogVM {
       }
     }
 
-    process.service.executeProcess(process, inputs);
+    process.service.executeProcess(process, inputs, successHandler: process.service.loadLayers);
   }
 }

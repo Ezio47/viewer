@@ -142,6 +142,28 @@ class WpsService extends OgcService {
     return c.future;
   }
 
+  // this function is used as the successHandler for executeProcess()
+  Future loadLayers(WpsJob job, Map<String, dynamic> results) {
+    OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
+    RialtoBackend.log("WPS job success");
+    RialtoBackend.log(ogcDoc.dump(0));
+
+    for (var key in results.keys) {
+      RialtoBackend.log("$key: ${results[key]}");
+
+      /*var layerName = "viewshed-${job.id}";
+        Map layerOptions = {
+        "type": "tms_imagery",
+        "url": url,
+        "gdal2Tiles": true,
+        "maximumLevel": 12,
+        //"alpha": 0.5
+        };*/
+    }
+
+    return null; //_backend.commands.addLayer(layerName, layerOptions);
+  }
+
   /// Issues a "describe process" request to the WPS server
   ///
   /// Returns the response document
@@ -149,20 +171,22 @@ class WpsService extends OgcService {
     return _getProcessDescriptionWork(processName);
   }
 
-  static String _descriptionField(String rawDescription, String field) {
-    if (rawDescription == null) return null;
-    var lines = rawDescription.split('\n');
-    var tok = "# " + field + ": ";
+  static String _extractFieldFromDescription(String description, String field) {
+    if (description == null) return null;
+    var lines = description.split('#');
+    lines = lines.map((s) => s.trim()).toList();
     for (var line in lines) {
-      if (line.startsWith(tok)) {
-        return line.substring(tok.length);
+      var tokens = line.split(':');
+      tokens = tokens.map((s) => s.trim()).toList();
+      if (tokens.length == 2 && tokens[0] == field) {
+        return tokens[1];
       }
     }
     return null;
   }
 
   static WpsProcessParamDataType inferDatatype(String abstract, String datatype_notused) {
-    var dt = _descriptionField(abstract, "datatype");
+    var dt = _extractFieldFromDescription(abstract, "datatype");
     assert(dt != null);
 
     if (dt.startsWith("enum:")) {
@@ -237,6 +261,7 @@ class WpsService extends OgcService {
       RialtoBackend.error("GetCapabilities check: FAILED");
     }
 
-    return new Future.value(null);
+    var numProcesses = (capabilities as OgcCapabilitiesDocument_7).processOfferings.processes.length;
+    return new Future.value("server providing $numProcesses processes");
   }
 }

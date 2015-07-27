@@ -185,15 +185,13 @@ class ConfigScript {
 
     Uri uri = Uri.parse(window.location.href);
 
-    var mode;
+    var mode = DeploymentMode.Tutum;
     if (uri.host == "localhost") {
-      mode = DeploymentMode.LocalAll;
+      mode = DeploymentMode.DockerServices;
     } else if (uri.host.startsWith("viewerserver")) {
       mode = DeploymentMode.Tutum;
     } else if (uri.host == "192.168.59.103") {
       mode = DeploymentMode.DockerAll;
-    } else {
-      mode = DeploymentMode.LocalAll;
     }
 
     switch (mode) {
