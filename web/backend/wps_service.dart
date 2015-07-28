@@ -124,11 +124,12 @@ class WpsService extends OgcService {
     if (description == null) return null;
     var lines = description.split('#');
     lines = lines.map((s) => s.trim()).toList();
-    for (var line in lines) {
-      var tokens = line.split(':');
-      tokens = tokens.map((s) => s.trim()).toList();
-      if (tokens.length == 2 && tokens[0] == field) {
-        return tokens[1];
+    for (String line in lines) {
+      int idx = line.indexOf(field + ':');
+      if (idx != -1) {
+        var value = line.substring((field + ':').length);
+        value = value.trim();
+        return value;
       }
     }
     return null;
