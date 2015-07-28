@@ -264,7 +264,7 @@ class ConfigScript {
         url: ${servers["geopackage"].toString()}/serp-small/mytablename
     - alberta_poly:
         type: geojson
-        url: ${servers["data"].toString()}/alberta.json
+        url: ${servers["data"].toString()}/inputs/alberta.json
 
 - wps:
     proxy: ${servers["wpsproxy"].toString()}
