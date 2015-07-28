@@ -15,45 +15,45 @@ class Viewshedder {
   /// WPS job to run the viewshed analysis using the given observer
   /// position and radius.
   static void callWps(RialtoBackend backend, double obsLon, double obsLat, double radius) {
-    var process = new WpsProcess(backend.wps, "groovy:wpsviewshed");
+    var process = new WpsProcess(backend.wpsService, "groovy:wpsviewshed");
 
     var inputs = new Map<String, dynamic>();
     WpsProcessParam param;
 
-    param = new WpsProcessParam("obsLat", WpsProcessParamDataType.double);
+    param = new WpsProcessParam("obsLat", WpsProcessParamDataType.double, "");
     process.inputs.add(param);
 
-    param = new WpsProcessParam("obsLon", WpsProcessParamDataType.double);
+    param = new WpsProcessParam("obsLon", WpsProcessParamDataType.double, "");
     process.inputs.add(param);
     inputs["obsLon"] = obsLon;
 
-    param = new WpsProcessParam("fovStart", WpsProcessParamDataType.double);
+    param = new WpsProcessParam("fovStart", WpsProcessParamDataType.double, "");
     process.inputs.add(param);
     inputs["fovStart"] = 0.0;
 
-    param = new WpsProcessParam("fovEnd", WpsProcessParamDataType.double);
+    param = new WpsProcessParam("fovEnd", WpsProcessParamDataType.double, "");
     process.inputs.add(param);
     inputs["fovEnd"] = 360.0;
 
-    param = new WpsProcessParam("eyeHeight", WpsProcessParamDataType.double);
+    param = new WpsProcessParam("eyeHeight", WpsProcessParamDataType.double, "");
     process.inputs.add(param);
     inputs["eyeHeight"] = 1.5;
 
-    param = new WpsProcessParam("radius", WpsProcessParamDataType.double);
+    param = new WpsProcessParam("radius", WpsProcessParamDataType.double, "");
     process.inputs.add(param);
     inputs["radius"] = radius;
 
-    param = new WpsProcessParam("inputDem", WpsProcessParamDataType.string);
+    param = new WpsProcessParam("inputDem", WpsProcessParamDataType.string, "");
     process.inputs.add(param);
     inputs["inputDem"] = "N48W114.hgt";
 
-    param = new WpsProcessParam("outputUrl", WpsProcessParamDataType.string);
+    param = new WpsProcessParam("outputUrl", WpsProcessParamDataType.string, "");
     process.outputs.add(param);
 
-    var yes = (WpsJob job, Map<String, dynamic> results) {
+    var yes = (WpsJob job) {
       OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
       RialtoBackend.log(ogcDoc.dump(0));
-      var url = results["outputUrl"];
+      var url = job.outputs["outputUrl"];
       RialtoBackend.log("SUCCESS: $url");
 
       var layerName = "viewshed-${job.id}";

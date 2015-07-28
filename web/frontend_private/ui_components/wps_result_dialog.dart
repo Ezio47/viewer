@@ -4,18 +4,22 @@
 
 part of rialto.frontend.private;
 
-class WpsDialog extends DialogVM {
-  WpsProcess process;
+class WpsResultDialog extends DialogVM {
+  WpsJob job;
 
   Map<String, _BaseTextInputVM> _fields = new Map<String, _BaseTextInputVM>();
 
-  WpsDialog(RialtoFrontend frontend, String id, WpsProcess this.process) : super(frontend, id, skipStateTest: true) {
-    for (var param in process.inputs) {
-      _addParameter(param);
+  WpsResultDialog(RialtoFrontend frontend, String id, WpsJob this.job) : super(frontend, id, skipStateTest: true) {
+    for (var param in job.process.inputs) {
+      _addParameter(param, job.inputs[param.name]);
+    }
+    for (var param in job.process.outputs) {
+      if (param.name.startsWith('_')) continue;
+      _addParameter(param, job.outputs[param.name]);
     }
   }
 
-  void _addParameter(WpsProcessParam param) {
+  void _addParameter(WpsProcessParam param, dynamic value) {
     FormElement form = querySelector("#" + id + "_formbody") as FormElement;
     assert(form != null);
 
@@ -31,70 +35,92 @@ class WpsDialog extends DialogVM {
 
     switch (param.datatype) {
       case WpsProcessParamDataType.double:
-        _addParameter_double(param, div);
+        _addParameter_double(param, div, value);
         break;
       case WpsProcessParamDataType.integer:
-        _addParameter_integer(param, div);
+        _addParameter_integer(param, div, value);
         break;
       case WpsProcessParamDataType.string:
-        _addParameter_string(param, div);
+        _addParameter_string(param, div, value);
         break;
       case WpsProcessParamDataType.position:
-        _addParameter_position(param, div);
+        _addParameter_position(param, div, value);
         break;
       case WpsProcessParamDataType.box:
-        _addParameter_bbox(param, div);
+        _addParameter_bbox(param, div, value);
         break;
     }
   }
 
-  void _addParameter_double(WpsProcessParam param, DivElement div) {
+  void _addParameter_double(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    input.disabled = true;
     div.children.add(input);
 
-    _fields[param.name] = new DoubleInputVM(_frontend, id + "_" + param.name);
+    _fields[param.name] = new DoubleInputVM(_frontend, id + "_" + param.name, defaultValue: value);
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_integer(WpsProcessParam param, DivElement div) {
+  void _addParameter_integer(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    input.disabled = true;
     div.children.add(input);
 
-    _fields[param.name] = new IntInputVM(_frontend, id + "_" + param.name);
+    _fields[param.name] = new IntInputVM(_frontend, id + "_" + param.name, defaultValue: value);
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_string(WpsProcessParam param, DivElement div) {
+  void _addParameter_string(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    input.disabled = true;
     div.children.add(input);
 
-    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: "name");
-    _trackState(_fields[param.name]);
-  }
-
-  void _addParameter_position(WpsProcessParam param, DivElement div) {
-    InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
-    div.children.add(input);
-
-    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Set via UI");
+    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
     div.children.add(buttonElement);
 
-    _fields[param.name] = new PositionInputVM(_frontend, id + "_" + param.name, this, new PositionString());
+    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: value);
     _trackState(_fields[param.name]);
+
+    var clickHandler = () {
+      RialtoBackend.log("load layer!");
+      var layerName = "${job.id}-param.name";
+      Map layerOptions = {
+        "type": "tms_imagery",
+        "url": "url",
+        "gdal2Tiles": true,
+        "maximumLevel": 12,
+        //"alpha": 0.5
+      };
+      _backend.commands.addLayer(layerName, layerOptions);
+    };
+    new ButtonVM(_frontend, id + "_" + param.name + "_button", (e) => clickHandler());
   }
 
-  void _addParameter_bbox(WpsProcessParam param, DivElement div) {
+  void _addParameter_position(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    input.disabled = true;
     div.children.add(input);
 
-    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Set via UI");
+    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
     div.children.add(buttonElement);
 
-    _fields[param.name] = new BoxInputVM(_frontend, id + "_" + param.name, this, new BoxString());
+    _fields[param.name] = new PositionInputVM(_frontend, id + "_" + param.name, this, value);
     _trackState(_fields[param.name]);
   }
 
-  static void makeDialogShell(String name) {
+  void _addParameter_bbox(WpsProcessParam param, DivElement div, dynamic value) {
+    InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
+    input.disabled = true;
+    div.children.add(input);
+
+    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
+    div.children.add(buttonElement);
+
+    _fields[param.name] = new BoxInputVM(_frontend, id + "_" + param.name, this, value);
+    _trackState(_fields[param.name]);
+  }
+
+  static Element makeDialogShell(String name) {
     var dialogDiv = new DivElement();
     dialogDiv.id = name + "Dialog";
     dialogDiv.classes.add("uk-modal");
@@ -134,6 +160,8 @@ class WpsDialog extends DialogVM {
     button2.classes.add("uk-button");
     button2.classes.add("uk-modal-close");
     footerDiv.children.add(button2);
+
+    return dialogDiv;
   }
 
   @override
@@ -141,10 +169,10 @@ class WpsDialog extends DialogVM {
 
   @override
   void _hide() {
-    RialtoBackend.log("running WPS process: ${process.name}");
+    RialtoBackend.log("running WPS process: ${job.process.name}");
 
     var inputs = new Map<String, dynamic>();
-    for (WpsProcessParam param in process.inputs) {
+    for (WpsProcessParam param in job.process.inputs) {
       switch (param.datatype) {
         case WpsProcessParamDataType.double:
           inputs[param.name] = _fields[param.name].valueAs;
@@ -164,10 +192,6 @@ class WpsDialog extends DialogVM {
       }
     }
 
-    var yes = (WpsJob job) {
-      _frontend.addWpsResultDialog(job);
-    };
-
-    _backend.wpsJobManager.execute(process, inputs, successHandler: yes);
+    //_backend.wpsJobManager.execute(process, inputs, successHandler: _backend.wpsJobManager.loadLayers);
   }
 }

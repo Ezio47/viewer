@@ -124,48 +124,48 @@ class Commands {
   ///
   /// Does a GetCapabilities request, a describe process for "helloworld", and executes "helloworld".
   void testWps() {
-    if (_backend.wps == null) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return;
     }
 
-    _backend.wps.testConnection().then((String status) {
+    _backend.wpsService.testConnection().then((String status) {
       window.alert(status);
     });
   }
 
   /// Asynchronously executes an arbitrary WPS process
   Future<WpsJob> wpsExecuteProcess(WpsProcess process, Map<String, dynamic> inputs,
-      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler failureHandler: null,
-      WpsJobErrorResultHandler timeoutHandler: null}) {
-    if (_backend.wps == null) {
+      {WpsJobResultHandler successHandler: null, WpsJobResultHandler errorHandler: null,
+      WpsJobResultHandler timeoutHandler: null}) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return new Future.value(null);
     }
-    return _backend.wps.executeProcess(process, inputs,
-        successHandler: successHandler, failureHandler: failureHandler, timeoutHandler: timeoutHandler);
+    return _backend.wpsJobManager.execute(process, inputs,
+        successHandler: successHandler, errorHandler: errorHandler, timeoutHandler: timeoutHandler);
   }
 
   /// Asynchronously requests description of a WPS function
   ///
   /// Returns the response document.
   Future<OgcDocument> wpsDescribeProcess(String processName) {
-    if (_backend.wps == null) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return new Future.value(null);
     }
-    return _backend.wps.describeProcess(processName);
+    return _backend.wpsService.describeProcess(processName);
   }
 
   /// Asynchronously requests an OGC capabilities document.
   ///
   /// Returns the response document.
   Future owsGetCapabilities() {
-    if (_backend.wps == null) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return new Future.value(null);
     }
-    return _backend.wps.getCapabilities();
+    return _backend.wpsService.getCapabilities();
   }
 
   /// Zooms to the given point

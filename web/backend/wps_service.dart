@@ -49,8 +49,11 @@ class WpsService extends OgcService {
     return c.future;
   }
 
-  Future<OgcDocument> _executeProcessWork(WpsProcess process, Map<String, dynamic> inputs) {
-    var c = new Completer<OgcDocument>();
+  Future<bool> execute(WpsJob job) {
+    var c = new Completer<bool>();
+
+    var process = job.process;
+    var inputs = job.inputs;
 
     String identifierKV = "Identifier=${process.name}";
 
@@ -78,90 +81,36 @@ class WpsService extends OgcService {
     _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
       if (ogcDoc == null) {
         RialtoBackend.error("Error parsing WPS process execution response document");
-        c.complete(null);
+        job.jobStatus = OgcStatusCodes.systemFailure;
+        c.complete(false);
         return;
       }
 
       if (ogcDoc is OgcExceptionReportDocument) {
-        c.complete(ogcDoc);
+        job.jobStatus = OgcStatusCodes.failed;
+        job.exceptionTexts = ogcDoc.exceptionTexts;
+        c.complete(false);
         return;
       }
 
       if (ogcDoc is! OgcExecuteResponseDocument_54) {
         RialtoBackend.error("Error parsing WPS process execution response document");
-        c.complete(ogcDoc);
-        return;
-      }
-
-      c.complete(ogcDoc);
-    });
-
-    return c.future;
-  }
-
-  /// Execute a WPS process
-  ///
-  /// Returns the job ID, and will have already created a status object for that ID (even in
-  /// the case of any failures)
-  Future<WpsJob> executeProcess(WpsProcess process, Map<String, dynamic> inputs,
-      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler failureHandler: null,
-      WpsJobErrorResultHandler timeoutHandler: null}) {
-    var c = new Completer<WpsJob>();
-
-    var request = _backend.wpsJobManager.createJob(this, process,
-        successHandler: successHandler, errorHandler: failureHandler, timeoutHandler: timeoutHandler);
-
-    _executeProcessWork(process, inputs).then((ogcDoc) {
-      if (ogcDoc == null) {
-        request.jobStatus = OgcStatusCodes.systemFailure;
-        request.stopPolling();
-        c.complete(request);
-        return;
-      }
-
-      if (ogcDoc is OgcExceptionReportDocument) {
-        request.jobStatus = OgcStatusCodes.failed;
-        request.exceptionTexts = ogcDoc.exceptionTexts;
-        request.stopPolling();
-        c.complete(request);
+        job.jobStatus = OgcStatusCodes.failed;
+        c.complete(false);
         return;
       }
 
       var resp = ogcDoc as OgcExecuteResponseDocument_54;
 
-      request.statusLocation = Uri.parse(resp.statusLocation);
-      request.proxyUri = proxyUri;
-      request.jobCreationTime = DateTime.parse(resp.status.creationTime);
-      request.jobStatus = resp.status.code;
+      job.statusLocation = Uri.parse(resp.statusLocation);
+      job.proxyUri = proxyUri;
+      job.jobCreationTime = DateTime.parse(resp.status.creationTime);
+      job.jobStatus = resp.status.code;
 
-      request.startPolling();
-
-      c.complete(request);
+      c.complete(true);
     });
 
     return c.future;
-  }
-
-  // this function is used as the successHandler for executeProcess()
-  Future loadLayers(WpsJob job, Map<String, dynamic> results) {
-    OgcExecuteResponseDocument_54 ogcDoc = job.responseDocument;
-    RialtoBackend.log("WPS job success");
-    RialtoBackend.log(ogcDoc.dump(0));
-
-    for (var key in results.keys) {
-      RialtoBackend.log("$key: ${results[key]}");
-
-      /*var layerName = "viewshed-${job.id}";
-        Map layerOptions = {
-        "type": "tms_imagery",
-        "url": url,
-        "gdal2Tiles": true,
-        "maximumLevel": 12,
-        //"alpha": 0.5
-        };*/
-    }
-
-    return null; //_backend.commands.addLayer(layerName, layerOptions);
   }
 
   /// Issues a "describe process" request to the WPS server
@@ -235,7 +184,7 @@ class WpsService extends OgcService {
         var name = xmlInput.identifier;
         //print("IN {$name} ${datatype}");
 
-        WpsProcessParam param = new WpsProcessParam(name, datatype);
+        WpsProcessParam param = new WpsProcessParam(name, datatype, xmlInput.abstract);
         process.inputs.add(param);
       }
 
@@ -246,7 +195,7 @@ class WpsService extends OgcService {
         ////////var datatype = inferDatatype(xmlOutput.abstract, xmlOutput.literalOutput.datatype);
         var datatype = WpsProcessParamDataType.string;
 
-        WpsProcessParam param = new WpsProcessParam(name, datatype);
+        WpsProcessParam param = new WpsProcessParam(name, datatype, xmlOutput.abstract);
         process.outputs.add(param);
       }
 

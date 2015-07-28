@@ -9,8 +9,9 @@ enum WpsProcessParamDataType { double, string, integer, position, box }
 class WpsProcessParam {
   String name;
   WpsProcessParamDataType datatype;
+  String description;
 
-  WpsProcessParam(String this.name, WpsProcessParamDataType this.datatype);
+  WpsProcessParam(String this.name, WpsProcessParamDataType this.datatype, String this.description);
 
   static final _datatypeNames = {
     WpsProcessParamDataType.double: "double",

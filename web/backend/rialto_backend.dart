@@ -18,7 +18,7 @@ class RialtoBackend {
   Commands commands;
   CesiumBridge cesium;
   JsBridge js;
-  WpsService wps;
+  WpsService wpsService;
   LayerManager layerManager;
   WpsJobManager wpsJobManager;
   ConfigScript configScript;

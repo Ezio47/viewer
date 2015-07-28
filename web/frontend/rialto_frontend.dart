@@ -71,7 +71,7 @@ class RialtoFrontend {
   }
 
   void addWpsControls() {
-    WpsService wps = backend.wps;
+    WpsService wps = backend.wpsService;
     if (wps == null) return;
 
     for (WpsProcess process in wps.processes.values) {
@@ -102,7 +102,21 @@ class RialtoFrontend {
     WpsDialog.makeDialogShell(name);
 
     // populate the shell
-    new WpsDialog(this, name + "Dialog", backend.wps.processes[processName]);
+    new WpsDialog(this, name + "Dialog", backend.wpsService.processes[processName]);
+  }
+
+  void addWpsResultDialog(WpsJob job) {
+    var name = job.process.name.substring(3); // exclude the "py:" part
+
+    name += "Result";
+
+    // create the <dialog> html
+    WpsResultDialog.makeDialogShell(name);
+
+    // populate the shell
+    var dlg = new WpsResultDialog(this, name + "Dialog", job);
+
+    dlg.show();
   }
 
   String get viewModeString => "Mode / ${ViewModeData.name[viewMode]}";

@@ -14,9 +14,9 @@ class OgcService {
   final Uri server;
   final Uri proxyUri;
   final String description;
-  RialtoBackend _backend;
+  RialtoBackend backend;
 
-  OgcService(RialtoBackend this._backend, String this.service, Uri this.server,
+  OgcService(RialtoBackend this.backend, String this.service, Uri this.server,
       {Uri this.proxyUri: null, String this.description: null});
 
   void open() {}
