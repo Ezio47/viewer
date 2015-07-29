@@ -144,16 +144,16 @@ class WpsService extends OgcService {
     }
 
     switch (dt) {
-      case "string":
-        return WpsProcessParamDataType.string;
-      case "int":
-        return WpsProcessParamDataType.integer;
       case "double":
         return WpsProcessParamDataType.double;
-      case "geo_pos_2d":
-        return WpsProcessParamDataType.position;
       case "geo_box_2d":
-        return WpsProcessParamDataType.box;
+        return WpsProcessParamDataType.geobox2d;
+      case "geo_pos_2d":
+        return WpsProcessParamDataType.geopos2d;
+      case "int":
+        return WpsProcessParamDataType.integer;
+      case "string":
+        return WpsProcessParamDataType.string;
       default:
         RialtoBackend.error("unknown passed datatype: $dt");
         assert(false);

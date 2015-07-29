@@ -39,11 +39,11 @@ class WpsDialog extends DialogVM {
       case WpsProcessParamDataType.string:
         _addParameter_string(param, div);
         break;
-      case WpsProcessParamDataType.position:
-        _addParameter_position(param, div);
+      case WpsProcessParamDataType.geopos2d:
+        _addParameter_geopos2d(param, div);
         break;
-      case WpsProcessParamDataType.box:
-        _addParameter_bbox(param, div);
+      case WpsProcessParamDataType.geobox2d:
+        _addParameter_geobox2d(param, div);
         break;
     }
   }
@@ -68,11 +68,11 @@ class WpsDialog extends DialogVM {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     div.children.add(input);
 
-    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: "name");
+    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: "string");
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_position(WpsProcessParam param, DivElement div) {
+  void _addParameter_geopos2d(WpsProcessParam param, DivElement div) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     div.children.add(input);
 
@@ -83,7 +83,7 @@ class WpsDialog extends DialogVM {
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_bbox(WpsProcessParam param, DivElement div) {
+  void _addParameter_geobox2d(WpsProcessParam param, DivElement div) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     div.children.add(input);
 
@@ -149,16 +149,16 @@ class WpsDialog extends DialogVM {
         case WpsProcessParamDataType.double:
           inputs[param.name] = _fields[param.name].valueAs;
           break;
+        case WpsProcessParamDataType.geobox2d:
+          inputs[param.name] = _fields[param.name].valueAs;
+          break;
+        case WpsProcessParamDataType.geopos2d:
+          inputs[param.name] = _fields[param.name].valueAs;
+          break;
         case WpsProcessParamDataType.integer:
           inputs[param.name] = _fields[param.name].valueAs;
           break;
         case WpsProcessParamDataType.string:
-          inputs[param.name] = _fields[param.name].valueAs;
-          break;
-        case WpsProcessParamDataType.position:
-          inputs[param.name] = _fields[param.name].valueAs;
-          break;
-        case WpsProcessParamDataType.box:
           inputs[param.name] = _fields[param.name].valueAs;
           break;
       }

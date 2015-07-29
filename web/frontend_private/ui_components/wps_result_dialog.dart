@@ -44,11 +44,11 @@ class WpsResultDialog extends DialogVM {
       case WpsProcessParamDataType.string:
         _addParameter_string(param, div, value);
         break;
-      case WpsProcessParamDataType.position:
-        _addParameter_position(param, div, value);
+      case WpsProcessParamDataType.geopos2d:
+        _addParameter_geopos2d(param, div, value);
         break;
-      case WpsProcessParamDataType.box:
-        _addParameter_bbox(param, div, value);
+      case WpsProcessParamDataType.geobox2d:
+        _addParameter_geobox2d(param, div, value);
         break;
     }
   }
@@ -88,20 +88,20 @@ class WpsResultDialog extends DialogVM {
       var thisparam = param;
       var thisvalue = value;
       var thisid = job.outputs['_id'];
-      var layerName = "http://192.168.59.103:42424/outputs/$thisid/${thisparam.name}.tif.tms";
+      var uri = ConfigScript.defaultServers["data"].toString() + "/outputs/$thisid/${thisparam.name}.tif.tms";
       Map layerOptions = {
         "type": "tms_imagery",
-        "url": layerName,
-        "gdal2Tiles": true,
+        "url": uri,
+        "gdal2Tiles": false,
         "maximumLevel": 12,
         //"alpha": 0.5
       };
-      _backend.commands.addLayer(layerName, layerOptions);
+      _backend.commands.addLayer("$thisid/${thisparam.name}", layerOptions);
     };
     new ButtonVM(_frontend, id + "_" + param.name + "_button", (e) => clickHandler());
   }
 
-  void _addParameter_position(WpsProcessParam param, DivElement div, dynamic value) {
+  void _addParameter_geopos2d(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     input.disabled = true;
     div.children.add(input);
@@ -113,7 +113,7 @@ class WpsResultDialog extends DialogVM {
     _trackState(_fields[param.name]);
   }
 
-  void _addParameter_bbox(WpsProcessParam param, DivElement div, dynamic value) {
+  void _addParameter_geobox2d(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     input.disabled = true;
     div.children.add(input);
