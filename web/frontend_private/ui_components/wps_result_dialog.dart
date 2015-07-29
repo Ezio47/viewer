@@ -9,7 +9,8 @@ class WpsResultDialog extends DialogVM {
 
   Map<String, _BaseTextInputVM> _fields = new Map<String, _BaseTextInputVM>();
 
-  WpsResultDialog(RialtoFrontend frontend, String id, WpsJob this.job) : super(frontend, id, skipStateTest: true) {
+  WpsResultDialog(RialtoFrontend frontend, String id, WpsJob this.job)
+      : super(frontend, id, hasCancelButton: false, skipStateTest: true) {
     for (var param in job.process.inputs) {
       _addParameter(param, job.inputs[param.name]);
     }
@@ -83,10 +84,14 @@ class WpsResultDialog extends DialogVM {
 
     var clickHandler = () {
       RialtoBackend.log("load layer!");
-      var layerName = "${job.id}-param.name";
+      var thisjob = job;
+      var thisparam = param;
+      var thisvalue = value;
+      var thisid = job.outputs['_id'];
+      var layerName = "http://192.168.59.103:42424/outputs/$thisid/${thisparam.name}.tif.tms";
       Map layerOptions = {
         "type": "tms_imagery",
-        "url": "url",
+        "url": layerName,
         "gdal2Tiles": true,
         "maximumLevel": 12,
         //"alpha": 0.5
@@ -149,17 +154,10 @@ class WpsResultDialog extends DialogVM {
 
     var button1 = new ButtonElement();
     button1.id = name + "Dialog_okay";
-    button1.text = "Okay";
+    button1.text = "Close";
     button1.classes.add("uk-button");
     button1.classes.add("uk-modal-close");
     footerDiv.children.add(button1);
-
-    var button2 = new ButtonElement();
-    button2.id = name + "Dialog_cancel";
-    button2.text = "Cancel";
-    button2.classes.add("uk-button");
-    button2.classes.add("uk-modal-close");
-    footerDiv.children.add(button2);
 
     return dialogDiv;
   }
@@ -168,30 +166,5 @@ class WpsResultDialog extends DialogVM {
   void _show() {}
 
   @override
-  void _hide() {
-    RialtoBackend.log("running WPS process: ${job.process.name}");
-
-    var inputs = new Map<String, dynamic>();
-    for (WpsProcessParam param in job.process.inputs) {
-      switch (param.datatype) {
-        case WpsProcessParamDataType.double:
-          inputs[param.name] = _fields[param.name].valueAs;
-          break;
-        case WpsProcessParamDataType.integer:
-          inputs[param.name] = _fields[param.name].valueAs;
-          break;
-        case WpsProcessParamDataType.string:
-          inputs[param.name] = _fields[param.name].valueAs;
-          break;
-        case WpsProcessParamDataType.position:
-          inputs[param.name] = _fields[param.name].valueAs;
-          break;
-        case WpsProcessParamDataType.box:
-          inputs[param.name] = _fields[param.name].valueAs;
-          break;
-      }
-    }
-
-    //_backend.wpsJobManager.execute(process, inputs, successHandler: _backend.wpsJobManager.loadLayers);
-  }
+  void _hide() {}
 }
