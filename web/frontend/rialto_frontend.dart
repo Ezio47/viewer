@@ -107,7 +107,7 @@ class RialtoFrontend {
 
   void addWpsResultDialog(WpsJob job) {
     var name = job.process.name.substring(3); // exclude the "py:" part
-
+    name += job.id.toString();
     name += "Result";
 
     // create the <dialog> html

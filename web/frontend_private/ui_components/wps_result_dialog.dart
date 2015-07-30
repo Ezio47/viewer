@@ -71,6 +71,17 @@ class WpsResultDialog extends DialogVM {
     _trackState(_fields[param.name]);
   }
 
+  // TODO: duplicated from makeProxyUri in Utils in backend
+  static Uri _makeProxyUri(Uri uri, Uri proxy) {
+    String s = uri.toString();
+
+    if (proxy != null) {
+      s = proxy.toString() + "?" + s;
+      uri = Uri.parse(s);
+    }
+    return uri;
+  }
+
   void _addParameter_string(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     //input.disabled = true;
@@ -84,16 +95,20 @@ class WpsResultDialog extends DialogVM {
 
     var clickHandler = () {
       RialtoBackend.log("load layer!");
+
       var thisjob = job;
       var thisparam = param;
       var thisvalue = value;
       var thisid = job.outputs['_id'];
-      var uri = ConfigScript.defaultServers["data"].toString() + "/outputs/$thisid/${thisparam.name}.tif.tms";
+
+      Uri uri = ConfigScript.defaultServers["data"];
+      uri = uri.replace(path: "/outputs/$thisid/${thisparam.name}.tif.tms");
+      uri = _makeProxyUri(uri, job.proxyUri);
+
       Map layerOptions = {
         "type": "tms_imagery",
-        "url": uri,
-        "gdal2Tiles": false,
-        "maximumLevel": 12,
+        "url": uri.toString(),
+        "gdal2tiles": true,
         //"alpha": 0.5
       };
       _backend.commands.addLayer("$thisid/${thisparam.name}", layerOptions);

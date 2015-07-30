@@ -5,7 +5,8 @@
 part of rialto.frontend.private;
 
 abstract class _BaseTextInputVM<T> extends InputVM {
-  _BaseTextInputVM(RialtoFrontend frontend, String id, T defaultValue) : super(frontend, id, defaultValue.toString()) {}
+  _BaseTextInputVM(RialtoFrontend frontend, String id, T defaultValue)
+      : super(frontend, id, (defaultValue == null) ? "" : defaultValue.toString()) {}
 
   void _setElementValueFromString(String v);
 
@@ -42,10 +43,10 @@ abstract class _SingleTextInputVM<T> extends _BaseTextInputVM<T> {
   T _parse(String s);
 }
 
-abstract class _MultiTextInputVM<T> extends _BaseTextInputVM<List<T>> {
+abstract class _MultiTextInputVM extends _BaseTextInputVM<List<String>> {
   TextAreaElement _inputElement;
 
-  _MultiTextInputVM(RialtoFrontend frontend, String id, {List<T> defaultValue: null})
+  _MultiTextInputVM(RialtoFrontend frontend, String id, {List<String> defaultValue: null})
       : super(frontend, id, defaultValue) {
     _inputElement = _element;
     _inputElement.value = defaultValue.toString();
@@ -56,7 +57,7 @@ abstract class _MultiTextInputVM<T> extends _BaseTextInputVM<List<T>> {
     _inputElement.value = v;
   }
 
-  List<T> _parse(String s);
+  List<String> _parse(String s);
 }
 
 class IntInputVM extends _SingleTextInputVM<int> {
@@ -93,7 +94,7 @@ class StringInputVM extends _SingleTextInputVM<String> {
   String _parse(String s) => s;
 }
 
-class StringListInputVM extends _MultiTextInputVM<String> {
+class StringListInputVM extends _MultiTextInputVM {
   StringListInputVM(RialtoFrontend frontend, String id, {List<String> defaultValue: null})
       : super(frontend, id, defaultValue: defaultValue);
 
