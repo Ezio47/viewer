@@ -25,8 +25,6 @@ class RialtoBackend {
 
   int displayPrecision = 5;
 
-  List viewshedCircles = new List();
-
   /// Creates the instance of the viewer backend
   RialtoBackend() {
     js = new JsBridge(log);

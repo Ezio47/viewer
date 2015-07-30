@@ -14,24 +14,6 @@ class Commands {
   /// Create the commands object
   Commands(RialtoBackend this._backend);
 
-  /// Allow user to draw a circle to be used for a viewshed analysis
-  void createViewshedCircle() {
-    _backend.cesium.drawCircle(
-        (longitude, latitude, height, radius) => _backend.viewshedCircles.add([longitude, latitude, height, radius]));
-  }
-
-  /// Run the viewshed analysis for each viewshed circle
-  void computeViewshed() {
-    for (var v in _backend.viewshedCircles) {
-      double obsLon = v[0];
-      double obsLat = v[1];
-      //double obsHeight = v[2];
-      var radius = v[3];
-
-      Viewshedder.callWps(_backend, obsLon, obsLat, radius);
-    }
-  }
-
   /// Allow user to draw a polyline and compute the linear length
   ///
   /// stub for future work

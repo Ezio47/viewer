@@ -53,15 +53,6 @@ class WpsJobManager {
 
     for (var key in job.outputs.keys) {
       RialtoBackend.log("$key: ${job.outputs[key]}");
-
-      /*var layerName = "viewshed-${job.id}";
-        Map layerOptions = {
-        "type": "tms_imagery",
-        "url": url,
-        "gdal2Tiles": true,
-        "maximumLevel": 12,
-        //"alpha": 0.5
-        };*/
     }
 
     return null; //_backend.commands.addLayer(layerName, layerOptions);

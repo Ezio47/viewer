@@ -25,8 +25,6 @@ class RialtoFrontend {
     querySelector("#homeDataButton").onClick.listen((ev) => backend.commands.zoomToLayer(null));
 
     querySelector("#wpsTestButton").onClick.listen((ev) => backend.commands.testWps());
-    querySelector("#viewshedCircleButton").onClick.listen((ev) => backend.commands.createViewshedCircle());
-    querySelector("#viewshedComputeButton").onClick.listen((ev) => backend.commands.computeViewshed());
 
     querySelector("#linearMeasurementButton").onClick.listen((ev) => backend.commands.computeLinearMeasurement());
     querySelector("#areaMeasurementButton").onClick.listen((ev) => backend.commands.computeAreaMeasurement());

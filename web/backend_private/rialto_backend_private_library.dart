@@ -37,4 +37,3 @@ part 'utils/utils.dart';
 part 'utils/config_utils.dart';
 
 part 'layer_manager.dart';
-part 'viewshedder.dart';
