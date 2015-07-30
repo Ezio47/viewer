@@ -68,7 +68,12 @@ class WpsDialog extends DialogVM {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     div.children.add(input);
 
-    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: "string");
+    // TODO: hack!
+    var defalt = "string";
+    if (param.name == 'dem') {
+      defalt = '/usr/share/ossim/elevation/srtm/1arc/N48W114.hgt';
+    }
+    _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: defalt);
     _trackState(_fields[param.name]);
   }
 
