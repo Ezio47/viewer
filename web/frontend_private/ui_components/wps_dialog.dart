@@ -168,6 +168,28 @@ class WpsDialog extends DialogVM {
       _frontend.addWpsResultDialog(job);
     };
 
-    _backend.wpsJobManager.execute(process, inputs, successHandler: yes);
+    var no = (WpsJob job) {
+      String s = "WPS process failed: ${job.process.name}";
+      if (job.outputs.containsKey("_stdout")) {
+        var m = job.outputs['_stdout'];
+        if (m is String && m.isNotEmpty) {
+          s += "\n--------STDOUT--------\n$m";
+        }
+      }
+      if (job.outputs.containsKey("_stderr")) {
+        var m = job.outputs['_stderr'];
+        if (m is String && m.isNotEmpty) {
+          s += "\n--------STDERR--------\n$m";
+        }
+      }
+      window.alert(s);
+    };
+
+    var time = (WpsJob job) {
+      String s = "WPS process timed out: ${job.process.name}";
+      window.alert(s);
+    };
+
+    _backend.wpsJobManager.execute(process, inputs, successHandler: yes, errorHandler: no, timeoutHandler: time);
   }
 }

@@ -30,6 +30,15 @@ void main() {
 
   if (configParam == null) {
     try {
+      /*      var s = '''
+- layers:
+    - y:
+        type: tms_imagery
+        url: http://localhost:8000/ssd
+        maximumLevel : 8
+        gdal2tiles: true
+''';
+              p = ui.backend.commands.loadScriptFromStringAsync(s);*/
       p = ui.backend.commands.loadScriptFromStringAsync(ConfigScript.defaultYaml);
     } catch (e) {
       RialtoBackend.error("Top-level exception caught", e);

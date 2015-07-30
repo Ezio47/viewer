@@ -112,12 +112,12 @@ class WmsImageryLayer extends ImageryLayer {
 
 class TmsImageryLayer extends ImageryLayer {
   int _maximumLevel;
-  bool _gdal2Tiles;
+  bool _gdal2tiles;
 
   TmsImageryLayer(RialtoBackend backend, String name, Map map)
       : super(backend, "tms_imagery", name, map),
         _maximumLevel = ConfigUtils.getOptionalSettingAsInt(map, "maximumLevel", 18),
-        _gdal2Tiles = ConfigUtils.getOptionalSettingAsBool(map, "gdal2Tiles", false) {
+        _gdal2tiles = ConfigUtils.getOptionalSettingAsBool(map, "gdal2tiles", false) {
     requireUrl();
   }
 
@@ -125,7 +125,7 @@ class TmsImageryLayer extends ImageryLayer {
   Future load() {
     var f = new Future(() {
       _layer =
-          backend.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2Tiles, proxyString);
+          backend.cesium.addTileMapServiceImageryLayer(urlString, _rectangle, _maximumLevel, _gdal2tiles, proxyString);
       if (!options["isVisible"]) {
         backend.cesium.setLayerVisible(_layer, false);
       }

@@ -73,7 +73,7 @@ class WpsResultDialog extends DialogVM {
 
   void _addParameter_string(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
-    input.disabled = true;
+    //input.disabled = true;
     div.children.add(input);
 
     ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");

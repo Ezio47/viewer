@@ -76,12 +76,12 @@ class CesiumBridge {
   }
 
   dynamic addTileMapServiceImageryLayer(
-      String url, List<num> rectList, int maximumLevel, bool gdal2Tiles, String proxyUrl) {
+      String url, List<num> rectList, int maximumLevel, bool gdal2tiles, String proxyUrl) {
     var rect = (rectList == null || rectList == [])
         ? null
         : _bridge.callMethod('newRectangleFromDegrees', [rectList[0], rectList[1], rectList[2], rectList[3]]);
     var proxy = (proxyUrl == null) ? null : _bridge.callMethod('createProxy', [proxyUrl]);
-    var layer = _bridge.callMethod('addTileMapServiceImageryLayer', [url, rect, maximumLevel, gdal2Tiles, proxy]);
+    var layer = _bridge.callMethod('addTileMapServiceImageryLayer', [url, rect, maximumLevel, gdal2tiles, proxy]);
     return layer;
   }
 

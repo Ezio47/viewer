@@ -97,12 +97,22 @@ class WpsJob {
       }
     } else {
       assert(_hasSucceeded);
-      if (_successHandler != null) {
-        for (var param in process.outputs) {
-          var value = responseDocument.getProcessOutput(param.name);
-          outputs[param.name] = value;
+
+      for (var param in process.outputs) {
+        var value = responseDocument.getProcessOutput(param.name);
+        outputs[param.name] = value;
+      }
+
+      // the WPS process succeeded, but did the underlying script actually succeed?
+      if (responseDocument.getProcessOutput("_status") != "0") {
+        // TODO: _hasScceeded is equal to true, even though we've actually failed
+        if (_errorHandler != null) {
+          _errorHandler(this);
         }
-        _successHandler(this);
+      } else {
+        if (_successHandler != null) {
+          _successHandler(this);
+        }
       }
     }
 
