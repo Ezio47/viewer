@@ -90,7 +90,7 @@ class WpsResultDialog extends DialogVM {
     _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: value);
     _trackState(_fields[param.name]);
 
-    if (param.name.endsWith('_tms')) {
+    if (param.name.endsWith('_tms') && job.process.name == 'py:ossim-viewshed') {
       ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
       div.children.add(buttonElement);
 
