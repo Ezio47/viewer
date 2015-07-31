@@ -11,8 +11,8 @@ typedef dynamic WpsJobResultHandler(WpsJob job);
 /// The (singleton) Rialto class has exactly one instance of this class. This manager
 /// is repsonsible for keeping track of all WPS jobs, both completed and in progress.
 class WpsJobManager {
-  static final Duration pollingDelay = new Duration(seconds: 1);
-  static final Duration pollingTimeout = new Duration(minutes: 1);
+  static final Duration pollingDelay = new Duration(seconds: 2);
+  static final Duration pollingTimeout = new Duration(minutes: 5);
 
   RialtoBackend _backend;
   Map<int, WpsJob> map = new Map<int, WpsJob>();

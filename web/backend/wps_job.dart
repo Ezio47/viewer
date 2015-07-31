@@ -21,7 +21,6 @@ class WpsJob {
   final DateTime _startTime;
   DateTime jobCreationTime; // from the server
   DateTime _timeoutTime;
-  int _pollCount = 0;
 
   Map<String, dynamic> inputs = new Map<String, dynamic>();
   Map<String, dynamic> outputs = new Map<String, dynamic>();
@@ -121,7 +120,7 @@ class WpsJob {
 
   void _poll() {
     var secs = new DateTime.now().difference(_startTime).inSeconds;
-    RialtoBackend.log("poll #$_pollCount, $secs seconds elapsed");
+    RialtoBackend.log("WPS: ${this.process.name}, $secs seconds elapsed");
 
     var now = new DateTime.now();
     if (now.isAfter(_timeoutTime)) {
@@ -160,7 +159,6 @@ class WpsJob {
         return;
       }
 
-      ++_pollCount;
       new Timer(WpsJobManager.pollingDelay, _poll);
     });
   }
