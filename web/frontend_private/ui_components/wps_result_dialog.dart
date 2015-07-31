@@ -84,57 +84,47 @@ class WpsResultDialog extends DialogVM {
 
   void _addParameter_string(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
-    //input.disabled = true;
+    input.disabled = true;
     div.children.add(input);
-
-    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
-    div.children.add(buttonElement);
 
     _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: value);
     _trackState(_fields[param.name]);
 
-    var clickHandler = () {
-      RialtoBackend.log("load layer!");
+    if (param.name.endsWith('_tms')) {
+      ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
+      div.children.add(buttonElement);
 
-      var thisjob = job;
-      var thisparam = param;
-      var thisvalue = value;
-      var thisid = job.outputs['_id'];
+      input.disabled = false;
 
-      Uri uri = ConfigScript.defaultServers["data"];
-      uri = uri.replace(path: "/outputs/$thisid/${thisparam.name}.tif.tms");
-      uri = _makeProxyUri(uri, job.proxyUri);
+      var clickHandler = () {
+        RialtoBackend.log("load layer!");
 
-      Map layerOptions = {
-        "type": "tms_imagery",
-        "url": uri.toString(),
-        "gdal2tiles": true,
-        //"alpha": 0.5
+        var thisjob = job;
+        var thisparam = param;
+        var thisvalue = value;
+        var thisid = job.outputs['_id'];
+
+        Uri uri = ConfigScript.defaultServers["data"];
+        uri = uri.replace(path: "/outputs/$thisid/${thisparam.name}.tif.tms");
+        uri = _makeProxyUri(uri, job.proxyUri);
+
+        Map layerOptions = {"type": "tms_imagery", "url": uri.toString(), "gdal2tiles": true, "alpha": 0.5};
+        _backend.commands.addLayer("$thisid/${thisparam.name}", layerOptions);
       };
-      _backend.commands.addLayer("$thisid/${thisparam.name}", layerOptions);
-    };
-    new ButtonVM(_frontend, id + "_" + param.name + "_button", (e) => clickHandler());
+      new ButtonVM(_frontend, id + "_" + param.name + "_button", (e) => clickHandler());
+    }
   }
 
   void _addParameter_geopos2d(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     input.disabled = true;
     div.children.add(input);
-
-    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
-    div.children.add(buttonElement);
-
-    _fields[param.name] = new PositionInputVM(_frontend, id + "_" + param.name, this, value);
-    _trackState(_fields[param.name]);
   }
 
   void _addParameter_geobox2d(WpsProcessParam param, DivElement div, dynamic value) {
     InputElement input = _SingleTextInputVM.makeInputElement(id + "_" + param.name);
     input.disabled = true;
     div.children.add(input);
-
-    ButtonElement buttonElement = ButtonVM.makeButtonElement(id + "_" + param.name + "_button", "Load layer");
-    div.children.add(buttonElement);
 
     _fields[param.name] = new BoxInputVM(_frontend, id + "_" + param.name, this, value);
     _trackState(_fields[param.name]);

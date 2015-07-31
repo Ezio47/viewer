@@ -70,7 +70,7 @@ class WpsDialog extends DialogVM {
 
     // TODO: hack!
     var defalt = "string";
-    if (param.name == 'dem') {
+    if (param.name == 'dem' && this.process.name == "py:ossim-viewshed") {
       defalt = '/usr/share/ossim/elevation/srtm/1arc/N48W114.hgt';
     }
     _fields[param.name] = new StringInputVM(_frontend, id + "_" + param.name, defaultValue: defalt);
