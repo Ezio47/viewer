@@ -2,7 +2,6 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-
 library rialto.backend.private;
 
 import 'dart:async';
@@ -29,7 +28,6 @@ part 'layers/geojson_layer.dart';
 
 part 'ogc/ogc_document_tests.dart';
 part 'ogc/ogc_document.dart';
-part 'ogc/wps_job_manager.dart';
 part 'ogc/wps_service_tests.dart';
 
 part 'utils/color.dart';
@@ -39,4 +37,3 @@ part 'utils/utils.dart';
 part 'utils/config_utils.dart';
 
 part 'layer_manager.dart';
-part 'viewshedder.dart';

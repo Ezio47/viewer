@@ -134,7 +134,7 @@ class ConfigScript {
     var wps = new WpsService(_backend, url, proxyUri: proxyUri, description: description);
     wps.open();
 
-    _backend.wps = wps;
+    _backend.wpsService = wps;
 
     return wps.readProcessList();
   }
@@ -185,15 +185,13 @@ class ConfigScript {
 
     Uri uri = Uri.parse(window.location.href);
 
-    var mode;
+    var mode = DeploymentMode.Tutum;
     if (uri.host == "localhost") {
-      mode = DeploymentMode.LocalAll;
+      mode = DeploymentMode.DockerServices;
     } else if (uri.host.startsWith("viewerserver")) {
       mode = DeploymentMode.Tutum;
     } else if (uri.host == "192.168.59.103") {
       mode = DeploymentMode.DockerAll;
-    } else {
-      mode = DeploymentMode.LocalAll;
     }
 
     switch (mode) {
@@ -226,10 +224,10 @@ class ConfigScript {
         RialtoBackend.log("Using deployment mode 'Tutum'");
         viewerServer = uri;
         var host = uri.host;
-        var geopackageServerHost = host.replaceAll("viewerserver.", "geopackageserver.");
+        var geopackageServerHost = host.replaceAll("viewerserver.", "gpkgserver.");
         var dataServerHost = host.replaceAll("viewerserver.", "dataserver.");
-        var wpsServerHost = host.replaceAll("viewerserver.", "wpsserver.");
-        var wpsProxyServerHost = host.replaceAll("viewerserver.", "wpsproxyserver.");
+        var wpsServerHost = host.replaceAll("viewerserver.", "geoserver.");
+        var wpsProxyServerHost = host.replaceAll("viewerserver.", "proxyserver.");
 
         geopackageServer = uri.replace(host: geopackageServerHost, port: GeoPackageServerPort, path: RootPath);
         dataServer = uri.replace(host: dataServerHost, port: DataServerPort, path: RootPath);
@@ -266,7 +264,7 @@ class ConfigScript {
         url: ${servers["geopackage"].toString()}/serp-small/mytablename
     - alberta_poly:
         type: geojson
-        url: ${servers["data"].toString()}/alberta.json
+        url: ${servers["data"].toString()}/inputs/alberta.json
 
 - wps:
     proxy: ${servers["wpsproxy"].toString()}

@@ -62,6 +62,9 @@ class LayerManager {
         layers.add(layer);
         _layerMap[layer.name] = layer;
 
+        if (options.containsKey('alpha') && layer is ImageryLayer) {
+          layer.alpha = options['alpha'];
+        }
         _backend.events.AddLayerCompleted.fire(layer);
 
         c.complete(layer);

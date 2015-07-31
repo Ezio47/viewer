@@ -24,3 +24,5 @@ part 'point_cloud_layer.dart';
 part 'rialto_backend.dart';
 part 'wps_process.dart';
 part 'wps_service.dart';
+part 'wps_job.dart';
+part 'wps_job_manager.dart';

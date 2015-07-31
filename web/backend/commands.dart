@@ -14,24 +14,6 @@ class Commands {
   /// Create the commands object
   Commands(RialtoBackend this._backend);
 
-  /// Allow user to draw a circle to be used for a viewshed analysis
-  void createViewshedCircle() {
-    _backend.cesium.drawCircle(
-        (longitude, latitude, height, radius) => _backend.viewshedCircles.add([longitude, latitude, height, radius]));
-  }
-
-  /// Run the viewshed analysis for each viewshed circle
-  void computeViewshed() {
-    for (var v in _backend.viewshedCircles) {
-      double obsLon = v[0];
-      double obsLat = v[1];
-      //double obsHeight = v[2];
-      var radius = v[3];
-
-      Viewshedder.callWps(_backend, obsLon, obsLat, radius);
-    }
-  }
-
   /// Allow user to draw a polyline and compute the linear length
   ///
   /// stub for future work
@@ -124,48 +106,48 @@ class Commands {
   ///
   /// Does a GetCapabilities request, a describe process for "helloworld", and executes "helloworld".
   void testWps() {
-    if (_backend.wps == null) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return;
     }
 
-    _backend.wps.testConnection().then((String status) {
+    _backend.wpsService.testConnection().then((String status) {
       window.alert(status);
     });
   }
 
   /// Asynchronously executes an arbitrary WPS process
   Future<WpsJob> wpsExecuteProcess(WpsProcess process, Map<String, dynamic> inputs,
-      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler failureHandler: null,
-      WpsJobErrorResultHandler timeoutHandler: null}) {
-    if (_backend.wps == null) {
+      {WpsJobResultHandler successHandler: null, WpsJobResultHandler errorHandler: null,
+      WpsJobResultHandler timeoutHandler: null}) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return new Future.value(null);
     }
-    return _backend.wps.executeProcess(process, inputs,
-        successHandler: successHandler, failureHandler: failureHandler, timeoutHandler: timeoutHandler);
+    return _backend.wpsJobManager.execute(process, inputs,
+        successHandler: successHandler, errorHandler: errorHandler, timeoutHandler: timeoutHandler);
   }
 
   /// Asynchronously requests description of a WPS function
   ///
   /// Returns the response document.
   Future<OgcDocument> wpsDescribeProcess(String processName) {
-    if (_backend.wps == null) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return new Future.value(null);
     }
-    return _backend.wps.describeProcess(processName);
+    return _backend.wpsService.describeProcess(processName);
   }
 
   /// Asynchronously requests an OGC capabilities document.
   ///
   /// Returns the response document.
   Future owsGetCapabilities() {
-    if (_backend.wps == null) {
+    if (_backend.wpsService == null) {
       RialtoBackend.error("No WPS server configured");
       return new Future.value(null);
     }
-    return _backend.wps.getCapabilities();
+    return _backend.wpsService.getCapabilities();
   }
 
   /// Zooms to the given point

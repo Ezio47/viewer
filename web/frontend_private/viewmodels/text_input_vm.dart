@@ -5,7 +5,8 @@
 part of rialto.frontend.private;
 
 abstract class _BaseTextInputVM<T> extends InputVM {
-  _BaseTextInputVM(RialtoFrontend frontend, String id, T defaultValue) : super(frontend, id, defaultValue.toString()) {}
+  _BaseTextInputVM(RialtoFrontend frontend, String id, T defaultValue)
+      : super(frontend, id, (defaultValue == null) ? "" : defaultValue.toString()) {}
 
   void _setElementValueFromString(String v);
 
@@ -42,10 +43,10 @@ abstract class _SingleTextInputVM<T> extends _BaseTextInputVM<T> {
   T _parse(String s);
 }
 
-abstract class _MultiTextInputVM<T> extends _BaseTextInputVM<List<T>> {
+abstract class _MultiTextInputVM extends _BaseTextInputVM<List<String>> {
   TextAreaElement _inputElement;
 
-  _MultiTextInputVM(RialtoFrontend frontend, String id, {List<T> defaultValue: null})
+  _MultiTextInputVM(RialtoFrontend frontend, String id, {List<String> defaultValue: null})
       : super(frontend, id, defaultValue) {
     _inputElement = _element;
     _inputElement.value = defaultValue.toString();
@@ -56,7 +57,7 @@ abstract class _MultiTextInputVM<T> extends _BaseTextInputVM<List<T>> {
     _inputElement.value = v;
   }
 
-  List<T> _parse(String s);
+  List<String> _parse(String s);
 }
 
 class IntInputVM extends _SingleTextInputVM<int> {
@@ -93,7 +94,7 @@ class StringInputVM extends _SingleTextInputVM<String> {
   String _parse(String s) => s;
 }
 
-class StringListInputVM extends _MultiTextInputVM<String> {
+class StringListInputVM extends _MultiTextInputVM {
   StringListInputVM(RialtoFrontend frontend, String id, {List<String> defaultValue: null})
       : super(frontend, id, defaultValue: defaultValue);
 
@@ -103,23 +104,17 @@ class StringListInputVM extends _MultiTextInputVM<String> {
 class PositionString {
   double x, y;
   PositionString([double this.x = 0.0, double this.y = 0.0]);
-  String toString() => "$x,$y";
+  String toString() => "$x $y";
 
   static PositionString fromString(String str) {
-    final begin = r"^";
-    final end = r"$";
-    final sp = r"\s*";
-    final number = r"([0-9]*[.]?[0-9]*)";
-    final comma = r",";
-
-    RegExp pattern = new RegExp(begin + sp + number + sp + comma + sp + number + sp + end);
-    var match = pattern.firstMatch(str);
-
-    if (match == null) return null;
-    if (match.groupCount != 2) return null;
-
-    var x = double.parse(match.group(1));
-    var y = double.parse(match.group(2));
+    var items = str.split(" ");
+    var x, y;
+    try {
+      x = double.parse(items[0]);
+      y = double.parse(items[1]);
+    } catch (e) {
+      return null;
+    }
     return new PositionString(x, y);
   }
 }
@@ -129,29 +124,19 @@ class BoxString {
 
   BoxString([double this.north = 0.0, double this.south = 0.0, double this.east = 0.0, double this.west = 0.0]);
 
-  String toString() => "$north,$south,$east,$west";
+  String toString() => "$north $south $east $west";
 
   static BoxString fromString(String str) {
-    final begin = r"^";
-    final end = r"$";
-    final sp = r"\s*";
-    final number = r"([0-9]*[.]?[0-9]*)";
-    final comma = r",";
-
-    final A = begin + sp;
-    final B = number + sp + comma + number + sp + comma + number + sp + comma + number;
-    final C = sp + end;
-
-    RegExp pattern = new RegExp(A + B + C);
-    var match = pattern.firstMatch(str);
-
-    if (match == null) return null;
-    if (match.groupCount != 4) return null;
-
-    var n = double.parse(match.group(1));
-    var s = double.parse(match.group(2));
-    var e = double.parse(match.group(3));
-    var w = double.parse(match.group(4));
+    var items = str.split(" ");
+    var n, s, e, w;
+    try {
+      n = double.parse(items[0]);
+      s = double.parse(items[1]);
+      e = double.parse(items[2]);
+      w = double.parse(items[3]);
+    } catch (e) {
+      return null;
+    }
     return new BoxString(n, s, e, w);
   }
 }
@@ -166,7 +151,7 @@ class PositionInputVM extends _SingleTextInputVM<PositionString> {
       _backend.cesium.drawMarker((x, y, z) {
         RialtoBackend.log("Position $x $y $z");
         _parentDialog.temporaryShow();
-        setValueFromString("$x,$y");
+        setValueFromString("$y $x");
       });
     };
 
@@ -188,7 +173,7 @@ class BoxInputVM extends _SingleTextInputVM<BoxString> {
       _backend.cesium.drawExtent((north, south, east, west) {
         RialtoBackend.log("Box $north $south $east $west");
         _parentDialog.temporaryShow();
-        setValueFromString("$north,$south,$east,$west");
+        setValueFromString("$north $south $east $west");
       });
     };
 

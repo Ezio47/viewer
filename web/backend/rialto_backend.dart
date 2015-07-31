@@ -18,14 +18,12 @@ class RialtoBackend {
   Commands commands;
   CesiumBridge cesium;
   JsBridge js;
-  WpsService wps;
+  WpsService wpsService;
   LayerManager layerManager;
   WpsJobManager wpsJobManager;
   ConfigScript configScript;
 
   int displayPrecision = 5;
-
-  List viewshedCircles = new List();
 
   /// Creates the instance of the viewer backend
   RialtoBackend() {

@@ -4,20 +4,21 @@
 
 part of rialto.backend;
 
-enum WpsProcessParamDataType { double, string, integer, position, box }
+enum WpsProcessParamDataType { double, geobox2d, geopos2d, integer, string }
 
 class WpsProcessParam {
   String name;
   WpsProcessParamDataType datatype;
+  String description;
 
-  WpsProcessParam(String this.name, WpsProcessParamDataType this.datatype);
+  WpsProcessParam(String this.name, WpsProcessParamDataType this.datatype, String this.description);
 
   static final _datatypeNames = {
     WpsProcessParamDataType.double: "double",
-    WpsProcessParamDataType.string: "string",
+    WpsProcessParamDataType.geobox2d: "geo_box_2d",
+    WpsProcessParamDataType.geopos2d: "geo_pos_2d",
     WpsProcessParamDataType.integer: "integer",
-    WpsProcessParamDataType.position: "position",
-    WpsProcessParamDataType.box: "box",
+    WpsProcessParamDataType.string: "string"
   };
 
   static String datatypeString(WpsProcessParamDataType datatype) {

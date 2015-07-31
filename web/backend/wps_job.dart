@@ -2,46 +2,7 @@
 // This file may only be used under the MIT-style
 // license found in the accompanying LICENSE.txt file.
 
-part of rialto.backend.private;
-
-typedef dynamic WpsJobSuccessResultHandler(WpsJob job, Map<String, dynamic> results);
-typedef dynamic WpsJobErrorResultHandler(WpsJob job);
-
-/// Manager of WPS operations
-///
-/// The (singleton) Rialto class has exactly one instance of this class. This manager
-/// is repsonsible for keeping track of all WPS jobs, both completed and in progress.
-class WpsJobManager {
-  static final Duration pollingDelay = new Duration(seconds: 2);
-  static final Duration pollingTimeout = new Duration(minutes: 5);
-
-  RialtoBackend _backend;
-  Map<int, WpsJob> map = new Map<int, WpsJob>();
-  int _jobId = 0;
-
-  WpsJobManager(RialtoBackend this._backend);
-
-  /// Start a WPS job
-  ///
-  /// The job will be tracked by this manager class.
-  ///
-  /// Use this function instead of calling the WpsJob ctor directly.
-  WpsJob createJob(WpsService service, WpsProcess process, {WpsJobSuccessResultHandler successHandler: null,
-      WpsJobErrorResultHandler errorHandler: null, WpsJobErrorResultHandler timeoutHandler: null}) {
-    var obj = new WpsJob(_backend, process, newJobId,
-        successHandler: successHandler, errorHandler: errorHandler, timeoutHandler: timeoutHandler);
-    add(obj);
-    return obj;
-  }
-
-  void add(WpsJob status) {
-    map[status.id] = status;
-  }
-
-  int get newJobId => _jobId++;
-
-  int get numActive => map.values.where((j) => j._isActive).length;
-}
+part of rialto.backend;
 
 /// Everything about a WPS job
 ///
@@ -60,32 +21,38 @@ class WpsJob {
   final DateTime _startTime;
   DateTime jobCreationTime; // from the server
   DateTime _timeoutTime;
-  int _pollCount = 0;
 
-  WpsJobSuccessResultHandler _successHandler;
-  WpsJobErrorResultHandler _errorHandler;
-  WpsJobErrorResultHandler _timeoutHandler;
+  Map<String, dynamic> inputs = new Map<String, dynamic>();
+  Map<String, dynamic> outputs = new Map<String, dynamic>();
+
+  WpsJobResultHandler _successHandler;
+  WpsJobResultHandler _errorHandler;
+  WpsJobResultHandler _timeoutHandler;
 
   /// WpsJob constructor
   ///
   /// Users should not call this directly -- call [WpsJobManager.createJob] instead.
-  WpsJob(RialtoBackend this._backend, WpsProcess this.process, int this.id,
-      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler errorHandler: null,
-      WpsJobErrorResultHandler timeoutHandler: null})
+  WpsJob(WpsProcess this.process, int this.id, Map<String, dynamic> inputsx, {WpsJobResultHandler successHandler: null,
+      WpsJobResultHandler errorHandler: null, WpsJobResultHandler timeoutHandler: null})
       : jobStatus = OgcStatusCodes.notYetSubmitted,
         _startTime = new DateTime.now(),
         _successHandler = successHandler,
         _errorHandler = errorHandler,
         _timeoutHandler = timeoutHandler {
+    _backend = process.service.backend;
+
+    inputs.addAll(inputsx);
+
     _timeoutTime = _startTime.add(WpsJobManager.pollingTimeout);
     _signalJobChange();
 
     if (_successHandler == null) {
-      _successHandler = (WpsJob job, Map<String, dynamic> results) {
+      _successHandler = (WpsJob job) {
         RialtoBackend.log("WPS job ${job.process.name} succeeded");
-        for (var result in results.keys) {
-          if (result.startsWith("_")) continue;
-          RialtoBackend.log("  $result: ${results[result]}");
+        for (var key in job.outputs.keys) {
+          if (key.startsWith("_")) continue;
+          var value = job.outputs[key];
+          RialtoBackend.log("  $key: $value");
         }
       };
     }
@@ -129,13 +96,22 @@ class WpsJob {
       }
     } else {
       assert(_hasSucceeded);
-      if (_successHandler != null) {
-        var outs = new Map<String, dynamic>();
-        for (var param in process.outputs) {
-          var value = responseDocument.getProcessOutput(param.name);
-          outs[param.name] = value;
+
+      for (var param in process.outputs) {
+        var value = responseDocument.getProcessOutput(param.name);
+        outputs[param.name] = value;
+      }
+
+      // the WPS process succeeded, but did the underlying script actually succeed?
+      if (responseDocument.getProcessOutput("_status") != "0") {
+        // TODO: _hasScceeded is equal to true, even though we've actually failed
+        if (_errorHandler != null) {
+          _errorHandler(this);
         }
-        _successHandler(this, outs);
+      } else {
+        if (_successHandler != null) {
+          _successHandler(this);
+        }
       }
     }
 
@@ -144,7 +120,7 @@ class WpsJob {
 
   void _poll() {
     var secs = new DateTime.now().difference(_startTime).inSeconds;
-    RialtoBackend.log("poll #$_pollCount, $secs seconds elapsed");
+    RialtoBackend.log("WPS: ${this.process.name}, $secs seconds elapsed");
 
     var now = new DateTime.now();
     if (now.isAfter(_timeoutTime)) {
@@ -159,12 +135,10 @@ class WpsJob {
 
     Utils.httpGet(statusLocation, proxyUri: proxyUri).then((Http.Response response) {
       var ogcDoc = OgcDocument.parseString(response.body);
-      //log(ogcDoc.dump(0));
 
       if (ogcDoc.isException) {
         jobStatus = OgcStatusCodes.systemFailure;
         exceptionTexts = ogcDoc.exceptionTexts;
-
         stopPolling();
         return;
       }
@@ -172,7 +146,6 @@ class WpsJob {
       if (ogcDoc is! OgcExecuteResponseDocument_54) {
         jobStatus = OgcStatusCodes.systemFailure;
         exceptionTexts = ["polled response neither exception report not response document"];
-
         stopPolling();
         return;
       }
@@ -182,13 +155,10 @@ class WpsJob {
       responseDocument = resp;
 
       if (OgcStatus_55.isComplete(jobStatus)) {
-        //Hub.log("done!");
-
         stopPolling();
         return;
       }
 
-      ++_pollCount;
       new Timer(WpsJobManager.pollingDelay, _poll);
     });
   }

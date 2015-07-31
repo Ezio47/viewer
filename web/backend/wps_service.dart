@@ -49,8 +49,11 @@ class WpsService extends OgcService {
     return c.future;
   }
 
-  Future<OgcDocument> _executeProcessWork(WpsProcess process, Map<String, dynamic> inputs) {
-    var c = new Completer<OgcDocument>();
+  Future<bool> execute(WpsJob job) {
+    var c = new Completer<bool>();
+
+    var process = job.process;
+    var inputs = job.inputs;
 
     String identifierKV = "Identifier=${process.name}";
 
@@ -78,65 +81,33 @@ class WpsService extends OgcService {
     _sendKvpServerRequest("Execute", parms).then((OgcDocument ogcDoc) {
       if (ogcDoc == null) {
         RialtoBackend.error("Error parsing WPS process execution response document");
-        c.complete(null);
+        job.jobStatus = OgcStatusCodes.systemFailure;
+        c.complete(false);
         return;
       }
 
       if (ogcDoc is OgcExceptionReportDocument) {
-        c.complete(ogcDoc);
+        job.jobStatus = OgcStatusCodes.failed;
+        job.exceptionTexts = ogcDoc.exceptionTexts;
+        c.complete(false);
         return;
       }
 
       if (ogcDoc is! OgcExecuteResponseDocument_54) {
         RialtoBackend.error("Error parsing WPS process execution response document");
-        c.complete(ogcDoc);
-        return;
-      }
-
-      c.complete(ogcDoc);
-    });
-
-    return c.future;
-  }
-
-  /// Execute a WPS process
-  ///
-  /// Returns the job ID, and will have already created a status object for that ID (even in
-  /// the case of any failures)
-  Future<WpsJob> executeProcess(WpsProcess process, Map<String, dynamic> inputs,
-      {WpsJobSuccessResultHandler successHandler: null, WpsJobErrorResultHandler failureHandler: null,
-      WpsJobErrorResultHandler timeoutHandler: null}) {
-    var c = new Completer<WpsJob>();
-
-    var request = _backend.wpsJobManager.createJob(this, process,
-        successHandler: successHandler, errorHandler: failureHandler, timeoutHandler: timeoutHandler);
-
-    _executeProcessWork(process, inputs).then((ogcDoc) {
-      if (ogcDoc == null) {
-        request.jobStatus = OgcStatusCodes.systemFailure;
-        request.stopPolling();
-        c.complete(request);
-        return;
-      }
-
-      if (ogcDoc is OgcExceptionReportDocument) {
-        request.jobStatus = OgcStatusCodes.failed;
-        request.exceptionTexts = ogcDoc.exceptionTexts;
-        request.stopPolling();
-        c.complete(request);
+        job.jobStatus = OgcStatusCodes.failed;
+        c.complete(false);
         return;
       }
 
       var resp = ogcDoc as OgcExecuteResponseDocument_54;
 
-      request.statusLocation = Uri.parse(resp.statusLocation);
-      request.proxyUri = proxyUri;
-      request.jobCreationTime = DateTime.parse(resp.status.creationTime);
-      request.jobStatus = resp.status.code;
+      job.statusLocation = Uri.parse(resp.statusLocation);
+      job.proxyUri = proxyUri;
+      job.jobCreationTime = DateTime.parse(resp.status.creationTime);
+      job.jobStatus = resp.status.code;
 
-      request.startPolling();
-
-      c.complete(request);
+      c.complete(true);
     });
 
     return c.future;
@@ -149,20 +120,23 @@ class WpsService extends OgcService {
     return _getProcessDescriptionWork(processName);
   }
 
-  static String _descriptionField(String rawDescription, String field) {
-    if (rawDescription == null) return null;
-    var lines = rawDescription.split('\n');
-    var tok = "# " + field + ": ";
-    for (var line in lines) {
-      if (line.startsWith(tok)) {
-        return line.substring(tok.length);
+  static String _extractFieldFromDescription(String description, String field) {
+    if (description == null) return null;
+    var lines = description.split('#');
+    lines = lines.map((s) => s.trim()).toList();
+    for (String line in lines) {
+      int idx = line.indexOf(field + ':');
+      if (idx != -1) {
+        var value = line.substring((field + ':').length);
+        value = value.trim();
+        return value;
       }
     }
     return null;
   }
 
   static WpsProcessParamDataType inferDatatype(String abstract, String datatype_notused) {
-    var dt = _descriptionField(abstract, "datatype");
+    var dt = _extractFieldFromDescription(abstract, "datatype");
     assert(dt != null);
 
     if (dt.startsWith("enum:")) {
@@ -170,16 +144,16 @@ class WpsService extends OgcService {
     }
 
     switch (dt) {
-      case "string":
-        return WpsProcessParamDataType.string;
-      case "int":
-        return WpsProcessParamDataType.integer;
       case "double":
         return WpsProcessParamDataType.double;
-      case "geo_pos_2d":
-        return WpsProcessParamDataType.position;
       case "geo_box_2d":
-        return WpsProcessParamDataType.box;
+        return WpsProcessParamDataType.geobox2d;
+      case "geo_pos_2d":
+        return WpsProcessParamDataType.geopos2d;
+      case "int":
+        return WpsProcessParamDataType.integer;
+      case "string":
+        return WpsProcessParamDataType.string;
       default:
         RialtoBackend.error("unknown passed datatype: $dt");
         assert(false);
@@ -211,7 +185,7 @@ class WpsService extends OgcService {
         var name = xmlInput.identifier;
         //print("IN {$name} ${datatype}");
 
-        WpsProcessParam param = new WpsProcessParam(name, datatype);
+        WpsProcessParam param = new WpsProcessParam(name, datatype, xmlInput.abstract);
         process.inputs.add(param);
       }
 
@@ -222,7 +196,7 @@ class WpsService extends OgcService {
         ////////var datatype = inferDatatype(xmlOutput.abstract, xmlOutput.literalOutput.datatype);
         var datatype = WpsProcessParamDataType.string;
 
-        WpsProcessParam param = new WpsProcessParam(name, datatype);
+        WpsProcessParam param = new WpsProcessParam(name, datatype, xmlOutput.abstract);
         process.outputs.add(param);
       }
 
@@ -237,6 +211,7 @@ class WpsService extends OgcService {
       RialtoBackend.error("GetCapabilities check: FAILED");
     }
 
-    return new Future.value(null);
+    var numProcesses = (capabilities as OgcCapabilitiesDocument_7).processOfferings.processes.length;
+    return new Future.value("server providing $numProcesses processes");
   }
 }

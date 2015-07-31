@@ -153,7 +153,13 @@ var CesiumBridge = function (element) {
             billboard.setEditable();
 
             if (cb) {
-                cb(position.x, position.y, position.z);
+                var pt = new Cesium.Cartesian3(position.x, position.y, position.z);
+                var ellipsoid = scene.globe.ellipsoid;
+                var carto = ellipsoid.cartesianToCartographic(pt);
+                var lon = Cesium.Math.toDegrees(carto.longitude);
+                var lat = Cesium.Math.toDegrees(carto.latitude);
+                var h = carto.height;
+                cb(lon, lat, position.z);
             }
         };
 
@@ -174,7 +180,16 @@ var CesiumBridge = function (element) {
             extentPrimitive.setEditable();
 
             if (cb) {
-                cb(extent.north, extent.south, extent.east, extent.west);
+                var ne = new Cesium.Cartesian2(extent.north, extent.east);
+                var sw = new Cesium.Cartesian2(extent.south, extent.west);
+                var ellipsoid = scene.globe.ellipsoid;
+                var carto_ne = ellipsoid.cartesianToCartographic(ne);
+                var carto_sw = ellipsoid.cartesianToCartographic(sw);
+                var lon_n = Cesium.Math.toDegrees(carto_ne.longitude);
+                var lat_e = Cesium.Math.toDegrees(carto_ne.latitude);
+                var lon_s = Cesium.Math.toDegrees(carto_sw.longitude);
+                var lat_w = Cesium.Math.toDegrees(carto_sw.latitude);
+                cb(lon_n, lon_s, lat_e, lat_w);
             }
         };
 
@@ -289,14 +304,14 @@ var CesiumBridge = function (element) {
     }
 
 
-    this.addTileMapServiceImageryLayer = function(url, rect, maximumLevel, gdal2Tiles, proxy) {
+    this.addTileMapServiceImageryLayer = function(url, rect, maximumLevel, gdal2tiles, proxy) {
 
         var options = {
             url: url,
             rectangle: rect == null ? undefined : rect,
             maximumLevel: maximumLevel,
             proxy: proxy == null ? undefined : proxy,
-            gdal2Tiles: gdal2Tiles
+            gdal2tiles: gdal2tiles
         };
         var provider = new Cesium.TileMapServiceImageryProvider(options);
         return this.viewer.imageryLayers.addImageryProvider(provider);

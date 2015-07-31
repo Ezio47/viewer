@@ -19,6 +19,7 @@ part 'ui_components/load_url_dialog.dart';
 part 'ui_components/layer_info_dialog.dart';
 part 'ui_components/layer_customization_dialog.dart';
 part 'ui_components/wps_dialog.dart';
+part 'ui_components/wps_result_dialog.dart';
 
 part 'viewmodels/button_vm.dart';
 part 'viewmodels/check_box_vm.dart';

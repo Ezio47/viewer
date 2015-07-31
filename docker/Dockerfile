@@ -1,4 +1,4 @@
-# rialto-viewer
+# radiantbluetechnolgoies/rialto-viewer
 
 FROM radiantbluetechnologies/rialto-cesium
 MAINTAINER mpg@flaxen.com
