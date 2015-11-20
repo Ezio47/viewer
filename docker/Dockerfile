@@ -1,12 +1,10 @@
-# radiantbluetechnolgoies/rialto-viewer
+# rialto/viewer
 
-FROM radiantbluetechnologies/rialto-cesium
+FROM rialto/cesium
 MAINTAINER mpg@flaxen.com
 
-RUN git clone https://github.com/radiantbluetechnologies/rialto-viewer.git /tmp/rialto-viewer
- 
-#COPY ./build.sh /tmp/rialto-viewer/build.sh
-RUN /tmp/rialto-viewer/docker/build.sh
+RUN git clone https://github.com/rialto/viewer.git /tmp/viewer \
+  && sh /tmp/viewer/docker/build.sh \
+  && rm -fr /tmp/*
 
 CMD /bin/bash
-
